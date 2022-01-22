@@ -1,0 +1,61 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Make initial directories
+        shell: cmd
+        run: |
+          make website
+          make website\static
+
+      - name: Clone Odin repo
+        shell: cmd
+        run: |
+          git clone https://github.com/odin-lang/Odin.git
+          cd Odin
+
+      - name: build Odin
+        shell: cmd
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
+          ./build.bat 1 1
+
+      - name: Odin run
+        shell: cmd
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
+          odin run examples/demo/demo.odin
+
+      - name: Generation doc format for examples/all
+        shell: cmd
+        run: |
+          odin doc examples/all -all-packages -doc-format
+
+      - name: Move doc format
+        shell: cmd
+
+      - name: Generate Tool
+        shell: cmd
+        run: |
+          pushd tools\odin-html-docs
+          ..\..\odin build .
+          popd
+
+      - name: Generate Website
+        shell: cmd
+        run: |
+          cd ..
+          copy Odin\tools\odin-html-docs\odin-html-docs.exe website\odin-html-docs.exe
+          copy Odin\tools\odin-html-docs\style.css          website\static\style.css
+          copy Odin\all.odin-doc                            website\all.odin-doc
+          pushd website\static
+            ..\odin-html-docs.exe ..\all.odin-doc
+          popd
