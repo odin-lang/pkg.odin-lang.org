@@ -19,27 +19,29 @@ jobs:
         shell: cmd
         run: |
           git clone https://github.com/odin-lang/Odin.git
-          cd Odin
       - name: build Odin
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
+          cd Odin
           call .\build.bat 1 1
       - name: Odin run
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
+          cd Odin
           odin run examples/demo/demo.odin
       - name: Generation doc format for examples/all
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
+          cd Odin
           odin doc examples/all -all-packages -doc-format
       - name: Generate Tool
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
-          pushd tools\odin-html-docs
+          pushd Odin\tools\odin-html-docs
           ..\..\odin build .
           popd
       - name: Generate Website
