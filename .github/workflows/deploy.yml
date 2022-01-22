@@ -24,7 +24,7 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
-          ./build.bat 1 1
+          call build.bat 1 1
       - name: Odin run
         shell: cmd
         run: |
@@ -33,10 +33,12 @@ jobs:
       - name: Generation doc format for examples/all
         shell: cmd
         run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
           odin doc examples/all -all-packages -doc-format
       - name: Generate Tool
         shell: cmd
         run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
           pushd tools\odin-html-docs
           ..\..\odin build .
           popd
@@ -50,3 +52,10 @@ jobs:
           pushd website\static
           ..\odin-html-docs.exe ..\all.odin-doc
           popd
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./website/static
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
