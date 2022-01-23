@@ -672,7 +672,8 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		if is_type_untyped(type) {
 			io.write_string(w, str(type.name))
 		} else {
-			fmt.wprintf(w, `<a href="">%s</a>`, str(type.name))
+			// fmt.wprintf(w, `<a href="">%s</a>`, str(type.name))
+			io.write_string(w, str(type.name))
 		}
 	case .Named:
 		e := entities[type_entities[0]]
