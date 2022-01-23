@@ -189,18 +189,18 @@ main :: proc() {
 	types    = array(header.types)
 
 	core_collection := &Collection{
-		"Core",
-		&core_pkgs_to_use,
-		GITHUB_CORE_URL,
-		BASE_CORE_URL,
-		nil,
+		name        = "Core",
+		pkgs_to_use = &core_pkgs_to_use,
+		github_url  = GITHUB_CORE_URL,
+		base_url    = BASE_CORE_URL,
+		root        = nil,
 	}
 	vendor_collection := &Collection{
-		"Vendor",
-		&vendor_pkgs_to_use,
-		GITHUB_VENDOR_URL,
-		BASE_VENDOR_URL,
-		nil,
+		name =        "Vendor",
+		pkgs_to_use = &vendor_pkgs_to_use,
+		github_url =  GITHUB_VENDOR_URL,
+		base_url =    BASE_VENDOR_URL,
+		root =        nil,
 	}
 
 	{
@@ -679,7 +679,10 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		e := entities[type_entities[0]]
 		name := str(type.name)
 		tn_pkg := files[e.pos.file].pkg
-		collection: Collection // TODO determine this from package
+		collection: Collection
+		if c := pkg_to_collection[&pkgs[tn_pkg]]; c != nil {
+			collection = c^
+		}
 
 		if tn_pkg != pkg {
 			fmt.wprintf(w, `%s.`, str(pkgs[tn_pkg].name))
