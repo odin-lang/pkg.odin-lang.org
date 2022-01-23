@@ -41,15 +41,13 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
-          pushd Odin\tools\odin-html-docs
-          ..\..\odin build .
-          popd
+          Odin\odin build . -out:odin-html-docs.exe
       - name: Generate Website
         shell: cmd
         run: |
-          copy Odin\tools\odin-html-docs\odin-html-docs.exe website\odin-html-docs.exe
-          copy Odin\tools\odin-html-docs\style.css          website\static\style.css
-          copy Odin\all.odin-doc                            website\all.odin-doc
+          copy odin-html-docs.exe website\odin-html-docs.exe
+          copy style.css          website\static\style.css
+          copy Odin\all.odin-doc  website\all.odin-doc
           pushd website\static
           ..\odin-html-docs.exe ..\all.odin-doc
           popd
