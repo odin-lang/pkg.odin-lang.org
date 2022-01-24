@@ -121,54 +121,6 @@ write_html_footer :: proc(w: io.Writer, include_directory_js: bool) {
 	fmt.wprintf(w, "\n")
 
 	io.write(w, #load("footer.txt.html"))
-
-	if false && include_directory_js {
-		io.write_string(w, `
-<script type="text/javascript">
-(function (win, doc) {
-	'use strict';
-	if (!doc.querySelectorAll || !win.addEventListener) {
-		// doesn't cut the mustard.
-		return;
-	}
-	let toggles = doc.querySelectorAll('[aria-controls]');
-	for (let i = 0; i < toggles.length; i = i + 1) {
-		let toggleID = toggles[i].getAttribute('aria-controls');
-		if (doc.getElementById(toggleID)) {
-			let togglecontent = doc.getElementById(toggleID);
-			togglecontent.setAttribute('aria-hidden', 'true');
-			togglecontent.setAttribute('tabindex', '-1');
-			toggles[i].setAttribute('aria-expanded', 'false');
-		}
-	}
-	function toggle(ev) {
-		ev = ev || win.event;
-		var target = ev.target || ev.srcElement;
-		if (target.hasAttribute('data-aria-owns')) {
-			let toggleIDs = target.getAttribute('data-aria-owns').match(/[^ ]+/g);
-			toggleIDs.forEach(toggleID => {
-				if (doc.getElementById(toggleID)) {
-					ev.preventDefault();
-					let togglecontent = doc.getElementById(toggleID);
-					if (togglecontent.getAttribute('aria-hidden') == 'true') {
-						togglecontent.setAttribute('aria-hidden', 'false');
-						target.setAttribute('aria-expanded', 'true');
-						if (target.tagName == 'A') {
-							togglecontent.focus();
-						}
-					} else {
-						togglecontent.setAttribute('aria-hidden', 'true');
-						target.setAttribute('aria-expanded', 'false');
-					}
-				}
-			})
-		}
-	}
-	doc.addEventListener('click', toggle, false);
-}(this, this.document));
-</script>`)
-	}
-
 	fmt.wprintf(w, "</body>\n</html>\n")
 }
 
