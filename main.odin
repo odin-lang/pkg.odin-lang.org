@@ -102,9 +102,19 @@ recursive_make_directory :: proc(path: string, prefix := "") {
 }
 
 
-write_html_header :: proc(w: io.Writer, title: string) {
+Header_Kind :: enum {
+	Normal,
+	Full_Width,
+}
+write_html_header :: proc(w: io.Writer, title: string, kind := Header_Kind.Normal) {
 	fmt.wprintf(w, string(#load("header.txt.html")), title)
 	io.write(w, #load("header-lower.txt.html"))
+	switch kind {
+	case .Normal:
+		io.write_string(w, `<div class="container">`+"\n")
+	case .Full_Width:
+		io.write_string(w, `<div class="container full-width">`+"\n")
+	}
 }
 
 write_html_footer :: proc(w: io.Writer, include_directory_js: bool) {
@@ -280,7 +290,7 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection, dir: str
 
 	for path, pkg in collection.pkgs_to_use {
 		strings.reset_builder(b)
-		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path))
+		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width)
 		write_pkg(w, path, pkg, collection)
 		write_html_footer(w, false)
 		recursive_make_directory(path, dir)
@@ -521,6 +531,7 @@ Write_Type_Flag :: enum {
 	Variadic,
 	Allow_Indent,
 	Poly_Names,
+	Ignore_Name,
 }
 Write_Type_Flags :: distinct bit_set[Write_Type_Flag]
 Type_Writer :: struct {
@@ -600,11 +611,12 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 						return
 					}
 				}
-
-				if name != "" {
-					io.write_string(w, name)
-					io.write_string(w, ": ")
-					write_padding(w, name, name_width)
+				if .Ignore_Name not_in flags {
+					if name != "" {
+						io.write_string(w, name)
+						io.write_string(w, ": ")
+						write_padding(w, name, name_width)
+					}
 				}
 				write_type(writer, the_type, type_flags)
 			case .Type_Name:
@@ -672,8 +684,8 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		if is_type_untyped(type) {
 			io.write_string(w, str(type.name))
 		} else {
-			// fmt.wprintf(w, `<a href="">%s</a>`, str(type.name))
-			io.write_string(w, str(type.name))
+			fmt.wprintf(w, `<span class="doc-builtin">%s</span>`, str(type.name))
+			// io.write_string(w, str(type.name))
 		}
 	case .Named:
 		e := entities[type_entities[0]]
@@ -727,21 +739,21 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		}
 		write_type(writer, types[type_types[0]], flags - {.Variadic})
 	case .Dynamic_Array:
-		io.write_string(w, "[dynamic]")
+		io.write_string(w, "[<span class=\"keyword\">dynamic</span>]")
 		write_type(writer, types[type_types[0]], flags)
 	case .Map:
-		io.write_string(w, "map[")
+		io.write_string(w, "<span class=\"keyword-type\">map</span>[")
 		write_type(writer, types[type_types[0]], flags)
 		io.write_byte(w, ']')
 		write_type(writer, types[type_types[1]], flags)
 	case .Struct:
 		type_flags := transmute(doc.Type_Flags_Struct)type.flags
-		io.write_string(w, "struct")
+		io.write_string(w, "<span class=\"keyword-type\">struct</span>")
 		write_poly_params(writer, type, flags)
-		if .Packed in type_flags { io.write_string(w, " #packed") }
-		if .Raw_Union in type_flags { io.write_string(w, " #raw_union") }
+		if .Packed in type_flags { io.write_string(w, " <span class=\"directive\">#packed</span>") }
+		if .Raw_Union in type_flags { io.write_string(w, " <span class=\"directive\">#raw_union</span>") }
 		if custom_align := str(type.custom_align); custom_align != "" {
-			io.write_string(w, " #align")
+			io.write_string(w, " <span class=\"directive\">#align</span>")
 			io.write_string(w, custom_align)
 		}
 		io.write_string(w, " {")
@@ -759,6 +771,26 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 				if i+1 < len(type_entities) {
 					next_entity = &entities[type_entities[i+1]]
 				}
+				docs, comment := str(e.docs), str(e.comment)
+
+				if docs != "" {
+					lines := strings.split_lines(docs)
+					defer delete(lines)
+					for i := len(lines)-1; i >= 0; i -= 1 {
+						if strings.trim_space(lines[i]) == "" {
+							lines = lines[:i]
+						} else {
+							break
+						}
+					}
+					for line in lines {
+						do_indent(writer, flags)
+						io.write_string(w, "<span class=\"comment\">// ")
+						io.write_string(w, line)
+						io.write_string(w, "</span>\n")
+					}
+				}
+
 				do_indent(writer, flags)
 				write_param_entity(writer, e, next_entity, flags, name_width)
 
@@ -776,12 +808,12 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		io.write_string(w, "}")
 	case .Union:
 		type_flags := transmute(doc.Type_Flags_Union)type.flags
-		io.write_string(w, "union")
+		io.write_string(w, "<span class=\"keyword-type\">union</span>")
 		write_poly_params(writer, type, flags)
-		if .No_Nil in type_flags { io.write_string(w, " #no_nil") }
-		if .Maybe in type_flags { io.write_string(w, " #maybe") }
+		if .No_Nil in type_flags { io.write_string(w, " <span class=\"directive\">#no_nil</span>") }
+		if .Maybe in type_flags { io.write_string(w, " <span class=\"directive\">#maybe</span>") }
 		if custom_align := str(type.custom_align); custom_align != "" {
-			io.write_string(w, " #align")
+			io.write_string(w, " <span class=\"directive\">#align</span>")
 			io.write_string(w, custom_align)
 		}
 		io.write_string(w, " {")
@@ -799,7 +831,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		}
 		io.write_string(w, "}")
 	case .Enum:
-		io.write_string(w, "enum")
+		io.write_string(w, "<span class=\"keyword-type\">enum</span>")
 		if len(type_types) != 0 {
 			io.write_byte(w, ' ')
 			write_type(writer, types[type_types[0]], flags)
@@ -836,6 +868,19 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		}
 		require_parens := (.Is_Results in flags) && (len(type_entities) > 1 || !is_entity_blank(type_entities[0]))
 		if require_parens { io.write_byte(w, '(') }
+		all_blank := true
+		for entity_index, i in type_entities {
+			e := &entities[entity_index]
+			if name := str(e.name); name == "" || name == "_" {
+				if str(e.init_string) != "" {
+					all_blank = false
+					break
+				}
+			} else {
+				all_blank = false
+				break
+			}
+		}
 		for entity_index, i in type_entities {
 			if i > 0 {
 				io.write_string(w, ", ")
@@ -851,7 +896,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 
 	case .Proc:
 		type_flags := transmute(doc.Type_Flags_Proc)type.flags
-		io.write_string(w, "proc")
+		io.write_string(w, "<span class=\"keyword-type\">proc</span>")
 		cc := str(type.calling_convention)
 		if cc != "" {
 			io.write_byte(w, ' ')
@@ -872,12 +917,12 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			io.write_string(w, " -> !")
 		}
 		if .Optional_Ok in type_flags {
-			io.write_string(w, " #optional_ok")
+			io.write_string(w, " <span class=\"directive\">#optional_ok</span>")
 		}
 
 	case .Bit_Set:
 		type_flags := transmute(doc.Type_Flags_Bit_Set)type.flags
-		io.write_string(w, "bit_set[")
+		io.write_string(w, "<span class=\"keyword-type\">bit_set</span>[")
 		if .Op_Lt in type_flags {
 			io.write_uint(w, uint(type.elem_counts[0]))
 			io.write_string(w, "..<")
@@ -895,24 +940,24 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		}
 		io.write_string(w, "]")
 	case .Simd_Vector:
-		io.write_string(w, "#simd[")
+		io.write_string(w, "<span class=\"directive\">#simd</span>[")
 		io.write_uint(w, uint(type.elem_counts[0]))
 		io.write_byte(w, ']')
 	case .SOA_Struct_Fixed:
-		io.write_string(w, "#soa[")
+		io.write_string(w, "<span class=\"directive\">#soa</span>[")
 		io.write_uint(w, uint(type.elem_counts[0]))
 		io.write_byte(w, ']')
 	case .SOA_Struct_Slice:
-		io.write_string(w, "#soa[]")
+		io.write_string(w, "<span class=\"directive\">#soa</span>[]")
 	case .SOA_Struct_Dynamic:
-		io.write_string(w, "#soa[dynamic]")
+		io.write_string(w, "<span class=\"directive\">#soa</span>[<span class=\"keyword\">dynamic</span>]")
 	case .Relative_Pointer:
-		io.write_string(w, "#relative(")
+		io.write_string(w, "<span class=\"directive\">#relative</span>(")
 		write_type(writer, types[type_types[1]], flags)
 		io.write_string(w, ") ")
 		write_type(writer, types[type_types[0]], flags)
 	case .Relative_Slice:
-		io.write_string(w, "#relative(")
+		io.write_string(w, "<span class=\"directive\">#relative</span>(")
 		write_type(writer, types[type_types[1]], flags)
 		io.write_string(w, ") ")
 		write_type(writer, types[type_types[0]], flags)
@@ -920,7 +965,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		io.write_string(w, "[^]")
 		write_type(writer, types[type_types[0]], flags)
 	case .Matrix:
-		io.write_string(w, "matrix[")
+		io.write_string(w, "<span class=\"keyword-type\">matrix</span>[")
 		io.write_uint(w, uint(type.elem_counts[0]))
 		io.write_string(w, ", ")
 		io.write_uint(w, uint(type.elem_counts[1]))
@@ -952,7 +997,7 @@ write_doc_sidebar :: proc(w: io.Writer) {
 
 }
 
-write_docs :: proc(w: io.Writer, pkg: ^doc.Pkg, docs: string) {
+write_docs :: proc(w: io.Writer, docs: string) {
 	if docs == "" {
 		return
 	}
@@ -1086,9 +1131,9 @@ write_docs :: proc(w: io.Writer, pkg: ^doc.Pkg, docs: string) {
 
 write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collection) {
 
-	fmt.wprintln(w, `<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light">`)
+	fmt.wprintln(w, `<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">`)
 	defer fmt.wprintln(w, `</nav>`)
-	fmt.wprintln(w, `<div class="sticky-top odin-below-navbar py-3">`)
+	fmt.wprintln(w, `<div class="py-3">`)
 	defer fmt.wprintln(w, `</div>`)
 
 	fmt.wprintf(w, "<h4>%s Library</h4>\n", collection.name)
@@ -1125,55 +1170,26 @@ write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collect
 }
 
 write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collection) {
-	fmt.wprintln(w, `<div class="row odin-main">`)
+	fmt.wprintln(w, `<div class="row odin-main" id="pkg">`)
 	defer fmt.wprintln(w, `</div>`)
 
 	write_pkg_sidebar(w, pkg, collection)
 
 	fmt.wprintln(w, `<article class="col-lg-8 p-4 documentation odin-article">`)
 
-	if false { // breadcrumbs
-		fmt.wprintln(w, `<div class="row">`)
-		defer fmt.wprintln(w, `</div>`)
+	fmt.wprintf(w, "<h1>package core:%s", path)
 
-		fmt.wprintln(w, `<nav aria-label="breadcrumb">`)
-		defer fmt.wprintln(w, `</nav>`)
-		io.write_string(w, "<ol class=\"breadcrumb\">\n")
-		defer io.write_string(w, "</ol>\n")
+	pkg_src_url := fmt.tprintf("%s/%s", collection.github_url, path)
+	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", pkg_src_url)
+	fmt.wprintf(w, "</h1>\n")
 
-		fmt.wprintf(w, `<li class="breadcrumb-item"><a class="breadcrumb-link" href="%s">core</a></li>`, collection.base_url)
-
-		dirs := strings.split(path, "/")
-		for dir, i in dirs {
-			url := strings.join(dirs[:i+1], "/")
-			short_path := strings.join(dirs[1:i+1], "/")
-
-			a_class := "breadcrumb-link"
-			is_curr := i+1 == len(dirs)
-			if is_curr {
-				io.write_string(w, `<li class="breadcrumb-item active" aria-current="page">`)
-			} else {
-				io.write_string(w, `<li class="breadcrumb-item">`)
-			}
-
-			if !is_curr && (short_path in collection.pkgs_to_use) {
-				fmt.wprintf(w, `<a href="%s/%s">%s</a>`, collection.base_url, url, dir)
-			} else {
-				io.write_string(w, dir)
-			}
-			io.write_string(w, "</li>\n")
-		}
-	}
-
-
-	fmt.wprintf(w, "<h1>package core:%s</h1>\n", path)
 	overview_docs := strings.trim_space(str(pkg.docs))
 	if overview_docs != "" {
 		fmt.wprintln(w, "<h2>Overview</h2>")
 		fmt.wprintln(w, "<div id=\"pkg-overview\">")
 		defer fmt.wprintln(w, "</div>")
 
-		write_docs(w, pkg, overview_docs)
+		write_docs(w, overview_docs)
 	}
 
 	fmt.wprintln(w, `<h2>Index</h2>`)
@@ -1385,7 +1401,7 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 		if the_docs != "" {
 			fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
 			fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
-			write_docs(w, pkg, the_docs)
+			write_docs(w, the_docs)
 			fmt.wprintln(w, `</details>`)
 		}
 	}
