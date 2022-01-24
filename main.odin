@@ -1183,6 +1183,13 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", pkg_src_url)
 	fmt.wprintf(w, "</h1>\n")
 
+	// TODO(bill): determine decent approach for performance
+	if len(array(pkg.entities)) <= 1000 {
+		io.write_string(w, `<div class="input-group mb-3">`)
+		io.write_string(w, `<input type="text" id="pkg-fuzzy-search" class="form-control" placeholder="Search Docs...">`+"\n")
+		io.write_string(w, `</div>`+"\n")
+	}
+
 	overview_docs := strings.trim_space(str(pkg.docs))
 	if overview_docs != "" {
 		fmt.wprintln(w, "<h2>Overview</h2>")
@@ -1192,8 +1199,8 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 		write_docs(w, overview_docs)
 	}
 
-	fmt.wprintln(w, `<h2>Index</h2>`)
 	fmt.wprintln(w, `<div id="pkg-index">`)
+	fmt.wprintln(w, `<h2>Index</h2>`)
 	pkg_procs:       [dynamic]^doc.Entity
 	pkg_proc_groups: [dynamic]^doc.Entity
 	pkg_types:       [dynamic]^doc.Entity
@@ -1232,9 +1239,12 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 		defer fmt.wprintln(w, `</div>`)
 
 
-		fmt.wprintf(w, `<details open class="doc-index" id="doc-index-{0:s}" aria-labelledby="#doc-index-{0:s}-header">`+"\n", name)
+		fmt.wprintf(w, `<details class="doc-index" id="doc-index-{0:s}" aria-labelledby="#doc-index-{0:s}-header">`+"\n", name)
 		fmt.wprintf(w, `<summary id="#doc-index-{0:s}-header">`+"\n", name)
 		io.write_string(w, name)
+		io.write_string(w, " (")
+		io.write_int(w, len(entities))
+		io.write_string(w, ")")
 		fmt.wprintln(w, `</summary>`)
 		defer fmt.wprintln(w, `</details>`)
 
@@ -1406,7 +1416,7 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 		}
 	}
 	write_entities :: proc(w: io.Writer, title: string, entities: []^doc.Entity) {
-		fmt.wprintf(w, "<h2 id=\"pkg-{0:s}\">{0:s}</h2>\n", title)
+		fmt.wprintf(w, "<h2 id=\"pkg-{0:s}\" class=\"pkg-header\">{0:s}</h2>\n", title)
 		fmt.wprintln(w, `<section class="documentation">`)
 		if len(entities) == 0 {
 			io.write_string(w, "<p>This section is empty.</p>\n")
