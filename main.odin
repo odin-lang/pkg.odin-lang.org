@@ -625,6 +625,59 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		return
 	}
 
+	calc_field_width :: proc(type_entities: []doc.Entity_Index) -> (field_width: int) {
+		name_width := calc_name_width(type_entities)
+
+		for entity_index in type_entities {
+			e := &entities[entity_index]
+			width := len(str(e.name))
+			init := len(str(e.init_string))
+			if init != 0 {
+				extra := max(name_width-width, 0) + init
+				width += extra + 3
+			}
+			field_width = max(width, field_width)
+		}
+		return
+	}
+
+	write_lead_comment :: proc(using writer: ^Type_Writer, flags: Write_Type_Flags, docs: string, index: int) {
+		if docs == "" {
+			return
+		}
+		lines := strings.split_lines(docs)
+		defer delete(lines)
+		for i := len(lines)-1; i >= 0; i -= 1 {
+			if strings.trim_space(lines[i]) == "" {
+				lines = lines[:i]
+			} else {
+				break
+			}
+		}
+		if len(lines) == 0 {
+			return
+		}
+		// if index != 0 { io.write_string(w, "\n") }
+		for line in lines {
+			do_indent(writer, flags)
+			io.write_string(w, "<span class=\"comment\">// ")
+			io.write_string(w, line)
+			io.write_string(w, "</span>\n")
+		}
+	}
+	write_line_comment :: proc(using writer: ^Type_Writer, flags: Write_Type_Flags, padding: int, comment: string) {
+		if comment == "" {
+			return
+		}
+		for _ in 0..< padding {
+			io.write_byte(w, ' ')
+		}
+
+		io.write_string(w, "<span class=\"comment\">// ")
+		io.write_string(w, strings.trim_right_space(comment))
+		io.write_string(w, "</span>")
+	}
+
 
 	type_entities := array(type.entities)
 	type_types := array(type.types)
@@ -725,23 +778,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 				}
 				docs, comment := str(e.docs), str(e.comment)
 
-				if docs != "" {
-					lines := strings.split_lines(docs)
-					defer delete(lines)
-					for i := len(lines)-1; i >= 0; i -= 1 {
-						if strings.trim_space(lines[i]) == "" {
-							lines = lines[:i]
-						} else {
-							break
-						}
-					}
-					for line in lines {
-						do_indent(writer, flags)
-						io.write_string(w, "<span class=\"comment\">// ")
-						io.write_string(w, line)
-						io.write_string(w, "</span>\n")
-					}
-				}
+				write_lead_comment(writer, flags, docs, i)
 
 				do_indent(writer, flags)
 				write_param_entity(writer, e, next_entity, flags, name_width)
@@ -793,15 +830,20 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		indent += 1
 
 		name_width := calc_name_width(type_entities)
+		field_width := calc_field_width(type_entities)
 
-		for entity_index in type_entities {
+		for entity_index, i in type_entities {
 			e := &entities[entity_index]
+			docs, comment := str(e.docs), str(e.comment)
+
+			write_lead_comment(writer, flags, docs, i)
 
 			name := str(e.name)
 			do_indent(writer, flags)
 			io.write_string(w, name)
 
-			if init_string := str(e.init_string); init_string != "" {
+			init_string := str(e.init_string)
+			if init_string != "" {
 				for _ in 0..<name_width-len(name) {
 					io.write_byte(w, ' ')
 				}
@@ -809,6 +851,16 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 				io.write_string(w, init_string)
 			}
 			io.write_string(w, ", ")
+
+			curr_field_width := len(name)
+			if init_string != "" {
+				curr_field_width += max(name_width-len(name), 0)
+				curr_field_width += 3
+				curr_field_width += len(init_string)
+			}
+
+			write_line_comment(writer, flags, field_width-curr_field_width, comment)
+
 			do_newline(writer, flags)
 		}
 		indent -= 1
