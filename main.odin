@@ -197,11 +197,17 @@ main :: proc() {
 				if strings.has_prefix(trimmed_path, "sys") {
 					continue fullpath_loop
 				}
+				if strings.contains(trimmed_path, "/_") {
+					continue fullpath_loop
+				}
 
 				core_pkgs_to_use[trimmed_path] = pkg
 			case strings.has_prefix(path, "vendor/"):
 				trimmed_path := strings.trim_prefix(path, "vendor/")
 				if strings.contains(trimmed_path, "/bindings") {
+					continue fullpath_loop
+				}
+				if strings.contains(trimmed_path, "/_") {
 					continue fullpath_loop
 				}
 				vendor_pkgs_to_use[trimmed_path] = pkg
