@@ -108,6 +108,14 @@ Header_Kind :: enum {
 }
 write_html_header :: proc(w: io.Writer, title: string, kind := Header_Kind.Normal) {
 	fmt.wprintf(w, string(#load("header.txt.html")), title)
+
+	when #config(ODIN_DOC_DEV, false) {
+		io.write_string(w, "\n")
+		io.write_string(w, `<script type="text/javascript" src="https://livejs.com/live.js"></script>`)
+		io.write_string(w, "\n")
+	}
+
+
 	io.write(w, #load("header-lower.txt.html"))
 	switch kind {
 	case .Normal:
