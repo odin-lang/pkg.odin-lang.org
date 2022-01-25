@@ -484,6 +484,7 @@ Write_Type_Flag :: enum {
 	Allow_Indent,
 	Poly_Names,
 	Ignore_Name,
+	Allow_Multiple_Lines,
 }
 Write_Type_Flags :: distinct bit_set[Write_Type_Flag]
 Type_Writer :: struct {
@@ -491,6 +492,15 @@ Type_Writer :: struct {
 	pkg:    doc.Pkg_Index,
 	indent: int,
 	generic_scope: map[string]bool,
+}
+
+calc_name_width :: proc(type_entities: []doc.Entity_Index) -> (name_width: int) {
+	for entity_index in type_entities {
+		e := &entities[entity_index]
+		name := str(e.name)
+		name_width = max(len(name), name_width)
+	}
+	return
 }
 
 write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type_Flags) {
@@ -615,14 +625,6 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		if .Allow_Indent in flags {
 			io.write_byte(w, '\n')
 		}
-	}
-	calc_name_width :: proc(type_entities: []doc.Entity_Index) -> (name_width: int) {
-		for entity_index in type_entities {
-			e := &entities[entity_index]
-			name := str(e.name)
-			name_width = max(len(name), name_width)
-		}
-		return
 	}
 
 	calc_field_width :: proc(type_entities: []doc.Entity_Index) -> (field_width: int) {
@@ -885,16 +887,81 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 				break
 			}
 		}
-		for entity_index, i in type_entities {
-			if i > 0 {
-				io.write_string(w, ", ")
+		span_multiple_lines := false
+		if .Allow_Multiple_Lines in flags && .Is_Results not_in flags {
+			span_multiple_lines = len(type_entities) >= 6
+		}
+
+		full_name_width :: proc(entity_indices: []doc.Entity_Index) -> (width: int) {
+			for entity_index, i in entity_indices {
+				if i > 0 {
+					width += 2
+				}
+				width += len(str(entities[entity_index].name))
 			}
-			e := &entities[entity_index]
-			next_entity: ^doc.Entity = nil
-			if i+1 < len(type_entities) {
-				next_entity = &entities[type_entities[i+1]]
+			return
+		}
+
+		if span_multiple_lines {
+			max_name_width := 0
+
+			groups: [dynamic][]doc.Entity_Index
+			defer delete(groups)
+
+			prev_field_group_index := i32le(-1)
+			prev_field_index := 0
+			for entity_index, i in type_entities {
+				e := &entities[entity_index]
+				if i+1 == len(type_entities) || prev_field_group_index != e.field_group_index {
+					prev_field_group_index = e.field_group_index
+					group := type_entities[prev_field_index:i]
+					if len(group) > 0 {
+						append(&groups, group)
+						width := full_name_width(group)
+						max_name_width = max(max_name_width, width)
+					}
+					prev_field_index = i
+				}
 			}
-			write_param_entity(writer, e, next_entity, flags)
+
+			j := 0
+			for group, group_idx in groups {
+				io.write_string(w, "\n\t")
+				group_name_width := full_name_width(group)
+				for entity_index, i in group {
+					defer j += 1
+
+
+					e := &entities[entity_index]
+					next_entity: ^doc.Entity = nil
+					if j+1 < len(type_entities) {
+						next_entity = &entities[type_entities[j+1]]
+					}
+
+					name_width := 0
+					if i+1 == len(group) {
+						name_width = max_name_width - group_name_width + len(str(e.name))
+					}
+					write_param_entity(writer, e, next_entity, flags, name_width)
+					io.write_string(w, ", ")
+				}
+			}
+
+			io.write_string(w, "\n")
+		} else {
+			for entity_index, i in type_entities {
+				e := &entities[entity_index]
+
+				if i > 0 {
+					io.write_string(w, ", ")
+				}
+				next_entity: ^doc.Entity = nil
+				if i+1 < len(type_entities) {
+					next_entity = &entities[type_entities[i+1]]
+				}
+
+				write_param_entity(writer, e, next_entity, flags)
+			}
 		}
 		if require_parens { io.write_byte(w, ')') }
 
@@ -997,8 +1064,29 @@ write_doc_line :: proc(w: io.Writer, text: string) {
 	}
 }
 
-write_doc_sidebar :: proc(w: io.Writer) {
 
+write_markup_text :: proc(w: io.Writer, s: string) {
+	s := s
+	n := strings.count(s, "`")
+	if n > 0 && n%2 == 0 {
+		for len(s) > 0 {
+			i := strings.index_byte(s, '`')
+			if i < 0 {
+				break
+			}
+			io.write_string(w, s[:i])
+			s = s[i+1:]
+			io.write_string(w, "<code>")
+
+			i = strings.index_byte(s, '`'); assert(i >= 0)
+			io.write_string(w, s[:i])
+			s = s[i+1:]
+			io.write_string(w, "</code>")
+		}
+		io.write_string(w, s)
+	} else {
+		io.write_string(w, s)
+	}
 }
 
 write_docs :: proc(w: io.Writer, docs: string) {
@@ -1097,7 +1185,7 @@ write_docs :: proc(w: io.Writer, docs: string) {
 				if line_idx > 0 {
 					io.write_string(w, "\n")
 				}
-				io.write_string(w, line)
+				write_markup_text(w, line)
 			}
 			io.write_string(w, "</p>\n")
 		case .Code:
@@ -1382,9 +1470,13 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 		case .Procedure:
 			fmt.wprint(w, `<pre class="doc-code">`)
 			fmt.wprintf(w, "%s :: ", name)
-			write_type(writer, types[e.type], nil)
+			write_type(writer, types[e.type], {.Allow_Multiple_Lines})
 			write_where_clauses(w, array(e.where_clauses))
-			fmt.wprint(w, " {…}")
+			if .Foreign in e.flags {
+				fmt.wprint(w, " ---")
+			} else {
+				fmt.wprint(w, " {…}")
+			}
 			fmt.wprintln(w, "</pre>")
 		case .Proc_Group:
 			fmt.wprint(w, `<pre class="doc-code">`)
