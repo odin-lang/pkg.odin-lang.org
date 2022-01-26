@@ -187,7 +187,7 @@ main :: proc() {
 		fullpath_loop: for fullpath, i in fullpaths {
 			path := strings.trim_prefix(fullpath, path_prefix)
 			pkg := &pkgs[i+1]
-			if len(array(pkg.entities)) == 0 {
+			if len(array(pkg.entries)) == 0 {
 				continue fullpath_loop
 			}
 
@@ -1276,23 +1276,40 @@ write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collect
 }
 
 write_breadcrumbs :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collection) {
-	// fmt.wprintln(w, `<header class="sticky-top">`)
-	// defer fmt.wprintln(w, `</header>`)
-	// fmt.wprintln(w, `<div class="container">`)
-	// defer fmt.wprintln(w, `</div>`)
+	fmt.wprintln(w, `<nav class="pkg-breadcrumb" aria-label="breadcrumb">`)
+	defer fmt.wprintln(w, `</nav>`)
 
+	dirs := strings.split(path, "/")
+	defer delete(dirs)
+
+	io.write_string(w, "<ol class=\"breadcrumb\">\n")
+	fmt.wprintf(w, "<li class=\"breadcrumb-item\"><a href=\"%s\">%s</a></li>\n", collection.base_url, strings.to_lower(collection.name, context.temp_allocator))
+	for dir, i in dirs {
+		is_active_string := ""
+		if i+1 == len(dirs) {
+			is_active_string = ` active" aria-current="page`
+		}
+
+		trimmed_path := strings.join(dirs[:i+1], "/", context.temp_allocator)
+		if pkg, ok := collection.pkgs_to_use[trimmed_path]; ok {
+			fmt.wprintf(w, "<li class=\"breadcrumb-item%s\"><a href=\"%s/%s\">%s</a></li>\n", is_active_string, collection.base_url, trimmed_path, dir)
+		} else {
+			fmt.wprintf(w, "<li class=\"breadcrumb-item\">%s</li>\n", dir)
+		}
+	}
+	io.write_string(w, "</ol>\n")
 }
 
 
 write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collection) {
-	write_breadcrumbs(w, path, pkg, collection)
-
 	fmt.wprintln(w, `<div class="row odin-main" id="pkg">`)
 	defer fmt.wprintln(w, `</div>`)
 
 	write_pkg_sidebar(w, pkg, collection)
 
 	fmt.wprintln(w, `<article class="col-lg-8 p-4 documentation odin-article">`)
+
+	write_breadcrumbs(w, path, pkg, collection)
 
 	fmt.wprintf(w, "<h1>package core:%s", path)
 
@@ -1301,7 +1318,7 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 	fmt.wprintf(w, "</h1>\n")
 
 	// TODO(bill): determine decent approach for performance
-	if len(array(pkg.entities)) <= 1000 {
+	if len(array(pkg.entries)) <= 1000 {
 		io.write_string(w, `<div class="input-group">`)
 		io.write_string(w, `<input type="text" id="pkg-fuzzy-search" class="form-control" placeholder="Search Docs...">`+"\n")
 		io.write_string(w, `</div>`+"\n")
@@ -1318,31 +1335,42 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 
 	fmt.wprintln(w, `<div id="pkg-index">`)
 	fmt.wprintln(w, `<h2>Index</h2>`)
-	pkg_procs:       [dynamic]^doc.Entity
-	pkg_proc_groups: [dynamic]^doc.Entity
-	pkg_types:       [dynamic]^doc.Entity
-	pkg_vars:        [dynamic]^doc.Entity
-	pkg_consts:      [dynamic]^doc.Entity
+	pkg_procs:       [dynamic]doc.Scope_Entry
+	pkg_proc_groups: [dynamic]doc.Scope_Entry
+	pkg_types:       [dynamic]doc.Scope_Entry
+	pkg_vars:        [dynamic]doc.Scope_Entry
+	pkg_consts:      [dynamic]doc.Scope_Entry
 
-	for entity_index in array(pkg.entities) {
-		e := &entities[entity_index]
+	for entry in array(pkg.entries) {
+		e := &entities[entry.entity]
 		name := str(e.name)
+		if name == "" || name[0] == '_' {
+			continue
+		}
+		name = str(entry.name)
 		if name == "" || name[0] == '_' {
 			continue
 		}
 		switch e.kind {
 		case .Invalid, .Import_Name, .Library_Name:
 			// ignore
-		case .Constant:   append(&pkg_consts, e)
-		case .Variable:   append(&pkg_vars, e)
-		case .Type_Name:  append(&pkg_types, e)
-		case .Procedure:  append(&pkg_procs, e)
-		case .Proc_Group: append(&pkg_proc_groups, e)
+		case .Constant:
+			append(&pkg_consts, entry)
+		case .Variable:
+			append(&pkg_vars, entry)
+		case .Type_Name:
+			append(&pkg_types, entry)
+		case .Procedure:
+			append(&pkg_procs, entry)
+		case .Builtin:
+			append(&pkg_procs, entry)
+		case .Proc_Group:
+			append(&pkg_proc_groups, entry)
 		}
 	}
 
-	entity_key :: proc(e: ^doc.Entity) -> string {
-		return str(e.name)
+	entity_key :: proc(entry: doc.Scope_Entry) -> string {
+		return str(entry.name)
 	}
 
 	slice.sort_by_key(pkg_procs[:],       entity_key)
@@ -1351,7 +1379,7 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 	slice.sort_by_key(pkg_vars[:],        entity_key)
 	slice.sort_by_key(pkg_consts[:],      entity_key)
 
-	write_index :: proc(w: io.Writer, name: string, entities: []^doc.Entity) {
+	write_index :: proc(w: io.Writer, name: string, entries: []doc.Scope_Entry) {
 		fmt.wprintln(w, `<div>`)
 		defer fmt.wprintln(w, `</div>`)
 
@@ -1360,16 +1388,16 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 		fmt.wprintf(w, `<summary id="#doc-index-{0:s}-header">`+"\n", name)
 		io.write_string(w, name)
 		io.write_string(w, " (")
-		io.write_int(w, len(entities))
+		io.write_int(w, len(entries))
 		io.write_string(w, ")")
 		fmt.wprintln(w, `</summary>`)
 		defer fmt.wprintln(w, `</details>`)
 
-		if len(entities) == 0 {
+		if len(entries) == 0 {
 			io.write_string(w, "<p>This section is empty.</p>\n")
 		} else {
 			fmt.wprintln(w, "<ul>")
-			for e in entities {
+			for e in entries {
 				name := str(e.name)
 				fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", name)
 			}
@@ -1377,7 +1405,7 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 		}
 	}
 
-	entity_ordering := [?]struct{name: string, entities: []^doc.Entity} {
+	entity_ordering := [?]struct{name: string, entries: []doc.Scope_Entry} {
 		{"Types",            pkg_types[:]},
 		{"Constants",        pkg_consts[:]},
 		{"Variables",        pkg_vars[:]},
@@ -1387,13 +1415,13 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 
 
 	for eo in entity_ordering {
-		write_index(w, eo.name, eo.entities)
+		write_index(w, eo.name, eo.entries)
 	}
 
 	fmt.wprintln(w, "</div>")
 
 
-	write_entity :: proc(w: io.Writer, e: ^doc.Entity) {
+	write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		write_attributes :: proc(w: io.Writer, e: ^doc.Entity) {
 			for attr in array(e.attributes) {
 				io.write_string(w, "@(")
@@ -1408,17 +1436,39 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 			}
 		}
 
-		pkg_index := files[e.pos.file].pkg
-		pkg := &pkgs[pkg_index]
+		write_entity_reference :: proc(w: io.Writer, pkg: ^doc.Pkg, entity: ^doc.Entity) {
+			this_pkg := &pkgs[files[entity.pos.file].pkg]
+			if pkg != this_pkg {
+				fmt.wprintf(w, "%s.", str(this_pkg.name))
+			}
+			collection := pkg_to_collection[this_pkg]
+			name := str(entity.name)
+
+			class := ""
+			if entity.kind == .Procedure {
+				class = "code-procedure"
+			}
+
+			fmt.wprintf(w, `<a class="{3:s}" href="{2:s}/{0:s}/#{1:s}">`, pkg_to_path[this_pkg], name, collection.base_url, class)
+			io.write_string(w, name)
+			io.write_string(w, `</a>`)
+		}
+
+		name := str(entry.name)
+		e := &entities[entry.entity]
+		entity_name := str(e.name)
+
+
+		entity_pkg_index := files[e.pos.file].pkg
+		entity_pkg := &pkgs[entity_pkg_index]
 		writer := &Type_Writer{
 			w = w,
-			pkg = pkg_index,
+			pkg = entity_pkg_index,
 		}
 		defer delete(writer.generic_scope)
 		collection := pkg_to_collection[pkg]
 		github_url := collection.github_url if collection != nil else GITHUB_CORE_URL
 
-		name := str(e.name)
 		path := pkg_to_path[pkg]
 		filename := slashpath.base(str(files[e.pos.file].name))
 		fmt.wprintf(w, "<h3 id=\"{0:s}\"><span><a class=\"doc-id-link\" href=\"#{0:s}\">{0:s}", name)
@@ -1430,101 +1480,101 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 		fmt.wprintf(w, "</h3>\n")
 		fmt.wprintln(w, `<div>`)
 
-		switch e.kind {
-		case .Invalid, .Import_Name, .Library_Name:
-			// ignore
-		case .Constant:
-			fmt.wprint(w, `<pre class="doc-code">`)
-			the_type := types[e.type]
-
-			init_string := str(e.init_string)
-			assert(init_string != "")
-
-			ignore_type := true
-			if the_type.kind == .Basic && is_type_untyped(the_type) {
-			} else {
-				ignore_type = false
-				type_name := str(the_type.name)
-				if type_name != "" && strings.has_prefix(init_string, type_name) {
-					ignore_type = true
-				}
-			}
-
-			if ignore_type {
-				fmt.wprintf(w, "%s :: ", name)
-			} else {
-				fmt.wprintf(w, "%s: ", name)
-				write_type(writer, the_type, {.Allow_Indent})
-				fmt.wprintf(w, " : ")
-			}
-
-
-			io.write_string(w, init_string)
-			fmt.wprintln(w, "</pre>")
-		case .Variable:
-			fmt.wprint(w, `<pre class="doc-code">`)
-			write_attributes(w, e)
-			fmt.wprintf(w, "%s: ", name)
-			write_type(writer, types[e.type], {.Allow_Indent})
-			init_string := str(e.init_string)
-			if init_string != "" {
-				io.write_string(w, " = ")
-				io.write_string(w, "…")
-			}
-			fmt.wprintln(w, "</pre>")
-
-		case .Type_Name:
+		if name != entity_name || entity_pkg != pkg {
 			fmt.wprint(w, `<pre class="doc-code">`)
 			fmt.wprintf(w, "%s :: ", name)
-			the_type := types[e.type]
-			type_to_print := the_type
-			if the_type.kind == .Named && .Type_Alias not_in e.flags {
-				if e.pos == entities[array(the_type.entities)[0]].pos {
-					bt := base_type(the_type)
-					#partial switch bt.kind {
-					case .Struct, .Union, .Proc, .Enum:
-						// Okay
-					case:
-						io.write_string(w, "distinct ")
+			write_entity_reference(w, pkg, e)
+			fmt.wprintln(w, "</pre>")
+		} else {
+			switch e.kind {
+			case .Invalid, .Import_Name, .Library_Name:
+				// ignore
+			case .Constant:
+				fmt.wprint(w, `<pre class="doc-code">`)
+				the_type := types[e.type]
+
+				init_string := str(e.init_string)
+				assert(init_string != "")
+
+				ignore_type := true
+				if the_type.kind == .Basic && is_type_untyped(the_type) {
+				} else {
+					ignore_type = false
+					type_name := str(the_type.name)
+					if type_name != "" && strings.has_prefix(init_string, type_name) {
+						ignore_type = true
 					}
-					type_to_print = bt
 				}
-			}
-			write_type(writer, type_to_print, {.Allow_Indent})
-			fmt.wprintln(w, "</pre>")
-		case .Procedure:
-			fmt.wprint(w, `<pre class="doc-code">`)
-			fmt.wprintf(w, "%s :: ", name)
-			write_type(writer, types[e.type], {.Allow_Multiple_Lines})
-			write_where_clauses(w, array(e.where_clauses))
-			if .Foreign in e.flags {
-				fmt.wprint(w, " ---")
-			} else {
-				fmt.wprint(w, " {…}")
-			}
-			fmt.wprintln(w, "</pre>")
-		case .Proc_Group:
-			fmt.wprint(w, `<pre class="doc-code">`)
-			fmt.wprintf(w, "%s :: proc{{\n", name)
-			for entity_index in array(e.grouped_entities) {
-				this_proc := &entities[entity_index]
-				this_pkg := files[this_proc.pos.file].pkg
-				io.write_byte(w, '\t')
-				if this_pkg != pkg_index {
-					fmt.wprintf(w, "%s.", str(pkgs[this_pkg].name))
-				}
-				pkg := &pkgs[this_pkg]
-				collection := pkg_to_collection[pkg]
-				name := str(this_proc.name)
-				fmt.wprintf(w, `<a class="code-procedure" href="{2:s}/{0:s}/#{1:s}">`, pkg_to_path[pkg], name, collection.base_url)
-				io.write_string(w, name)
-				io.write_string(w, `</a>`)
-				io.write_byte(w, ',')
-				io.write_byte(w, '\n')
-			}
-			fmt.wprintln(w, "}")
-			fmt.wprintln(w, "</pre>")
 
+				if ignore_type {
+					fmt.wprintf(w, "%s :: ", name)
+				} else {
+					fmt.wprintf(w, "%s: ", name)
+					write_type(writer, the_type, {.Allow_Indent})
+					fmt.wprintf(w, " : ")
+				}
+
+
+				io.write_string(w, init_string)
+				fmt.wprintln(w, "</pre>")
+			case .Variable:
+				fmt.wprint(w, `<pre class="doc-code">`)
+				write_attributes(w, e)
+				fmt.wprintf(w, "%s: ", name)
+				write_type(writer, types[e.type], {.Allow_Indent})
+				init_string := str(e.init_string)
+				if init_string != "" {
+					io.write_string(w, " = ")
+					io.write_string(w, "…")
+				}
+				fmt.wprintln(w, "</pre>")
+
+			case .Type_Name:
+				fmt.wprint(w, `<pre class="doc-code">`)
+				fmt.wprintf(w, "%s :: ", name)
+				the_type := types[e.type]
+				type_to_print := the_type
+				if the_type.kind == .Named && .Type_Alias not_in e.flags {
+					if e.pos == entities[array(the_type.entities)[0]].pos {
+						bt := base_type(the_type)
+						#partial switch bt.kind {
+						case .Struct, .Union, .Proc, .Enum:
+							// Okay
+						case:
+							io.write_string(w, "distinct ")
+						}
+						type_to_print = bt
+					}
+				}
+				write_type(writer, type_to_print, {.Allow_Indent})
+				fmt.wprintln(w, "</pre>")
+			case .Builtin:
+				panic("todo")
+			case .Procedure:
+				fmt.wprint(w, `<pre class="doc-code">`)
+				fmt.wprintf(w, "%s :: ", name)
+				write_type(writer, types[e.type], {.Allow_Multiple_Lines})
+				write_where_clauses(w, array(e.where_clauses))
+				if .Foreign in e.flags {
+					fmt.wprint(w, " ---")
+				} else {
+					fmt.wprint(w, " {…}")
+				}
+				fmt.wprintln(w, "</pre>")
+			case .Proc_Group:
+				fmt.wprint(w, `<pre class="doc-code">`)
+				fmt.wprintf(w, "%s :: proc{{\n", name)
+				for entity_index in array(e.grouped_entities) {
+					this_proc := &entities[entity_index]
+					io.write_byte(w, '\t')
+					write_entity_reference(w, pkg, this_proc)
+					io.write_byte(w, ',')
+					io.write_byte(w, '\n')
+				}
+				fmt.wprintln(w, "}")
+				fmt.wprintln(w, "</pre>")
+
+			}
 		}
 		fmt.wprintln(w, `</div>`)
 
@@ -1536,15 +1586,15 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 			fmt.wprintln(w, `</details>`)
 		}
 	}
-	write_entities :: proc(w: io.Writer, title: string, entities: []^doc.Entity) {
+	write_entries :: proc(w: io.Writer,pkg: ^doc.Pkg, title: string, entries: []doc.Scope_Entry) {
 		fmt.wprintf(w, "<h2 id=\"pkg-{0:s}\" class=\"pkg-header\">{0:s}</h2>\n", title)
 		fmt.wprintln(w, `<section class="documentation">`)
-		if len(entities) == 0 {
+		if len(entries) == 0 {
 			io.write_string(w, "<p>This section is empty.</p>\n")
 		} else {
-			for e in entities {
+			for e in entries {
 				fmt.wprintln(w, `<div class="pkg-entity">`)
-				write_entity(w, e)
+				write_entry(w, pkg, e)
 				fmt.wprintln(w, `</div>`)
 			}
 		}
@@ -1552,7 +1602,7 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 	}
 
 	for eo in entity_ordering {
-		write_entities(w, eo.name, eo.entities)
+		write_entries(w, pkg, eo.name, eo.entries)
 	}
 
 	fmt.wprintln(w, `<h2 id="pkg-source-files">Source Files</h2>`)
@@ -1608,10 +1658,10 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 		if overview_docs != "" {
 			write_link(w, "pkg-overview", "Overview")
 		}
-		for eo in entity_ordering do if len(eo.entities) != 0 {
+		for eo in entity_ordering do if len(eo.entries) != 0 {
 			fmt.wprintf(w, `<li><a href="#pkg-{0:s}">{0:s}</a>`, eo.name)
 			fmt.wprintln(w, `<ul>`)
-			for e in eo.entities {
+			for e in eo.entries {
 				fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", str(e.name))
 			}
 			fmt.wprintln(w, "</ul>")
