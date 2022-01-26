@@ -1275,7 +1275,18 @@ write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collect
 	}
 }
 
+write_breadcrumbs :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collection) {
+	// fmt.wprintln(w, `<header class="sticky-top">`)
+	// defer fmt.wprintln(w, `</header>`)
+	// fmt.wprintln(w, `<div class="container">`)
+	// defer fmt.wprintln(w, `</div>`)
+
+}
+
+
 write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collection) {
+	write_breadcrumbs(w, path, pkg, collection)
+
 	fmt.wprintln(w, `<div class="row odin-main" id="pkg">`)
 	defer fmt.wprintln(w, `</div>`)
 
@@ -1291,7 +1302,7 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 
 	// TODO(bill): determine decent approach for performance
 	if len(array(pkg.entities)) <= 1000 {
-		io.write_string(w, `<div class="input-group mb-3">`)
+		io.write_string(w, `<div class="input-group">`)
 		io.write_string(w, `<input type="text" id="pkg-fuzzy-search" class="form-control" placeholder="Search Docs...">`+"\n")
 		io.write_string(w, `</div>`+"\n")
 	}
