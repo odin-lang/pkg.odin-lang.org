@@ -775,7 +775,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		if .Packed in type_flags { io.write_string(w, " <span class=\"directive\">#packed</span>") }
 		if .Raw_Union in type_flags { io.write_string(w, " <span class=\"directive\">#raw_union</span>") }
 		if custom_align := str(type.custom_align); custom_align != "" {
-			io.write_string(w, " <span class=\"directive\">#align</span>")
+			io.write_string(w, " <span class=\"directive\">#align</span>&nbsp;")
 			io.write_string(w, custom_align)
 		}
 		io.write_string(w, " {")
@@ -819,7 +819,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		if .No_Nil in type_flags { io.write_string(w, " <span class=\"directive\">#no_nil</span>") }
 		if .Maybe in type_flags { io.write_string(w, " <span class=\"directive\">#maybe</span>") }
 		if custom_align := str(type.custom_align); custom_align != "" {
-			io.write_string(w, " <span class=\"directive\">#align</span>")
+			io.write_string(w, " <span class=\"directive\">#align</span>&nbsp;")
 			io.write_string(w, custom_align)
 		}
 		io.write_string(w, " {")
