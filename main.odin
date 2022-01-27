@@ -9,6 +9,7 @@ import "core:path/slashpath"
 import "core:sort"
 import "core:slice"
 import "core:time"
+import "core:intrinsics"
 
 GITHUB_LICENSE_URL :: "https://github.com/odin-lang/Odin/tree/master/LICENSE"
 GITHUB_CORE_URL :: "https://github.com/odin-lang/Odin/tree/master/core"
@@ -1437,12 +1438,19 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 		}
 
 		write_entity_reference :: proc(w: io.Writer, pkg: ^doc.Pkg, entity: ^doc.Entity) {
+			name := str(entity.name)
+
 			this_pkg := &pkgs[files[entity.pos.file].pkg]
-			if pkg != this_pkg {
+			if .Builtin_Pkg_Builtin in entity.flags {
+				fmt.wprintf(w, "builtin.%s", name)
+				return
+			} else if .Builtin_Pkg_Intrinsics in entity.flags {
+				fmt.wprintf(w, "intrinsics.%s", name)
+				return
+			} else if pkg != this_pkg {
 				fmt.wprintf(w, "%s.", str(this_pkg.name))
 			}
 			collection := pkg_to_collection[this_pkg]
-			name := str(entity.name)
 
 			class := ""
 			if entity.kind == .Procedure {
@@ -1463,7 +1471,7 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 		entity_pkg := &pkgs[entity_pkg_index]
 		writer := &Type_Writer{
 			w = w,
-			pkg = entity_pkg_index,
+			pkg = doc.Pkg_Index(intrinsics.ptr_sub(pkg, &pkgs[0])),
 		}
 		defer delete(writer.generic_scope)
 		collection := pkg_to_collection[pkg]
@@ -1549,7 +1557,10 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 				write_type(writer, type_to_print, {.Allow_Indent})
 				fmt.wprintln(w, "</pre>")
 			case .Builtin:
-				panic("todo")
+				fmt.wprint(w, `<pre class="doc-code">`)
+				fmt.wprintf(w, "%s :: ", name)
+				write_entity_reference(w, pkg, e)
+				fmt.wprint(w, `</pre>`)
 			case .Procedure:
 				fmt.wprint(w, `<pre class="doc-code">`)
 				fmt.wprintf(w, "%s :: ", name)
