@@ -1539,9 +1539,16 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 
 			case .Type_Name:
 				fmt.wprint(w, `<pre class="doc-code">`)
+				defer fmt.wprintln(w, "</pre>")
+
 				fmt.wprintf(w, "%s :: ", name)
 				the_type := types[e.type]
 				type_to_print := the_type
+				if base_type(type_to_print).kind == .Basic && str(pkg.name) == "c" {
+					io.write_string(w, str(e.init_string))
+					break
+				}
+
 				if the_type.kind == .Named && .Type_Alias not_in e.flags {
 					if e.pos == entities[array(the_type.entities)[0]].pos {
 						bt := base_type(the_type)
@@ -1555,7 +1562,6 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 					}
 				}
 				write_type(writer, type_to_print, {.Allow_Indent})
-				fmt.wprintln(w, "</pre>")
 			case .Builtin:
 				fmt.wprint(w, `<pre class="doc-code">`)
 				fmt.wprintf(w, "%s :: ", name)
