@@ -205,9 +205,6 @@ main :: proc() {
 				core_pkgs_to_use[trimmed_path] = pkg
 			case strings.has_prefix(path, "vendor/"):
 				trimmed_path := strings.trim_prefix(path, "vendor/")
-				if strings.contains(trimmed_path, "/bindings") {
-					continue fullpath_loop
-				}
 				if strings.contains(trimmed_path, "/_") {
 					continue fullpath_loop
 				}
@@ -1292,7 +1289,7 @@ write_breadcrumbs :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection:
 		}
 
 		trimmed_path := strings.join(dirs[:i+1], "/", context.temp_allocator)
-		if pkg, ok := collection.pkgs_to_use[trimmed_path]; ok {
+		if _, ok := collection.pkgs_to_use[trimmed_path]; ok {
 			fmt.wprintf(w, "<li class=\"breadcrumb-item%s\"><a href=\"%s/%s\">%s</a></li>\n", is_active_string, collection.base_url, trimmed_path, dir)
 		} else {
 			fmt.wprintf(w, "<li class=\"breadcrumb-item\">%s</li>\n", dir)
@@ -1312,7 +1309,7 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 
 	write_breadcrumbs(w, path, pkg, collection)
 
-	fmt.wprintf(w, "<h1>package core:%s", path)
+	fmt.wprintf(w, "<h1>package %s:%s", strings.to_lower(collection.name, context.temp_allocator), path)
 
 	pkg_src_url := fmt.tprintf("%s/%s", collection.github_url, path)
 	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", pkg_src_url)
