@@ -1077,160 +1077,132 @@ write_doc_line :: proc(w: io.Writer, text: string) {
 }
 
 
-write_markup_text :: proc(w: io.Writer, s: string) {
-	s := s
-	n := strings.count(s, "`")
-	if n > 0 && n%2 == 0 {
-		for len(s) > 0 {
-			i := strings.index_byte(s, '`')
-			if i < 0 {
+write_markup_text :: proc(w: io.Writer, lines: []string) {
+	io.write_string(w, "<span style=\"white-space: pre-wrap\">") // Preserve leading whitespace
+	io.write_string(w, "<p>")
+	
+	for i := 0; i < len(lines); i += 1 {
+		line := lines[i]
+		trimmed_line := strings.trim_space(line)
+
+		// Paragraph break
+		if len(trimmed_line) == 0 {
+			io.write_string(w, "</p>")
+			io.write_string(w, "<p>")
+			continue
+		}
+
+		// Lists
+		if trimmed_line[0] == '-' {
+			io.write_string(w, "<ul>")
+			for len(trimmed_line) > 0 && trimmed_line[0] == '-' {
+				fmt.wprintf(w, "<li>%s</li>", trimmed_line[1:])
+				
+				i += 1;
+				if i >= len(lines) {
+					break
+				}
+				
+				line = lines[i]
+				trimmed_line = strings.trim_space(line)
+			}
+			io.write_string(w, "</ul>")
+			continue
+		}
+
+		// Code
+		for {
+			backtick_index := strings.index_byte(line, '`');
+			if backtick_index >= 0 {
+				io.write_string(w, line[:backtick_index])
+				line = line[backtick_index + 1:]
+				next_backtick_index := strings.index_byte(line, '`')
+				
+				if next_backtick_index < 0 {
+					// Multi-line code block
+					// TODO(fkp): Other languages
+					io.write_string(w, "<pre><code class=\"hljs\" data-lang=\"odin\">")
+					io.write_string(w, line)
+
+					for {
+						i += 1
+						if i >= len(lines) {
+							break
+						}
+
+						line = lines[i]
+						backtick_index = strings.index_byte(line, '`')
+						if backtick_index < 0 {
+							io.write_string(w, line)
+							io.write_string(w, "\n")
+						} else {
+							io.write_string(w, line[:backtick_index])
+							line = line[backtick_index + 1:]
+							break
+						}
+					}
+
+					io.write_string(w, "</code></pre>")
+				} else {
+					// Inline code
+					io.write_string(w, "<code>")
+					io.write_string(w, line[:next_backtick_index])
+					io.write_string(w, "</code>")
+					line = line[next_backtick_index + 1:]
+				}
+			} else {
 				break
 			}
-			io.write_string(w, s[:i])
-			s = s[i+1:]
-			io.write_string(w, "<code>")
-
-			i = strings.index_byte(s, '`'); assert(i >= 0)
-			io.write_string(w, s[:i])
-			s = s[i+1:]
-			io.write_string(w, "</code>")
 		}
-		io.write_string(w, s)
-	} else {
-		io.write_string(w, s)
+
+		// Normal text
+		io.write_string(w, line)
+		io.write_string(w, "<br>")
 	}
+
+	io.write_string(w, "</p>\n")
+	io.write_string(w, "</span>\n")
 }
 
 write_docs :: proc(w: io.Writer, docs: string) {
 	if docs == "" {
 		return
 	}
-	Block_Kind :: enum {
-		Paragraph,
-		Code,
-	}
-	Block :: struct {
-		kind: Block_Kind,
-		lines: []string,
-	}
 
-	lines: [dynamic]string
 	it := docs
+	lines: [dynamic]string
 	for line_ in strings.split_iterator(&it, "\n") {
 		line := strings.trim_right_space(line_)
 		append(&lines, line)
 	}
-
-	curr_block_kind := Block_Kind.Paragraph
-	start := 0
-	blocks: [dynamic]Block
-
-	for line, i in lines {
-		text := strings.trim_space(line)
-		switch curr_block_kind {
-		case .Paragraph:
-			if strings.has_prefix(line, "\t") {
-				if i-start > 0 {
-					append(&blocks, Block{curr_block_kind, lines[start:i]})
+	
+	// Removes leading tabs that are common to every line
+	unindent_loop: for {
+		// Checks if every line of the comment has a leading tab
+		has_non_empty_line := false
+		for line in lines {
+			if len(line) > 0 {
+				has_non_empty_line = true
+				if line[0] != '\t' {
+					break unindent_loop
 				}
-				curr_block_kind, start = .Code, i
-			} else if text == "" {
-				if i-start > 0 {
-					append(&blocks, Block{curr_block_kind, lines[start:i]})
-				}
-				start = i
 			}
-		case .Code:
-			if text == "" || strings.has_prefix(line, "\t") {
-				continue
-			}
-
-			if i-start > 0 {
-				append(&blocks, Block{curr_block_kind, lines[start:i]})
-			}
-			curr_block_kind, start = .Paragraph, i
 		}
-	}
-	if start < len(lines) {
-		if len(lines)-start > 0 {
-			append(&blocks, Block{curr_block_kind, lines[start:]})
+
+		if !has_non_empty_line {
+			// Every line is now blank
+			break unindent_loop
+		}
+
+		// Remove the leading tab from every line
+		for line in &lines {
+			if len(line) > 0 && line[0] == '\t' {
+				line = line[1:]
+			}
 		}
 	}
 
-	for block in &blocks {
-		trim_amount := 0
-		for trim_amount = 0; trim_amount < len(block.lines); trim_amount += 1 {
-			line := block.lines[trim_amount]
-			if strings.trim_space(line) != "" {
-				break
-			}
-		}
-		block.lines = block.lines[trim_amount:]
-	}
-
-	for block, i in blocks {
-		if len(block.lines) == 0 {
-			continue
-		}
-		prev_line := ""
-		if i > 0 {
-			prev_lines := blocks[i-1].lines
-			if len(prev_lines) > 0 {
-				prev_line = prev_lines[len(prev_lines)-1]
-			}
-		}
-		prev_line = strings.trim_space(prev_line)
-
-		lines := block.lines[:]
-
-		end_line := block.lines[len(lines)-1]
-		if block.kind == .Paragraph && i+1 < len(blocks) {
-			if strings.has_prefix(end_line, "Example:") && blocks[i+1].kind == .Code {
-				lines = lines[:len(lines)-1]
-			}
-		}
-
-		switch block.kind {
-		case .Paragraph:
-			io.write_string(w, "<p>")
-			for line, line_idx in lines {
-				if line_idx > 0 {
-					io.write_string(w, "\n")
-				}
-				write_markup_text(w, line)
-			}
-			io.write_string(w, "</p>\n")
-		case .Code:
-			all_blank := len(lines) > 0
-			for line in lines {
-				if strings.trim_space(line) != "" {
-					all_blank = false
-				}
-			}
-			if all_blank {
-				continue
-			}
-
-			if strings.has_prefix(prev_line, "Example:") {
-				io.write_string(w, "<details open class=\"code-example\">\n")
-				defer io.write_string(w, "</details>\n")
-				io.write_string(w, "<summary>Example:</summary>\n")
-				io.write_string(w, `<pre><code class="hljs" data-lang="odin">`)
-				for line in lines {
-					io.write_string(w, strings.trim_prefix(line, "\t"))
-					io.write_string(w, "\n")
-				}
-				io.write_string(w, "</code></pre>\n")
-			} else {
-				io.write_string(w, "<pre>")
-				for line in lines {
-					io.write_string(w, strings.trim_prefix(line, "\t"))
-					io.write_string(w, "\n")
-				}
-				io.write_string(w, "</pre>\n")
-			}
-		}
-	}
+	write_markup_text(w, lines[:])
 }
 
 write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collection) {
@@ -1328,7 +1300,7 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 		fmt.wprintln(w, "<div id=\"pkg-overview\">")
 		defer fmt.wprintln(w, "</div>")
 
-		write_docs(w, overview_docs)
+		write_docs(w, str(pkg.docs)) // We want the untrimmed version, it will be trimmed when parsed for markup
 	}
 
 	fmt.wprintln(w, `<div id="pkg-index">`)
@@ -1596,7 +1568,7 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 		if the_docs != "" {
 			fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
 			fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
-			write_docs(w, the_docs)
+			write_docs(w, str(e.docs)) // We want the untrimmed version, it will be trimmed when parsed for markup
 			fmt.wprintln(w, `</details>`)
 		}
 	}
