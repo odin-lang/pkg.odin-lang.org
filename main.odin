@@ -1120,9 +1120,9 @@ write_markup_text :: proc(w: io.Writer, lines: []string) {
 				
 				if next_backtick_index < 0 {
 					// Multi-line code block
-					// TODO(fkp): Other languages
-					io.write_string(w, "<pre><code class=\"hljs\" data-lang=\"odin\">")
-					io.write_string(w, line)
+					
+					//io.write_string(w, "<pre><code class=\"hljs\" data-lang=\"odin\">")
+					fmt.wprintf(w, "<pre><code class=\"%s\">", line if line != "" else "odin");
 
 					for {
 						i += 1
