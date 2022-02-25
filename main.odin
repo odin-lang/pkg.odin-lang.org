@@ -1157,7 +1157,7 @@ write_markup_text :: proc(w: io.Writer, lines: []string) {
 
 		// Normal text
 		io.write_string(w, line)
-		io.write_string(w, "<br>")
+		io.write_string(w, "\n")
 	}
 
 	io.write_string(w, "</p>\n")
@@ -1176,32 +1176,6 @@ write_docs :: proc(w: io.Writer, docs: string) {
 		append(&lines, line)
 	}
 	
-	// Removes leading tabs that are common to every line
-	unindent_loop: for {
-		// Checks if every line of the comment has a leading tab
-		has_non_empty_line := false
-		for line in lines {
-			if len(line) > 0 {
-				has_non_empty_line = true
-				if line[0] != '\t' {
-					break unindent_loop
-				}
-			}
-		}
-
-		if !has_non_empty_line {
-			// Every line is now blank
-			break unindent_loop
-		}
-
-		// Remove the leading tab from every line
-		for line in &lines {
-			if len(line) > 0 && line[0] == '\t' {
-				line = line[1:]
-			}
-		}
-	}
-
 	write_markup_text(w, lines[:])
 }
 
