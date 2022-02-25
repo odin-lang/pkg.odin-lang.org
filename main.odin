@@ -1101,7 +1101,7 @@ write_markup_single_line :: proc(w: io.Writer, line: ^string) {
 
 	// Normal text
 	io.write_string(w, line^)
-	io.write_string(w, "\n")
+	io.write_string(w, " ")
 }
 
 write_markup_text :: proc(w: io.Writer, lines: []string) {
