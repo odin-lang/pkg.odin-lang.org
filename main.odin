@@ -1077,6 +1077,33 @@ write_doc_line :: proc(w: io.Writer, text: string) {
 }
 
 
+write_markup_single_line :: proc(w: io.Writer, line: ^string) {
+	// Inline code
+	for {
+		backtick_index := strings.index_byte(line^, '`')
+		if backtick_index >= 0 {
+			io.write_string(w, line[:backtick_index])
+			line^ = line[backtick_index + 1:]
+
+			closing_backtick_index := strings.index_byte(line^, '`')
+			if closing_backtick_index >= 0 {
+				io.write_string(w, "<code>")
+				defer io.write_string(w, "</code>")
+				io.write_string(w, line[:closing_backtick_index])
+				line^ = line[closing_backtick_index + 1:]
+			} else {
+				break
+			}
+		} else {
+			break
+		}
+	}
+
+	// Normal text
+	io.write_string(w, line^)
+	io.write_string(w, "\n")
+}
+
 write_markup_text :: proc(w: io.Writer, lines: []string) {
 	io.write_string(w, "<span style=\"white-space: pre-wrap\">") // Preserve leading whitespace
 	io.write_string(w, "<p>")
@@ -1096,7 +1123,10 @@ write_markup_text :: proc(w: io.Writer, lines: []string) {
 		if trimmed_line[0] == '-' {
 			io.write_string(w, "<ul>")
 			for len(trimmed_line) > 0 && trimmed_line[0] == '-' {
-				fmt.wprintf(w, "<li>%s</li>", trimmed_line[1:])
+				io.write_string(w, "<li>")
+				trimmed_line_to_write := trimmed_line[1:]
+				write_markup_single_line(w, &trimmed_line_to_write)
+				io.write_string(w, "</li>")
 				
 				i += 1;
 				if i >= len(lines) {
@@ -1117,7 +1147,9 @@ write_markup_text :: proc(w: io.Writer, lines: []string) {
 			line_start_section := line[:triple_backtick_index]
 			if line_start_section != "" {
 				io.write_string(w, "<details open class=\"code-example\">")
-				fmt.wprintf(w, "<summary>%s</summary>", line_start_section)
+				io.write_string(w, "<summary>")
+				write_markup_single_line(w, &line_start_section)
+				io.write_string(w, "</summary>")
 			}
 
 			defer if line_start_section != "" {
@@ -1148,31 +1180,7 @@ write_markup_text :: proc(w: io.Writer, lines: []string) {
 			}
 		}
 
-		// Inline code
-		for {
-			backtick_index := strings.index_byte(line, '`')
-			if backtick_index >= 0 {
-				io.write_string(w, line[:backtick_index])
-				line = line[backtick_index + 1:]
-
-				closing_backtick_index := strings.index_byte(line, '`')
-				if closing_backtick_index >= 0 {
-					io.write_string(w, "<code>")
-					defer io.write_string(w, "</code>")
-					io.write_string(w, line[:closing_backtick_index])
-					line = line[closing_backtick_index + 1:]
-				} else {
-					io.write_string(w, line)
-					continue line_loop
-				}
-			} else {
-				break
-			}
-		}
-
-		// Normal text
-		io.write_string(w, line)
-		io.write_string(w, "\n")
+		write_markup_single_line(w, &line)
 	}
 
 	io.write_string(w, "</p>\n")
