@@ -1081,7 +1081,7 @@ write_markup_text :: proc(w: io.Writer, lines: []string) {
 	io.write_string(w, "<span style=\"white-space: pre-wrap\">") // Preserve leading whitespace
 	io.write_string(w, "<p>")
 	
-	for i := 0; i < len(lines); i += 1 {
+	line_loop: for i := 0; i < len(lines); i += 1 {
 		line := lines[i]
 		trimmed_line := strings.trim_space(line)
 
@@ -1100,7 +1100,7 @@ write_markup_text :: proc(w: io.Writer, lines: []string) {
 				
 				i += 1;
 				if i >= len(lines) {
-					break
+					break line_loop
 				}
 				
 				line = lines[i]
@@ -1110,45 +1110,60 @@ write_markup_text :: proc(w: io.Writer, lines: []string) {
 			continue
 		}
 
-		// Code
+		// Multi-line code block
+		triple_backtick_index := strings.index(line, "```")
+		if triple_backtick_index >= 0 {
+			// If we have a heading for this block of code, write it as a collapsible block
+			line_start_section := line[:triple_backtick_index]
+			if line_start_section != "" {
+				io.write_string(w, "<details open class=\"code-example\">")
+				fmt.wprintf(w, "<summary>%s</summary>", line_start_section)
+			}
+
+			defer if line_start_section != "" {
+				io.write_string(w, "</details>")
+			}
+			
+			// Writes the code
+			line = line[triple_backtick_index + 3:]
+			fmt.wprintf(w, "<pre><code class=\"%s\">", line if line != "" else "odin")
+			defer io.write_string(w, "</code></pre>")
+
+			for {
+				i += 1
+				if i >= len(lines) {
+					break line_loop
+				}
+
+				line = lines[i]
+				triple_backtick_index = strings.index(line, "```")
+				if triple_backtick_index < 0 {
+					io.write_string(w, line)
+					io.write_string(w, "\n")
+				} else {
+					io.write_string(w, line[:triple_backtick_index])
+					line = line[triple_backtick_index + 3:]
+					break
+				}
+			}
+		}
+
+		// Inline code
 		for {
-			backtick_index := strings.index_byte(line, '`');
+			backtick_index := strings.index_byte(line, '`')
 			if backtick_index >= 0 {
 				io.write_string(w, line[:backtick_index])
 				line = line[backtick_index + 1:]
-				next_backtick_index := strings.index_byte(line, '`')
-				
-				if next_backtick_index < 0 {
-					// Multi-line code block
-					
-					//io.write_string(w, "<pre><code class=\"hljs\" data-lang=\"odin\">")
-					fmt.wprintf(w, "<pre><code class=\"%s\">", line if line != "" else "odin");
 
-					for {
-						i += 1
-						if i >= len(lines) {
-							break
-						}
-
-						line = lines[i]
-						backtick_index = strings.index_byte(line, '`')
-						if backtick_index < 0 {
-							io.write_string(w, line)
-							io.write_string(w, "\n")
-						} else {
-							io.write_string(w, line[:backtick_index])
-							line = line[backtick_index + 1:]
-							break
-						}
-					}
-
-					io.write_string(w, "</code></pre>")
-				} else {
-					// Inline code
+				closing_backtick_index := strings.index_byte(line, '`')
+				if closing_backtick_index >= 0 {
 					io.write_string(w, "<code>")
-					io.write_string(w, line[:next_backtick_index])
-					io.write_string(w, "</code>")
-					line = line[next_backtick_index + 1:]
+					defer io.write_string(w, "</code>")
+					io.write_string(w, line[:closing_backtick_index])
+					line = line[closing_backtick_index + 1:]
+				} else {
+					io.write_string(w, line)
+					continue line_loop
 				}
 			} else {
 				break
