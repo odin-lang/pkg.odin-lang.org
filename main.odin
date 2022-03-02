@@ -1120,9 +1120,9 @@ write_markup_text :: proc(w: io.Writer, lines: []string) {
 		}
 
 		// Lists
-		if trimmed_line[0] == '-' {
+		if trimmed_line[0] == '-' || trimmed_line[0] == '*' {
 			io.write_string(w, "<ul>")
-			for len(trimmed_line) > 0 && trimmed_line[0] == '-' {
+			for len(trimmed_line) > 0 && (trimmed_line[0] == '-' || trimmed_line[0] == '*') {
 				io.write_string(w, "<li>")
 				trimmed_line_to_write := trimmed_line[1:]
 				write_markup_single_line(w, &trimmed_line_to_write)
