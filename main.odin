@@ -28,6 +28,14 @@ vendor_pkgs_to_use: map[string]^doc.Pkg // trimmed path
 pkg_to_path: map[^doc.Pkg]string // trimmed path
 pkg_to_collection: map[^doc.Pkg]^Collection
 
+// On Unix systems we need to set the directory mode so that we
+// can read/write from them
+when os.OS == .Darwin || os.OS == .Linux || os.OS == .FreeBSD {
+     directory_mode :: 0o775
+} else {
+     directory_mode :: 0
+}
+
 Collection :: struct {
 	name: string,
 	pkgs_to_use: ^map[string]^doc.Pkg,
@@ -96,7 +104,7 @@ recursive_make_directory :: proc(path: string, prefix := "") {
 	if prefix != "" {
 		path_to_make = fmt.tprintf("%s/%s", prefix, head)
 	}
-	os.make_directory(path_to_make, 0)
+	os.make_directory(path_to_make, directory_mode)
 	if tail != "" {
 		recursive_make_directory(tail, path_to_make)
 	}
@@ -248,7 +256,7 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection, dir: str
 		write_html_header(w, fmt.tprintf("%s library - pkg.odin-lang.org", dir))
 		write_collection_directory(w, collection)
 		write_html_footer(w, true)
-		os.make_directory(dir, 0)
+		os.make_directory(dir, directory_mode)
 		os.write_entire_file(fmt.tprintf("%s/index.html", dir), b.buf[:])
 	}
 
