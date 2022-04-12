@@ -286,6 +286,7 @@ write_home_page :: proc(w: io.Writer) {
 
 	fmt.wprintln(w, "<article><header>")
 	fmt.wprintln(w, "<h1>Odin Packages</h1>")
+	fmt.wprintln(w, `<div id="algolia-search"></div>`)
 	fmt.wprintln(w, "</header></article>")
 	fmt.wprintln(w, "<div>")
 	defer fmt.wprintln(w, "</div>")
@@ -403,6 +404,7 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 		fmt.wprintf(w, "<li>License: <a href=\"{0:s}\">BSD-3-Clause</a></li>\n", GITHUB_LICENSE_URL)
 		fmt.wprintf(w, "<li>Repository: <a href=\"{0:s}\">{0:s}</a></li>\n", collection.github_url)
 		fmt.wprintln(w, "</ul>")
+		fmt.wprintln(w, `<div id="algolia-search"></div>`)
 		fmt.wprintln(w, "</header>")
 		fmt.wprintln(w, "</article>")
 		fmt.wprintln(w, `<hr class="collection-hr">`)
@@ -1315,12 +1317,14 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", pkg_src_url)
 	fmt.wprintf(w, "</h1>\n")
 
-	// TODO(bill): determine decent approach for performance
-	if len(array(pkg.entries)) <= 1000 {
-		io.write_string(w, `<div class="input-group">`)
-		io.write_string(w, `<input type="text" id="pkg-fuzzy-search" class="form-control" placeholder="Search Docs...">`+"\n")
-		io.write_string(w, `</div>`+"\n")
-	}
+	fmt.wprintln(w, `<div id="algolia-search"></div>`)
+
+	// // TODO(bill): determine decent approach for performance
+	// if len(array(pkg.entries)) <= 1000 {
+	// 	io.write_string(w, `<div class="input-group">`)
+	// 	io.write_string(w, `<input type="text" id="pkg-fuzzy-search" class="form-control" placeholder="Search Docs...">`+"\n")
+	// 	io.write_string(w, `</div>`+"\n")
+	// }
 
 	overview_docs := strings.trim_space(str(pkg.docs))
 	if overview_docs != "" {

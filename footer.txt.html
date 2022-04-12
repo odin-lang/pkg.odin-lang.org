@@ -41,44 +41,15 @@
 </footer>
 
 <script src="https://odin-lang.org/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
 <script src="https://odin-lang.org/js/script.js"></script>
 <script type="text/javascript">
-hljs.highlightAll();
-
-let fuzzySearchBar = document.querySelector("#pkg-fuzzy-search");
-if (fuzzySearchBar !== undefined) {
-	let pkg_entities = document.querySelectorAll(".pkg-entity");
-	let pkg_index = document.querySelector("#pkg-index");
-
-	const resetPage = () => {
-		pkg_entities.forEach(e => {
-			e.classList.remove("pkg-entity-hidden");
-		});
-		pkg_index.classList.remove("hidden");
-	};
-	fuzzySearchBar.addEventListener("input", (event) => {
-		if (!event.target.value) {
-			resetPage();
-			return;
-		}
+	docsearch({
+		appId:     "H6XRVBSW5C",
+		apiKey:    "43bb20431f8b3e7576dbb757cbab9047",
+		indexName: "odin-lang",
+		container: "#algolia-search",
+		debug:     false // Set debug to true if you want to inspect the modal
 	});
-	fuzzySearchBar.addEventListener("keyup", (event) => {
-		if (!event.target.value) {
-			resetPage();
-			return;
-		}
-		pkg_entities.forEach(e => {
-			let title = e.getElementsByTagName("h3")[0].innerText.toLowerCase();
-			title = title.replace(/¶/g, '').trim().toLowerCase();
-			let query = event.target.value;
-			if (title.includes(query)) {
-				e.classList.remove("pkg-entity-hidden");
-			} else {
-				e.classList.add("pkg-entity-hidden");
-				pkg_index.classList.add("hidden");
-			}
-		});
-	});
-}
+
 </script>
-
