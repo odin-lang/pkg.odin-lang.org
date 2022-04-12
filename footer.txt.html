@@ -44,12 +44,35 @@
 <script src="https://cdn.jsdelivr.net/npm/@docsearch/js@3"></script>
 <script src="https://odin-lang.org/js/script.js"></script>
 <script type="text/javascript">
-	docsearch({
+	let docsearch_data = {
 		appId:     "H6XRVBSW5C",
 		apiKey:    "43bb20431f8b3e7576dbb757cbab9047",
 		indexName: "odin-lang",
 		container: "#algolia-search",
-		debug:     false // Set debug to true if you want to inspect the modal
-	});
+		debug:     false,
+		hint:      true,
+		autocompleteOptions: {
+			minLength: 1,
+		},
+		algoliaOptions: {
+			hitsPerPage: 10,
+			ignorePlural: true,
+		},
+	};
+
+	let search_elem = document.getElementById("algolia-search");
+	if (search_elem.hasAttribute("data-path")) {
+		let data_path = search_elem.getAttribute("data-path");
+		docsearch_data.transformItems = function(items) {
+			return items.filter(function(item) {
+				if (item.url.indexOf(data_path) < 0) {
+					return false;
+				}
+				return true;
+			});
+		};
+	}
+
+	docsearch(docsearch_data);
 
 </script>

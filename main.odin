@@ -255,7 +255,7 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection, dir: str
 	for path, pkg in collection.pkgs_to_use {
 		strings.reset_builder(b)
 		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width)
-		write_pkg(w, path, pkg, collection)
+		write_pkg(w, dir, path, pkg, collection)
 		write_html_footer(w, false)
 		recursive_make_directory(path, dir)
 		os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
@@ -1301,7 +1301,7 @@ write_breadcrumbs :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection:
 }
 
 
-write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collection) {
+write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^Collection) {
 	fmt.wprintln(w, `<div class="row odin-main" id="pkg">`)
 	defer fmt.wprintln(w, `</div>`)
 
@@ -1317,7 +1317,8 @@ write_pkg :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection: ^Collec
 	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", pkg_src_url)
 	fmt.wprintf(w, "</h1>\n")
 
-	fmt.wprintln(w, `<div id="algolia-search"></div>`)
+	path_url := fmt.tprintf("%s/%s", dir, path)
+	fmt.wprintf(w, "<div id=\"algolia-search\" data-path=\"%s\"></div>\n", path_url)
 
 	// // TODO(bill): determine decent approach for performance
 	// if len(array(pkg.entries)) <= 1000 {
