@@ -229,12 +229,12 @@ main :: proc() {
 		}
 	}
 
-	b := strings.make_builder()
-	defer strings.destroy_builder(&b)
+	b := strings.builder_make()
+	defer strings.builder_destroy(&b)
 	w := strings.to_writer(&b)
 
 	{
-		strings.reset_builder(&b)
+		strings.builder_reset(&b)
 		write_html_header(w, "Packages - pkg.odin-lang.org")
 		write_home_page(w)
 		write_html_footer(w, true)
@@ -252,7 +252,7 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection, dir: str
 	w := strings.to_writer(b)
 
 	{
-		strings.reset_builder(b)
+		strings.builder_reset(b)
 		write_html_header(w, fmt.tprintf("%s library - pkg.odin-lang.org", dir))
 		write_collection_directory(w, collection)
 		write_html_footer(w, true)
@@ -261,7 +261,7 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection, dir: str
 	}
 
 	for path, pkg in collection.pkgs_to_use {
-		strings.reset_builder(b)
+		strings.builder_reset(b)
 		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width)
 		write_pkg(w, dir, path, pkg, collection)
 		write_html_footer(w, false)
