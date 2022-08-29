@@ -932,10 +932,15 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 
 			prev_field_group_index := i32le(-1)
 			prev_field_index := 0
-			for entity_index, i in type_entities {
-				e := &entities[entity_index]
-				if i+1 == len(type_entities) || prev_field_group_index != e.field_group_index {
-					prev_field_group_index = e.field_group_index
+			for i := 0; i <= len(type_entities); i += 1 {
+				e: ^doc.Entity
+				if i != len(type_entities) {
+					e = &entities[type_entities[i]]
+				}
+				if i+1 >= len(type_entities) || prev_field_group_index != e.field_group_index {
+					if i != len(type_entities) {
+						prev_field_group_index = e.field_group_index
+					}
 					group := type_entities[prev_field_index:i]
 					if len(group) > 0 {
 						append(&groups, group)
