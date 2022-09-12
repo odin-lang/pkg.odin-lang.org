@@ -1044,7 +1044,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		io.write_string(w, "<span class=\"directive\">#soa</span>[]")
 	case .SOA_Struct_Dynamic:
 		io.write_string(w, "<span class=\"directive\">#soa</span>[<span class=\"keyword\">dynamic</span>]")
-	case .SOA_Pointer:
+	case .Soa_Pointer:
 		io.write_string(w, "<span class=\"directive\">#soa</span>^")
 		if len(type_types) != 0 && len(types) != 0 {
 			write_type(writer, types[type_types[0]], flags)
