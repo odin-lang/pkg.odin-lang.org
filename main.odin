@@ -1094,26 +1094,68 @@ write_doc_line :: proc(w: io.Writer, text: string) {
 
 write_markup_text :: proc(w: io.Writer, s: string) {
 	s := s
-	n := strings.count(s, "`")
-	if n > 0 && n%2 == 0 {
-		for len(s) > 0 {
-			i := strings.index_byte(s, '`')
-			if i < 0 {
-				break
-			}
-			io.write_string(w, s[:i])
-			s = s[i+1:]
-			io.write_string(w, "<code>")
-
-			i = strings.index_byte(s, '`'); assert(i >= 0)
-			io.write_string(w, s[:i])
-			s = s[i+1:]
-			io.write_string(w, "</code>")
-		}
-		io.write_string(w, s)
-	} else {
-		io.write_string(w, s)
+	// In markdown 2 spaces at the end a line indicates a break is needed
+	need_break: bool
+	if len(s) >= 2 && s[len(s) - 2:] == "  " {
+		s = s[:len(s) - 2]
+		need_break = true
 	}
+	defer if need_break do io.write_string(w, "<br>")
+
+	latest_index := 0
+	for index := 0; index < len(s); index += 1 {
+		switch s[index] {
+		case '`':
+			next_tick := strings.index_byte(s[index + 1:], '`')
+			if next_tick >= 0 {
+				next_tick += index + 1
+				io.write_string(w, s[latest_index:index])
+				io.write_string(w, "<code>")
+				io.write_string(w, s[index + 1:next_tick])
+				io.write_string(w, "</code>")
+				latest_index = next_tick + 1
+				index = latest_index
+			}
+		case '*':
+			Star_Type :: enum {
+				none,
+				bold,
+				italics,
+			}
+			star_type := Star_Type.none
+			next_star := strings.index_byte(s[index + 1:], '*')
+			if next_star == 0 {
+				// double star we are bold
+				star_type = .bold
+			} else if next_star > 0 {
+				star_type = .italics
+			}
+			switch star_type {
+			case .bold:
+				ending_star := strings.index(s[index + 2:], "**")
+				if ending_star < 0 {
+					continue
+				}
+				ending_star += index + 2
+				io.write_string(w, s[latest_index:index])
+				io.write_string(w, "<b>")
+				io.write_string(w, s[index + 2:ending_star])
+				io.write_string(w, "</b>")
+				latest_index = ending_star + 2
+				index = latest_index
+			case .italics:
+                next_star += index + 1
+				io.write_string(w, s[latest_index:index])
+				io.write_string(w, "<i>")
+				io.write_string(w, s[index + 1:next_star])
+				io.write_string(w, "</i>")
+				latest_index = next_star + 1
+				index = latest_index
+			case .none: // nothing
+			}
+		}
+	}
+	io.write_string(w, s[latest_index:])
 }
 
 write_docs :: proc(w: io.Writer, docs: string) {
@@ -1131,8 +1173,7 @@ write_docs :: proc(w: io.Writer, docs: string) {
 
 	lines: [dynamic]string
 	it := docs
-	for line_ in strings.split_iterator(&it, "\n") {
-		line := strings.trim_right_space(line_)
+	for line in strings.split_lines_iterator(&it) {
 		append(&lines, line)
 	}
 
