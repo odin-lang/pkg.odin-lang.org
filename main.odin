@@ -31,9 +31,9 @@ pkg_to_collection: map[^doc.Pkg]^Collection
 // On Unix systems we need to set the directory mode so that we
 // can read/write from them
 when os.OS == .Darwin || os.OS == .Linux || os.OS == .FreeBSD {
-     directory_mode :: 0o775
+	directory_mode :: 0o775
 } else {
-     directory_mode :: 0
+	directory_mode :: 0
 }
 
 Collection :: struct {
@@ -1657,6 +1657,9 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		fmt.wprintln(w, `</div>`)
 
 		the_docs := strings.trim_space(str(e.docs))
+		if the_docs == "" {
+			the_docs = strings.trim_space(str(e.comment))
+		}
 		if the_docs != "" {
 			fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
 			fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
