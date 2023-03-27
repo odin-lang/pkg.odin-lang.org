@@ -1096,9 +1096,18 @@ write_doc_line :: proc(w: io.Writer, text: string) {
 	}
 }
 
-
 write_markup_text :: proc(w: io.Writer, s: string) {
 	s := s
+	// Consume '- ' if the string begins with one
+	// this means we need to make a bullet point
+	is_list_element: bool
+	if len(s) > 1 && strings.has_prefix(s, "- ") {
+		s = strings.trim_left_space(s[2:])
+		// NOTE: The reason for a span rather than <li> is that list items cannpt be in a paragraph
+		io.write_string(w, "<span class=\"doc-list\">")
+		is_list_element = true
+	}
+	defer if is_list_element do io.write_string(w, "</span>")
 	// In markdown 2 spaces at the end a line indicates a break is needed
 	need_break: bool
 	if len(s) >= 2 && s[len(s) - 2:] == "  " {
@@ -1149,7 +1158,7 @@ write_markup_text :: proc(w: io.Writer, s: string) {
 				latest_index = ending_star + 2
 				index = latest_index
 			case .italics:
-                next_star += index + 1
+				next_star += index + 1
 				io.write_string(w, s[latest_index:index])
 				io.write_string(w, "<i>")
 				io.write_string(w, s[index + 1:next_star])
@@ -1163,59 +1172,92 @@ write_markup_text :: proc(w: io.Writer, s: string) {
 	io.write_string(w, s[latest_index:])
 }
 
-write_docs :: proc(w: io.Writer, docs: string) {
+write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 	if docs == "" {
 		return
 	}
 	Block_Kind :: enum {
 		Paragraph,
 		Code,
+		Example,
+		Output,
 	}
 	Block :: struct {
 		kind: Block_Kind,
 		lines: []string,
 	}
 
-	lines: [dynamic]string
-	it := docs
-	for line in strings.split_lines_iterator(&it) {
-		append(&lines, line)
-	}
-
+	lines := strings.split_lines(docs)
 	curr_block_kind := Block_Kind.Paragraph
 	start := 0
 	blocks: [dynamic]Block
 
-	for line, i in lines {
-		text := strings.trim_space(line)
-		switch curr_block_kind {
-		case .Paragraph:
-			if strings.has_prefix(line, "\t") {
-				if i-start > 0 {
-					append(&blocks, Block{curr_block_kind, lines[start:i]})
-				}
-				curr_block_kind, start = .Code, i
-			} else if text == "" {
-				if i-start > 0 {
-					append(&blocks, Block{curr_block_kind, lines[start:i]})
-				}
-				start = i
-			}
-		case .Code:
-			if text == "" || strings.has_prefix(line, "\t") {
-				continue
-			}
+	example_block: Block // when set the kind should be Example
+	output_block: Block // when set the kind should be Output
+	// rely on zii that the kinds have not been set
+	assert(example_block.kind != .Example)
+	assert(output_block.kind != .Output)
 
-			if i-start > 0 {
-				append(&blocks, Block{curr_block_kind, lines[start:i]})
+	insert_block :: proc(block: Block, blocks: ^[dynamic]Block, example: ^Block, output: ^Block, name: string) {
+		switch block.kind {
+		case .Paragraph: fallthrough
+		case .Code: append(blocks, block)
+		case .Example:
+			if example.kind == .Example {
+				errorf("The documentation for %q has multiple examples which is not allowed\n", name)
 			}
-			curr_block_kind, start = .Paragraph, i
+			example^ = block
+		case .Output:
+			if example.kind == .Output {
+				errorf("The documentation for %q has multiple output which is not allowed\n", name)
+			}
+			output^ = block
 		}
 	}
-	if start < len(lines) {
-		if len(lines)-start > 0 {
-			append(&blocks, Block{curr_block_kind, lines[start:]})
+
+	for line, i in lines {
+		text := strings.trim_space(line)
+		next_block_kind := curr_block_kind
+		force_write_block := false
+
+		switch curr_block_kind {
+		case .Paragraph:
+			switch {
+			case strings.has_prefix(line, "Example:"): next_block_kind = .Example
+			case strings.has_prefix(line, "Output:"): next_block_kind = .Output
+			case strings.has_prefix(line, "\t"): next_block_kind = .Code
+			case text == "": force_write_block = true
+			}
+		case .Code:
+			switch {
+			case strings.has_prefix(line, "Example:"): next_block_kind = .Example
+			case strings.has_prefix(line, "Output:"): next_block_kind = .Output
+			case ! (text == "" || strings.has_prefix(line, "\t")): next_block_kind = .Paragraph
+			}
+		case .Example:
+			switch {
+			case strings.has_prefix(line, "Output:"): next_block_kind = .Output
+			case ! (text == "" || strings.has_prefix(line, "\t")): next_block_kind = .Paragraph
+			}
+		case .Output:
+			switch {
+			case strings.has_prefix(line, "Example:"): next_block_kind = .Example
+			case ! (text == "" || strings.has_prefix(line, "\t")): next_block_kind = .Paragraph
+			}
 		}
+
+		if i-start > 0 && (curr_block_kind != next_block_kind || force_write_block) {
+			insert_block(Block{curr_block_kind, lines[start:i]}, &blocks, &example_block, &output_block, name)
+			curr_block_kind, start = next_block_kind, i
+		}
+	}
+
+	if start < len(lines) {
+		insert_block(Block{curr_block_kind, lines[start:]}, &blocks, &example_block, &output_block, name)
+	}
+
+	if output_block.kind == .Output && example_block.kind != .Example {
+		errorf("The documentation for %q has an output block but no example\n", name)
 	}
 
 	for block in &blocks {
@@ -1244,16 +1286,26 @@ write_docs :: proc(w: io.Writer, docs: string) {
 
 		lines := block.lines[:]
 
-		end_line := block.lines[len(lines)-1]
-		if block.kind == .Paragraph && i+1 < len(blocks) {
-			if strings.has_prefix(end_line, "Example:") && blocks[i+1].kind == .Code {
-				lines = lines[:len(lines)-1]
-			}
-		}
-
 		switch block.kind {
 		case .Paragraph:
 			io.write_string(w, "<p>")
+
+			subtitles_to_markup := [?]string{ "Inputs:", "Returns:" }
+			for subtitle in subtitles_to_markup {
+				if ! strings.has_prefix(lines[0], subtitle) {
+					continue
+				}
+				fmt.wprintf(w, "<b>%v</b><br>", subtitle)
+				removed_subtitle := strings.trim_prefix(lines[0], subtitle)
+				removed_subtitle = strings.trim_left_space(removed_subtitle)
+				if removed_subtitle == "" {
+					lines = lines[1:]
+				} else {
+					lines[0] = removed_subtitle
+				}
+				break
+			}
+
 			for line, line_idx in lines {
 				if line_idx > 0 {
 					io.write_string(w, "\n")
@@ -1272,24 +1324,54 @@ write_docs :: proc(w: io.Writer, docs: string) {
 				continue
 			}
 
-			if strings.has_prefix(prev_line, "Example:") {
-				io.write_string(w, "<details open class=\"code-example\">\n")
-				defer io.write_string(w, "</details>\n")
-				io.write_string(w, "<summary>Example:</summary>\n")
-				io.write_string(w, `<pre><code class="hljs" data-lang="odin">`)
-				for line in lines {
-					io.write_string(w, strings.trim_prefix(line, "\t"))
-					io.write_string(w, "\n")
-				}
-				io.write_string(w, "</code></pre>\n")
-			} else {
-				io.write_string(w, "<pre>")
-				for line in lines {
-					io.write_string(w, strings.trim_prefix(line, "\t"))
-					io.write_string(w, "\n")
-				}
-				io.write_string(w, "</pre>\n")
+			io.write_string(w, "<pre>")
+			for line in lines {
+				io.write_string(w, strings.trim_prefix(line, "\t"))
+				io.write_string(w, "\n")
 			}
+			io.write_string(w, "</pre>\n")
+		case .Example: panic("We should not have example blocks in the block array")
+		case .Output: panic("We should not have output blocks in the block array")
+		}
+	}
+
+	// Write example and output block if required
+	if example_block.kind == .Example {
+		trim_empty_and_subtitle_lines :: proc(lines: []string, subtitle: string) -> []string {
+			lines := lines
+			for len(lines) > 0 && (strings.trim_space(lines[0]) == "" || strings.has_prefix(lines[0], subtitle)) {
+				lines = lines[1:]
+			}
+			for len(lines) > 0 && (strings.trim_space(lines[len(lines) - 1]) == "") {
+				lines = lines[:len(lines) - 1]
+			}
+			return lines
+		}
+		// Example block starts with `Example:` and a number of white spaces,
+		example_lines := trim_empty_and_subtitle_lines(example_block.lines, "Example:")
+
+		io.write_string(w, "<details open class=\"code-example\">\n")
+		defer io.write_string(w, "</details>\n")
+		io.write_string(w, "<summary><b>Example:</b></summary>\n")
+		io.write_string(w, `<pre><code class="hljs" data-lang="odin">`)
+		for line in example_lines {
+			io.write_string(w, strings.trim_prefix(line, "\t"))
+			io.write_string(w, "\n")
+		}
+		io.write_string(w, "</code></pre>\n")
+
+		// Add the output block if it is present
+		if output_block.kind == .Output {
+			// Output block starts with `Output:` and a number of white spaces,
+			output_lines := trim_empty_and_subtitle_lines(output_block.lines, "Output:")
+
+			io.write_string(w, "<b>Output:</b>\n")
+			io.write_string(w, `<pre class="doc-code">`)
+			for line in output_lines {
+				io.write_string(w, strings.trim_prefix(line, "\t"))
+				io.write_string(w, "\n")
+			}
+			io.write_string(w, "</pre>\n")
 		}
 	}
 }
@@ -1663,7 +1745,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		if the_docs != "" {
 			fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
 			fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
-			write_docs(w, the_docs)
+			write_docs(w, the_docs, str(e.name))
 			fmt.wprintln(w, `</details>`)
 		}
 	}
