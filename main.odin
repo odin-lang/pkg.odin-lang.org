@@ -17,6 +17,8 @@ GITHUB_VENDOR_URL :: "https://github.com/odin-lang/Odin/tree/master/vendor"
 BASE_CORE_URL :: "/core"
 BASE_VENDOR_URL :: "/vendor"
 
+HTML_LESS_THAN :: "&lt;"
+
 header:   ^doc.Header
 files:    []doc.File
 pkgs:     []doc.Pkg
@@ -525,7 +527,7 @@ calc_name_width :: proc(type_entities: []doc.Entity_Index) -> (name_width: int) 
 	return
 }
 
-write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type_Flags) {
+write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type_Flags, is_file: bool = false) {
 	write_param_entity :: proc(using writer: ^Type_Writer, e, next_entity: ^doc.Entity, flags: Write_Type_Flags, name_width := 0) {
 		name := str(e.name)
 
@@ -604,6 +606,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 				}
 				write_type(writer, the_type, type_flags)
 			case .Type_Name:
+
 				io.write_byte(w, '$')
 				io.write_string(w, name)
 				generic_scope[name] = true
@@ -1097,7 +1100,8 @@ write_doc_line :: proc(w: io.Writer, text: string) {
 }
 
 write_markup_text :: proc(w: io.Writer, s: string) {
-	s := s
+	// We need to ensure that we don't escape html tags in our docs
+	s, _ := strings.replace_all(s, "<", HTML_LESS_THAN, context.temp_allocator)
 	// Consume '- ' if the string begins with one
 	// this means we need to make a bullet point
 	is_list_element: bool
@@ -1176,6 +1180,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 	if docs == "" {
 		return
 	}
+
 	Block_Kind :: enum {
 		Paragraph,
 		Code,
@@ -1326,7 +1331,9 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 
 			io.write_string(w, "<pre>")
 			for line in lines {
-				io.write_string(w, strings.trim_prefix(line, "\t"))
+				trimmed := strings.trim_prefix(line, "\t")
+				s, _ := strings.replace_all(trimmed, "<", HTML_LESS_THAN, context.temp_allocator)
+				io.write_string(w, s)
 				io.write_string(w, "\n")
 			}
 			io.write_string(w, "</pre>\n")
@@ -1337,7 +1344,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 
 	// Write example and output block if required
 	if example_block.kind == .Example {
-		trim_empty_and_subtitle_lines :: proc(lines: []string, subtitle: string) -> []string {
+		trim_empty_and_subtitle_lines_and_replace_lt :: proc(lines: []string, subtitle: string) -> []string {
 			lines := lines
 			for len(lines) > 0 && (strings.trim_space(lines[0]) == "" || strings.has_prefix(lines[0], subtitle)) {
 				lines = lines[1:]
@@ -1345,10 +1352,13 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 			for len(lines) > 0 && (strings.trim_space(lines[len(lines) - 1]) == "") {
 				lines = lines[:len(lines) - 1]
 			}
+			for line in &lines {
+				line, _ = strings.replace_all(line, "<", HTML_LESS_THAN, context.temp_allocator)
+			}
 			return lines
 		}
 		// Example block starts with `Example:` and a number of white spaces,
-		example_lines := trim_empty_and_subtitle_lines(example_block.lines, "Example:")
+		example_lines := trim_empty_and_subtitle_lines_and_replace_lt(example_block.lines, "Example:")
 
 		io.write_string(w, "<details open class=\"code-example\">\n")
 		defer io.write_string(w, "</details>\n")
@@ -1363,7 +1373,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 		// Add the output block if it is present
 		if output_block.kind == .Output {
 			// Output block starts with `Output:` and a number of white spaces,
-			output_lines := trim_empty_and_subtitle_lines(output_block.lines, "Output:")
+			output_lines := trim_empty_and_subtitle_lines_and_replace_lt(output_block.lines, "Output:")
 
 			io.write_string(w, "<b>Output:</b>\n")
 			io.write_string(w, `<pre class="doc-code">`)
@@ -1684,6 +1694,10 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 				fmt.wprint(w, `<pre class="doc-code">`)
 				defer fmt.wprintln(w, "</pre>")
 
+                do_file := name == "FILE"
+                if do_file {
+                    fmt.printf("FILE\n")
+                }
 				fmt.wprintf(w, "%s :: ", name)
 				the_type := types[e.type]
 				type_to_print := the_type
@@ -1704,7 +1718,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 						type_to_print = bt
 					}
 				}
-				write_type(writer, type_to_print, {.Allow_Indent})
+				write_type(writer, type_to_print, {.Allow_Indent}, do_file)
 			case .Builtin:
 				fmt.wprint(w, `<pre class="doc-code">`)
 				fmt.wprintf(w, "%s :: ", name)
