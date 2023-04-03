@@ -527,7 +527,7 @@ calc_name_width :: proc(type_entities: []doc.Entity_Index) -> (name_width: int) 
 	return
 }
 
-write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type_Flags, is_file: bool = false) {
+write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type_Flags) {
 	write_param_entity :: proc(using writer: ^Type_Writer, e, next_entity: ^doc.Entity, flags: Write_Type_Flags, name_width := 0) {
 		name := str(e.name)
 
@@ -1694,10 +1694,6 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 				fmt.wprint(w, `<pre class="doc-code">`)
 				defer fmt.wprintln(w, "</pre>")
 
-                do_file := name == "FILE"
-                if do_file {
-                    fmt.printf("FILE\n")
-                }
 				fmt.wprintf(w, "%s :: ", name)
 				the_type := types[e.type]
 				type_to_print := the_type
@@ -1718,7 +1714,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 						type_to_print = bt
 					}
 				}
-				write_type(writer, type_to_print, {.Allow_Indent}, do_file)
+				write_type(writer, type_to_print, {.Allow_Indent})
 			case .Builtin:
 				fmt.wprint(w, `<pre class="doc-code">`)
 				fmt.wprintf(w, "%s :: ", name)
