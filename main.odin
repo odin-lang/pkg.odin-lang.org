@@ -733,7 +733,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		}
 		if .Private in e.flags {
 			io.write_string(w, name)
-		} else if n := strings.contains_rune(name, '('); n >= 0 {
+		} else if n := strings.index_rune(name, '('); n >= 0 {
 			fmt.wprintf(w, `<a class="code-typename" href="{2:s}/{0:s}/#{1:s}">{1:s}</a>`, pkg_to_path[&pkgs[tn_pkg]], name[:n], collection.base_url)
 			io.write_string(w, name[n:])
 		} else {
