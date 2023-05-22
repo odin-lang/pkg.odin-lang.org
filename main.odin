@@ -1927,7 +1927,8 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 				if .Param_Using in field.flags {
 					field_type := types[field.type]
 					field_type_entity := &entities[array(field_type.entities)[0]]
-					write_objc_methods(w, pkg, field_type_entity, method_names_seen, true)
+					field_pkg := &pkgs[files[field.pos.file].pkg]
+					write_objc_methods(w, field_pkg, field_type_entity, method_names_seen, true)
 				}
 			}
 		}
