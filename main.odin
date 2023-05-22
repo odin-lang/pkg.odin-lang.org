@@ -538,12 +538,12 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			}
 		}
 
-		if .Param_Using     in e.flags { io.write_string(w, "using ")      }
-		if .Param_Const     in e.flags { io.write_string(w, "#const ")     }
-		if .Param_Auto_Cast in e.flags { io.write_string(w, "#auto_cast ") }
-		if .Param_CVararg   in e.flags { io.write_string(w, "#c_vararg ")  }
-		if .Param_No_Alias  in e.flags { io.write_string(w, "#no_alias ")  }
-		if .Param_Any_Int   in e.flags { io.write_string(w, "#any_int ")   }
+		if .Param_Using     in e.flags { io.write_string(w, `<span class="keyword-type"> using</span> `)      }
+		if .Param_Const     in e.flags { io.write_string(w, `<span class="keyword-type"> #const</span> `)     }
+		if .Param_Auto_Cast in e.flags { io.write_string(w, `<span class="keyword-type"> #auto_cast</span> `) }
+		if .Param_CVararg   in e.flags { io.write_string(w, `<span class="keyword-type"> #c_vararg</span> `)  }
+		if .Param_No_Alias  in e.flags { io.write_string(w, `<span class="keyword-type"> #no_alias</span> `)  }
+		if .Param_Any_Int   in e.flags { io.write_string(w, `<span class="keyword-type"> #any_int</span> `)   }
 
 		init_string := str(e.init_string)
 		switch {
