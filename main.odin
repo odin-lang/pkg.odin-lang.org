@@ -1848,9 +1848,8 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		return true
 	}
 
-	write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, method_names_seen: ^map[string]bool) {
+	write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, method_names_seen: ^map[string]bool, is_inherited := false) {
 		methods: [dynamic]^doc.Entity
-		defer delete(methods)
 
 		parent_name := str(parent.name)
 
@@ -1872,9 +1871,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		}
 
 		seen_item := false
-		defer if seen_item {
-			fmt.wprintln(w, "</ul>")
-		}
+
 		loop: for e in methods {
 			method_name := find_entity_attribute(e, "objc_name") or_else panic("unable to find objc_name")
 			method_name, _ = strconv.unquote_string(method_name) or_else panic("unable to unquote method name")
@@ -1884,7 +1881,12 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			}
 			method_names_seen[method_name] = true
 			if !seen_item {
-				fmt.wprintln(w, "<h5>Bound Objective-C Methods</h5>")
+				if is_inherited {
+					fmt.wprintf(w, `<h6>Methods Inherited From <a href="#%s">%s</a></h6>`, parent_name, parent_name)
+					fmt.wprintln(w)
+				} else {
+					fmt.wprintln(w, "<h5>Bound Objective-C Methods</h5>")
+				}
 				fmt.wprintln(w, "<ul>")
 				seen_item = true
 			}
@@ -1904,7 +1906,24 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			fmt.wprintln(w)
 		}
 
-		// TODO(bill): look recursively for any `using` fields
+		if seen_item {
+			fmt.wprintln(w, "</ul>")
+		}
+
+		delete(methods)
+
+		recursive_inheritance_check: {
+			parent_type := base_type(types[parent.type])
+			assert(parent_type.kind == .Struct)
+			for field_idx in array(parent_type.entities) {
+				field := &entities[field_idx]
+				if .Param_Using in field.flags {
+					field_type := types[field.type]
+					field_type_entity := &entities[array(field_type.entities)[0]]
+					write_objc_methods(w, pkg, field_type_entity, method_names_seen, true)
+				}
+			}
+		}
 	}
 
 	for eo in entity_ordering {
