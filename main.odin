@@ -1974,7 +1974,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			method_names_seen[method_name] = true
 			if !seen_item {
 				if is_inherited {
-					fmt.wprintf(w, `<h6>Methods Inherited From <a href="#%s">%s</a></h6>`, parent_name, parent_name)
+					fmt.wprintf(w, `<h6>Methods Inherited From <a href="%s/%s/#%s">%s</a></h6>`, pkg_to_collection[pkg].base_url, pkg_to_path[pkg], parent_name, parent_name)
 					fmt.wprintln(w)
 				} else {
 					fmt.wprintln(w, "<h5>Bound Objective-C Methods</h5>")
