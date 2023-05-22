@@ -1922,8 +1922,9 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		recursive_inheritance_check: {
 			parent_type := base_type(types[parent.type])
 			assert(parent_type.kind == .Struct)
-			for field_idx in array(parent_type.entities) {
-				field := &entities[field_idx]
+			fields := array(parent_type.entities)
+			for field_idx := len(fields)-1; field_idx >= 0; field_idx -= 1 {
+				field := &entities[fields[field_idx]]
 				if .Param_Using in field.flags {
 					field_type := types[field.type]
 					field_type_entity := &entities[array(field_type.entities)[0]]
