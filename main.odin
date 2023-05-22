@@ -1984,7 +1984,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			}
 
 			fmt.wprintf(w, "<li>")
-			fmt.wprintf(w, `<a href="#%s">%s</a>`, str(e.name), method_name)
+			fmt.wprintf(w, `<a href="%s/%s/#%s">%s</a>`, pkg_to_collection[pkg].base_url, pkg_to_path[pkg], str(e.name), method_name)
 
 			if v, ok := find_entity_attribute(e, "objc_is_class_method"); ok && v == "true" {
 				fmt.wprintf(w, `&nbsp;<em>(class method)</em>`)
