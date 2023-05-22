@@ -730,7 +730,14 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		}
 
 		if tn_pkg != pkg {
-			fmt.wprintf(w, `%s.`, str(pkgs[tn_pkg].name))
+			// remove the extra prefix e.g. `foo.foo.bar`
+			name_prefix := name
+			if n := strings.index_byte(name_prefix, '('); n >= 0 {
+				name_prefix = name_prefix[:n]
+			}
+			if !strings.contains_rune(name_prefix, '.') {
+				fmt.wprintf(w, `%s.`, str(pkgs[tn_pkg].name))
+			}
 		}
 		if .Private in e.flags {
 			io.write_string(w, name)
