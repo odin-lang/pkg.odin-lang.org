@@ -923,6 +923,10 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		span_multiple_lines := false
 		if .Allow_Multiple_Lines in flags && .Is_Results not_in flags {
 			span_multiple_lines = len(type_entities) >= 6
+
+			if strings.has_prefix(str(pkgs[pkg].name), "objc_") {
+				span_multiple_lines = true
+			}
 		}
 
 		full_name_width :: proc(entity_indices: []doc.Entity_Index) -> (width: int) {
@@ -1755,7 +1759,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 				}
 				fmt.wprintln(w, "</pre>")
 
-				write_objc_method_info(w, pkg, e)
+				write_objc_method_info(writer, pkg, e)
 
 			case .Proc_Group:
 				fmt.wprint(w, `<pre class="doc-code">`)
@@ -1770,7 +1774,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 				fmt.wprintln(w, "}")
 				fmt.wprintln(w, "</pre>")
 
-				write_objc_method_info(w, pkg, e)
+				write_objc_method_info(writer, pkg, e)
 			}
 		}
 		fmt.wprintln(w, `</div>`)
@@ -1821,7 +1825,9 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		fmt.wprintln(w, "</section>")
 	}
 
-	write_objc_method_info :: proc(w: io.Writer, pkg: ^doc.Pkg, e: ^doc.Entity) -> bool {
+	write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Entity) -> bool {
+		w := writer.w
+
 		objc_name := find_entity_attribute(e, "objc_name") or_return
 		objc_type := find_entity_attribute(e, "objc_type") or_return
 		objc_name, _ = strconv.unquote_string(objc_name)   or_return
@@ -1852,6 +1858,98 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		}
 		fmt.wprintln(w, `</ul>`)
 		fmt.wprintln(w, `</div>`)
+
+		fmt.wprintln(w, "<h5>Syntax Usage</h5>")
+		fmt.wprintln(w, "<pre>")
+
+		write_syntax_usage :: proc(w: io.Writer, e: ^doc.Entity, objc_name: string, parent: ^doc.Entity, is_class_method: bool) {
+			assert(e.kind == .Procedure)
+			pt := base_type(types[e.type])
+			pentities: []doc.Entity_Index
+			rentities: []doc.Entity_Index
+
+			params := &types[array(pt.types)[0]]
+			if params.kind == .Tuple {
+				pentities = array(params.entities)
+				if !is_class_method {
+					pentities = pentities[1:]
+				}
+			}
+
+			results := &types[array(pt.types)[1]]
+			if results.kind == .Tuple {
+				rentities = array(results.entities)
+			}
+
+			if len(rentities) != 0 {
+				for e_idx, i in rentities {
+					if i != 0 {
+						fmt.wprintf(w, ", ")
+					}
+					e := &entities[e_idx]
+					name := str(e.name)
+					if name != "" {
+						fmt.wprintf(w, "%s", name)
+					} else {
+						if len(rentities) == 1 {
+							fmt.wprintf(w, "res")
+						} else {
+							fmt.wprintf(w, "res%d", i)
+						}
+					}
+				}
+				fmt.wprintf(w, " := ")
+			}
+
+			if is_class_method {
+				fmt.wprintf(w, `<a href="#{0:s}">{0:s}</a>.`, str(parent.name))
+			} else {
+				fmt.wprintf(w, "self->")
+			}
+
+			fmt.wprintf(w, `<a href="#{0:s}">{1:s}</a>(`, str(e.name), objc_name)
+			if len(pentities) > 1 {
+				fmt.wprintf(w, "\n")
+				for e_idx, i in pentities {
+					e := &entities[e_idx]
+					fmt.wprintf(w, "\t%s,\n", str(e.name))
+				}
+			} else {
+				for e_idx, i in pentities {
+					if i != 0 {
+						fmt.wprintf(w, ", ")
+					}
+					e := &entities[e_idx]
+					fmt.wprintf(w, "%s", str(e.name))
+				}
+			}
+			fmt.wprintf(w, ")\n")
+		}
+
+		#partial switch e.kind {
+		case .Procedure:
+			write_syntax_usage(w, e, objc_name, parent, is_class_method)
+		case .Proc_Group:
+			for e_idx in array(e.grouped_entities) {
+				e := &entities[e_idx]
+				write_syntax_usage(w, e, objc_name, parent, is_class_method)
+			}
+		}
+
+		fmt.wprintln(w, "</pre>")
+		if e.kind == .Proc_Group {
+
+		}
+		// fmt.wprintf(w, "", objc_name)
+		// write_type(writer, types[e.type], {.Allow_Multiple_Lines})
+		// write_where_clauses(w, array(e.where_clauses))
+		// if .Foreign in e.flags {
+		// 	fmt.wprint(w, " ---")
+		// } else {
+		// 	fmt.wprint(w, " {…}")
+		// }
+		// fmt.wprintln(w, "</pre>")
+
 		return true
 	}
 
