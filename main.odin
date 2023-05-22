@@ -1937,19 +1937,6 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		}
 
 		fmt.wprintln(w, "</pre>")
-		if e.kind == .Proc_Group {
-
-		}
-		// fmt.wprintf(w, "", objc_name)
-		// write_type(writer, types[e.type], {.Allow_Multiple_Lines})
-		// write_where_clauses(w, array(e.where_clauses))
-		// if .Foreign in e.flags {
-		// 	fmt.wprint(w, " ---")
-		// } else {
-		// 	fmt.wprint(w, " {…}")
-		// }
-		// fmt.wprintln(w, "</pre>")
-
 		return true
 	}
 
