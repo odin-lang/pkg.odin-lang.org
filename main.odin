@@ -5,6 +5,7 @@ import "core:fmt"
 import "core:io"
 import "core:os"
 import "core:strings"
+import "core:strconv"
 import "core:path/slashpath"
 import "core:sort"
 import "core:slice"
@@ -1694,6 +1695,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 				fmt.wprint(w, `<pre class="doc-code">`)
 				defer fmt.wprintln(w, "</pre>")
 
+				write_attributes(w, e)
 				fmt.wprintf(w, "%s :: ", name)
 				the_type := types[e.type]
 				type_to_print := the_type
@@ -1757,6 +1759,19 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
 			write_docs(w, the_docs, str(e.name))
 			fmt.wprintln(w, `</details>`)
+		}
+
+
+		attr_loop: for attr in array(e.attributes) do if str(attr.name) == "objc_class" {
+			cls_name, allocated, cls_name_ok := strconv.unquote_string(str(attr.value))
+			defer if allocated { delete(cls_name) }
+			if cls_name_ok {
+				switch str(pkg.name) {
+				case "objc_Metal":
+					fmt.wprintf(w, `<em>Apple's Metal Documentation: <a href="https://developer.apple.com/documentation/metal/%s?language=objc">%s</a></em>`, cls_name, cls_name)
+				}
+			}
+			break attr_loop
 		}
 	}
 	write_entries :: proc(w: io.Writer,pkg: ^doc.Pkg, title: string, entries: []doc.Scope_Entry) {
