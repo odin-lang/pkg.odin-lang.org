@@ -1452,6 +1452,14 @@ write_breadcrumbs :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection:
 	io.write_string(w, "</ol>\n")
 }
 
+find_entity_attribute :: proc(e: ^doc.Entity, key: string) -> (value: string, ok: bool) {
+	for attr in array(e.attributes) {
+		if str(attr.name) == key {
+			return str(attr.value), true
+		}
+	}
+	return
+}
 
 write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^Collection) {
 	fmt.wprintln(w, `<div class="row odin-main" id="pkg">`)
@@ -1762,19 +1770,26 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		}
 
 
-		attr_loop: for attr in array(e.attributes) do if str(attr.name) == "objc_class" {
-			cls_name, allocated, cls_name_ok := strconv.unquote_string(str(attr.value))
+		if raw_cls_name, ok := find_entity_attribute(e, "objc_class"); ok {
+			cls_name, allocated, cls_name_ok := strconv.unquote_string(raw_cls_name)
 			defer if allocated { delete(cls_name) }
-			if cls_name_ok {
-				switch str(pkg.name) {
-				case "objc_Metal":
-					fmt.wprintf(w, `<em>Apple's Metal Documentation: <a href="https://developer.apple.com/documentation/metal/%s?language=objc">%s</a></em>`, cls_name, cls_name)
-				}
+			assert(cls_name_ok)
+
+			fmt.wprintln(w, `<div>`)
+			defer fmt.wprintln(w, `</div>`)
+
+			method_names_seen: map[string]bool
+			write_objc_methods(w, pkg, e, &method_names_seen)
+			delete(method_names_seen)
+
+			switch str(pkg.name) {
+			case "objc_Metal":
+				fmt.wprintf(w, `<em>Apple's Metal Documentation: <a href="https://developer.apple.com/documentation/metal/%s?language=objc">%s</a></em>`, cls_name, cls_name)
 			}
-			break attr_loop
+
 		}
 	}
-	write_entries :: proc(w: io.Writer,pkg: ^doc.Pkg, title: string, entries: []doc.Scope_Entry) {
+	write_entries :: proc(w: io.Writer, pkg: ^doc.Pkg, title: string, entries: []doc.Scope_Entry) {
 		fmt.wprintf(w, "<h2 id=\"pkg-{0:s}\" class=\"pkg-header\">{0:s}</h2>\n", title)
 		fmt.wprintln(w, `<section class="documentation">`)
 		if len(entries) == 0 {
@@ -1787,6 +1802,63 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			}
 		}
 		fmt.wprintln(w, "</section>")
+	}
+
+	write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, method_names_seen: ^map[string]bool) {
+		methods: [dynamic]^doc.Entity
+		defer delete(methods)
+
+		parent_name := str(parent.name)
+
+		for entry in array(pkg.entries) {
+			e := &entities[entry.entity]
+			if e.kind == .Proc_Group {
+				if type_name, ok := find_entity_attribute(e, "objc_type"); ok && parent_name == type_name {
+					append(&methods, e)
+				}
+			}
+		}
+		for entry in array(pkg.entries) {
+			e := &entities[entry.entity]
+			if e.kind == .Procedure {
+				if type_name, ok := find_entity_attribute(e, "objc_type"); ok && parent_name == type_name {
+					append(&methods, e)
+				}
+			}
+		}
+
+		seen_item := false
+		defer if seen_item {
+			fmt.wprintln(w, "</ul>")
+		}
+		loop: for e in methods {
+			method_name := find_entity_attribute(e, "objc_name") or_else panic("unable to find objc_name")
+			method_name, _ = strconv.unquote_string(method_name) or_else panic("unable to unquote method name")
+
+			if method_names_seen[method_name] {
+				continue loop
+			}
+			method_names_seen[method_name] = true
+			if !seen_item {
+				fmt.wprintln(w, "<h5>Bound Objective-C Methods</h5>")
+				fmt.wprintln(w, "<ul>")
+				seen_item = true
+			}
+
+			fmt.wprintf(w, "<li>")
+			fmt.wprintf(w, `<a href="#%s">%s</a>`, str(e.name), method_name)
+
+			if v, ok := find_entity_attribute(e, "objc_is_class_method"); ok && v == "true" {
+				fmt.wprintf(w, `&nbsp;(class method)`)
+			}
+			if e.kind == .Proc_Group {
+				fmt.wprintf(w, `&nbsp;(overloaded method)`)
+			}
+
+			fmt.wprintf(w, "</li>")
+
+			fmt.wprintln(w)
+		}
 	}
 
 	for eo in entity_ordering {
