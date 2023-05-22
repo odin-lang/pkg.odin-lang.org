@@ -1000,6 +1000,12 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		type_flags := transmute(doc.Type_Flags_Proc)type.flags
 		io.write_string(w, "<span class=\"keyword-type\">proc</span>")
 		cc := str(type.calling_convention)
+		switch cc {
+		case "odin":
+			cc = "" // ignore
+		case "cdecl":
+			cc = "c"
+		}
 		if cc != "" {
 			io.write_byte(w, ' ')
 			io.write_quoted_string(w, cc)
@@ -1741,6 +1747,9 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 					fmt.wprint(w, " {…}")
 				}
 				fmt.wprintln(w, "</pre>")
+
+				write_objc_method_info(w, pkg, e)
+
 			case .Proc_Group:
 				fmt.wprint(w, `<pre class="doc-code">`)
 				fmt.wprintf(w, "%s :: proc{{\n", name)
@@ -1754,6 +1763,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 				fmt.wprintln(w, "}")
 				fmt.wprintln(w, "</pre>")
 
+				write_objc_method_info(w, pkg, e)
 			}
 		}
 		fmt.wprintln(w, `</div>`)
@@ -1804,6 +1814,40 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		fmt.wprintln(w, "</section>")
 	}
 
+	write_objc_method_info :: proc(w: io.Writer, pkg: ^doc.Pkg, e: ^doc.Entity) -> bool {
+		objc_name := find_entity_attribute(e, "objc_name") or_return
+		objc_type := find_entity_attribute(e, "objc_type") or_return
+		objc_name, _ = strconv.unquote_string(objc_name)   or_return
+
+		objc_is_class_method, _ := find_entity_attribute(e, "objc_is_class_method")
+		is_class_method := objc_is_class_method == "true"
+
+		parent: ^doc.Entity
+		for entry in array(pkg.entries) {
+			e := &entities[entry.entity]
+			if e.kind == .Type_Name && str(e.name) == objc_type {
+				parent = e
+				break
+			}
+		}
+		if parent == nil {
+			return false
+		}
+
+		fmt.wprintln(w, `<div>`)
+
+		fmt.wprintln(w, `<h5>Objective-C Method Information</h5>`)
+		fmt.wprintln(w, `<ul>`)
+		fmt.wprintf(w, `<li>Class: <a href="#%s">%s</a></li>`+"\n", objc_type, objc_type)
+		fmt.wprintf(w, `<li>Name: <strong>%s</strong></li>`+"\n", objc_name)
+		if is_class_method {
+			fmt.wprintf(w, `<li>Kind: <em>Class Method</em></li>`+"\n")
+		}
+		fmt.wprintln(w, `</ul>`)
+		fmt.wprintln(w, `</div>`)
+		return true
+	}
+
 	write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, method_names_seen: ^map[string]bool) {
 		methods: [dynamic]^doc.Entity
 		defer delete(methods)
@@ -1849,16 +1893,18 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			fmt.wprintf(w, `<a href="#%s">%s</a>`, str(e.name), method_name)
 
 			if v, ok := find_entity_attribute(e, "objc_is_class_method"); ok && v == "true" {
-				fmt.wprintf(w, `&nbsp;(class method)`)
+				fmt.wprintf(w, `&nbsp;<em>(class method)</em>`)
 			}
 			if e.kind == .Proc_Group {
-				fmt.wprintf(w, `&nbsp;(overloaded method)`)
+				fmt.wprintf(w, `&nbsp;<em>(overloaded method)</em>`)
 			}
 
 			fmt.wprintf(w, "</li>")
 
 			fmt.wprintln(w)
 		}
+
+		// TODO(bill): look recursively for any `using` fields
 	}
 
 	for eo in entity_ordering {
