@@ -1873,7 +1873,6 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	}
 	write_entries :: proc(w: io.Writer, pkg: ^doc.Pkg, title: string, entries: []doc.Scope_Entry) {
 		fmt.wprintf(w, "<h2 id=\"pkg-{0:s}\" class=\"pkg-header\">{0:s}</h2>\n", title)
-		fmt.wprintln(w, `<section class="documentation">`)
 		if len(entries) == 0 {
 			io.write_string(w, "<p class=\"pkg-empty-section\">This section is empty.</p>\n")
 		} else {
@@ -1883,7 +1882,6 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 				fmt.wprintln(w, `</div>`)
 			}
 		}
-		fmt.wprintln(w, "</section>")
 	}
 
 	write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Entity) -> bool {
@@ -2081,9 +2079,11 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		}
 	}
 
+	fmt.wprintln(w, `<section class="documentation">`)
 	for eo in pkg_entries.ordering {
 		write_entries(w, pkg, eo.name, eo.entries)
 	}
+	fmt.wprintln(w, "</section>")
 
 	fmt.wprintln(w, `<h2 id="pkg-source-files">Source Files</h2>`)
 	fmt.wprintln(w, "<ul>")
