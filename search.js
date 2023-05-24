@@ -1,5 +1,6 @@
 "use strict";
 
+var odin_pkg_name;
 var odin_pkg_data;
 
 let odin_search = document.getElementById("odin-search");
@@ -27,7 +28,9 @@ if (odin_search) {
 		return score;
 	};
 
-	let entities = odin_pkg_data.entities.map(e => e.name);
+	var pkg_data = odin_pkg_data.packages[odin_pkg_name];
+
+	let entities = pkg_data.entities.map(e => e.name);
 	let doc_entities = getElementsByClassNameArray("doc-id-link").map(x => x.closest(".pkg-entity")).filter(x => x);
 
 	let pkg_top = document.getElementById("pkg-top");

@@ -282,24 +282,36 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection) {
 		recursive_make_directory(path, dir)
 		os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
 	}
-	now := time.now()
-	for path, pkg in collection.pkgs_to_use {
+	{
 		strings.builder_reset(b)
-		entries := entries_map[pkg]
+		now := time.now()
 		fmt.wprintf(w, "/** Generated with odin version %s (vendor %q) %s_%s @ %v */\n", ODIN_VERSION, ODIN_VENDOR, ODIN_OS, ODIN_ARCH, now)
 		fmt.wprint(w, "var odin_pkg_data={\n")
-		fmt.wprintf(w, "\"pkg\":\"%s\",\n", str(pkg.name))
-		fmt.wprint(w, "\"entities\":[\n")
-		for e, i in entries.all {
-			if i != 0 { fmt.wprint(w, ",\n") }
-			fmt.wprint(w, "{")
-			fmt.wprintf(w, `"name":%q,`, str(e.name))
-			fmt.wprintf(w, `"full":"%s.%s"`, str(pkg.name), str(e.name))
-			fmt.wprint(w, "}")
+		fmt.wprintf(w, "\"path\":\"%s\",\n", collection.base_url)
+		fmt.wprintf(w, "\"collection\":\"%s\",\n", collection.name)
+		fmt.wprintln(w, `"packages":{`)
+		pkg_idx := 0
+		for path, pkg in collection.pkgs_to_use {
+			entries := entries_map[pkg]
+			if pkg_idx != 0 {
+				fmt.wprintln(w, ",")
+			}
+			fmt.wprintf(w, "\"%s\": {{\n", str(pkg.name))
+			fmt.wprintf(w, "\"path\":\"%s/%s\",\n", collection.base_url, path)
+			fmt.wprint(w, "\"entities\":[\n")
+			for e, i in entries.all {
+				if i != 0 { fmt.wprint(w, ",\n") }
+				fmt.wprint(w, "{")
+				fmt.wprintf(w, `"name":%q,`, str(e.name))
+				fmt.wprintf(w, `"full":"%s.%s"`, str(pkg.name), str(e.name))
+				fmt.wprint(w, "}")
+			}
+			fmt.wprint(w, "\n]}")
+			pkg_idx += 1
 		}
-		fmt.wprint(w, "\n]};")
-		fmt.wprintln(w)
-		os.write_entire_file(fmt.tprintf("%s/%s/data.js", dir, path), b.buf[:])
+		fmt.wprintln(w, "}};")
+
+		os.write_entire_file(fmt.tprintf("%s/pkg-data.js", dir), b.buf[:])
 	}
 
 }
@@ -2153,6 +2165,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		fmt.wprintln(w, `</div></div>`)
 	}
 
-	io.write_string(w, `<script type="text/javascript" src="data.js"></script>`)
+	fmt.wprintf(w, `<script type="text/javascript">var odin_pkg_name = "%s";</script>`+"\n", str(pkg.name))
+	fmt.wprintf(w, `<script type="text/javascript" src="%s/pkg-data.js"></script>`+"\n", collection.base_url)
 
 }
