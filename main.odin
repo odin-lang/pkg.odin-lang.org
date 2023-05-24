@@ -171,14 +171,14 @@ main :: proc() {
 	types    = array(header.types)
 
 	core_collection := &Collection{
-		name        = "Core",
+		name        = "core",
 		pkgs_to_use = &core_pkgs_to_use,
 		github_url  = GITHUB_CORE_URL,
 		base_url    = BASE_CORE_URL,
 		root        = nil,
 	}
 	vendor_collection := &Collection{
-		name =        "Vendor",
+		name =        "vendor",
 		pkgs_to_use = &vendor_pkgs_to_use,
 		github_url =  GITHUB_VENDOR_URL,
 		base_url =    BASE_VENDOR_URL,
@@ -247,12 +247,15 @@ main :: proc() {
 	core_collection.root   = generate_directory_tree(core_pkgs_to_use)
 	vendor_collection.root = generate_directory_tree(vendor_pkgs_to_use)
 
-	generate_packages(&b, core_collection, "core")
-	generate_packages(&b, vendor_collection, "vendor")
+	generate_packages(&b, core_collection)
+	generate_packages(&b, vendor_collection)
 }
 
-generate_packages :: proc(b: ^strings.Builder, collection: ^Collection, dir: string) {
+
+generate_packages :: proc(b: ^strings.Builder, collection: ^Collection) {
 	w := strings.to_writer(b)
+
+	dir := collection.name
 
 	{
 		strings.builder_reset(b)
@@ -263,14 +266,42 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection, dir: str
 		os.write_entire_file(fmt.tprintf("%s/index.html", dir), b.buf[:])
 	}
 
+	entries_map := make(map[^doc.Pkg]Pkg_Entries, len(collection.pkgs_to_use))
+	for _, pkg in collection.pkgs_to_use {
+		entries_map[pkg] = pkg_entries_gather(pkg)
+	}
+	defer for _, entries in &entries_map {
+		pkg_entries_destroy(&entries)
+	}
+
 	for path, pkg in collection.pkgs_to_use {
 		strings.builder_reset(b)
 		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width)
-		write_pkg(w, dir, path, pkg, collection)
+		write_pkg(w, dir, path, pkg, collection, entries_map[pkg])
 		write_html_footer(w, false)
 		recursive_make_directory(path, dir)
 		os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
 	}
+	now := time.now()
+	for path, pkg in collection.pkgs_to_use {
+		strings.builder_reset(b)
+		entries := entries_map[pkg]
+		fmt.wprintf(w, "/** Generated with odin version %s (vendor %q) %s_%s @ %v */\n", ODIN_VERSION, ODIN_VENDOR, ODIN_OS, ODIN_ARCH, now)
+		fmt.wprint(w, "var odin_pkg_data={\n")
+		fmt.wprintf(w, "\"pkg\":\"%s\",\n", str(pkg.name))
+		fmt.wprint(w, "\"entities\":[\n")
+		for e, i in entries.all {
+			if i != 0 { fmt.wprint(w, ",\n") }
+			fmt.wprint(w, "{")
+			fmt.wprintf(w, `"name":%q,`, str(e.name))
+			fmt.wprintf(w, `"full":"%s.%s"`, str(pkg.name), str(e.name))
+			fmt.wprint(w, "}")
+		}
+		fmt.wprint(w, "\n]};")
+		fmt.wprintln(w)
+		os.write_entire_file(fmt.tprintf("%s/%s/data.js", dir, path), b.buf[:])
+	}
+
 }
 
 
@@ -282,7 +313,7 @@ write_home_sidebar :: proc(w: io.Writer) {
 
 	fmt.wprintln(w, `<ul class="nav nav-pills d-flex flex-column">`)
 	fmt.wprintln(w, `<li class="nav-item"><a class="nav-link" href="/core">Core Library</a></li>`)
-	fmt.wprintln(w, `<li class="nav-item"><a class="nav-link" href="/vendor">Vendor Library</a></li>`)
+	fmt.wprintln(w, `<li class="nav-item"><a class="nav-link" href="/vendor">Vendor Libr ary</a></li>`)
 	fmt.wprintln(w, `</ul>`)
 }
 
@@ -410,7 +441,7 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 	{
 		fmt.wprintln(w, `<article class="p-4">`)
 		fmt.wprintln(w, `<header class="collection-header">`)
-		fmt.wprintf(w, "<h1>%s Library Collection</h1>\n", collection.name)
+		fmt.wprintf(w, "<h1 style=\"text-transform: capitalize\">%s Library Collection</h1>\n", collection.name)
 		fmt.wprintln(w, "<ul>")
 		fmt.wprintf(w, "<li>License: <a href=\"{0:s}\">BSD-3-Clause</a></li>\n", GITHUB_LICENSE_URL)
 		fmt.wprintf(w, "<li>Repository: <a href=\"{0:s}\">{0:s}</a></li>\n", collection.github_url)
@@ -1411,7 +1442,7 @@ write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collect
 	fmt.wprintln(w, `<div class="py-3">`)
 	defer fmt.wprintln(w, `</div>`)
 
-	fmt.wprintf(w, "<h4>%s Library</h4>\n", collection.name)
+	fmt.wprintf(w, "<h4 style=\"text-transform: capitalize\">%s Library</h4>\n", collection.name)
 
 	fmt.wprintln(w, `<ul>`)
 	defer fmt.wprintln(w, `</ul>`)
@@ -1478,7 +1509,85 @@ find_entity_attribute :: proc(e: ^doc.Entity, key: string) -> (value: string, ok
 	return
 }
 
-write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^Collection) {
+
+Pkg_Entries :: struct {
+	procs:       [dynamic]doc.Scope_Entry,
+	proc_groups: [dynamic]doc.Scope_Entry,
+	types:       [dynamic]doc.Scope_Entry,
+	vars:        [dynamic]doc.Scope_Entry,
+	consts:      [dynamic]doc.Scope_Entry,
+
+	all:         [dynamic]doc.Scope_Entry,
+
+	ordering: [5]struct{name: string, entries: []doc.Scope_Entry},
+}
+
+pkg_entries_gather :: proc(pkg: ^doc.Pkg) -> (entries: Pkg_Entries) {
+	for entry in array(pkg.entries) {
+		e := &entities[entry.entity]
+		name := str(e.name)
+		if name == "" || name[0] == '_' {
+			continue
+		}
+		name = str(entry.name)
+		if name == "" || name[0] == '_' {
+			continue
+		}
+		switch e.kind {
+		case .Invalid, .Import_Name, .Library_Name:
+			continue
+		case .Constant:
+			append(&entries.consts, entry)
+		case .Variable:
+			append(&entries.vars, entry)
+		case .Type_Name:
+			append(&entries.types, entry)
+		case .Procedure:
+			append(&entries.procs, entry)
+		case .Builtin:
+			append(&entries.procs, entry)
+		case .Proc_Group:
+			append(&entries.proc_groups, entry)
+		}
+		append(&entries.all, entry)
+	}
+
+	entity_key :: proc(entry: doc.Scope_Entry) -> string {
+		return str(entry.name)
+	}
+
+	slice.sort_by_key(entries.procs[:],       entity_key)
+	slice.sort_by_key(entries.proc_groups[:], entity_key)
+	slice.sort_by_key(entries.types[:],       entity_key)
+	slice.sort_by_key(entries.vars[:],        entity_key)
+	slice.sort_by_key(entries.consts[:],      entity_key)
+	slice.sort_by_key(entries.all[:],         entity_key)
+
+	entries.ordering = {
+		{"Types",            entries.types[:]},
+		{"Constants",        entries.consts[:]},
+		{"Variables",        entries.vars[:]},
+		{"Procedures",       entries.procs[:]},
+		{"Procedure Groups", entries.proc_groups[:]},
+	}
+	return
+}
+
+pkg_entries_destroy :: proc(entries: ^Pkg_Entries) {
+	delete(entries.procs)
+	delete(entries.proc_groups)
+	delete(entries.types)
+	delete(entries.vars)
+	delete(entries.consts)
+	entries^ = {}
+}
+
+write_search :: proc(w: io.Writer) {
+	fmt.wprintln(w, `<input type="search" id="odin-search" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">`)
+}
+
+
+write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^Collection, pkg_entries: Pkg_Entries) {
 	fmt.wprintln(w, `<div class="row odin-main" id="pkg">`)
 	defer fmt.wprintln(w, `</div>`)
 
@@ -1495,7 +1604,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	fmt.wprintf(w, "</h1>\n")
 
 	path_url := fmt.tprintf("%s/%s", dir, path)
-	fmt.wprintf(w, "<div id=\"algolia-search\" data-path=\"%s\"></div>\n", path_url)
+	write_search(w)
 
 	// // TODO(bill): determine decent approach for performance
 	// if len(array(pkg.entries)) <= 1000 {
@@ -1503,6 +1612,8 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	// 	io.write_string(w, `<input type="text" id="pkg-fuzzy-search" class="form-control" placeholder="Search Docs...">`+"\n")
 	// 	io.write_string(w, `</div>`+"\n")
 	// }
+
+	fmt.wprintln(w, `<div id="pkg-top">`)
 
 	overview_docs := strings.trim_space(str(pkg.docs))
 	if overview_docs != "" {
@@ -1515,49 +1626,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 
 	fmt.wprintln(w, `<div id="pkg-index">`)
 	fmt.wprintln(w, `<h2>Index</h2>`)
-	pkg_procs:       [dynamic]doc.Scope_Entry
-	pkg_proc_groups: [dynamic]doc.Scope_Entry
-	pkg_types:       [dynamic]doc.Scope_Entry
-	pkg_vars:        [dynamic]doc.Scope_Entry
-	pkg_consts:      [dynamic]doc.Scope_Entry
 
-	for entry in array(pkg.entries) {
-		e := &entities[entry.entity]
-		name := str(e.name)
-		if name == "" || name[0] == '_' {
-			continue
-		}
-		name = str(entry.name)
-		if name == "" || name[0] == '_' {
-			continue
-		}
-		switch e.kind {
-		case .Invalid, .Import_Name, .Library_Name:
-			// ignore
-		case .Constant:
-			append(&pkg_consts, entry)
-		case .Variable:
-			append(&pkg_vars, entry)
-		case .Type_Name:
-			append(&pkg_types, entry)
-		case .Procedure:
-			append(&pkg_procs, entry)
-		case .Builtin:
-			append(&pkg_procs, entry)
-		case .Proc_Group:
-			append(&pkg_proc_groups, entry)
-		}
-	}
-
-	entity_key :: proc(entry: doc.Scope_Entry) -> string {
-		return str(entry.name)
-	}
-
-	slice.sort_by_key(pkg_procs[:],       entity_key)
-	slice.sort_by_key(pkg_proc_groups[:], entity_key)
-	slice.sort_by_key(pkg_types[:],       entity_key)
-	slice.sort_by_key(pkg_vars[:],        entity_key)
-	slice.sort_by_key(pkg_consts[:],      entity_key)
 
 	write_index :: proc(w: io.Writer, name: string, entries: []doc.Scope_Entry) {
 		fmt.wprintln(w, `<div>`)
@@ -1574,7 +1643,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		defer fmt.wprintln(w, `</details>`)
 
 		if len(entries) == 0 {
-			io.write_string(w, "<p>This section is empty.</p>\n")
+			io.write_string(w, "<p class=\"pkg-empty-section\">This section is empty.</p>\n")
 		} else {
 			fmt.wprintln(w, "<ul>")
 			for e in entries {
@@ -1585,19 +1654,11 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		}
 	}
 
-	entity_ordering := [?]struct{name: string, entries: []doc.Scope_Entry} {
-		{"Types",            pkg_types[:]},
-		{"Constants",        pkg_consts[:]},
-		{"Variables",        pkg_vars[:]},
-		{"Procedures",       pkg_procs[:]},
-		{"Procedure Groups", pkg_proc_groups[:]},
-	}
-
-
-	for eo in entity_ordering {
+	for eo in pkg_entries.ordering {
 		write_index(w, eo.name, eo.entries)
 	}
 
+	fmt.wprintln(w, "</div>")
 	fmt.wprintln(w, "</div>")
 
 
@@ -1814,7 +1875,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		fmt.wprintf(w, "<h2 id=\"pkg-{0:s}\" class=\"pkg-header\">{0:s}</h2>\n", title)
 		fmt.wprintln(w, `<section class="documentation">`)
 		if len(entries) == 0 {
-			io.write_string(w, "<p>This section is empty.</p>\n")
+			io.write_string(w, "<p class=\"pkg-empty-section\">This section is empty.</p>\n")
 		} else {
 			for e in entries {
 				fmt.wprintln(w, `<div class="pkg-entity">`)
@@ -2020,7 +2081,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		}
 	}
 
-	for eo in entity_ordering {
+	for eo in pkg_entries.ordering {
 		write_entries(w, pkg, eo.name, eo.entries)
 	}
 
@@ -2077,7 +2138,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		if overview_docs != "" {
 			write_link(w, "pkg-overview", "Overview")
 		}
-		for eo in entity_ordering do if len(eo.entries) != 0 {
+		for eo in pkg_entries.ordering do if len(eo.entries) != 0 {
 			fmt.wprintf(w, `<li><a href="#pkg-{0:s}">{0:s}</a>`, eo.name)
 			fmt.wprintln(w, `<ul>`)
 			for e in eo.entries {
@@ -2091,5 +2152,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		fmt.wprintln(w, `</nav>`)
 		fmt.wprintln(w, `</div></div>`)
 	}
+
+	io.write_string(w, `<script type="text/javascript" src="data.js"></script>`)
 
 }
