@@ -45,6 +45,8 @@ Collection :: struct {
 	github_url: string,
 	base_url:   string,
 	root: ^Dir_Node,
+
+	pkg_entries_map: map[^doc.Pkg]Pkg_Entries,
 }
 
 array :: proc(a: $A/doc.Array($T)) -> []T {
@@ -249,6 +251,59 @@ main :: proc() {
 
 	generate_packages(&b, core_collection)
 	generate_packages(&b, vendor_collection)
+
+	generate_json_pkg_data(&b, core_collection, vendor_collection)
+}
+
+
+generate_json_pkg_data :: proc(b: ^strings.Builder, collections: ..^Collection) {
+	w := strings.to_writer(b)
+
+	strings.builder_reset(b)
+	now := time.now()
+	fmt.wprintf(w, "/** Generated with odin version %s (vendor %q) %s_%s @ %v */\n", ODIN_VERSION, ODIN_VENDOR, ODIN_OS, ODIN_ARCH, now)
+	fmt.wprint(w, "var odin_pkg_data = {\n")
+	fmt.wprintln(w, `"packages": {`)
+	pkg_idx := 0
+	for collection in collections {
+		for path, pkg in collection.pkgs_to_use {
+			entries := collection.pkg_entries_map[pkg]
+			if pkg_idx != 0 {
+				fmt.wprintln(w, ",")
+			}
+			fmt.wprintf(w, "\t\"%s\": {{\n", str(pkg.name))
+			fmt.wprintf(w, "\t\"collection\": \"%s\",\n", collection.name)
+			fmt.wprintf(w, "\t\"path\": \"%s/%s\",\n", collection.base_url, path)
+			fmt.wprint(w, "\t\"entities\": [\n")
+			for e, i in entries.all {
+				if i != 0 { fmt.wprint(w, ",\n") }
+
+				kind_str := ""
+				switch entities[e.entity].kind {
+				case .Invalid:      kind_str = ""
+				case .Constant:     kind_str = "c"
+				case .Variable:     kind_str = "v"
+				case .Type_Name:    kind_str = "t"
+				case .Procedure:    kind_str = "p"
+				case .Proc_Group:   kind_str = "g"
+				case .Import_Name:  kind_str = "i"
+				case .Library_Name: kind_str = "l"
+				case .Builtin:      kind_str = "b"
+				}
+
+				fmt.wprint(w, "\t\t{")
+				fmt.wprintf(w, `"kind": "%s", `,  kind_str)
+				fmt.wprintf(w, `"name": %q, `, str(e.name))
+				fmt.wprintf(w, `"full": "%s.%s"`, str(pkg.name), str(e.name))
+				fmt.wprint(w, "}")
+			}
+			fmt.wprint(w, "\n\t]}")
+			pkg_idx += 1
+	}
+	}
+	fmt.wprintln(w, "}};")
+
+	os.write_entire_file("pkg-data.js", b.buf[:])
 }
 
 
@@ -266,54 +321,19 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection) {
 		os.write_entire_file(fmt.tprintf("%s/index.html", dir), b.buf[:])
 	}
 
-	entries_map := make(map[^doc.Pkg]Pkg_Entries, len(collection.pkgs_to_use))
+	collection.pkg_entries_map = make(map[^doc.Pkg]Pkg_Entries, len(collection.pkgs_to_use))
 	for _, pkg in collection.pkgs_to_use {
-		entries_map[pkg] = pkg_entries_gather(pkg)
-	}
-	defer for _, entries in &entries_map {
-		pkg_entries_destroy(&entries)
+		collection.pkg_entries_map[pkg] = pkg_entries_gather(pkg)
 	}
 
 	for path, pkg in collection.pkgs_to_use {
 		strings.builder_reset(b)
 		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width)
-		write_pkg(w, dir, path, pkg, collection, entries_map[pkg])
+		write_pkg(w, dir, path, pkg, collection, collection.pkg_entries_map[pkg])
 		write_html_footer(w, false)
 		recursive_make_directory(path, dir)
 		os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
 	}
-	{
-		strings.builder_reset(b)
-		now := time.now()
-		fmt.wprintf(w, "/** Generated with odin version %s (vendor %q) %s_%s @ %v */\n", ODIN_VERSION, ODIN_VENDOR, ODIN_OS, ODIN_ARCH, now)
-		fmt.wprint(w, "var odin_pkg_data={\n")
-		fmt.wprintf(w, "\"path\":\"%s\",\n", collection.base_url)
-		fmt.wprintf(w, "\"collection\":\"%s\",\n", collection.name)
-		fmt.wprintln(w, `"packages":{`)
-		pkg_idx := 0
-		for path, pkg in collection.pkgs_to_use {
-			entries := entries_map[pkg]
-			if pkg_idx != 0 {
-				fmt.wprintln(w, ",")
-			}
-			fmt.wprintf(w, "\"%s\": {{\n", str(pkg.name))
-			fmt.wprintf(w, "\"path\":\"%s/%s\",\n", collection.base_url, path)
-			fmt.wprint(w, "\"entities\":[\n")
-			for e, i in entries.all {
-				if i != 0 { fmt.wprint(w, ",\n") }
-				fmt.wprint(w, "{")
-				fmt.wprintf(w, `"name":%q,`, str(e.name))
-				fmt.wprintf(w, `"full":"%s.%s"`, str(pkg.name), str(e.name))
-				fmt.wprint(w, "}")
-			}
-			fmt.wprint(w, "\n]}")
-			pkg_idx += 1
-		}
-		fmt.wprintln(w, "}};")
-
-		os.write_entire_file(fmt.tprintf("%s/pkg-data.js", dir), b.buf[:])
-	}
-
 }
 
 
@@ -340,7 +360,7 @@ write_home_page :: proc(w: io.Writer) {
 
 	fmt.wprintln(w, "<article><header>")
 	fmt.wprintln(w, "<h1>Odin Packages</h1>")
-	fmt.wprintln(w, `<div id="algolia-search"></div>`)
+	write_search(w, .All)
 	fmt.wprintln(w, "</header></article>")
 	fmt.wprintln(w, "<div>")
 	defer fmt.wprintln(w, "</div>")
@@ -354,9 +374,6 @@ write_home_page :: proc(w: io.Writer) {
 	fmt.wprintln(w, `<a href="/vendor" class="link-primary text-decoration-node"><h3>Vendor Library Collection</h3></a>`)
 	fmt.wprintln(w, `<p>Documentation for all the packages part of the <code>vendor</code> library collection.</p>`)
 	fmt.wprintln(w, `</div>`)
-
-
-
 }
 
 
@@ -458,7 +475,9 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 		fmt.wprintf(w, "<li>License: <a href=\"{0:s}\">BSD-3-Clause</a></li>\n", GITHUB_LICENSE_URL)
 		fmt.wprintf(w, "<li>Repository: <a href=\"{0:s}\">{0:s}</a></li>\n", collection.github_url)
 		fmt.wprintln(w, "</ul>")
-		fmt.wprintln(w, `<div id="algolia-search"></div>`)
+
+		write_search(w, .Collection)
+
 		fmt.wprintln(w, "</header>")
 		fmt.wprintln(w, "</article>")
 		fmt.wprintln(w, `<hr class="collection-hr">`)
@@ -1594,8 +1613,21 @@ pkg_entries_destroy :: proc(entries: ^Pkg_Entries) {
 	entries^ = {}
 }
 
-write_search :: proc(w: io.Writer) {
-	fmt.wprintln(w, `<input type="search" id="odin-search" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">`)
+Search_Kind :: enum {
+	Package,
+	Collection,
+	All,
+}
+
+write_search :: proc(w: io.Writer, kind: Search_Kind) {
+	class := ""
+	switch kind {
+	case .Package:    class = "odin-search-package"
+	case .Collection: class = "odin-search-collection"
+	case .All:        class = "odin-search-all"
+	}
+	fmt.wprintf(w, `<input type="search" id="odin-search" class="%s" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">`, class)
+	fmt.wprintln(w)
 }
 
 
@@ -1616,7 +1648,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	fmt.wprintf(w, "</h1>\n")
 
 	path_url := fmt.tprintf("%s/%s", dir, path)
-	write_search(w)
+	write_search(w, .Package)
 
 	// // TODO(bill): determine decent approach for performance
 	// if len(array(pkg.entries)) <= 1000 {
@@ -2166,6 +2198,6 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	}
 
 	fmt.wprintf(w, `<script type="text/javascript">var odin_pkg_name = "%s";</script>`+"\n", str(pkg.name))
-	fmt.wprintf(w, `<script type="text/javascript" src="%s/pkg-data.js"></script>`+"\n", collection.base_url)
+	fmt.wprintf(w, `<script type="text/javascript" src="/pkg-data.js"></script>`+"\n")
 
 }

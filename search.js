@@ -88,39 +88,3 @@ if (odin_search) {
 		return;
 	}, false);
 }
-
-
-
-// LEGACY CRAP SEARCH TO BE REMOVED
-
-
-let docsearch_data = {
-	appId:     "H6XRVBSW5C",
-	apiKey:    "43bb20431f8b3e7576dbb757cbab9047",
-	indexName: "odin-lang",
-	container: "#algolia-search",
-	debug:     false,
-	hint:      true,
-	autocompleteOptions: {
-		minLength: 1,
-	},
-	algoliaOptions: {
-		hitsPerPage: 10,
-		ignorePlural: true,
-	},
-};
-
-let search_elem = document.getElementById("algolia-search");
-if (search_elem && search_elem.hasAttribute("data-path")) {
-	let data_path = search_elem.getAttribute("data-path");
-	docsearch_data.transformItems = function(items) {
-		return items.filter(function(item) {
-			if (item.url.indexOf(data_path) < 0) {
-				return false;
-			}
-			return true;
-		});
-	};
-
-	docsearch(docsearch_data);
-}
