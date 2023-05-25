@@ -272,9 +272,9 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: ..^Collection) 
 				fmt.wprintln(w, ",")
 			}
 			fmt.wprintf(w, "\t\"%s\": {{\n", str(pkg.name))
-			fmt.wprintf(w, "\t\"collection\": \"%s\",\n", collection.name)
-			fmt.wprintf(w, "\t\"path\": \"%s/%s\",\n", collection.base_url, path)
-			fmt.wprint(w, "\t\"entities\": [\n")
+			fmt.wprintf(w, "\t\t\"collection\": \"%s\",\n", collection.name)
+			fmt.wprintf(w, "\t\t\"path\": \"%s/%s\",\n", collection.base_url, path)
+			fmt.wprint(w, "\t\t\"entities\": [\n")
 			for e, i in entries.all {
 				if i != 0 { fmt.wprint(w, ",\n") }
 
@@ -291,13 +291,14 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: ..^Collection) 
 				case .Builtin:      kind_str = "b"
 				}
 
-				fmt.wprint(w, "\t\t{")
+				fmt.wprint(w, "\t\t\t{")
 				fmt.wprintf(w, `"kind": "%s", `,  kind_str)
 				fmt.wprintf(w, `"name": %q, `, str(e.name))
 				fmt.wprintf(w, `"full": "%s.%s"`, str(pkg.name), str(e.name))
 				fmt.wprint(w, "}")
 			}
-			fmt.wprint(w, "\n\t]}")
+			fmt.wprint(w, "\n\t\t]")
+			fmt.wprint(w, "\n\t}")
 			pkg_idx += 1
 	}
 	}
@@ -1628,6 +1629,13 @@ write_search :: proc(w: io.Writer, kind: Search_Kind) {
 	}
 	fmt.wprintf(w, `<input type="search" id="odin-search" class="%s" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">`, class)
 	fmt.wprintln(w)
+
+	switch kind {
+	case .Package:
+		// ignore
+	case .Collection, .All:
+		fmt.wprintln(w, `<div id="odin-search-results"></div>`)
+	}
 }
 
 
@@ -2198,6 +2206,5 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	}
 
 	fmt.wprintf(w, `<script type="text/javascript">var odin_pkg_name = "%s";</script>`+"\n", str(pkg.name))
-	fmt.wprintf(w, `<script type="text/javascript" src="/pkg-data.js"></script>`+"\n")
 
 }
