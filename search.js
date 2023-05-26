@@ -9,131 +9,130 @@ if (odin_search) {
 	}
 
 	function fuzzy_match(str, pattern) {
-
 		// Score consts
-		var adjacency_bonus = 5;                // bonus for adjacent matches
-		var separator_bonus = 10;               // bonus if match occurs after a separator
-		var camel_bonus = 10;                   // bonus if match is uppercase and prev is lower
-		var leading_letter_penalty = -3;        // penalty applied for every letter in str before the first match
-		var max_leading_letter_penalty = -9;    // maximum penalty for leading letters
-		var unmatched_letter_penalty = -1;      // penalty for every letter that doesn't matter
+		const adjacency_bonus            =  5; // bonus for adjacent matches
+		const separator_bonus            = 10; // bonus if match occurs after a separator
+		const camel_bonus                = 10; // bonus if match is uppercase and prev is lower
+		const leading_letter_penalty     = -3; // penalty applied for every letter in str before the first match
+		const max_leading_letter_penalty = -9; // maximum penalty for leading letters
+		const unmatched_letter_penalty   = -1; // penalty for every letter that doesn't matter
 
 		// Loop variables
-		var score = 0;
-		var patternIdx = 0;
-		var patternLength = pattern.length;
-		var strIdx = 0;
-		var strLength = str.length;
-		var prevMatched = false;
-		var prevLower = false;
-		var prevSeparator = true;       // true so if first letter match gets separator bonus
+		let score          = 0;
+		let pattern_idx    = 0;
+		let pattern_length = pattern.length;
+		let str_idx        = 0;
+		let str_length     = str.length;
+		let prev_matched   = false;
+		let prev_lower     = false;
+		let prev_separator = true;  // true so if first letter match gets separator bonus
 
 		// Use "best" matched letter if multiple string letters match the pattern
-		var bestLetter = null;
-		var bestLower = null;
-		var bestLetterIdx = null;
-		var bestLetterScore = 0;
+		let best_letter       = null;
+		let best_lower        = null;
+		let best_letter_idx   = null;
+		let best_letter_score = 0;
 
-		var matchedIndices = [];
+		let matched_indices = [];
 
 		// Loop over strings
-		while (strIdx != strLength) {
-			var patternChar = patternIdx != patternLength ? pattern.charAt(patternIdx) : null;
-			var strChar = str.charAt(strIdx);
+		while (str_idx != str_length) {
+			let pattern_char = pattern_idx != pattern_length ? pattern.charAt(pattern_idx) : null;
+			let str_char     = str.charAt(str_idx);
 
-			var patternLower = patternChar != null ? patternChar.toLowerCase() : null;
-			var strLower = strChar.toLowerCase();
-			var strUpper = strChar.toUpperCase();
+			let pattern_lower = pattern_char != null ? pattern_char.toLowerCase() : null;
+			let str_lower     = str_char.toLowerCase();
+			let str_upper     = str_char.toUpperCase();
 
-			var nextMatch = patternChar && patternLower == strLower;
-			var rematch = bestLetter && bestLower == strLower;
+			let next_match = pattern_char && pattern_lower == str_lower;
+			let rematch    = best_letter && best_lower == str_lower;
 
-			var advanced = nextMatch && bestLetter;
-			var patternRepeat = bestLetter && patternChar && bestLower == patternLower;
-			if (advanced || patternRepeat) {
-				score += bestLetterScore;
-				matchedIndices.push(bestLetterIdx);
-				bestLetter = null;
-				bestLower = null;
-				bestLetterIdx = null;
-				bestLetterScore = 0;
+			let advanced       = next_match && best_letter;
+			let pattern_repeat = best_letter && pattern_char && best_lower == pattern_lower;
+			if (advanced || pattern_repeat) {
+				score += best_letter_score;
+				matched_indices.push(best_letter_idx);
+				best_letter = null;
+				best_lower = null;
+				best_letter_idx = null;
+				best_letter_score = 0;
 			}
 
-			if (nextMatch || rematch) {
-				var newScore = 0;
+			if (next_match || rematch) {
+				let new_score = 0;
 
 				// Apply penalty for each letter before the first pattern match
 				// Note: std::max because penalties are negative values. So max is smallest penalty.
-				if (patternIdx == 0) {
-					var penalty = Math.max(strIdx * leading_letter_penalty, max_leading_letter_penalty);
+				if (pattern_idx == 0) {
+					let penalty = Math.max(str_idx * leading_letter_penalty, max_leading_letter_penalty);
 					score += penalty;
 				}
 
 				// Apply bonus for consecutive bonuses
-				if (prevMatched)
-					newScore += adjacency_bonus;
-
-				// Apply bonus for matches after a separator
-				if (prevSeparator)
-					newScore += separator_bonus;
-
-				// Apply bonus across camel case boundaries. Includes "clever" isLetter check.
-				if (prevLower && strChar == strUpper && strLower != strUpper)
-					newScore += camel_bonus;
-
-				// Update patter index IFF the next pattern letter was matched
-				if (nextMatch)
-					++patternIdx;
-
-				// Update best letter in str which may be for a "next" letter or a "rematch"
-				if (newScore >= bestLetterScore) {
-
-					// Apply penalty for now skipped letter
-					if (bestLetter != null)
-						score += unmatched_letter_penalty;
-
-					bestLetter = strChar;
-					bestLower = bestLetter.toLowerCase();
-					bestLetterIdx = strIdx;
-					bestLetterScore = newScore;
+				if (prev_matched) {
+					new_score += adjacency_bonus;
 				}
 
-				prevMatched = true;
-			}
-			else {
-				// Append unmatch characters
-				formattedStr += strChar;
+				// Apply bonus for matches after a separator
+				if (prev_separator) {
+					new_score += separator_bonus;
+				}
 
+				// Apply bonus across camel case boundaries. Includes "clever" isLetter check.
+				if (prev_lower && str_char == str_upper && str_lower != str_upper) {
+					new_score += camel_bonus;
+				}
+
+				// Update patter index IFF the next pattern letter was matched
+				if (next_match) {
+					pattern_idx += 1;
+				}
+
+				// Update best letter in str which may be for a "next" letter or a "rematch"
+				if (new_score >= best_letter_score) {
+
+					// Apply penalty for now skipped letter
+					if (best_letter != null) {
+						score += unmatched_letter_penalty;
+					}
+
+					best_letter = str_char;
+					best_lower = best_letter.toLowerCase();
+					best_letter_idx = str_idx;
+					best_letter_score = new_score;
+				}
+
+				prev_matched = true;
+			} else {
 				score += unmatched_letter_penalty;
-				prevMatched = false;
+				prev_matched = false;
 			}
 
 			// Includes "clever" isLetter check.
-			prevLower = strChar == strLower && strLower != strUpper;
-			prevSeparator = strChar == '_' || strChar == ' ';
+			prev_lower = str_char == str_lower && str_lower != str_upper;
+			prev_separator = str_char == '_' || str_char == ' ' || str_char == '.';
 
-			++strIdx;
+			str_idx += 1;
 		}
 
 		// Apply score for last match
-		if (bestLetter) {
-			score += bestLetterScore;
-			matchedIndices.push(bestLetterIdx);
+		if (best_letter) {
+			score += best_letter_score;
+			matched_indices.push(best_letter_idx);
 		}
 
 		// Finish out formatted string after last pattern matched
 		// Build formated string based on matched letters
-		var formattedStr = "";
-		var lastIdx = 0;
-		for (var i = 0; i < matchedIndices.length; ++i) {
-			var idx = matchedIndices[i];
-			formattedStr += str.substr(lastIdx, idx - lastIdx) + "<b>" + str.charAt(idx) + "</b>";
-			lastIdx = idx + 1;
+		let formatted_str = "";
+		let last_idx = 0;
+		for (let idx of matched_indices) {
+			formatted_str += str.substr(last_idx, idx - last_idx) + "<b>" + str.charAt(idx) + "</b>";
+			last_idx = idx + 1;
 		}
-		formattedStr += str.substr(lastIdx, str.length - lastIdx);
+		formatted_str += str.substr(last_idx, str.length - last_idx);
 
-		var matched = patternIdx == patternLength;
-		return [matched, score, formattedStr];
+		let matched = pattern_idx == pattern_length;
+		return [matched, score, formatted_str];
 	}
 
 	function fuzzy_entity_match(entities, search_text) {
@@ -194,24 +193,23 @@ if (odin_search) {
 						results.length = Math.min(results.length, MAX_RESULTS_LENGTH);
 
 						let innerHTML = '';
-						innerHTML = '';
 						innerHTML += '<ul>\n';
 						for (let result of results) {
-							let parts = result.name.split(".", 2);
+							let [pkg_name, entity_name] = result.name.split(".", 2);
 
 							let score = result.score;
-							let pkg_name = parts[0], entity_name = parts[1];
 
 							let pkg_path = odin_pkg_data.packages[pkg_name].path;
 
-							let formatted_parts = result.formatted.split(".", 2);
-							innerHTML += `<li><a href="${pkg_path}/#${entity_name}"><a href="${pkg_path}">${formatted_parts[0]}</a>.<a href="${pkg_path}/#${entity_name}">${formatted_parts[1]}</a></a></li>\n`;
+							let [formatted_pkg, formatted_name] = result.formatted.split(".", 2);
+							let full_path = `/${pkg_path}/#${entity_name}`;
+							innerHTML += `<li data-path="${full_path}"><a href="/${pkg_path}/#${entity_name}"><a href="/${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a></a></li>\n`;
 						}
 						innerHTML += '</ul>';
 						let end_time = performance.now();
 						let diff = (end_time - start_time).toFixed(1);
 
-						innerHTML = `<p>Time to search ${diff} milliseconds</p>` + innerHTML
+						// innerHTML = `<p>Time to search ${diff} milliseconds</p>` + innerHTML
 
 						odin_search_results.innerHTML = innerHTML;
 					} else {
@@ -227,7 +225,7 @@ if (odin_search) {
 
 	} else if (odin_search.className == "odin-search-package") {
 
-		var pkg_data = odin_pkg_data.packages[odin_pkg_name];
+		let pkg_data = odin_pkg_data.packages[odin_pkg_name];
 
 		let entities = pkg_data.entities.map(e => e.name);
 		let doc_entities = getElementsByClassNameArray("doc-id-link").map(x => x.closest(".pkg-entity")).filter(x => x);
