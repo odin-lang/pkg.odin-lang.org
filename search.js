@@ -386,5 +386,11 @@ if (odin_search) {
 			}
 			ev.stopPropagation(); return;
 		}, false);
+
+		window.addEventListener("keydown", ev => {
+			if ((ev.key == "k" && ev.metaKey) || ev.key == "/") {
+				odin_search.focus();
+			}
+		});
 	}
 }
