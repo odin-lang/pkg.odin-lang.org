@@ -8,171 +8,164 @@ if (odin_search) {
 		return Array.from(document.getElementsByClassName(x));
 	}
 
+	function fuzzy_match(str, pattern) {
 
-	const SEQUENTIAL_BONUS = 15; // bonus for adjacent matches
-	const SEPARATOR_BONUS = 30; // bonus if match occurs after a separator
-	const CAMEL_BONUS = 30; // bonus if match is uppercase and prev is lower
-	const FIRST_LETTER_BONUS = 15; // bonus if the first letter is matched
+		// Score consts
+		var adjacency_bonus = 5;                // bonus for adjacent matches
+		var separator_bonus = 10;               // bonus if match occurs after a separator
+		var camel_bonus = 10;                   // bonus if match is uppercase and prev is lower
+		var leading_letter_penalty = -3;        // penalty applied for every letter in str before the first match
+		var max_leading_letter_penalty = -9;    // maximum penalty for leading letters
+		var unmatched_letter_penalty = -1;      // penalty for every letter that doesn't matter
 
-	const LEADING_LETTER_PENALTY = -5; // penalty applied for every letter in str before the first match
-	const MAX_LEADING_LETTER_PENALTY = -15; // maximum penalty for leading letters
-	const UNMATCHED_LETTER_PENALTY = -1;
+		// Loop variables
+		var score = 0;
+		var patternIdx = 0;
+		var patternLength = pattern.length;
+		var strIdx = 0;
+		var strLength = str.length;
+		var prevMatched = false;
+		var prevLower = false;
+		var prevSeparator = true;       // true so if first letter match gets separator bonus
 
-	function fuzzyMatch(pattern, str) {
-		const recursionCount = 0;
-		const recursionLimit = 10;
-		const matches = [];
-		const maxMatches = 256;
+		// Use "best" matched letter if multiple string letters match the pattern
+		var bestLetter = null;
+		var bestLower = null;
+		var bestLetterIdx = null;
+		var bestLetterScore = 0;
 
-		return fuzzyMatchRecursive(
-			pattern,
-			str,
-			0 /* patternCurIndex */,
-			0 /* strCurrIndex */,
-			null /* srcMatces */,
-			matches,
-			maxMatches,
-			0 /* nextMatch */,
-			recursionCount,
-			recursionLimit
-		);
+		var matchedIndices = [];
+
+		// Loop over strings
+		while (strIdx != strLength) {
+			var patternChar = patternIdx != patternLength ? pattern.charAt(patternIdx) : null;
+			var strChar = str.charAt(strIdx);
+
+			var patternLower = patternChar != null ? patternChar.toLowerCase() : null;
+			var strLower = strChar.toLowerCase();
+			var strUpper = strChar.toUpperCase();
+
+			var nextMatch = patternChar && patternLower == strLower;
+			var rematch = bestLetter && bestLower == strLower;
+
+			var advanced = nextMatch && bestLetter;
+			var patternRepeat = bestLetter && patternChar && bestLower == patternLower;
+			if (advanced || patternRepeat) {
+				score += bestLetterScore;
+				matchedIndices.push(bestLetterIdx);
+				bestLetter = null;
+				bestLower = null;
+				bestLetterIdx = null;
+				bestLetterScore = 0;
+			}
+
+			if (nextMatch || rematch) {
+				var newScore = 0;
+
+				// Apply penalty for each letter before the first pattern match
+				// Note: std::max because penalties are negative values. So max is smallest penalty.
+				if (patternIdx == 0) {
+					var penalty = Math.max(strIdx * leading_letter_penalty, max_leading_letter_penalty);
+					score += penalty;
+				}
+
+				// Apply bonus for consecutive bonuses
+				if (prevMatched)
+					newScore += adjacency_bonus;
+
+				// Apply bonus for matches after a separator
+				if (prevSeparator)
+					newScore += separator_bonus;
+
+				// Apply bonus across camel case boundaries. Includes "clever" isLetter check.
+				if (prevLower && strChar == strUpper && strLower != strUpper)
+					newScore += camel_bonus;
+
+				// Update patter index IFF the next pattern letter was matched
+				if (nextMatch)
+					++patternIdx;
+
+				// Update best letter in str which may be for a "next" letter or a "rematch"
+				if (newScore >= bestLetterScore) {
+
+					// Apply penalty for now skipped letter
+					if (bestLetter != null)
+						score += unmatched_letter_penalty;
+
+					bestLetter = strChar;
+					bestLower = bestLetter.toLowerCase();
+					bestLetterIdx = strIdx;
+					bestLetterScore = newScore;
+				}
+
+				prevMatched = true;
+			}
+			else {
+				// Append unmatch characters
+				formattedStr += strChar;
+
+				score += unmatched_letter_penalty;
+				prevMatched = false;
+			}
+
+			// Includes "clever" isLetter check.
+			prevLower = strChar == strLower && strLower != strUpper;
+			prevSeparator = strChar == '_' || strChar == ' ';
+
+			++strIdx;
+		}
+
+		// Apply score for last match
+		if (bestLetter) {
+			score += bestLetterScore;
+			matchedIndices.push(bestLetterIdx);
+		}
+
+		// Finish out formatted string after last pattern matched
+		// Build formated string based on matched letters
+		var formattedStr = "";
+		var lastIdx = 0;
+		for (var i = 0; i < matchedIndices.length; ++i) {
+			var idx = matchedIndices[i];
+			formattedStr += str.substr(lastIdx, idx - lastIdx) + "<b>" + str.charAt(idx) + "</b>";
+			lastIdx = idx + 1;
+		}
+		formattedStr += str.substr(lastIdx, str.length - lastIdx);
+
+		var matched = patternIdx == patternLength;
+		return [matched, score, formattedStr];
 	}
 
-	function fuzzyMatchRecursive(
-		pattern,
-		str,
-		patternCurIndex,
-		strCurrIndex,
-		srcMatces,
-		matches,
-		maxMatches,
-		nextMatch,
-		recursionCount,
-		recursionLimit
-	) {
-		let outScore = 0;
-
-		// Return if recursion limit is reached.
-		if (++recursionCount >= recursionLimit) {
-			return [false, outScore];
-		}
-
-		// Return if we reached ends of strings.
-		if (patternCurIndex === pattern.length || strCurrIndex === str.length) {
-			return [false, outScore];
-		}
-
-		// Recursion params
-		let recursiveMatch = false;
-		let bestRecursiveMatches = [];
-		let bestRecursiveScore = 0;
-
-		// Loop through pattern and str looking for a match.
-		let firstMatch = true;
-		while (patternCurIndex < pattern.length && strCurrIndex < str.length) {
-			// Match found.
-			if (pattern[patternCurIndex].toLowerCase() === str[strCurrIndex].toLowerCase()) {
-				if (nextMatch >= maxMatches) {
-					return [false, outScore];
-				}
-
-				if (firstMatch && srcMatces) {
-					matches = [...srcMatces];
-					firstMatch = false;
-				}
-
-				const recursiveMatches = [];
-				const [matched, recursiveScore] = fuzzyMatchRecursive(
-					pattern,
-					str,
-					patternCurIndex,
-					strCurrIndex + 1,
-					matches,
-					recursiveMatches,
-					maxMatches,
-					nextMatch,
-					recursionCount,
-					recursionLimit
-				);
-
-				if (matched) {
-					// Pick best recursive score.
-					if (!recursiveMatch || recursiveScore > bestRecursiveScore) {
-						bestRecursiveMatches = [...recursiveMatches];
-						bestRecursiveScore = recursiveScore;
-					}
-					recursiveMatch = true;
-				}
-
-				matches[nextMatch++] = strCurrIndex;
-				++patternCurIndex;
+	function fuzzy_entity_match(entities, search_text) {
+		let results = [];
+		for (let e of entities) {
+			let [matched, score, formatted] = fuzzy_match(e, search_text);
+			if (!matched) {
+				continue;
 			}
-			++strCurrIndex;
-		}
 
-		const matched = patternCurIndex === pattern.length;
-
-		if (matched) {
-			outScore = 100;
-
-			// Apply leading letter penalty
-			let penalty = LEADING_LETTER_PENALTY * matches[0];
-			penalty =
-				penalty < MAX_LEADING_LETTER_PENALTY
-					? MAX_LEADING_LETTER_PENALTY
-					: penalty;
-			outScore += penalty;
-
-			//Apply unmatched penalty
-			const unmatched = str.length - nextMatch;
-			outScore += UNMATCHED_LETTER_PENALTY * unmatched;
-
-			// Apply ordering bonuses
-			for (let i = 0; i < nextMatch; i++) {
-				const currIdx = matches[i];
-
-				if (i > 0) {
-					const prevIdx = matches[i - 1];
-					if (currIdx == prevIdx + 1) {
-						outScore += SEQUENTIAL_BONUS;
-					}
-				}
-
-				// Check for bonuses based on neighbor character value.
-				if (currIdx > 0) {
-					// Camel case
-					const neighbor = str[currIdx - 1];
-					const curr = str[currIdx];
-					if (
-						neighbor !== neighbor.toUpperCase() &&
-						curr !== curr.toLowerCase()
-					) {
-						outScore += CAMEL_BONUS;
-					}
-					const isNeighbourSeparator = neighbor == "_" || neighbor == " ";
-					if (isNeighbourSeparator) {
-						outScore += SEPARATOR_BONUS;
-					}
-				} else {
-					// First letter
-					outScore += FIRST_LETTER_BONUS;
+			if (e.includes(".")) {
+				// Weight the name of the entity itself more than the entire thing
+				let base_name = e.split(".", 2)[1];
+				let [base_matched, base_score, _] = fuzzy_match(base_name, search_text);
+				if (base_matched) {
+					score += base_score;
 				}
 			}
 
-			// Return best result
-			if (recursiveMatch && (!matched || bestRecursiveScore > outScore)) {
-				// Recursive score is better than "this"
-				matches = [...bestRecursiveMatches];
-				outScore = bestRecursiveScore;
-				return [true, outScore];
-			} else if (matched) {
-				// "this" score is better than recursive
-				return [true, outScore];
-			} else {
-				return [false, outScore];
-			}
+
+			results.push({
+				"name":      e,
+				"score":     score,
+				"formatted": formatted,
+			});
 		}
-		return [false, outScore];
+
+		results.sort(function(a, b) {
+			return b.score - a.score;
+		});
+
+		return results;
 	}
 
 
@@ -185,13 +178,6 @@ if (odin_search) {
 			}
 		}
 
-		entities.sort();
-		// entities.sort(function (a, b) {
-		// 	a = a.split(".", 2)[1];
-		// 	b = b.split(".", 2)[1];
-		// 	return a.localeCompare(b);
-		// });
-
 		let odin_search_results = document.getElementById("odin-search-results");
 
 		let curr_search_value = "";
@@ -202,40 +188,30 @@ if (odin_search) {
 				if (search_text) {
 					let start_time = performance.now();
 
-					let results_e_and_score = entities.map(e => [e, fuzzyMatch(search_text, e)]).filter(v => v[1][0]);
-
-					results_e_and_score.sort(function (a, b) {
-						return -(a[1] - b[1]);
-					});
-
-					let results = results_e_and_score.map(function(v) {
-						return {"name": v[0], "score": v[1][1]}
-					});
-					results.sort(function(a, b) {
-						return b.score - a.score;
-					});
-
-					let MAX_RESULTS_LENGTH = 64;
-
+					let results = fuzzy_entity_match(entities, search_text);
 					if (results.length) {
+						let MAX_RESULTS_LENGTH = 64;
 						results.length = Math.min(results.length, MAX_RESULTS_LENGTH);
+
 						let innerHTML = '';
 						innerHTML = '';
 						innerHTML += '<ul>\n';
 						for (let result of results) {
 							let parts = result.name.split(".", 2);
+
 							let score = result.score;
 							let pkg_name = parts[0], entity_name = parts[1];
 
 							let pkg_path = odin_pkg_data.packages[pkg_name].path;
 
-							innerHTML += `<li>${score}&mdash;<a href="${pkg_path}">${pkg_name}</a>.<a href="${pkg_path}/#${entity_name}">${entity_name}</a></li>\n`;
+							let formatted_parts = result.formatted.split(".", 2);
+							innerHTML += `<li><a href="${pkg_path}/#${entity_name}"><a href="${pkg_path}">${formatted_parts[0]}</a>.<a href="${pkg_path}/#${entity_name}">${formatted_parts[1]}</a></a></li>\n`;
 						}
 						innerHTML += '</ul>';
 						let end_time = performance.now();
 						let diff = (end_time - start_time).toFixed(1);
 
-						// innerHTML = `<p>Time to search ${diff} milliseconds</p>` + innerHTML
+						innerHTML = `<p>Time to search ${diff} milliseconds</p>` + innerHTML
 
 						odin_search_results.innerHTML = innerHTML;
 					} else {
@@ -280,23 +256,20 @@ if (odin_search) {
 			if (curr_search_value != search_text) {
 				curr_search_value = search_text;
 				if (search_text) {
-					let results_e_and_score = entities.map(e => [e, fuzzy_filter(e, search_text)]).filter(v => v[1] >= 0);
-					let results = results_e_and_score.map(v => v[0]);
-					let scores  = results_e_and_score.map(v => v[1]);
-					let max_score = Math.max(...scores);
-					scores = scores.map(s => max_score-s);
-
+					let results = fuzzy_entity_match(entities, search_text);
 					if (results.length) {
+						let result_names = results.map(e => e.name);
+
 						setAllDisplays("none");
 						for (let e of doc_entities) {
 							let name = e.getElementsByTagName("h3")[0].id;
-							let idx = results.indexOf(name);
+							let idx = result_names.indexOf(name);
 							if (idx >= 0) {
 								e.style.display = null;
-								// e.style.order = scores[idx];
+								e.style.order = -results[idx].score;
 							} else {
 								e.style.display = "none";
-								// e.style.order = null;
+								e.style.order = null;
 							}
 						}
 					} else {
