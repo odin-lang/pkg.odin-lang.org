@@ -258,7 +258,7 @@ write_home_page :: proc(w: io.Writer) {
 	defer fmt.wprintln(w, `</article>`)
 
 	fmt.wprintln(w, "<article><header>")
-	fmt.wprintln(w, "<h1>Odin Packages</h1>")
+	fmt.wprintln(w, `<h1 class="odin-package-header">Odin Packages</h1>`)
 	write_search(w, .All)
 	fmt.wprintln(w, "</header></article>")
 	fmt.wprintln(w, "<div>")
@@ -1459,7 +1459,7 @@ write_search :: proc(w: io.Writer, kind: enum { Package, Collection, All}) {
 	case .Package:
 		// ignore
 	case .Collection, .All:
-		fmt.wprintln(w, `<div id="odin-search-results"></div>`)
+		fmt.wprintln(w, `<ul id="odin-search-results"></ul>`)
 	}
 }
 

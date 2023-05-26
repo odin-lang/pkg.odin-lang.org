@@ -8,6 +8,44 @@ if (odin_search) {
 		return Array.from(document.getElementsByClassName(x));
 	}
 
+	function strcmp(a, b) {
+		return ((a == b) ? 0 : ((a > b) ? 1 : -1));
+	}
+	function get_key_string(e) {
+		let name;
+		let ignore_shift = false;
+		switch (e.which) {
+		case 13:
+			name = "Enter";
+			break;
+		case 27:
+			name = "Esc";
+			break;
+		case 38:
+			name = "Up";
+			break;
+		case 40:
+			name = "Down";
+			break;
+		default:
+			ignore_shift = true;
+			name = e.key != null ? e.key : String.fromCharCode(e.charCode || e.keyCode);
+		}
+		if (!ignore_shift && e.shiftKey) name = "Shift+" + name;
+		if (e.altKey) name = "Alt+" + name;
+		if (e.ctrlKey) name = "Ctrl+" + name;
+		return name;
+	}
+	function clamp(x, lo, hi) {
+		if (x < lo) {
+			return lo;
+		} else if (x > hi) {
+			return hi;
+		}
+		return x;
+	}
+
+
 	function fuzzy_match(str, pattern) {
 		// Score consts
 		const adjacency_bonus            =  5; // bonus for adjacent matches
@@ -152,6 +190,7 @@ if (odin_search) {
 				}
 			}
 
+			// if (score < 0) { continue; }
 
 			results.push({
 				"name":      e,
@@ -161,6 +200,9 @@ if (odin_search) {
 		}
 
 		results.sort(function(a, b) {
+			if (a.score == b.score) {
+				return strcmp(a.name, b.name);
+			}
 			return b.score - a.score;
 		});
 
@@ -178,22 +220,50 @@ if (odin_search) {
 		}
 
 		let odin_search_results = document.getElementById("odin-search-results");
-
+		let curr_search_index = -1;
 		let curr_search_value = "";
+
+
+		function move_search_cursor(dir) {
+			if (curr_search_index < 0 || curr_search_index >= odin_search_results.children.length) {
+				if (dir > 0)  {
+					curr_search_index = dir-1;
+				} else if (dir < 0) {
+					curr_search_index = dir+odin_search_results.children.length;
+				}
+			} else {
+				curr_search_index += dir;
+			}
+			curr_search_index = clamp(curr_search_index, 0, odin_search_results.children.length-1);
+			draw_search_cursor();
+		}
+		function draw_search_cursor() {
+			for (let i = 0; i < odin_search_results.children.length; i++) {
+				let li = odin_search_results.children[i];
+				if (curr_search_index === i) {
+					li.classList.add("selected");
+				} else {
+					li.classList.remove("selected");
+				}
+			}
+		}
+
+
 		odin_search.addEventListener("input", ev => {
 			let search_text = odin_search.value.trim();
 			if (curr_search_value != search_text) {
 				curr_search_value = search_text;
 				if (search_text) {
+					curr_search_index = -1;
 					let start_time = performance.now();
 
 					let results = fuzzy_entity_match(entities, search_text);
 					if (results.length) {
+						let results_found = results.length;
 						let MAX_RESULTS_LENGTH = 64;
 						results.length = Math.min(results.length, MAX_RESULTS_LENGTH);
 
 						let innerHTML = '';
-						innerHTML += '<ul>\n';
 						for (let result of results) {
 							let [pkg_name, entity_name] = result.name.split(".", 2);
 
@@ -202,14 +272,15 @@ if (odin_search) {
 							let pkg_path = odin_pkg_data.packages[pkg_name].path;
 
 							let [formatted_pkg, formatted_name] = result.formatted.split(".", 2);
-							let full_path = `/${pkg_path}/#${entity_name}`;
-							innerHTML += `<li data-path="${full_path}"><a href="/${pkg_path}/#${entity_name}"><a href="/${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a></a></li>\n`;
+							let full_path = `${pkg_path}/#${entity_name}`;
+							innerHTML += `<li data-path="${full_path}">`;
+							// innerHTML += `${score}&mdash;`;
+							innerHTML += `<a href="${pkg_path}/#${entity_name}"><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a></a></li>\n`;
 						}
-						innerHTML += '</ul>';
 						let end_time = performance.now();
 						let diff = (end_time - start_time).toFixed(1);
 
-						// innerHTML = `<p>Time to search ${diff} milliseconds</p>` + innerHTML
+						// innerHTML = `<p>Time to search ${diff} milliseconds (found ${results_found})</p>` + innerHTML
 
 						odin_search_results.innerHTML = innerHTML;
 					} else {
@@ -222,6 +293,36 @@ if (odin_search) {
 			ev.stopPropagation();
 			return;
 		}, false);
+
+		odin_search.addEventListener("keydown", e => {
+			switch (get_key_string(e)) {
+			case "Enter":
+				if (0 <= curr_search_index && curr_search_index < odin_search_results.children.length) {
+					let li = odin_search_results.children[curr_search_index];
+					let path = li.dataset.path;
+					odin_search_results.innerHTML = '';
+					window.location.href = li.dataset.path;
+				}
+				break;
+			case "Esc":
+				move_search_cursor = -1;
+				draw_search_cursor();
+				break;
+			case "Up":
+				move_search_cursor(-1);
+				e.preventDefault();
+				break;
+			case "Down":
+				move_search_cursor(+1);
+				e.preventDefault();
+				break;
+			default:
+				break;
+			}
+			e.stopPropagation();
+			return;
+		}, false);
+
 
 	} else if (odin_search.className == "odin-search-package") {
 
