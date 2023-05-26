@@ -12,140 +12,6 @@ import "core:slice"
 import "core:time"
 import "core:intrinsics"
 
-GITHUB_LICENSE_URL :: "https://github.com/odin-lang/Odin/tree/master/LICENSE"
-GITHUB_CORE_URL :: "https://github.com/odin-lang/Odin/tree/master/core"
-GITHUB_VENDOR_URL :: "https://github.com/odin-lang/Odin/tree/master/vendor"
-BASE_CORE_URL :: "/core"
-BASE_VENDOR_URL :: "/vendor"
-
-HTML_LESS_THAN :: "&lt;"
-
-header:   ^doc.Header
-files:    []doc.File
-pkgs:     []doc.Pkg
-entities: []doc.Entity
-types:    []doc.Type
-
-core_pkgs_to_use: map[string]^doc.Pkg // trimmed path
-vendor_pkgs_to_use: map[string]^doc.Pkg // trimmed path
-pkg_to_path: map[^doc.Pkg]string // trimmed path
-pkg_to_collection: map[^doc.Pkg]^Collection
-
-// On Unix systems we need to set the directory mode so that we
-// can read/write from them
-when os.OS == .Darwin || os.OS == .Linux || os.OS == .FreeBSD {
-	directory_mode :: 0o775
-} else {
-	directory_mode :: 0
-}
-
-Collection :: struct {
-	name: string,
-	pkgs_to_use: ^map[string]^doc.Pkg,
-	github_url: string,
-	base_url:   string,
-	root: ^Dir_Node,
-
-	pkg_entries_map: map[^doc.Pkg]Pkg_Entries,
-}
-
-array :: proc(a: $A/doc.Array($T)) -> []T {
-	return doc.from_array(header, a)
-}
-str :: proc(s: $A/doc.String) -> string {
-	return doc.from_string(header, s)
-}
-
-errorf :: proc(format: string, args: ..any) -> ! {
-	fmt.eprintf("%s ", os.args[0])
-	fmt.eprintf(format, ..args)
-	fmt.eprintln()
-	os.exit(1)
-}
-
-base_type :: proc(t: doc.Type) -> doc.Type {
-	t := t
-	for {
-		if t.kind != .Named {
-			break
-		}
-		t = types[array(t.types)[0]]
-	}
-	return t
-}
-
-is_type_untyped :: proc(type: doc.Type) -> bool {
-	if type.kind == .Basic {
-		flags := transmute(doc.Type_Flags_Basic)type.flags
-		return .Untyped in flags
-	}
-	return false
-}
-
-common_prefix :: proc(strs: []string) -> string {
-	if len(strs) == 0 {
-		return ""
-	}
-	n := max(int)
-	for str in strs {
-		n = min(n, len(str))
-	}
-
-	prefix := strs[0][:n]
-	for str in strs[1:] {
-		for len(prefix) != 0 && str[:len(prefix)] != prefix {
-			prefix = prefix[:len(prefix)-1]
-		}
-		if len(prefix) == 0 {
-			break
-		}
-	}
-	return prefix
-}
-
-recursive_make_directory :: proc(path: string, prefix := "") {
-	head, _, tail := strings.partition(path, "/")
-	path_to_make := head
-	if prefix != "" {
-		path_to_make = fmt.tprintf("%s/%s", prefix, head)
-	}
-	os.make_directory(path_to_make, directory_mode)
-	if tail != "" {
-		recursive_make_directory(tail, path_to_make)
-	}
-}
-
-
-Header_Kind :: enum {
-	Normal,
-	Full_Width,
-}
-write_html_header :: proc(w: io.Writer, title: string, kind := Header_Kind.Normal) {
-	fmt.wprintf(w, string(#load("header.txt.html")), title)
-
-	when #config(ODIN_DOC_DEV, false) {
-		io.write_string(w, "\n")
-		io.write_string(w, `<script type="text/javascript" src="https://livejs.com/live.js"></script>`)
-		io.write_string(w, "\n")
-	}
-
-
-	io.write(w, #load("header-lower.txt.html"))
-	switch kind {
-	case .Normal:
-		io.write_string(w, `<div class="container">`+"\n")
-	case .Full_Width:
-		io.write_string(w, `<div class="container full-width">`+"\n")
-	}
-}
-
-write_html_footer :: proc(w: io.Writer, include_directory_js: bool) {
-	fmt.wprintf(w, "\n")
-
-	io.write(w, #load("footer.txt.html"))
-	fmt.wprintf(w, "</body>\n</html>\n")
-}
-
 main :: proc() {
 	if len(os.args) != 2 {
 		errorf("expected 1 .odin-doc file")
@@ -256,6 +122,38 @@ main :: proc() {
 }
 
 
+
+Header_Kind :: enum {
+	Normal,
+	Full_Width,
+}
+write_html_header :: proc(w: io.Writer, title: string, kind := Header_Kind.Normal) {
+	fmt.wprintf(w, string(#load("header.txt.html")), title)
+
+	when #config(ODIN_DOC_DEV, false) {
+		io.write_string(w, "\n")
+		io.write_string(w, `<script type="text/javascript" src="https://livejs.com/live.js"></script>`)
+		io.write_string(w, "\n")
+	}
+
+
+	io.write(w, #load("header-lower.txt.html"))
+	switch kind {
+	case .Normal:
+		io.write_string(w, `<div class="container">`+"\n")
+	case .Full_Width:
+		io.write_string(w, `<div class="container full-width">`+"\n")
+	}
+}
+
+write_html_footer :: proc(w: io.Writer, include_directory_js: bool) {
+	io.write_string(w, "\n")
+
+	io.write(w, #load("footer.txt.html"))
+	fmt.wprintf(w, "</body>\n</html>\n")
+}
+
+
 generate_json_pkg_data :: proc(b: ^strings.Builder, collections: ..^Collection) {
 	w := strings.to_writer(b)
 
@@ -318,7 +216,7 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection) {
 		write_html_header(w, fmt.tprintf("%s library - pkg.odin-lang.org", dir))
 		write_collection_directory(w, collection)
 		write_html_footer(w, true)
-		os.make_directory(dir, directory_mode)
+		os.make_directory(dir, DIRECTORY_MODE)
 		os.write_entire_file(fmt.tprintf("%s/index.html", dir), b.buf[:])
 	}
 
@@ -377,68 +275,6 @@ write_home_page :: proc(w: io.Writer) {
 	fmt.wprintln(w, `</div>`)
 }
 
-
-
-Dir_Node :: struct {
-	dir: string,
-	path: string,
-	name: string,
-	pkg: ^doc.Pkg,
-	children: [dynamic]^Dir_Node,
-}
-
-generate_directory_tree :: proc(pkgs_to_use: map[string]^doc.Pkg) -> (root: ^Dir_Node) {
-	sort_tree :: proc(node: ^Dir_Node) {
-		slice.sort_by_key(node.children[:], proc(node: ^Dir_Node) -> string {return node.name})
-		for child in node.children {
-			sort_tree(child)
-		}
-	}
-	root = new(Dir_Node)
-	root.children = make([dynamic]^Dir_Node)
-	children := make([dynamic]^Dir_Node)
-	for path, pkg in pkgs_to_use {
-		dir, _, inner := strings.partition(path, "/")
-		if inner == "" {
-			node := new_clone(Dir_Node{
-				dir  = dir,
-				name = dir,
-				path = path,
-				pkg  = pkg,
-			})
-			append(&root.children, node)
-		} else {
-			node := new_clone(Dir_Node{
-				dir  = dir,
-				name = inner,
-				path = path,
-				pkg  = pkg,
-			})
-			append(&children, node)
-		}
-	}
-	child_loop: for child in children {
-		dir, _, inner := strings.partition(child.path, "/")
-		for node in root.children {
-			if node.dir == dir {
-				append(&node.children, child)
-				continue child_loop
-			}
-		}
-		parent := new_clone(Dir_Node{
-			dir  = dir,
-			name = dir,
-			path = dir,
-			pkg  = nil,
-		})
-		append(&root.children, parent)
-		append(&parent.children, child)
-	}
-
-	sort_tree(root)
-
-	return
-}
 
 write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 	get_line_doc :: proc(pkg: ^doc.Pkg) -> (line_doc: string, ok: bool) {
@@ -546,11 +382,6 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 	fmt.wprintln(w, "\t\t</tbody>")
 	fmt.wprintln(w, "\t</table>")
 	fmt.wprintln(w, "</div>")
-}
-
-is_entity_blank :: proc(e: doc.Entity_Index) -> bool {
-	name := str(entities[e].name)
-	return name == ""
 }
 
 write_where_clauses :: proc(w: io.Writer, where_clauses: []doc.String) {
@@ -1614,13 +1445,7 @@ pkg_entries_destroy :: proc(entries: ^Pkg_Entries) {
 	entries^ = {}
 }
 
-Search_Kind :: enum {
-	Package,
-	Collection,
-	All,
-}
-
-write_search :: proc(w: io.Writer, kind: Search_Kind) {
+write_search :: proc(w: io.Writer, kind: enum { Package, Collection, All}) {
 	class := ""
 	switch kind {
 	case .Package:    class = "odin-search-package"
