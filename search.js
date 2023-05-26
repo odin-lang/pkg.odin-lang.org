@@ -1,5 +1,20 @@
 "use strict";
 
+const userAgent = navigator.userAgent;
+const osList = [
+	{lookFor: "Win", name: "windows"},
+	{lookFor: "Mac", name: "macos"},
+	{lookFor: "X11", name: "unix"},
+	{lookFor: "Linux", name: "linux"},
+	{lookFor: "iPhone", name: "ios"},
+	{lookFor: "Android", name: "android"},
+];
+for (const os of osList) {
+	if (userAgent.includes(os.lookFor)) {
+		document.body.classList.add(`os-${os.name}`);	
+	}	
+}
+
 var odin_pkg_name;
 
 let odin_search = document.getElementById("odin-search");
@@ -386,12 +401,12 @@ if (odin_search) {
 			}
 			ev.stopPropagation(); return;
 		}, false);
-
-		window.addEventListener("keydown", ev => {
-			if ((ev.key === 'k' && (ev.metaKey || ev.ctrlKey)) || ev.key === '/') {
-				ev.preventDefault();
-				odin_search.focus();
-			}
-		});
 	}
+
+	window.addEventListener("keydown", ev => {
+		if ((ev.key === 'k' && (ev.metaKey || ev.ctrlKey)) || ev.key === '/') {
+			ev.preventDefault();
+			odin_search.focus();
+		}
+	});
 }
