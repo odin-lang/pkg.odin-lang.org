@@ -11,10 +11,10 @@ if (odin_search) {
 	function strcmp(a, b) {
 		return ((a == b) ? 0 : ((a > b) ? 1 : -1));
 	}
-	function get_key_string(e) {
+	function get_key_string(ev) {
 		let name;
 		let ignore_shift = false;
-		switch (e.which) {
+		switch (ev.which) {
 		case 13:
 			name = "Enter";
 			break;
@@ -29,11 +29,11 @@ if (odin_search) {
 			break;
 		default:
 			ignore_shift = true;
-			name = e.key != null ? e.key : String.fromCharCode(e.charCode || e.keyCode);
+			name = ev.key != null ? ev.key : String.fromCharCode(ev.charCode || ev.keyCode);
 		}
-		if (!ignore_shift && e.shiftKey) name = "Shift+" + name;
-		if (e.altKey) name = "Alt+" + name;
-		if (e.ctrlKey) name = "Ctrl+" + name;
+		if (!ignore_shift && ev.shiftKey) name = "Shift+" + name;
+		if (ev.altKey) name = "Alt+" + name;
+		if (ev.ctrlKey) name = "Ctrl+" + name;
 		return name;
 	}
 	function clamp(x, lo, hi) {
@@ -48,12 +48,12 @@ if (odin_search) {
 
 	function fuzzy_match(str, pattern) {
 		// Score consts
-		const adjacency_bonus            =  5; // bonus for adjacent matches
-		const separator_bonus            = 10; // bonus if match occurs after a separator
-		const camel_bonus                = 10; // bonus if match is uppercase and prev is lower
-		const leading_letter_penalty     = -3; // penalty applied for every letter in str before the first match
-		const max_leading_letter_penalty = -9; // maximum penalty for leading letters
-		const unmatched_letter_penalty   = -1; // penalty for every letter that doesn't matter
+		const ADJACENCY_BONUS            =  5; // bonus for adjacent matches
+		const SEPARATOR_BONUS            = 10; // bonus if match occurs after a separator
+		const CAMEL_BONUS                = 10; // bonus if match is uppercase and prev is lower
+		const LEADING_LETTER_PENALTY     = -3; // penalty applied for every letter in str before the first match
+		const MAX_LEADING_LETTER_PENALTY = -9; // maximum penalty for leading letters
+		const UNMATCHED_LETTER_PENALTY   = -1; // penalty for every letter that doesn't matter
 
 		// Loop variables
 		let score          = 0;
@@ -102,23 +102,23 @@ if (odin_search) {
 				// Apply penalty for each letter before the first pattern match
 				// Note: std::max because penalties are negative values. So max is smallest penalty.
 				if (pattern_idx == 0) {
-					let penalty = Math.max(str_idx * leading_letter_penalty, max_leading_letter_penalty);
+					let penalty = Math.max(str_idx * LEADING_LETTER_PENALTY, MAX_LEADING_LETTER_PENALTY);
 					score += penalty;
 				}
 
 				// Apply bonus for consecutive bonuses
 				if (prev_matched) {
-					new_score += adjacency_bonus;
+					new_score += ADJACENCY_BONUS;
 				}
 
 				// Apply bonus for matches after a separator
 				if (prev_separator) {
-					new_score += separator_bonus;
+					new_score += SEPARATOR_BONUS;
 				}
 
 				// Apply bonus across camel case boundaries. Includes "clever" isLetter check.
 				if (prev_lower && str_char == str_upper && str_lower != str_upper) {
-					new_score += camel_bonus;
+					new_score += CAMEL_BONUS;
 				}
 
 				// Update patter index IFF the next pattern letter was matched
@@ -131,7 +131,7 @@ if (odin_search) {
 
 					// Apply penalty for now skipped letter
 					if (best_letter != null) {
-						score += unmatched_letter_penalty;
+						score += UNMATCHED_LETTER_PENALTY;
 					}
 
 					best_letter = str_char;
@@ -142,7 +142,7 @@ if (odin_search) {
 
 				prev_matched = true;
 			} else {
-				score += unmatched_letter_penalty;
+				score += UNMATCHED_LETTER_PENALTY;
 				prev_matched = false;
 			}
 
@@ -251,51 +251,55 @@ if (odin_search) {
 
 		odin_search.addEventListener("input", ev => {
 			let search_text = odin_search.value.trim();
-			if (curr_search_value != search_text) {
-				curr_search_value = search_text;
-				if (search_text) {
-					curr_search_index = -1;
-					let start_time = performance.now();
-
-					let results = fuzzy_entity_match(entities, search_text);
-					if (results.length) {
-						let results_found = results.length;
-						let MAX_RESULTS_LENGTH = 64;
-						results.length = Math.min(results.length, MAX_RESULTS_LENGTH);
-
-						let innerHTML = '';
-						for (let result of results) {
-							let [pkg_name, entity_name] = result.name.split(".", 2);
-
-							let score = result.score;
-
-							let pkg_path = odin_pkg_data.packages[pkg_name].path;
-
-							let [formatted_pkg, formatted_name] = result.formatted.split(".", 2);
-							let full_path = `${pkg_path}/#${entity_name}`;
-							innerHTML += `<li data-path="${full_path}">`;
-							// innerHTML += `${score}&mdash;`;
-							innerHTML += `<a href="${pkg_path}/#${entity_name}"><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a></a></li>\n`;
-						}
-						let end_time = performance.now();
-						let diff = (end_time - start_time).toFixed(1);
-
-						// innerHTML = `<p>Time to search ${diff} milliseconds (found ${results_found})</p>` + innerHTML
-
-						odin_search_results.innerHTML = innerHTML;
-					} else {
-						odin_search_results.innerHTML = '';
-					}
-				} else {
-					odin_search_results.innerHTML = '';
-				}
+			if (curr_search_value == search_text) {
+				ev.stopPropagation(); return;
 			}
-			ev.stopPropagation();
-			return;
+			curr_search_value = search_text;
+			if (!search_text) {
+				odin_search_results.innerHTML = '';
+				ev.stopPropagation(); return;
+			}
+
+			curr_search_index = -1; // reset the search index as new text has been found
+
+			let start_time = performance.now();
+
+			let results = fuzzy_entity_match(entities, search_text);
+			if (!results.length) {
+				odin_search_results.innerHTML = '';
+				ev.stopPropagation(); return;
+			}
+
+			let results_found = results.length;
+			let MAX_RESULTS_LENGTH = 64;
+			results.length = Math.min(results.length, MAX_RESULTS_LENGTH);
+
+			let innerHTML = '';
+			for (let result of results) {
+				let [pkg_name, entity_name] = result.name.split(".", 2);
+
+				let score = result.score;
+
+				let pkg_path = odin_pkg_data.packages[pkg_name].path;
+
+				let [formatted_pkg, formatted_name] = result.formatted.split(".", 2);
+				let full_path = `${pkg_path}/#${entity_name}`;
+				innerHTML += `<li data-path="${full_path}">`;
+				// innerHTML += `${score}&mdash;`;
+				innerHTML += `<a href="${pkg_path}/#${entity_name}"><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a></a></li>\n`;
+			}
+			let end_time = performance.now();
+			let diff = (end_time - start_time).toFixed(1);
+
+			// innerHTML = `<p>Time to search ${diff} milliseconds (found ${results_found})</p>` + innerHTML
+
+			odin_search_results.innerHTML = innerHTML;
+
+			ev.stopPropagation(); return;
 		}, false);
 
-		odin_search.addEventListener("keydown", e => {
-			switch (get_key_string(e)) {
+		odin_search.addEventListener("keydown", ev => {
+			switch (get_key_string(ev)) {
 			case "Enter":
 				if (0 <= curr_search_index && curr_search_index < odin_search_results.children.length) {
 					let li = odin_search_results.children[curr_search_index];
@@ -310,76 +314,77 @@ if (odin_search) {
 				break;
 			case "Up":
 				move_search_cursor(-1);
-				e.preventDefault();
+				ev.preventDefault();
 				break;
 			case "Down":
 				move_search_cursor(+1);
-				e.preventDefault();
+				ev.preventDefault();
 				break;
 			default:
 				break;
 			}
-			e.stopPropagation();
+			ev.stopPropagation();
 			return;
 		}, false);
 
 
 	} else if (odin_search.className == "odin-search-package") {
-
-		let pkg_data = odin_pkg_data.packages[odin_pkg_name];
-
-		let entities = pkg_data.entities.map(e => e.name);
+		let entities     = odin_pkg_data.packages[odin_pkg_name].entities.map(e => e.name);
 		let doc_entities = getElementsByClassNameArray("doc-id-link").map(x => x.closest(".pkg-entity")).filter(x => x);
 
-		let pkg_top = document.getElementById("pkg-top");
-		let pkg_headers = getElementsByClassNameArray("pkg-header");
+		let pkg_top        = document.getElementById("pkg-top");
+		let pkg_headers    = getElementsByClassNameArray("pkg-header");
 		let empty_sections = getElementsByClassNameArray("pkg-empty-section");
 
-		const setAllDisplays = function(v) {
+		function set_all_displays(v) {
 			pkg_top.style.display = v;
 			pkg_headers.forEach(x => x.style.display = v);
 			empty_sections.forEach(x => x.style.display = v);
 		}
 
-		const resetEntities = function() {
+		function reset_entities() {
 			for (let e of doc_entities) {
 				e.style.display = null;
 				e.style.order = null;
 			}
-			setAllDisplays(null);
-		};
+			set_all_displays(null);
+		}
 
 		let curr_search_value = "";
 		odin_search.addEventListener("input", ev => {
 			let search_text = odin_search.value.trim();
-			if (curr_search_value != search_text) {
-				curr_search_value = search_text;
-				if (search_text) {
-					let results = fuzzy_entity_match(entities, search_text);
-					if (results.length) {
-						let result_names = results.map(e => e.name);
+			if (curr_search_value == search_text) {
+				ev.stopPropagation(); return;
+			}
 
-						setAllDisplays("none");
-						for (let e of doc_entities) {
-							let name = e.getElementsByTagName("h3")[0].id;
-							let idx = result_names.indexOf(name);
-							if (idx >= 0) {
-								e.style.display = null;
-								e.style.order = -results[idx].score;
-							} else {
-								e.style.display = "none";
-								e.style.order = null;
-							}
-						}
-					} else {
-						resetEntities();
-					}
+			curr_search_value = search_text;
+			if (!search_text) {
+				reset_entities();
+				ev.stopPropagation(); return;
+			}
+
+			let results = fuzzy_entity_match(entities, search_text);
+			if (results.length == 0) {
+				reset_entities();
+				ev.stopPropagation(); return;
+			}
+			set_all_displays("none");
+
+			let max_score = Math.max(...results.map(x => x.score));
+
+			let result_names = results.map(e => e.name);
+			for (let e of doc_entities) {
+				let name = e.getElementsByTagName("h3")[0].id;
+				let idx = result_names.indexOf(name);
+				if (idx >= 0) {
+					e.style.display = null;
+					e.style.order = max_score-results[idx].score+1;
 				} else {
-					resetEntities();
+					e.style.display = "none";
+					e.style.order = null;
 				}
 			}
-			ev.stopPropagation();
-			return;
+			ev.stopPropagation(); return;
 		}, false);
 	}
 }
