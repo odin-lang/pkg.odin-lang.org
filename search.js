@@ -344,7 +344,7 @@ if (odin_search) {
 				}
 				break;
 			case "Esc":
-				move_search_cursor = -1;
+				curr_search_index = -1;
 				draw_search_cursor();
 				break;
 			case "Up":
