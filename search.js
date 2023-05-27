@@ -366,6 +366,7 @@ if (odin_search) {
 	window.addEventListener("keydown", ev => {
 		if ((ev.key === 'k' && (ev.metaKey || ev.ctrlKey)) || ev.key === '/') {
 			odin_search.focus();
+			ev.preventDefault();
 		}
 	});
 }
