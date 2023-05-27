@@ -1465,12 +1465,7 @@ write_search :: proc(w: io.Writer, kind: enum { Package, Collection, All}) {
 	`, class)
 	fmt.wprintln(w)
 
-	switch kind {
-	case .Package:
-		// ignore
-	case .Collection, .All:
-		fmt.wprintln(w, `<ul id="odin-search-results"></ul>`)
-	}
+	fmt.wprintln(w, `<ul id="odin-search-results"></ul>`)
 }
 
 
