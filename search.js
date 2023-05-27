@@ -307,18 +307,18 @@ if (odin_search) {
 				// innerHTML += `${score}&mdash;`;
 
 				if (IS_PACKAGE_PAGE) {
-					innerHTML += `<a href="${full_path}">${formatted_name}</a>`;
+					innerHTML += `<div><a href="${full_path}">${formatted_name}</a></div>`;
 				} else {
-					innerHTML += `<a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a>`;
+					innerHTML += `<div><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a></div>`;
 				}
 
 				switch (result.entity.kind) {
-				case "c": innerHTML += `&nbsp;<span class="kind">constant</span>`;          break;
-				case "v": innerHTML += `&nbsp;<span class="kind">variable</span>`;          break;
-				case "t": innerHTML += `&nbsp;<span class="kind">type</span>`;              break;
-				case "p": innerHTML += `&nbsp;<span class="kind">procedure</span>`;         break;
-				case "g": innerHTML += `&nbsp;<span class="kind">procedure group</span>`;   break;
-				case "b": innerHTML += `&nbsp;<span class="kind">builtin procedure</span>`; break;
+				case "c": innerHTML += `&nbsp;<div class="kind">constant</div>`;          break;
+				case "v": innerHTML += `&nbsp;<div class="kind">variable</div>`;          break;
+				case "t": innerHTML += `&nbsp;<div class="kind">type</div>`;              break;
+				case "p": innerHTML += `&nbsp;<div class="kind">procedure</div>`;         break;
+				case "g": innerHTML += `&nbsp;<div class="kind">procedure group</div>`;   break;
+				case "b": innerHTML += `&nbsp;<div class="kind">builtin procedure</div>`; break;
 				}
 
 				innerHTML += `</li>\n`;
