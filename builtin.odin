@@ -11,13 +11,13 @@ Builtin :: struct {
 	kind: string,
 	type: string,
 	comment: string,
-	runtime: bool,
+	value: string,
 }
 
 builtins := []Builtin{
-	{name = "nil",          kind = "c", type = "untyped nil"},
-	{name = "false",        kind = "c", type = "untyped boolean"},
-	{name = "true",         kind = "c", type = "untyped boolean"},
+	{name = "nil",          kind = "c", type = "untyped nil", comment = "`nil` is a predecared identifier representing the zero value for a pointer, multi-pointer, enum, bit_set, slice, dynamic array, map, procedure, any, typeid, cstring, union, #soa array, #soa pointer, #relative type"},
+	{name = "false",        kind = "c", type = "untyped boolean", value = "0 != 0"},
+	{name = "true",         kind = "c", type = "untyped boolean", value = "0 == 0"},
 
 	{name = "ODIN_OS",      kind = "c", type = "runtime.Odin_OS_Type"},
 	{name = "ODIN_ARCH",    kind = "c", type = "runtime.Odin_Arch_Type"},
@@ -27,78 +27,83 @@ builtins := []Builtin{
 	{name = "ODIN_ROOT",    kind = "c", type = "untyped string"},
 	{name = "ODIN_DEBUG",   kind = "c", type = "untyped boolean"},
 
-	{name = "byte", kind = "t"},
+	{name = "byte", kind = "t", value = "u8", comment = "`byte` is an alias for `u8` and is equivalent to `u8` in all ways. It is used as a convention to distinguish values from 8-bit unsigned integer values."},
 
-	{name = "bool", kind = "t"},
-	{name = "b8", kind = "t"},
-	{name = "b16", kind = "t"},
-	{name = "b32", kind = "t"},
-	{name = "b64", kind = "t"},
+	{name = "bool", kind = "t", comment = "`bool` is the set of boolean values, `false` and `true`. This is distinct to `b8`."},
+	{name = "b8",   kind = "t", comment = "`b8` is the set of boolean values, `false` and `true`. This is distinct to `bool`."},
+	{name = "b16",  kind = "t", comment = "`b16` is the set of boolean values, `false` and `true`."},
+	{name = "b32",  kind = "t", comment = "`b32` is the set of boolean values, `false` and `true`."},
+	{name = "b64",  kind = "t", comment = "`b64` is the set of boolean values, `false` and `true`."},
 
-	{name = "i8", kind = "t"},
-	{name = "u8", kind = "t"},
-	{name = "i16", kind = "t"},
-	{name = "u16", kind = "t"},
-	{name = "i32", kind = "t"},
-	{name = "u32", kind = "t"},
-	{name = "i64", kind = "t"},
-	{name = "u64", kind = "t"},
+	{name = "i8", kind = "t",  comment = "`i8` is the set of all signed 8-bit integers. Range -128 through 127."},
+	{name = "u8", kind = "t",  comment = "`u8` is the set of all unsigned 8-bit integers. Range 0 through 255."},
+	{name = "i16", kind = "t", comment = "`i16` is the set of all signed 16-bit integers with native endianness. Range -32768 through 32767."},
+	{name = "u16", kind = "t", comment = "`u16` is the set of all unsigned 16-bit integers with native endianness. Range 0 through 65535."},
+	{name = "i32", kind = "t", comment = "`i32` is the set of all signed 32-bit integers with native endianness. Range -2147483648 through 2147483647."},
+	{name = "u32", kind = "t", comment = "`u32` is the set of all unsigned 32-bit integers with native endianness. Range 0 through 4294967295."},
+	{name = "i64", kind = "t", comment = "`i64` is the set of all signed 64-bit integers with native endianness. Range -9223372036854775808 through 9223372036854775807."},
+	{name = "u64", kind = "t", comment = "`u64` is the set of all unsigned 64-bit integers with native endianness. Range 0 through 18446744073709551615."},
 
-	{name = "i128", kind = "t"},
-	{name = "u128", kind = "t"},
+	{name = "i128", kind = "t", comment = "`i128` is the set of all signed 128-bit integers with native endianness. Range -170141183460469231731687303715884105728 through 170141183460469231731687303715884105727."},
+	{name = "u128", kind = "t", comment = "`u128` is the set of all unsigned 128-bit integers with native endianness. Range 0 through 340282366920938463463374607431768211455."},
 
-	{name = "rune", kind = "t"},
+	{name = "rune", kind = "t", comment = "`rune` is the set of all Unicode code points. It is internally the same as `i32` but distinct."},
 
-	{name = "f16", kind = "t"},
-	{name = "f32", kind = "t"},
-	{name = "f64", kind = "t"},
+	{name = "f16", kind = "t", comment = "`f16` is the set of all IEEE-754 16-bit floating-point numbers with native endianness."},
+	{name = "f32", kind = "t", comment = "`f32` is the set of all IEEE-754 32-bit floating-point numbers with native endianness."},
+	{name = "f64", kind = "t", comment = "`f64` is the set of all IEEE-754 64-bit floating-point numbers with native endianness."},
 
-	{name = "complex32", kind = "t"},
-	{name = "complex64", kind = "t"},
-	{name = "complex128", kind = "t"},
+	{name = "complex32",  kind = "t", comment = "`complex32` is the set of all complex numbers with `f16` real and imaginary parts"},
+	{name = "complex64",  kind = "t", comment = "`complex64` is the set of all complex numbers with `f32` real and imaginary parts"},
+	{name = "complex128", kind = "t", comment = "`complex128` is the set of all complex numbers with `f64` real and imaginary parts"},
 
-	{name = "quaternion64", kind = "t"},
-	{name = "quaternion128", kind = "t"},
-	{name = "quaternion256", kind = "t"},
+	{name = "quaternion64",  kind = "t", comment = "`quaternion64` is the set of all complex numbers with `f16` real and imaginary (i, j, & k) parts"},
+	{name = "quaternion128", kind = "t", comment = "`quaternion128` is the set of all complex numbers with `f32` real and imaginary (i, j, & k) parts"},
+	{name = "quaternion256", kind = "t", comment = "`quaternion256` is the set of all complex numbers with `f64` real and imaginary (i, j, & k) parts"},
 
-	{name = "int", kind = "t"},
-	{name = "uint", kind = "t"},
-	{name = "uintptr", kind = "t"},
+	{name = "int",     kind = "t", comment = "`int` is a signed integer type that is at least 32 bits in size. It is a distinct type, however, and not an alias for say, `i32`."},
+	{name = "uint",    kind = "t", comment = "`uint` is an unsigned integer type that is at least 32 bits in size. It is a distinct type, however, and not an alias for say, `u32`."},
+	{name = "uintptr", kind = "t", comment = "`uintptr` is an unsigned integer type that is large enough to hold the bit pattern of any pointer."},
 
-	{name = "rawptr", kind = "t"},
-	{name = "string", kind = "t"},
-	{name = "cstring", kind = "t"},
-	{name = "any", kind = "t"},
+	{name = "rawptr",  kind = "t", comment = "`rawptr` represents a pointer to an arbitrary type. It is equivalent to `void *` in C."},
 
-	{name = "typeid", kind = "t"},
+	{name = "string",  kind = "t", comment = "`string` is the set of all strings of 8-bit bytes, conventionally but not necessarily representing UTF-8 encoding text. A `string` may be empty but not `nil`. Elements of `string` type are immutable and indexable."},
+	{name = "cstring", kind = "t", comment = "`cstring` is the set of all strings of 8-bit bytes terminated with a NUL (0) byte, conventionally but not necessarily representing UTF-8 encoding text. A `cstring` may be empty or `nil`. Elements of `string` type are immutable but not indexable."},
+
+	{name = "typeid", kind = "t", comment = "`typeid` is a unique identifier for an Odin type at runtime. It can be mapped to relevant type information through `type_info_of`."},
+	{name = "any",    kind = "t",
+		comment = "`any` can reference any data type at runtime. Internally it contains a pointer to the underlying data and its relevant `typeid`. This is a very useful construct in order to have a runtime type safe printing procedure.\n\n"+
+		          "**Note:** The `any` value is only valid for as long as the underlying data is still valid. Passing a literal to an `any` will allocate the literal in the current stack frame.\n\n"+
+		          "**Note:** It is highly recommend that you **do not** use this unless you know what you are doing. Its primary use is for printing procedures."
+	},
 
 	// Endian Specific Types
-	{name = "i16le", kind = "t"},
-	{name = "u16le", kind = "t"},
-	{name = "i32le", kind = "t"},
-	{name = "u32le", kind = "t"},
-	{name = "i64le", kind = "t"},
-	{name = "u64le", kind = "t"},
-	{name = "i128le", kind = "t"},
-	{name = "u128le", kind = "t"},
+	{name = "i16le",  kind = "t", comment = "`i16le` is the set of all signed 16-bit integers with little endianness. Range -32768 through 32767."},
+	{name = "u16le",  kind = "t", comment = "`u16le` is the set of all unsigned 16-bit integers with little endianness. Range 0 through 65535."},
+	{name = "i32le",  kind = "t", comment = "`i32le` is the set of all signed 32-bit integers with little endianness. Range -2147483648 through 2147483647."},
+	{name = "u32le",  kind = "t", comment = "`u32le` is the set of all unsigned 32-bit integers with little endianness. Range 0 through 4294967295."},
+	{name = "i64le",  kind = "t", comment = "`i64le` is the set of all signed 64-bit integers with little endianness. Range -9223372036854775808 through 9223372036854775807."},
+	{name = "u64le",  kind = "t", comment = "`u64le` is the set of all unsigned 64-bit integers with little endianness. Range 0 through 18446744073709551615."},
+	{name = "i128le", kind = "t", comment = "`i128le` is the set of all signed 128-bit integers with little endianness. Range -170141183460469231731687303715884105728 through 170141183460469231731687303715884105727."},
+	{name = "u128le", kind = "t", comment = "`u128le` is the set of all unsigned 128-bit integers with little endianness. Range 0 through 340282366920938463463374607431768211455."},
 
-	{name = "i16be", kind = "t"},
-	{name = "u16be", kind = "t"},
-	{name = "i32be", kind = "t"},
-	{name = "u32be", kind = "t"},
-	{name = "i64be", kind = "t"},
-	{name = "u64be", kind = "t"},
-	{name = "i128be", kind = "t"},
-	{name = "u128be", kind = "t"},
+	{name = "i16be",  kind = "t", comment = "`i16be` is the set of all signed 16-bit integers with big endianness. Range -32768 through 32767."},
+	{name = "u16be",  kind = "t", comment = "`u16be` is the set of all unsigned 16-bit integers with big endianness. Range 0 through 65535."},
+	{name = "i32be",  kind = "t", comment = "`i32be` is the set of all signed 32-bit integers with big endianness. Range -2147483648 through 2147483647."},
+	{name = "u32be",  kind = "t", comment = "`u32be` is the set of all unsigned 32-bit integers with big endianness. Range 0 through 4294967295."},
+	{name = "i64be",  kind = "t", comment = "`i64be` is the set of all signed 64-bit integers with big endianness. Range -9223372036854775808 through 9223372036854775807."},
+	{name = "u64be",  kind = "t", comment = "`u64be` is the set of all unsigned 64-bit integers with big endianness. Range 0 through 18446744073709551615."},
+	{name = "i128be", kind = "t", comment = "`i128be` is the set of all signed 128-bit integers with big endianness. Range -170141183460469231731687303715884105728 through 170141183460469231731687303715884105727."},
+	{name = "u128be", kind = "t", comment = "`u128be` is the set of all unsigned 128-bit integers with big endianness. Range 0 through 340282366920938463463374607431768211455."},
 
 
-	{name = "f16le", kind = "t"},
-	{name = "f32le", kind = "t"},
-	{name = "f64le", kind = "t"},
+	{name = "f16le", kind = "t", comment = "`f16le` is the set of all IEEE-754 16-bit floating-point numbers with little endianness."},
+	{name = "f32le", kind = "t", comment = "`f32le` is the set of all IEEE-754 32-bit floating-point numbers with little endianness."},
+	{name = "f64le", kind = "t", comment = "`f64le` is the set of all IEEE-754 64-bit floating-point numbers with little endianness."},
 
-	{name = "f16be", kind = "t"},
-	{name = "f32be", kind = "t"},
-	{name = "f64be", kind = "t"},
+	{name = "f16be", kind = "t", comment = "`f16be` is the set of all IEEE-754 16-bit floating-point numbers with big endianness."},
+	{name = "f32be", kind = "t", comment = "`f32be` is the set of all IEEE-754 32-bit floating-point numbers with big endianness."},
+	{name = "f64be", kind = "t", comment = "`f64be` is the set of all IEEE-754 64-bit floating-point numbers with big endianness."},
 
 	// Procedures
 	{name = "len", kind = "b", type = "proc(array: Array_Type) -> int"},
@@ -140,7 +145,14 @@ builtins := []Builtin{
 builtin_docs := `package builtin provides documentation for Odin's predeclared identifiers. The items documented here are not actually in package builtin but here to allow for better documentation for the language's special identifiers.`
 
 write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg, collection: ^Collection) {
-	fmt.wprintln(w, `<div class="row odin-main" id="pkg">`)
+	// slice.sort_by(builtins, proc(a, b: Builtin) -> bool {
+	// 	if a.kind == b.kind {
+	// 		return a.name < b.name
+	// 	}
+	// 	return a.kind < b.kind
+	// })
+
+		fmt.wprintln(w, `<div class="row odin-main" id="pkg">`)
 	defer fmt.wprintln(w, `</div>`)
 
 	{
@@ -306,20 +318,26 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 				if strings.contains(b.type, ".") {
 					pkg, _, type := strings.partition(b.type, ".")
 					if pkg == str(runtime_pkg.name) {
-						fmt.wprintf(w, `{0:s} : <a href="{1:s}">{2:s}</a>.<a href="{1:s}#{3:s}">{3:s}</a> : {0:s}`, name, runtime_url, pkg, type)
+						fmt.wprintf(w, `{0:s} : <a href="{1:s}">{2:s}</a>.<a href="{1:s}#{3:s}">{3:s}</a> : `, name, runtime_url, pkg, type)
 					} else {
-						fmt.wprintf(w, "%s :: %s", name, name)
+						fmt.wprintf(w, "%s :: ", name)
 					}
 				} else {
-					fmt.wprintf(w, "%s :: %s", name, name)
+					fmt.wprintf(w, "%s :: ", name)
 				}
+				fmt.wprintf(w, "%s", b.value if len(b.value) != 0 else name)
+				if strings.contains(b.type, "untyped") {
+					fmt.wprintf(w, " <span class=\"comment\">// %s</span>", b.type)
+				}
+
 				fmt.wprintln(w, "</pre>")
-				fmt.wprintln(w, "<br>")
-				fmt.wprintln(w, "<br>")
 			case "b":
 				fmt.wprint(w, `<pre class="doc-code">`)
 				fmt.wprintf(w, "%s :: %s {…}", name, b.type)
 				fmt.wprintln(w, "</pre>")
+			}
+
+			if len(b.comment) == 0 {
 				fmt.wprintln(w, "<br>")
 				fmt.wprintln(w, "<br>")
 			}

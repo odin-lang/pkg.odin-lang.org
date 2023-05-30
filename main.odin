@@ -52,13 +52,6 @@ main :: proc() {
 		root =        nil,
 	}
 
-	slice.sort_by(builtins, proc(a, b: Builtin) -> bool {
-		if a.kind == b.kind {
-			return a.name < b.name
-		}
-		return a.kind < b.kind
-	})
-
 	{
 		fullpaths: [dynamic]string
 		defer delete(fullpaths)
@@ -194,9 +187,6 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: ..^Collection) 
 			fmt.wprintf(w, `"name": %q, `, b.name)
 			fmt.wprintf(w, `"type": %q, `, b.type)
 			fmt.wprintf(w, `"builtin": %v, `, true)
-			if b.runtime {
-				fmt.wprintf(w, `"runtime": %v`, b.runtime)
-			}
 			if len(b.comment) != 0 {
 				fmt.wprintf(w, `"comment": %q`, b.comment)
 			}
