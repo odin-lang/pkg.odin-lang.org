@@ -330,10 +330,10 @@ if (odin_search) {
 				list_contents.push(`<li data-path="${full_path}">`);
 				// list_contents.push(`${result.score}&mdash;`);
 
+				let [formatted_pkg, formatted_name] = formatted_str.split(".", 2);
 				if (IS_PACKAGE_PAGE) {
-					list_contents.push(`<div><a href="${full_path}">${formatted_str}</a></div>`);
+					list_contents.push(`<div><a href="${full_path}">${formatted_name}</a></div>`);
 				} else {
-					let [formatted_pkg, formatted_name] = formatted_str.split(".", 2);
 					list_contents.push(`<div><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a></div>`);
 				}
 
