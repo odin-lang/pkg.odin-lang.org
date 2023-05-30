@@ -29,11 +29,11 @@ builtins := []Builtin{
 
 	{name = "byte", kind = "t", value = "u8", comment = "`byte` is an alias for `u8` and is equivalent to `u8` in all ways. It is used as a convention to distinguish values from 8-bit unsigned integer values."},
 
-	{name = "bool", kind = "t", comment = "`bool` is the set of boolean values, `false` and `true`. This is distinct to `b8`."},
-	{name = "b8",   kind = "t", comment = "`b8` is the set of boolean values, `false` and `true`. This is distinct to `bool`."},
-	{name = "b16",  kind = "t", comment = "`b16` is the set of boolean values, `false` and `true`."},
-	{name = "b32",  kind = "t", comment = "`b32` is the set of boolean values, `false` and `true`."},
-	{name = "b64",  kind = "t", comment = "`b64` is the set of boolean values, `false` and `true`."},
+	{name = "bool", kind = "t", comment = "`bool` is the set of boolean values, `false` and `true`. This is distinct to `b8`. `bool` has a size of 1 byte (8 bits)."},
+	{name = "b8",   kind = "t", comment = "`b8` is the set of boolean values, `false` and `true`. This is distinct to `bool`. `b8` has a size of 1 byte (8 bits)."},
+	{name = "b16",  kind = "t", comment = "`b16` is the set of boolean values, `false` and `true`. `b16` has a size of 2 bytes (16 bits)."},
+	{name = "b32",  kind = "t", comment = "`b32` is the set of boolean values, `false` and `true`. `b32` has a size of 4 bytes (32 bits)."},
+	{name = "b64",  kind = "t", comment = "`b64` is the set of boolean values, `false` and `true`. `b64` has a size of 8 bytes (64 bits)."},
 
 	{name = "i8", kind = "t",  comment = "`i8` is the set of all signed 8-bit integers. Range -128 through 127."},
 	{name = "u8", kind = "t",  comment = "`u8` is the set of all unsigned 8-bit integers. Range 0 through 255."},
