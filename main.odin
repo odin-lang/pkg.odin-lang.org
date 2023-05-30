@@ -170,6 +170,7 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: ..^Collection) 
 				fmt.wprintln(w, ",")
 			}
 			fmt.wprintf(w, "\t\"%s\": {{\n", str(pkg.name))
+			fmt.wprintf(w, "\t\t\"name\": \"%s\",\n", str(pkg.name))
 			fmt.wprintf(w, "\t\t\"collection\": \"%s\",\n", collection.name)
 			fmt.wprintf(w, "\t\t\"path\": \"%s/%s\",\n", collection.base_url, path)
 			fmt.wprint(w, "\t\t\"entities\": [\n")
@@ -191,8 +192,7 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: ..^Collection) 
 
 				fmt.wprint(w, "\t\t\t{")
 				fmt.wprintf(w, `"kind": "%s", `,  kind_str)
-				fmt.wprintf(w, `"name": %q, `, str(e.name))
-				fmt.wprintf(w, `"full": "%s.%s"`, str(pkg.name), str(e.name))
+				fmt.wprintf(w, `"name": %q`, str(e.name))
 				fmt.wprint(w, "}")
 			}
 			fmt.wprint(w, "\n\t\t]")
@@ -1465,6 +1465,7 @@ write_search :: proc(w: io.Writer, kind: enum { Package, Collection, All}) {
 	`, class)
 	fmt.wprintln(w)
 
+	fmt.wprintln(w, `<div id="odin-search-time"></div>`)
 	fmt.wprintln(w, `<ul id="odin-search-results"></ul>`)
 }
 

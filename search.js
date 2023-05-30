@@ -66,6 +66,7 @@ if (odin_search) {
 		const ADJACENCY_BONUS            =  5; // bonus for adjacent matches
 		const SEPARATOR_BONUS            = 10; // bonus if match occurs after a separator
 		const CAMEL_BONUS                = 10; // bonus if match is uppercase and prev is lower
+		const SEEN_DOT_BONUS             = 10;
 		const LEADING_LETTER_PENALTY     = -3; // penalty applied for every letter in str before the first match
 		const MAX_LEADING_LETTER_PENALTY = -9; // maximum penalty for leading letters
 		const UNMATCHED_LETTER_PENALTY   = -1; // penalty for every letter that doesn't matter
@@ -85,6 +86,7 @@ if (odin_search) {
 		let best_lower        = null;
 		let best_letter_idx   = null;
 		let best_letter_score = 0;
+		let seen_dot = false;
 
 		let matched_indices = [];
 
@@ -153,6 +155,10 @@ if (odin_search) {
 					best_lower = best_letter.toLowerCase();
 					best_letter_idx = str_idx;
 					best_letter_score = new_score;
+					if (seen_dot) {
+						// Priorities declaration name not package
+						best_letter_score += SEEN_DOT_BONUS;
+					}
 				}
 
 				prev_matched = true;
@@ -163,6 +169,9 @@ if (odin_search) {
 
 			// Includes "clever" isLetter check.
 			prev_lower = str_char == str_lower && str_lower != str_upper;
+			if (str_char == '.') {
+				seen_dot = true;
+			}
 			prev_separator = str_char == '_' || str_char == ' ' || str_char == '.';
 
 			str_idx += 1;
@@ -178,7 +187,9 @@ if (odin_search) {
 		// Build formated string based on matched letters
 		let formatted_str = "";
 		let last_idx = 0;
-		for (const idx of matched_indices) {
+		let matched_indices_length = matched_indices.length;
+		for (let i = 0; i < matched_indices_length; i++) {
+			let idx = matched_indices[i];
 			formatted_str += str.substr(last_idx, idx - last_idx) + "<b>" + str.charAt(idx) + "</b>";
 			last_idx = idx + 1;
 		}
@@ -189,29 +200,24 @@ if (odin_search) {
 	}
 
 	function fuzzy_entity_match(entities, search_text) {
-		let results = [];
-		for (const entity of entities) {
+		let entities_length = entities.length;
+
+		let result_idx = 0;
+		let results = new Array(entities_length);
+		for (let i = 0; i < entities_length; i++) {
+			let entity = entities[i];
 			let full_name = entity.full;
 			let [matched, score, formatted] = fuzzy_match(full_name, search_text);
-			if (!matched) {
-				continue;
+			if (matched) {
+				results[result_idx++] = {
+					"entity":    entity,
+					"score":     score,
+					"formatted": formatted,
+				};
 			}
-
-			if (full_name.includes(".")) {
-				// Weight the name of the entity itself more than the entire thing
-				let base_name = full_name.split(".", 2)[1];
-				let [base_matched, base_score, _] = fuzzy_match(base_name, search_text);
-				if (base_matched) {
-					score += base_score;
-				}
-			}
-
-			results.push({
-				"entity":    entity,
-				"score":     score,
-				"formatted": formatted,
-			});
 		}
+
+		results.length = result_idx;
 
 		results.sort(function(a, b) {
 			if (a.score == b.score) {
@@ -225,22 +231,35 @@ if (odin_search) {
 
 	{
 		const IS_PACKAGE_PAGE = odin_search.className == "odin-search-package";
+
 		let entities = [];
+		function add_entity(odin_pkg_name, e) {
+			e.full = odin_pkg_name+'.'+e.name; // add full name
+			e.pkg = odin_pkg_name;
+			entities.push(e);
+		}
+
 		if (IS_PACKAGE_PAGE) {
-			for (const e of odin_pkg_data.packages[odin_pkg_name].entities) {
-				entities.push(e);
+			let pkg_name = odin_pkg_name;
+			let entities = odin_pkg_data.packages[pkg_name].entities;
+			for (let j = 0; j < entities.length; j++) {
+				add_entity(pkg_name, entities[j]);
 			}
 		} else {
-			for (const [pkg_name, pkg] of Object.entries(odin_pkg_data.packages)) {
-				for (const e of pkg.entities) {
-					entities.push(e);
+			let all_packages = Object.entries(odin_pkg_data.packages);
+			for (let i = 0; i < all_packages.length; i++) {
+				let [pkg_name, pkg] = all_packages[i];
+				let entities = pkg.entities;
+				for (let j = 0; j < entities.length; j++) {
+					add_entity(pkg_name, entities[j]);
 				}
 			}
 		}
 
 		let odin_search_results = document.getElementById("odin-search-results");
-		let curr_search_index = -1;
-		let curr_search_value = "";
+		let odin_search_time    = document.getElementById("odin-search-time");
+		let curr_search_index   = -1;
+		let curr_search_value   = "";
 
 
 		function move_search_cursor(dir) {
@@ -267,16 +286,20 @@ if (odin_search) {
 			}
 		}
 
+		function clear_odin_search_doms() {
+			odin_search_results.innerHTML = '';
+			odin_search_time.innerHTML = '';
+		}
 
-		odin_search.addEventListener("input", ev => {
+		function odin_search_input(ev) {
 			let search_text = odin_search.value.trim();
 			if (curr_search_value == search_text) {
-				ev.stopPropagation(); return;
+				return;
 			}
 			curr_search_value = search_text;
 			if (!search_text) {
-				odin_search_results.innerHTML = '';
-				ev.stopPropagation(); return;
+				clear_odin_search_doms();
+				return;
 			}
 
 			curr_search_index = -1; // reset the search index as new text has been found
@@ -285,52 +308,61 @@ if (odin_search) {
 
 			let results = fuzzy_entity_match(entities, search_text);
 			if (!results.length) {
-				odin_search_results.innerHTML = '';
-				ev.stopPropagation(); return;
+				clear_odin_search_doms();
+				return;
 			}
 
 			let results_found = results.length;
-			let MAX_RESULTS_LENGTH = 64;
-			results.length = Math.min(results.length, MAX_RESULTS_LENGTH);
+			let MAX_RESULTS_LENGTH = 32;
+			let results_length = results.length;
+			results_length = Math.min(results_length, MAX_RESULTS_LENGTH);
 
-			let innerHTML = '';
-			for (const result of results) {
-				let [pkg_name, entity_name] = result.entity.full.split(".", 2);
+			let list_contents = [];
+			for (let result_idx = 0; result_idx < results_length; result_idx++) {
+				let result = results[result_idx];
+				let entity = result.entity;
+				let formatted_str = result.formatted;
 
-				let score = result.score;
+				let pkg_path = odin_pkg_data.packages[entity.pkg].path;
 
-				let pkg_path = odin_pkg_data.packages[pkg_name].path;
+				let full_path = `${pkg_path}/#${entity.name}`;
 
-				let [formatted_pkg, formatted_name] = result.formatted.split(".", 2);
-				let full_path = `${pkg_path}/#${entity_name}`;
-				innerHTML += `<li data-path="${full_path}">`;
-				// innerHTML += `${score}&mdash;`;
+				list_contents.push(`<li data-path="${full_path}">`);
+				// list_contents.push(`${result.score}&mdash;`);
 
 				if (IS_PACKAGE_PAGE) {
-					innerHTML += `<div><a href="${full_path}">${formatted_name}</a></div>`;
+					list_contents.push(`<div><a href="${full_path}">${formatted_str}</a></div>`);
 				} else {
-					innerHTML += `<div><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a></div>`;
+					let [formatted_pkg, formatted_name] = formatted_str.split(".", 2);
+					list_contents.push(`<div><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a></div>`);
 				}
 
-				switch (result.entity.kind) {
-				case "c": innerHTML += `&nbsp;<div class="kind">constant</div>`;          break;
-				case "v": innerHTML += `&nbsp;<div class="kind">variable</div>`;          break;
-				case "t": innerHTML += `&nbsp;<div class="kind">type</div>`;              break;
-				case "p": innerHTML += `&nbsp;<div class="kind">procedure</div>`;         break;
-				case "g": innerHTML += `&nbsp;<div class="kind">procedure group</div>`;   break;
-				case "b": innerHTML += `&nbsp;<div class="kind">builtin procedure</div>`; break;
+				switch (entity.kind) {
+				case "c": list_contents.push(`&nbsp;<div class="kind">constant</div>`);          break;
+				case "v": list_contents.push(`&nbsp;<div class="kind">variable</div>`);          break;
+				case "t": list_contents.push(`&nbsp;<div class="kind">type</div>`);              break;
+				case "p": list_contents.push(`&nbsp;<div class="kind">procedure</div>`);         break;
+				case "g": list_contents.push(`&nbsp;<div class="kind">procedure group</div>`);   break;
+				case "b": list_contents.push(`&nbsp;<div class="kind">builtin procedure</div>`); break;
 				}
 
-				innerHTML += `</li>\n`;
+				list_contents.push(`</li>\n`);
 			}
+
+			odin_search_results.innerHTML = list_contents.join('');
+
 			let end_time = performance.now();
 			let diff = (end_time - start_time).toFixed(1);
 
-			// innerHTML = `<p>Time to search ${diff} milliseconds (found ${results_found})</p>` + innerHTML
+			odin_search_time.innerHTML = `<p>Time to search ${diff} milliseconds (found ${results_found}/${entities.length}, displaying ${results_length})</p>`;
 
-			odin_search_results.innerHTML = innerHTML;
+			return;
+		}
 
-			ev.stopPropagation(); return;
+
+		odin_search.addEventListener("input", ev => {
+			odin_search_input(ev);
+			ev.stopPropagation();
 		}, false);
 
 		odin_search.addEventListener("keydown", ev => {
@@ -339,7 +371,7 @@ if (odin_search) {
 				if (0 <= curr_search_index && curr_search_index < odin_search_results.children.length) {
 					let li = odin_search_results.children[curr_search_index];
 					let path = li.dataset.path;
-					odin_search_results.innerHTML = '';
+					clear_odin_search_doms();
 					window.location.href = li.dataset.path;
 				}
 				break;
