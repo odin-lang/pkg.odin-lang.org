@@ -1914,7 +1914,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 					case .Struct, .Union, .Proc, .Enum:
 						// Okay
 					case:
-						io.write_string(w, "distinct ")
+						io.write_string(w, `<span class="keyword-type">distinct</span> `)
 					}
 					type_to_print = bt
 				}

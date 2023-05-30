@@ -19,13 +19,13 @@ builtins := []Builtin{
 	{name = "false",        kind = "c", type = "untyped boolean", value = "0 != 0"},
 	{name = "true",         kind = "c", type = "untyped boolean", value = "0 == 0"},
 
-	{name = "ODIN_OS",      kind = "c", type = "runtime.Odin_OS_Type"},
-	{name = "ODIN_ARCH",    kind = "c", type = "runtime.Odin_Arch_Type"},
-	{name = "ODIN_ENDIAN",  kind = "c", type = "runtime.Odin_Endian_Type"},
-	{name = "ODIN_VENDOR",  kind = "c", type = "untyped string"},
-	{name = "ODIN_VERSION", kind = "c", type = "untyped string"},
-	{name = "ODIN_ROOT",    kind = "c", type = "untyped string"},
-	{name = "ODIN_DEBUG",   kind = "c", type = "untyped boolean"},
+	{name = "ODIN_OS",      kind = "c", type = "runtime.Odin_OS_Type",     comment = "An enum value specifying the target platform's operating system."},
+	{name = "ODIN_ARCH",    kind = "c", type = "runtime.Odin_Arch_Type",   comment = "An enum value specifying the target platform's architecture."},
+	{name = "ODIN_ENDIAN",  kind = "c", type = "runtime.Odin_Endian_Type", comment = "An enum value specifying the target platform's endiannes."},
+	{name = "ODIN_VENDOR",  kind = "c", type = "untyped string",           comment = "A string specifying the current Odin compiler vendor."},
+	{name = "ODIN_VERSION", kind = "c", type = "untyped string",           comment = "A string specifying the current Odin version."},
+	{name = "ODIN_ROOT",    kind = "c", type = "untyped string",           comment = "The path to the root Odin directory."},
+	{name = "ODIN_DEBUG",   kind = "c", type = "untyped boolean",          comment = "Equal to `true` if the `-debug` flag has been set during compilation, otherwise `false`."},
 
 	{name = "byte", kind = "t", value = "u8", comment = "`byte` is an alias for `u8` and is equivalent to `u8` in all ways. It is used as a convention to distinguish values from 8-bit unsigned integer values."},
 
@@ -347,6 +347,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 			fmt.wprintln(w, `<div>`)
 
 			the_comment := b.comment
+			extra_comment := ""
 
 			switch b.kind {
 			case "c", "t":
@@ -356,26 +357,25 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 					if pkg == str(runtime_pkg.name) {
 						fmt.wprintf(w, `{0:s} : {2:s}.<a href="{1:s}#{3:s}">{3:s}</a> : `, name, runtime_url, pkg, type)
 
-						if len(the_comment) == 0 {
-							for entry in array(runtime_pkg.entries) {
-								e := &entities[entry.entity]
-								if e.kind == .Type_Name && str(e.name) == type {
-									the_comment = strings.trim_space(str(e.docs))
-									if the_comment == "" {
-										the_comment = strings.trim_space(str(e.comment))
-									}
-									break
+						for entry in array(runtime_pkg.entries) {
+							e := &entities[entry.entity]
+							if e.kind == .Type_Name && str(e.name) == type {
+								extra_comment = strings.trim_space(str(e.docs))
+								if extra_comment == "" {
+									extra_comment = strings.trim_space(str(e.comment))
 								}
+								break
 							}
 						}
-
 					} else {
 						fmt.wprintf(w, "%s :: ", name)
 					}
 				} else {
 					fmt.wprintf(w, "%s :: ", name)
 				}
-				fmt.wprintf(w, "%s", b.value if len(b.value) != 0 else name)
+				fmt.wprintf(w, "%s", b.value if len(b.value) != 0 else
+				                     "…"     if b.kind == "c"     else
+				                     name)
 				if strings.contains(b.type, "untyped") {
 					fmt.wprintf(w, " <span class=\"comment\">// %s</span>", b.type)
 				}
@@ -390,10 +390,11 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 
 			fmt.wprintln(w, `</div>`)
 
-			if len(the_comment) != 0 {
+			if len(the_comment) != 0 || len(extra_comment) != 0 {
 				fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
 				fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
 				write_docs(w, the_comment, name)
+				write_docs(w, extra_comment, name)
 				fmt.wprintln(w, `</details>`)
 			}
 		}
