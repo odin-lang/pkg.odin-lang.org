@@ -4,6 +4,7 @@ import doc "core:odin/doc-format"
 import "core:io"
 import "core:fmt"
 import "core:strings"
+import "core:slice"
 
 Builtin :: struct {
 	name: string,
@@ -164,7 +165,6 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", pkg_src_url)
 	fmt.wprintf(w, "</h1>\n")
 
-	path_url := fmt.tprintf("%s/%s", dir, path)
 	write_search(w, .Package)
 
 	fmt.wprintln(w, `<div id="pkg-top">`)
@@ -267,6 +267,11 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 	defer delete(runtime_types)
 	defer delete(runtime_procs)
 	defer delete(runtime_groups)
+
+	slice.sort_by_key(runtime_consts[:], entity_key)
+	slice.sort_by_key(runtime_types[:],  entity_key)
+	slice.sort_by_key(runtime_procs[:],  entity_key)
+	slice.sort_by_key(runtime_groups[:], entity_key)
 
 	write_index(w, runtime_entries, "Constants",        "c", &runtime_consts)
 	write_index(w, runtime_entries, "Types",            "t", &runtime_types)

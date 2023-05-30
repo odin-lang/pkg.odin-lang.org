@@ -7,7 +7,6 @@ import "core:os"
 import "core:strings"
 import "core:strconv"
 import "core:path/slashpath"
-import "core:sort"
 import "core:slice"
 import "core:time"
 import "core:intrinsics"
@@ -446,8 +445,8 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 			line_doc, _, _ := strings.partition(str(child.pkg.docs), "\n")
 			line_doc = strings.trim_space(line_doc)
 			io.write_string(w, `<td class="pkg-line pkg-line-doc">`)
-			if line_doc, ok := get_line_doc(child.pkg); ok {
-				write_doc_line(w, line_doc)
+			if child_line_doc, ok := get_line_doc(child.pkg); ok {
+				write_doc_line(w, child_line_doc)
 			} else {
 				io.write_string(w, `&nbsp;`)
 			}
@@ -1106,9 +1105,9 @@ write_doc_line :: proc(w: io.Writer, text: string) {
 	}
 }
 
-write_markup_text :: proc(w: io.Writer, s: string) {
+write_markup_text :: proc(w: io.Writer, s_: string) {
 	// We need to ensure that we don't escape html tags in our docs
-	s, _ := strings.replace_all(s, "<", HTML_LESS_THAN, context.temp_allocator)
+	s, _ := strings.replace_all(s_, "<", HTML_LESS_THAN, context.temp_allocator)
 	// Consume '- ' if the string begins with one
 	// this means we need to make a bullet point
 	is_list_element: bool
@@ -1480,6 +1479,10 @@ Pkg_Entries :: struct {
 	ordering: [5]struct{name: string, entries: []doc.Scope_Entry},
 }
 
+entity_key :: proc(entry: doc.Scope_Entry) -> string {
+	return str(entry.name)
+}
+
 pkg_entries_gather :: proc(pkg: ^doc.Pkg) -> (entries: Pkg_Entries) {
 	for entry in array(pkg.entries) {
 		e := &entities[entry.entity]
@@ -1508,10 +1511,6 @@ pkg_entries_gather :: proc(pkg: ^doc.Pkg) -> (entries: Pkg_Entries) {
 			append(&entries.proc_groups, entry)
 		}
 		append(&entries.all, entry)
-	}
-
-	entity_key :: proc(entry: doc.Scope_Entry) -> string {
-		return str(entry.name)
 	}
 
 	slice.sort_by_key(entries.procs[:],       entity_key)
@@ -1658,8 +1657,8 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 				if i != 0 {
 					fmt.wprintf(w, ", ")
 				}
-				e := &entities[e_idx]
-				fmt.wprintf(w, "%s", str(e.name))
+				entity := &entities[e_idx]
+				fmt.wprintf(w, "%s", str(entity.name))
 			}
 		}
 		fmt.wprintf(w, ")\n")
@@ -1670,8 +1669,8 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 		write_syntax_usage(w, e, objc_name, parent, is_class_method)
 	case .Proc_Group:
 		for e_idx in array(e.grouped_entities) {
-			e := &entities[e_idx]
-			write_syntax_usage(w, e, objc_name, parent, is_class_method)
+			entity := &entities[e_idx]
+			write_syntax_usage(w, entity, objc_name, parent, is_class_method)
 		}
 	}
 
@@ -1986,7 +1985,6 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", pkg_src_url)
 	fmt.wprintf(w, "</h1>\n")
 
-	path_url := fmt.tprintf("%s/%s", dir, path)
 	write_search(w, .Package)
 
 	// // TODO(bill): determine decent approach for performance
@@ -2030,8 +2028,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		} else {
 			fmt.wprintln(w, "<ul>")
 			for e in entries {
-				name := str(e.name)
-				fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", name)
+				fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", str(e.name))
 			}
 			fmt.wprintln(w, "</ul>")
 		}

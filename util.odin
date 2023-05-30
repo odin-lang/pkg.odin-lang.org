@@ -2,14 +2,9 @@ package odin_html_docs
 
 import doc "core:odin/doc-format"
 import "core:fmt"
-import "core:io"
 import "core:os"
 import "core:strings"
-import "core:strconv"
-import "core:path/slashpath"
-import "core:sort"
 import "core:slice"
-import "core:time"
 import "core:intrinsics"
 
 GITHUB_LICENSE_URL :: "https://github.com/odin-lang/Odin/tree/master/LICENSE"
@@ -120,7 +115,7 @@ generate_directory_tree :: proc(pkgs_to_use: map[string]^doc.Pkg) -> (root: ^Dir
 		}
 	}
 	child_loop: for child in children {
-		dir, _, inner := strings.partition(child.path, "/")
+		dir, _, _ := strings.partition(child.path, "/")
 		for node in root.children {
 			if node.dir == dir {
 				append(&node.children, child)
