@@ -356,13 +356,29 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 			fmt.wprintf(w, "</h3>\n")
 			fmt.wprintln(w, `<div>`)
 
+			the_comment := b.comment
+
 			switch b.kind {
 			case "c", "t":
 				fmt.wprint(w, `<pre class="doc-code">`)
 				if strings.contains(b.type, ".") {
 					pkg, _, type := strings.partition(b.type, ".")
 					if pkg == str(runtime_pkg.name) {
-						fmt.wprintf(w, `{0:s} : <a href="{1:s}">{2:s}</a>.<a href="{1:s}#{3:s}">{3:s}</a> : `, name, runtime_url, pkg, type)
+						fmt.wprintf(w, `{0:s} : {2:s}.<a href="{1:s}#{3:s}">{3:s}</a> : `, name, runtime_url, pkg, type)
+
+						if len(the_comment) == 0 {
+							for entry in array(runtime_pkg.entries) {
+								e := &entities[entry.entity]
+								if e.kind == .Type_Name && str(e.name) == type {
+									the_comment = strings.trim_space(str(e.docs))
+									if the_comment == "" {
+										the_comment = strings.trim_space(str(e.comment))
+									}
+									break
+								}
+							}
+						}
+
 					} else {
 						fmt.wprintf(w, "%s :: ", name)
 					}
@@ -381,17 +397,17 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 				fmt.wprintln(w, "</pre>")
 			}
 
-			if len(b.comment) == 0 {
+			if len(the_comment) == 0 {
 				fmt.wprintln(w, "<br>")
 				fmt.wprintln(w, "<br>")
 			}
 
 			fmt.wprintln(w, `</div>`)
 
-			if len(b.comment) != 0 {
+			if len(the_comment) != 0 {
 				fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
 				fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
-				write_docs(w, b.comment, name)
+				write_docs(w, the_comment, name)
 				fmt.wprintln(w, `</details>`)
 			}
 		}
