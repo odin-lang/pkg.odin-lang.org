@@ -132,46 +132,58 @@ builtins := []Builtin{
 		          "For some arguments, such as a string literal or a simple array expression, the result can be constant.",
 	},
 
-	{name = "size_of"     , kind = "b", type = "proc($T: typeid) -> int",
+	{name = "size_of", kind = "b", type = "proc($T: typeid) -> int",
 		comment = "`size_of` takes an expression or type, and returns the size in bytes of the type of the expression if it was hypothetically instantiated as a variable. " +
 		"The size does not include any memory possibly referenced by a value. For instance, if a slice was given, `size_of` returns the size of the internal slice data structure and not the size of the memory referenced by the slice. " +
 		"For a struct, the size includes any padding introduced by field alignment (if not specified with `#packed`. " +
 		"Other types follow similar rules. " +
 		"The return value of `size_of` is a compile time known integer constant."
 	},
-	{name = "align_of"    , kind = "b", type = "proc($T: typeid) -> int",
+	{name = "align_of", kind = "b", type = "proc($T: typeid) -> int",
 		comment = "`align_of` takes an expression or type, and returns the alignment in bytes of the type of the expression if it was hypothetically instantiated as a variable `v`. " +
 		          "It is the largest value `m` such that the address of `v` is always `0 mod m`.",
 	},
 
-	{name = "offset_of", kind = "b", type = "proc{offset_of_selector, offset_of_member}", comment = "`offset_of` returns the offset in bytes with the struct of the field."},
-	{name = "offset_of_selector", kind = "b", type = "proc(selector: $T) -> uintptr", comment = `e.g. offset_of(t.f), where t is an instance of the type T`},
-	{name = "offset_of_member"  , kind = "b", type = "proc($T: typeid, member: $M) -> uintptr", comment = `e.g. offset_of(T, f), where T can be the type instead of a variable`},
+	{name = "offset_of",           kind = "b", type = "proc{offset_of_selector, offset_of_member}",  comment = "`offset_of` returns the offset in bytes with the struct of the field."},
+	{name = "offset_of_selector",  kind = "b", type = "proc(selector: $T) -> uintptr",               comment = `e.g. offset_of(t.f), where t is an instance of the type T`},
+	{name = "offset_of_member"  ,  kind = "b", type = "proc($T: typeid, member: $M) -> uintptr",     comment = `e.g. offset_of(T, f), where T can be the type instead of a variable`},
 	{name = "offset_of_by_string", kind = "b", type = "proc($T: typeid, member: string) -> uintptr", comment = `e.g. offset_of(T, "f"), where T can be the type instead of a variable`},
 
-	{name = "type_of"     , kind = "b", type = "proc(x: expr) -> type",                  comment = "`type_of` returns the type of a given expression"},
+	{name = "type_of",      kind = "b", type = "proc(x: expr) -> type",                  comment = "`type_of` returns the type of a given expression"},
 	{name = "type_info_of", kind = "b", type = "proc($T: typeid) -> ^runtime.Type_Info", comment = "`type_info_of` returns the runtime type information from a given `typeid`."},
-	{name = "typeid_of"   , kind = "b", type = "proc($T: typeid) -> typeid",             comment = "`typeid_of` returns the associated runtime known `typeid` of the specified type."},
+	{name = "typeid_of",    kind = "b", type = "proc($T: typeid) -> typeid",             comment = "`typeid_of` returns the associated runtime known `typeid` of the specified type."},
 
 	{name = "swizzle", kind = "b", type = "proc(x: [N]T, indices: ..int) -> [len(indices)]T"},
 
-	{name = "complex"   , kind = "b", type = "proc(real, imag: Float) -> Complex_Type"},
+	{name = "complex",    kind = "b", type = "proc(real, imag: Float) -> Complex_Type"},
 	{name = "quaternion", kind = "b", type = "proc(real, imag, jmag, kmag: Float) -> Quaternion_Type"},
-	{name = "real"      , kind = "b", type = "proc(value: Complex_Or_Quaternion) -> Float"},
-	{name = "imag"      , kind = "b", type = "proc(value: Complex_Or_Quaternion) -> Float"},
-	{name = "jmag"      , kind = "b", type = "proc(value: Quaternion) -> Float"},
-	{name = "kmag"      , kind = "b", type = "proc(value: Quaternion) -> Float"},
-	{name = "conj"      , kind = "b", type = "proc(value: Complex_Or_Quaternion) -> Complex_Or_Quaternion"},
+	{name = "real",       kind = "b", type = "proc(v: Complex_Or_Quaternion) -> Float", comment = "`real` returns the real part of a complex or quaternion number `v`. The return value will be the floating-point type corresponding to the type of `v`."},
+	{name = "imag",       kind = "b", type = "proc(v: Complex_Or_Quaternion) -> Float", comment = "`imag` returns the i-imaginary part of a complex or quaternion number `v`. The return value will be the floating-point type corresponding to the type of `v`."},
+	{name = "jmag",       kind = "b", type = "proc(v: Quaternion) -> Float", comment = "`jmag` returns the j-imaginary part of a quaternion number `v`. The return value will be the floating-point type corresponding to the type of `v`."},
+	{name = "kmag",       kind = "b", type = "proc(v: Quaternion) -> Float", comment = "`jmag` returns the j-imaginary part of a quaternion number `v`. The return value will be the floating-point type corresponding to the type of `v`."},
+	{name = "conj",       kind = "b", type = "proc(v: Complex_Or_Quaternion) -> Complex_Or_Quaternion", comment = "`conj` returns the complex conjugate of a complex or quaternion number `v`. This negates the imaginary component(s) whilst keeping the real component untouched."},
 
-	{name = "expand_values", kind = "b", type = "proc(value: Struct_Or_Array) -> (A, B, C, ...)"},
+	{name = "expand_values", kind = "b", type = "proc(value: Struct_Or_Array) -> (A, B, C, ...)", comment = "`expand_values` will return multiple values corresponding to the multiple fields of the passed struct or the multiple elements of a passed fixed length array."},
 
-	{name = "min"  , kind = "b", type = "proc(values: ..T) -> T"},
-	{name = "max"  , kind = "b", type = "proc(values: ..T) -> T"},
-	{name = "abs"  , kind = "b", type = "proc(value: T) -> T"},
-	{name = "clamp", kind = "b", type = "proc(value, minimum, maximum: T) -> T"},
+	{name = "min",       kind = "b", type = "proc(values: ..T) -> T",
+		comment = "`min` returns the minimum value of passed arguments of all the same type.\n" +
+		          "If one argument is passed and it is an enum type, then `min` returns the minimum value of the fields of that enum type.",
+	},
+	{name = "max",       kind = "b", type = "proc(values: ..T) -> T",
+		comment = "`max` returns the maximum value of passed arguments of all the same type.\n" +
+		          "If one argument is passed and it is an enum type, then `max` returns the maximum value of the fields of that enum type.",
+	},
+	{name = "abs",       kind = "b", type = "proc(value: T) -> T",
+		comment = "`abs` returns the absolute value of passed argument.\n" +
+		          "If the argument is a complex or quaternion, this is equivalent to `real(conj(value) * value)`."
+	},
+	{name = "clamp",     kind = "b", type = "proc(v, minimum, maximum: T) -> T",
+		comment = "`clamp` returns a value `v` clamped between `minimum` and `maximum`.\n" +
+		          "This is calculated as the following: `minimum if v < minimum else maximum if v > maximum else v`."
+	},
 
-	{name = "soa_zip", kind = "b", type = "proc(slices: ...) -> #soa[]Struct"},
-	{name = "soa_unzip", kind = "b", type = "proc(value: $S/#soa[]$E) -> (slices: ...)"},
+	{name = "soa_zip",   kind = "b", type = "proc(slices: ...) -> #soa[]Struct", comment = "See: [[https://odin-lang.org/docs/overview/#soa_zip-and-soa_unzip]]\n\n."},
+	{name = "soa_unzip", kind = "b", type = "proc(value: $S/#soa[]$E) -> (slices: ...)", comment = "See: [[https://odin-lang.org/docs/overview/#soa_zip-and-soa_unzip]]\n\n."},
 }
 
 builtin_docs := `package builtin provides documentation for Odin's predeclared identifiers. The items documented here are not actually in package builtin but here to allow for better documentation for the language's special identifiers.`
