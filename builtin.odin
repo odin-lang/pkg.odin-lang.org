@@ -393,13 +393,9 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 				fmt.wprintln(w, "</pre>")
 			case "b":
 				fmt.wprint(w, `<pre class="doc-code">`)
-				fmt.wprintf(w, "%s :: %s {…}", name, b.type)
+				fmt.wprintf(w, "%s :: %s", name, b.type)
+				io.write_string(w, " {…}")
 				fmt.wprintln(w, "</pre>")
-			}
-
-			if len(the_comment) == 0 {
-				fmt.wprintln(w, "<br>")
-				fmt.wprintln(w, "<br>")
 			}
 
 			fmt.wprintln(w, `</div>`)
