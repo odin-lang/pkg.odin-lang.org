@@ -199,17 +199,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 	fmt.wprintln(w, `<div class="row odin-main" id="pkg">`)
 	defer fmt.wprintln(w, `</div>`)
 
-	{
-		fmt.wprintln(w, `<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">`)
-		defer fmt.wprintln(w, `</nav>`)
-		fmt.wprintln(w, `<div class="py-3">`)
-		defer fmt.wprintln(w, `</div>`)
-
-		fmt.wprintf(w, "<h4 style=\"text-transform: capitalize\">%s Library</h4>\n", collection.name)
-
-		fmt.wprintln(w, `<ul>`)
-		defer fmt.wprintln(w, `</ul>`)
-	}
+	write_pkg_sidebar(w, nil, collection)
 
 	fmt.wprintln(w, `<article class="col-lg-8 p-4 documentation odin-article">`)
 

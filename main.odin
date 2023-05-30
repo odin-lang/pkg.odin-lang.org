@@ -1410,12 +1410,12 @@ write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collect
 	fmt.wprintln(w, `<ul>`)
 	defer fmt.wprintln(w, `</ul>`)
 
-	for dir in collection.root.children {
+	write_side_bar_item :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collection, dir: ^Dir_Node) {
 		fmt.wprint(w, `<li class="nav-item">`)
 		defer fmt.wprintln(w, `</li>`)
 		if dir.pkg == curr_pkg {
 			fmt.wprintf(w, `<a class="active" href="%s/%s">%s</a>`, collection.base_url, dir.path, dir.name)
-		} else if dir.pkg != nil {
+		} else if dir.pkg != nil || dir.name == "builtin" {
 			fmt.wprintf(w, `<a href="%s/%s">%s</a>`, collection.base_url, dir.path, dir.name)
 		} else {
 			fmt.wprintf(w, "%s", dir.name)
@@ -1435,6 +1435,20 @@ write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collect
 				}
 			}
 		}
+	}
+
+	if collection.name == "core" {
+		write_side_bar_item(w, curr_pkg, collection, &Dir_Node{
+			dir = "builtin",
+			path = "builtin",
+			name = "builtin",
+			pkg = nil,
+			children = nil,
+		})
+	}
+
+	for dir in collection.root.children {
+		write_side_bar_item(w, curr_pkg, collection, dir)
 	}
 }
 
