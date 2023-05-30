@@ -72,9 +72,9 @@ builtins := []Builtin{
 
 	{name = "typeid", kind = "t", comment = "`typeid` is a unique identifier for an Odin type at runtime. It can be mapped to relevant type information through `type_info_of`."},
 	{name = "any",    kind = "t",
-		comment = "`any` can reference any data type at runtime. Internally it contains a pointer to the underlying data and its relevant `typeid`. This is a very useful construct in order to have a runtime type safe printing procedure.\n\n"+
-		          "**Note:** The `any` value is only valid for as long as the underlying data is still valid. Passing a literal to an `any` will allocate the literal in the current stack frame.\n\n"+
-		          "**Note:** It is highly recommend that you **do not** use this unless you know what you are doing. Its primary use is for printing procedures."
+		comment = "`any` can reference any data type at runtime. Internally it contains a pointer to the underlying data and its relevant `typeid`. This is a very useful construct in order to have a runtime type safe printing procedure.\n\n" +
+		          "**Note:** The `any` value is only valid for as long as the underlying data is still valid. Passing a literal to an `any` will allocate the literal in the current stack frame.\n\n" +
+		          "**Note:** It is highly recommend that you **do not** use this unless you know what you are doing. Its primary use is for printing procedures.",
 	},
 
 	// Endian Specific Types
@@ -106,20 +106,52 @@ builtins := []Builtin{
 	{name = "f64be", kind = "t", comment = "`f64be` is the set of all IEEE-754 64-bit floating-point numbers with big endianness."},
 
 	// Procedures
-	{name = "len", kind = "b", type = "proc(array: Array_Type) -> int"},
-	{name = "cap", kind = "b", type = "proc(array: Array_Type) -> int"},
+	{name = "len", kind = "b", type = "proc(v: Array_Type) -> int",
+		comment = "The `len` built-in procedure returns the length of `v` according to its type:\n" +
+		          "\n" +
+		          "\tArray: the number of elements in v.\n" +
+		          "\tPointer to (any) array: the number of elements in `v^` (even if `v` is `nil`).\n" +
+		          "\tSlice, dynamic array, or map: the number of elements in `v`; if `v` is `nil`, `len(v)` is zero.\n" +
+		          "\tString: the number of bytes in `v`\n" +
+		          "\tEnumerated array: the number elements in v.`\n" +
+		          "\tEnum type: the number of enumeration fields.\n"+
+		          "\t#soa array: the number of elements in `v`; if `v` is `nil`, `len(v)` is zero.\n"+
+		          "\t#simd vector: the number of elements in `v`.\n"+
+		          "\n" +
+		          "For some arguments, such as a string literal or a simple array expression, the result can be constant.",
+	},
+	{name = "cap", kind = "b", type = "proc(v: Array_Type) -> int",
+		comment = "The `cap` built-in procedure returns the length of `v` according to its type:\n" +
+		          "\n" +
+		          "\tArray: the number of elements in v.\n" +
+		          "\tPointer to (any) array: the number of elements in `v^` (even if `v` is `nil`).\n" +
+		          "\tDynamic array, or map: the reserved number of elements in `v`; if `v` is `nil`, `len(v)` is zero.\n" +
+		          "\tEnum type: equal to `max(Enum)-min(Enum)+1`.\n"+
+		          "\t#soa dynamic array: the reserved number of elements in `v`; if `v` is `nil`, `len(v)` is zero.\n"+
+		          "\n" +
+		          "For some arguments, such as a string literal or a simple array expression, the result can be constant.",
+	},
 
-	{name = "size_of"     , kind = "b", type = "proc($T: typeid) -> int"},
-	{name = "align_of"    , kind = "b", type = "proc($T: typeid) -> int"},
+	{name = "size_of"     , kind = "b", type = "proc($T: typeid) -> int",
+		comment = "`size_of` takes an expression or type, and returns the size in bytes of the type of the expression if it was hypothetically instantiated as a variable. " +
+		"The size does not include any memory possibly referenced by a value. For instance, if a slice was given, `size_of` returns the size of the internal slice data structure and not the size of the memory referenced by the slice. " +
+		"For a struct, the size includes any padding introduced by field alignment (if not specified with `#packed`. " +
+		"Other types follow similar rules. " +
+		"The return value of `size_of` is a compile time known integer constant."
+	},
+	{name = "align_of"    , kind = "b", type = "proc($T: typeid) -> int",
+		comment = "`align_of` takes an expression or type, and returns the alignment in bytes of the type of the expression if it was hypothetically instantiated as a variable `v`. " +
+		          "It is the largest value `m` such that the address of `v` is always `0 mod m`.",
+	},
 
+	{name = "offset_of", kind = "b", type = "proc{offset_of_selector, offset_of_member}", comment = "`offset_of` returns the offset in bytes with the struct of the field."},
 	{name = "offset_of_selector", kind = "b", type = "proc(selector: $T) -> uintptr", comment = `e.g. offset_of(t.f), where t is an instance of the type T`},
 	{name = "offset_of_member"  , kind = "b", type = "proc($T: typeid, member: $M) -> uintptr", comment = `e.g. offset_of(T, f), where T can be the type instead of a variable`},
-	{name = "offset_of", kind = "b", type = "proc{offset_of_selector, offset_of_membe"},
-	{name = "offset_of_by_string", kind = "b", type = "proc($T: typeid, member: string) -> uintptr", comment = `e.g. offset_of(T, "f\), where T can be the type instead of a variable`},
+	{name = "offset_of_by_string", kind = "b", type = "proc($T: typeid, member: string) -> uintptr", comment = `e.g. offset_of(T, "f"), where T can be the type instead of a variable`},
 
-	{name = "type_of"     , kind = "b", type = "proc(x: expr) -> type"},
-	{name = "type_info_of", kind = "b", type = "proc($T: typeid) -> ^runtime.Type_Info"},
-	{name = "typeid_of"   , kind = "b", type = "proc($T: typeid) -> typeid"},
+	{name = "type_of"     , kind = "b", type = "proc(x: expr) -> type",                  comment = "`type_of` returns the type of a given expression"},
+	{name = "type_info_of", kind = "b", type = "proc($T: typeid) -> ^runtime.Type_Info", comment = "`type_info_of` returns the runtime type information from a given `typeid`."},
+	{name = "typeid_of"   , kind = "b", type = "proc($T: typeid) -> typeid",             comment = "`typeid_of` returns the associated runtime known `typeid` of the specified type."},
 
 	{name = "swizzle", kind = "b", type = "proc(x: [N]T, indices: ..int) -> [len(indices)]T"},
 
@@ -363,7 +395,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 	fmt.wprintln(w, `<section class="documentation">`)
 	write_entries(w, runtime_pkg, "Constants",        "c", runtime_consts[:])
 	write_entries(w, runtime_pkg, "Types",            "t", runtime_types[:])
-	write_entries(w, runtime_pkg, "Procedures",       "p", runtime_procs[:])
+	write_entries(w, runtime_pkg, "Procedures",       "b", runtime_procs[:])
 	write_entries(w, runtime_pkg, "Procedure Groups", "g", runtime_groups[:])
 
 
