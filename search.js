@@ -231,6 +231,7 @@ if (odin_search) {
 
 	{
 		const IS_PACKAGE_PAGE = odin_search.className == "odin-search-package";
+		const IS_PACKAGE_BUILTIN = IS_PACKAGE_PAGE && odin_pkg_name == "builtin";
 
 		let entities = [];
 		function add_entity(odin_pkg_name, e) {
@@ -244,6 +245,16 @@ if (odin_search) {
 			let entities = odin_pkg_data.packages[pkg_name].entities;
 			for (let j = 0; j < entities.length; j++) {
 				add_entity(pkg_name, entities[j]);
+			}
+			if (IS_PACKAGE_BUILTIN) {
+				pkg_name = "runtime";
+				let entities = odin_pkg_data.packages[pkg_name].entities;
+				for (let j = 0; j < entities.length; j++) {
+					let entity = entities[j];
+					if (entity.builtin) {
+						add_entity(pkg_name, entity);
+					}
+				}
 			}
 		} else {
 			let all_packages = Object.entries(odin_pkg_data.packages);
@@ -331,10 +342,10 @@ if (odin_search) {
 				// list_contents.push(`${result.score}&mdash;`);
 
 				let [formatted_pkg, formatted_name] = formatted_str.split(".", 2);
-				if (IS_PACKAGE_PAGE) {
-					list_contents.push(`<div><a href="${full_path}">${formatted_name}</a></div>`);
-				} else {
+				if (!IS_PACKAGE_PAGE || entity.pkg != odin_pkg_name) {
 					list_contents.push(`<div><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a></div>`);
+				} else {
+					list_contents.push(`<div><a href="${full_path}">${formatted_name}</a></div>`);
 				}
 
 				switch (entity.kind) {
@@ -371,8 +382,10 @@ if (odin_search) {
 				if (0 <= curr_search_index && curr_search_index < odin_search_results.children.length) {
 					let li = odin_search_results.children[curr_search_index];
 					let path = li.dataset.path;
-					clear_odin_search_doms();
-					window.location.href = li.dataset.path;
+					if (li.dataset.path) {
+						clear_odin_search_doms();
+						window.location.href = li.dataset.path;
+					}
 				}
 				break;
 			case "Esc":
