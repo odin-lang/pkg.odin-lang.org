@@ -1209,6 +1209,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 	start := 0
 	blocks: [dynamic]Block
 
+	has_possible: bool
 	example_block: Block // when set the kind should be Example
 	output_block: Block // when set the kind should be Output
 	// rely on zii that the kinds have not been set
@@ -1242,6 +1243,9 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 			switch {
 			case strings.has_prefix(line, "Example:"): next_block_kind = .Example
 			case strings.has_prefix(line, "Output:"): next_block_kind = .Output
+			case strings.has_prefix(line, "Possible Output:"):
+				next_block_kind = .Output
+				has_possible = true
 			case strings.has_prefix(line, "\t"): next_block_kind = .Code
 			case text == "": force_write_block = true
 			}
@@ -1249,11 +1253,17 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 			switch {
 			case strings.has_prefix(line, "Example:"): next_block_kind = .Example
 			case strings.has_prefix(line, "Output:"): next_block_kind = .Output
+			case strings.has_prefix(line, "Possible Output:"):
+				next_block_kind = .Output
+				has_possible = true
 			case ! (text == "" || strings.has_prefix(line, "\t")): next_block_kind = .Paragraph
 			}
 		case .Example:
 			switch {
 			case strings.has_prefix(line, "Output:"): next_block_kind = .Output
+			case strings.has_prefix(line, "Possible Output:"):
+				next_block_kind = .Output
+				has_possible = true
 			case ! (text == "" || strings.has_prefix(line, "\t")): next_block_kind = .Paragraph
 			}
 		case .Output:
@@ -1384,10 +1394,10 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 
 		// Add the output block if it is present
 		if output_block.kind == .Output {
-			// Output block starts with `Output:` and a number of white spaces,
-			output_lines := trim_empty_and_subtitle_lines_and_replace_lt(output_block.lines, "Output:")
+			// Output block starts with `Output:` or `Possible Output:` and a number of white spaces,
+			output_lines := trim_empty_and_subtitle_lines_and_replace_lt(output_block.lines, has_possible ? "Possible Output:" : "Output:")
 
-			io.write_string(w, "<b>Output:</b>\n")
+			io.write_string(w, has_possible ? "<b>Possible Output:</b>" : "<b>Output:</b>\n")
 			io.write_string(w, `<pre class="doc-code">`)
 			for line in output_lines {
 				io.write_string(w, strings.trim_prefix(line, "\t"))
