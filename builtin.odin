@@ -21,7 +21,7 @@ builtins := []Builtin{
 
 	{name = "ODIN_OS",      kind = "c", type = "runtime.Odin_OS_Type"},
 	{name = "ODIN_ARCH",    kind = "c", type = "runtime.Odin_Arch_Type"},
-	{name = "ODIN_ENDIAN",  kind = "c", type = "runtime.Endian_Type"},
+	{name = "ODIN_ENDIAN",  kind = "c", type = "runtime.Odin_Endian_Type"},
 	{name = "ODIN_VENDOR",  kind = "c", type = "untyped string"},
 	{name = "ODIN_VERSION", kind = "c", type = "untyped string"},
 	{name = "ODIN_ROOT",    kind = "c", type = "untyped string"},
@@ -285,6 +285,8 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 	write_entries :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, title: string, kind: string, entries: []doc.Scope_Entry) {
 		fmt.wprintf(w, "<h2 id=\"pkg-{0:s}\" class=\"pkg-header\">{0:s}</h2>\n", title)
 
+		runtime_url := fmt.aprintf("%s/%s", pkg_to_collection[runtime_pkg].base_url, pkg_to_path[runtime_pkg])
+		defer delete(runtime_url)
 
 		// builtin entries
 		for b in builtins do if b.kind == kind {
@@ -301,12 +303,25 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 			switch b.kind {
 			case "c", "t":
 				fmt.wprint(w, `<pre class="doc-code">`)
-				fmt.wprintf(w, "%s :: %s", name, name)
+				if strings.contains(b.type, ".") {
+					pkg, _, type := strings.partition(b.type, ".")
+					if pkg == str(runtime_pkg.name) {
+						fmt.wprintf(w, `{0:s} : <a href="{1:s}">{2:s}</a>.<a href="{1:s}#{3:s}">{3:s}</a> : {0:s}`, name, runtime_url, pkg, type)
+					} else {
+						fmt.wprintf(w, "%s :: %s", name, name)
+					}
+				} else {
+					fmt.wprintf(w, "%s :: %s", name, name)
+				}
 				fmt.wprintln(w, "</pre>")
+				fmt.wprintln(w, "<br>")
+				fmt.wprintln(w, "<br>")
 			case "b":
 				fmt.wprint(w, `<pre class="doc-code">`)
 				fmt.wprintf(w, "%s :: %s {…}", name, b.type)
 				fmt.wprintln(w, "</pre>")
+				fmt.wprintln(w, "<br>")
+				fmt.wprintln(w, "<br>")
 			}
 
 			fmt.wprintln(w, `</div>`)
