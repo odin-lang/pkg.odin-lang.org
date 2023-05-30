@@ -1413,7 +1413,7 @@ write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collect
 	write_side_bar_item :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collection, dir: ^Dir_Node) {
 		fmt.wprint(w, `<li class="nav-item">`)
 		defer fmt.wprintln(w, `</li>`)
-		if dir.pkg == curr_pkg {
+		if dir.pkg == curr_pkg && (curr_pkg != nil || dir.name == "builtin") {
 			fmt.wprintf(w, `<a class="active" href="%s/%s">%s</a>`, collection.base_url, dir.path, dir.name)
 		} else if dir.pkg != nil || dir.name == "builtin" {
 			fmt.wprintf(w, `<a href="%s/%s">%s</a>`, collection.base_url, dir.path, dir.name)
