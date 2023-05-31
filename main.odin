@@ -1579,7 +1579,16 @@ write_search :: proc(w: io.Writer, kind: enum { Package, Collection, All}) {
 	`, class)
 	fmt.wprintln(w)
 
+	fmt.wprintln(w, `<div id="odin-search-info">`)
 	fmt.wprintln(w, `<div id="odin-search-time"></div>`)
+	if kind == .Package {
+		fmt.wprintln(w, `
+		<div id="odin-search-options">
+			<input type="checkbox" id="odin-search-filter" name="odin-search-filter">
+			<label for="odin-search-filter">Filter Results</label>
+		</div>`)
+	}
+	fmt.wprintln(w, `</div>`)
 	fmt.wprintln(w, `<ul id="odin-search-results"></ul>`)
 }
 

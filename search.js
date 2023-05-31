@@ -269,8 +269,18 @@ if (odin_search) {
 
 		let odin_search_results = document.getElementById("odin-search-results");
 		let odin_search_time    = document.getElementById("odin-search-time");
+		let odin_search_filter  = document.getElementById("odin-search-filter");
 		let curr_search_index   = -1;
 		let curr_search_value   = "";
+
+		let pkg_entities = getElementsByClassNameArray("pkg-entity");
+		let pkg_headers = getElementsByClassNameArray("pkg-header");
+		let pkg_top = document.getElementById("pkg-top");
+
+		odin_search_filter.onclick = function(ev) {
+			clear_odin_search_doms();
+			odin_search.value = '';
+		};
 
 
 		function move_search_cursor(dir) {
@@ -300,6 +310,15 @@ if (odin_search) {
 		function clear_odin_search_doms() {
 			odin_search_results.innerHTML = '';
 			odin_search_time.innerHTML = '';
+			for (let i = 0; i < pkg_entities.length; i++) {
+				let pkg_entity = pkg_entities[i];
+				pkg_entity.style.display = null;
+				pkg_entity.style.order = null;
+			}
+			for (let i = 0; i < pkg_headers.length; i++) {
+				pkg_headers[i].style.display = null;
+			}
+			pkg_top.style.display = null;
 		}
 
 		function odin_search_input(ev) {
@@ -326,41 +345,73 @@ if (odin_search) {
 			let results_found = results.length;
 			let MAX_RESULTS_LENGTH = 32;
 			let results_length = results.length;
-			results_length = Math.min(results_length, MAX_RESULTS_LENGTH);
 
-			let list_contents = [];
-			for (let result_idx = 0; result_idx < results_length; result_idx++) {
-				let result = results[result_idx];
-				let entity = result.entity;
-				let formatted_str = result.formatted;
-
-				let pkg_path = odin_pkg_data.packages[entity.pkg].path;
-
-				let full_path = `${pkg_path}/#${entity.name}`;
-
-				list_contents.push(`<li data-path="${full_path}">`);
-				// list_contents.push(`${result.score}&mdash;`);
-
-				let [formatted_pkg, formatted_name] = formatted_str.split(".", 2);
-				if (!IS_PACKAGE_PAGE || entity.pkg != odin_pkg_name) {
-					list_contents.push(`<div><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a></div>`);
-				} else {
-					list_contents.push(`<div><a href="${full_path}">${formatted_name}</a></div>`);
+			if (IS_PACKAGE_PAGE && odin_search_filter.checked) {
+				let result_map = {};
+				for (let result_idx = 0; result_idx < results_length; result_idx++) {
+					let result = results[result_idx];
+					let entity = result.entity;
+					result_map[entity.name] = result;
 				}
 
-				switch (entity.kind) {
-				case "c": list_contents.push(`&nbsp;<div class="kind">constant</div>`);          break;
-				case "v": list_contents.push(`&nbsp;<div class="kind">variable</div>`);          break;
-				case "t": list_contents.push(`&nbsp;<div class="kind">type</div>`);              break;
-				case "p": list_contents.push(`&nbsp;<div class="kind">procedure</div>`);         break;
-				case "g": list_contents.push(`&nbsp;<div class="kind">procedure group</div>`);   break;
-				case "b": list_contents.push(`&nbsp;<div class="kind">builtin procedure</div>`); break;
+				if (results_length) {
+					pkg_top.style.display = 'none';
+					for (let i = 0; i < pkg_headers.length; i++) {
+						pkg_headers[i].style.display = 'none';
+					}
 				}
 
-				list_contents.push(`</li>\n`);
+				for (let i = 0; i < pkg_entities.length; i++) {
+					let pkg_entity = pkg_entities[i];
+					let name = pkg_entity.getElementsByTagName('h3')[0].id;
+					let result = result_map[name];
+					if (result) {
+						pkg_entity.style.display = null;
+						pkg_entity.style.order = -result.score;
+					} else {
+						pkg_entity.style.display = 'none';
+						pkg_entity.style.order = null;
+					}
+
+				}
+			} else {
+				// limit the results
+				results_length = Math.min(results_length, MAX_RESULTS_LENGTH);
+
+				let list_contents = [];
+				for (let result_idx = 0; result_idx < results_length; result_idx++) {
+					let result = results[result_idx];
+					let entity = result.entity;
+					let formatted_str = result.formatted;
+
+					let pkg_path = odin_pkg_data.packages[entity.pkg].path;
+
+					let full_path = `${pkg_path}/#${entity.name}`;
+
+					list_contents.push(`<li data-path="${full_path}">`);
+					// list_contents.push(`${result.score}&mdash;`);
+
+					let [formatted_pkg, formatted_name] = formatted_str.split(".", 2);
+					if (!IS_PACKAGE_PAGE || entity.pkg != odin_pkg_name) {
+						list_contents.push(`<div><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a></div>`);
+					} else {
+						list_contents.push(`<div><a href="${full_path}">${formatted_name}</a></div>`);
+					}
+
+					switch (entity.kind) {
+					case "c": list_contents.push(`&nbsp;<div class="kind">constant</div>`);          break;
+					case "v": list_contents.push(`&nbsp;<div class="kind">variable</div>`);          break;
+					case "t": list_contents.push(`&nbsp;<div class="kind">type</div>`);              break;
+					case "p": list_contents.push(`&nbsp;<div class="kind">procedure</div>`);         break;
+					case "g": list_contents.push(`&nbsp;<div class="kind">procedure group</div>`);   break;
+					case "b": list_contents.push(`&nbsp;<div class="kind">builtin procedure</div>`); break;
+					}
+
+					list_contents.push(`</li>\n`);
+				}
+
+				odin_search_results.innerHTML = list_contents.join('');
 			}
-
-			odin_search_results.innerHTML = list_contents.join('');
 
 			let end_time = performance.now();
 			let diff = (end_time - start_time).toFixed(1);
