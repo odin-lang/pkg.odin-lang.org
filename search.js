@@ -277,10 +277,13 @@ if (odin_search) {
 		let pkg_headers = getElementsByClassNameArray("pkg-header");
 		let pkg_top = document.getElementById("pkg-top");
 
-		odin_search_filter.onclick = function(ev) {
-			clear_odin_search_doms();
-			odin_search.value = '';
-		};
+
+		if (odin_search_filter) {
+			odin_search_filter.onclick = function(ev) {
+				clear_odin_search_doms();
+				odin_search.value = '';
+			};
+		}
 
 
 		function move_search_cursor(dir) {
