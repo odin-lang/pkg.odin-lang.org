@@ -86,7 +86,9 @@ Dir_Node :: struct {
 
 generate_directory_tree :: proc(pkgs_to_use: map[string]^doc.Pkg) -> (root: ^Dir_Node) {
 	sort_tree :: proc(node: ^Dir_Node) {
-		slice.sort_by_key(node.children[:], proc(node: ^Dir_Node) -> string {return node.name})
+		slice.sort_by_key(node.children[:], proc(node: ^Dir_Node) -> string {
+			return strings.to_lower(node.name, context.temp_allocator)
+		})
 		for child in node.children {
 			sort_tree(child)
 		}

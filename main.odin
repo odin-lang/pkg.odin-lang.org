@@ -1743,6 +1743,11 @@ write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, met
 
 	seen_item := false
 
+
+	slice.sort_by_key(methods[:], proc(e: ^doc.Entity) -> string {
+		return str(e.name)
+	})
+
 	loop: for e in methods {
 		method_name := find_entity_attribute(e, "objc_name") or_else panic("unable to find objc_name")
 		method_name, _ = strconv.unquote_string(method_name) or_else panic("unable to unquote method name")
