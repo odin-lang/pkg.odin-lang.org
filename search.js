@@ -315,13 +315,17 @@ if (odin_search) {
 			odin_search_time.innerHTML = '';
 			for (let i = 0; i < pkg_entities.length; i++) {
 				let pkg_entity = pkg_entities[i];
-				pkg_entity.style.display = null;
-				pkg_entity.style.order = null;
+				if (pkg_entity) {
+					pkg_entity.style.display = null;
+					pkg_entity.style.order = null;
+				}
 			}
 			for (let i = 0; i < pkg_headers.length; i++) {
 				pkg_headers[i].style.display = null;
 			}
-			pkg_top.style.display = null;
+			if (pkg_top) {
+				pkg_top.style.display = null;
+			}
 		}
 
 		function odin_search_input(ev) {

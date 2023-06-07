@@ -306,7 +306,7 @@ write_home_sidebar :: proc(w: io.Writer) {
 
 	fmt.wprintln(w, `<ul class="nav nav-pills d-flex flex-column">`)
 	fmt.wprintln(w, `<li class="nav-item"><a class="nav-link" href="/core">Core Library</a></li>`)
-	fmt.wprintln(w, `<li class="nav-item"><a class="nav-link" href="/vendor">Vendor Libr ary</a></li>`)
+	fmt.wprintln(w, `<li class="nav-item"><a class="nav-link" href="/vendor">Vendor Library</a></li>`)
 	fmt.wprintln(w, `</ul>`)
 }
 
