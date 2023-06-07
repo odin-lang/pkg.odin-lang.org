@@ -447,13 +447,15 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 		}
 	}
 
-	write_directory(w, &Dir_Node{
-		dir = "builtin",
-		path = "builtin",
-		name = "builtin",
-		pkg = nil,
-		children = nil,
-	}, collection)
+	if collection.name == "core" {
+		write_directory(w, &Dir_Node{
+			dir = "builtin",
+			path = "builtin",
+			name = "builtin",
+			pkg = nil,
+			children = nil,
+		}, collection)
+	}
 
 	for dir in collection.root.children {
 		write_directory(w, dir, collection)
