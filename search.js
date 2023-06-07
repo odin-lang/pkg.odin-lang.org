@@ -70,6 +70,14 @@ if (odin_search) {
 		const LEADING_LETTER_PENALTY     = -3; // penalty applied for every letter in str before the first match
 		const MAX_LEADING_LETTER_PENALTY = -9; // maximum penalty for leading letters
 		const UNMATCHED_LETTER_PENALTY   = -1; // penalty for every letter that doesn't matter
+		const SUBSTRING_BOUNS            = 50;
+
+		if (str.includes(pattern)) {
+			let i = str.indexOf(pattern);
+			let formatted_str = str.substr(0, i) + '<b>' + str.substr(i, pattern.length) + '</b>' + str.substr(pattern.length, str.length);
+			let n = str.length - (str.length-pattern.length);
+			return [true, n * SUBSTRING_BOUNS, formatted_str];
+		}
 
 		// Loop variables
 		let score          = 0;
