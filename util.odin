@@ -194,8 +194,9 @@ recursive_make_directory :: proc(path: string, prefix := "") {
 	}
 }
 
-make_temp_html_escaped_string :: proc(s: string) -> string {
-	escaped, _ := strings.replace_all(s, "<", HTML_LESS_THAN, context.temp_allocator)
-	escaped, _ = strings.replace_all(escaped, ">", HTML_GREATER_THAN, context.temp_allocator)
+escape_html_string :: proc(s: string, allocator := context.allocator) -> string {
+	context.allocator = allocator
+	escaped, _ := strings.replace_all(s, "<", HTML_LESS_THAN)
+	escaped, _ = strings.replace_all(escaped, ">", HTML_GREATER_THAN)
 	return escaped
 }
