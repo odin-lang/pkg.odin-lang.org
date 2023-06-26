@@ -74,7 +74,7 @@ if (odin_search) {
 
 		if (str.includes(pattern)) {
 			let i = str.indexOf(pattern);
-			let formatted_str = str.substr(0, i) + '<b>' + str.substr(i, pattern.length) + '</b>' + str.substr(pattern.length, str.length);
+			let formatted_str = str.substring(0, i) + '<b>' + str.substring(i, i+pattern.length) + '</b>' + str.substring(i+pattern.length, str.length);
 			let n = str.length - (str.length-pattern.length);
 			return [true, n * SUBSTRING_BOUNS, formatted_str];
 		}
@@ -198,10 +198,10 @@ if (odin_search) {
 		let matched_indices_length = matched_indices.length;
 		for (let i = 0; i < matched_indices_length; i++) {
 			let idx = matched_indices[i];
-			formatted_str += str.substr(last_idx, idx - last_idx) + "<b>" + str.charAt(idx) + "</b>";
+			formatted_str += str.substring(last_idx, idx) + "<b>" + str.charAt(idx) + "</b>";
 			last_idx = idx + 1;
 		}
-		formatted_str += str.substr(last_idx, str.length - last_idx);
+		formatted_str += str.substring(last_idx, str.length);
 
 		let matched = pattern_idx == pattern_length;
 		return [matched, score, formatted_str];
@@ -329,7 +329,10 @@ if (odin_search) {
 				}
 			}
 			for (let i = 0; i < pkg_headers.length; i++) {
-				pkg_headers[i].style.display = null;
+				let pkg_header = pkg_headers[i];
+				if (pkg_header) {
+					pkg_header.style.display = null;
+				}
 			}
 			if (pkg_top) {
 				pkg_top.style.display = null;
@@ -413,14 +416,15 @@ if (odin_search) {
 						list_contents.push(`<div><a href="${full_path}">${formatted_name}</a></div>`);
 					}
 
-					switch (entity.kind) {
-					case "c": list_contents.push(`&nbsp;<div class="kind">constant</div>`);          break;
-					case "v": list_contents.push(`&nbsp;<div class="kind">variable</div>`);          break;
-					case "t": list_contents.push(`&nbsp;<div class="kind">type</div>`);              break;
-					case "p": list_contents.push(`&nbsp;<div class="kind">procedure</div>`);         break;
-					case "g": list_contents.push(`&nbsp;<div class="kind">procedure group</div>`);   break;
-					case "b": list_contents.push(`&nbsp;<div class="kind">builtin procedure</div>`); break;
-					}
+					const entity_kind_map = {
+						"c": "constant",
+						"v": "variable",
+						"t": "type",
+						"p": "procedure",
+						"g": "procedure",
+						"b": "builtin",
+					};
+					list_contents.push(`&nbsp;<div class="kind">${entity_kind_map[entity.kind]}</div>`);
 
 					list_contents.push(`</li>\n`);
 				}
