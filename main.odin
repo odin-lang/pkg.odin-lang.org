@@ -1138,10 +1138,18 @@ write_markup_text :: proc(w: io.Writer, s_: string) {
 				slash_slash := strings.index(s[index + 1:], "//")
 				if end_bracket >= 0 && slash_slash < end_bracket {
 					end_bracket += index + 2
-					url := s[index + 2:end_bracket-1]
+
+					text := s[index + 2:end_bracket-1]
+					url := text
+					if strings.contains(text, ";") {
+						text, _, url = strings.partition(text, ";")
+					}
+					text = strings.trim_space(text)
+					url  = strings.trim_space(url)
+
 					io.write_string(w, s[latest_index:index])
 					fmt.wprintf(w, `<a href="%s">`, url)
-					io.write_string(w, url)
+					io.write_string(w, text)
 					io.write_string(w, "</a>")
 					latest_index = end_bracket + 1
 					index = latest_index

@@ -175,15 +175,26 @@ builtins := []Builtin{
 	},
 	{name = "abs",       kind = "b", type = "proc(value: T) -> T",
 		comment = "`abs` returns the absolute value of passed argument.\n" +
-		          "If the argument is a complex or quaternion, this is equivalent to `real(conj(value) * value)`."
+		          "If the argument is a complex or quaternion, this is equivalent to `real(conj(value) * value)`.",
 	},
 	{name = "clamp",     kind = "b", type = "proc(v, minimum, maximum: T) -> T",
 		comment = "`clamp` returns a value `v` clamped between `minimum` and `maximum`.\n" +
-		          "This is calculated as the following: `minimum if v < minimum else maximum if v > maximum else v`."
+		          "This is calculated as the following: `minimum if v < minimum else maximum if v > maximum else v`.",
 	},
 
 	{name = "soa_zip",   kind = "b", type = "proc(slices: ...) -> #soa[]Struct", comment = "See: [[https://odin-lang.org/docs/overview/#soa_zip-and-soa_unzip]]"},
 	{name = "soa_unzip", kind = "b", type = "proc(value: $S/#soa[]$E) -> (slices: ...)", comment = "See: [[https://odin-lang.org/docs/overview/#soa_zip-and-soa_unzip]]"},
+
+	{name = "raw_data", kind = "b", type = "proc(value: $T) -> [^]$E",
+		comment = "`raw_data` returns the underlying data of a built-in data type as a [[multi-pointer ; https://odin-lang.org/docs/overview/#multi-pointers]].\n\n" +
+		          "\traw_data([]$E)         -> [^]E    // slices\n" +
+		          "\traw_data([dynamic]$E)  -> [^]E    // dynamic arrays\n" +
+		          "\traw_data(^[$N]$E)      -> [^]E    // fixed array and enumerated arrays \n" +
+		          "\traw_data(^#simd[$N]$E) -> [^]E    // simd vectors \n" +
+		          "\traw_data(string)       -> [^]byte // string\n" +
+		          "",
+	},
+
 }
 
 builtin_docs := `package builtin provides documentation for Odin's predeclared identifiers. The items documented here are not actually in package builtin but here to allow for better documentation for the language's special identifiers.`

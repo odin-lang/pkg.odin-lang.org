@@ -75,8 +75,11 @@ if (odin_search) {
 		if (str.includes(pattern)) {
 			let i = str.indexOf(pattern);
 			let formatted_str = str.substring(0, i) + '<b>' + str.substring(i, i+pattern.length) + '</b>' + str.substring(i+pattern.length, str.length);
-			let n = str.length - (str.length-pattern.length);
-			return [true, n * SUBSTRING_BOUNS, formatted_str];
+			let score = pattern.length * SUBSTRING_BOUNS;
+			if (str.length == pattern.length) {
+				score *= 2;
+			}
+			return [true, score, formatted_str];
 		}
 
 		// Loop variables
@@ -243,8 +246,13 @@ if (odin_search) {
 
 		let entities = [];
 		function add_entity(odin_pkg_name, e) {
-			e.full = odin_pkg_name+'.'+e.name; // add full name
-			e.pkg = odin_pkg_name;
+			if (odin_pkg_name == "") {
+				e.pkg = "builtin";
+				e.full = e.name;
+			} else {
+				e.pkg = odin_pkg_name;
+				e.full = odin_pkg_name+'.'+e.name; // add full name
+			}
 			entities.push(e);
 		}
 
@@ -270,7 +278,12 @@ if (odin_search) {
 				let [pkg_name, pkg] = all_packages[i];
 				let entities = pkg.entities;
 				for (let j = 0; j < entities.length; j++) {
-					add_entity(pkg_name, entities[j]);
+					let e = entities[j];
+					if (e.builtin) {
+						let be = Object.assign({}, e);
+						add_entity("", be);
+					}
+					add_entity(pkg_name, e);
 				}
 			}
 		}
@@ -409,8 +422,15 @@ if (odin_search) {
 					list_contents.push(`<li data-path="${full_path}">`);
 					// list_contents.push(`${result.score}&mdash;`);
 
-					let [formatted_pkg, formatted_name] = formatted_str.split(".", 2);
-					if (!IS_PACKAGE_PAGE || entity.pkg != odin_pkg_name) {
+					let is_builtin = false;
+					let [formatted_pkg, formatted_name] = [null, ""];
+					if (formatted_str.includes(".")) {
+						[formatted_pkg, formatted_name] = formatted_str.split(".", 2);
+					} else {
+						is_builtin = entity.pkg == "builtin" || entity.pkg == "runtime";
+						formatted_name = formatted_str;
+					}
+					if (formatted_pkg !== null && (!IS_PACKAGE_PAGE || entity.pkg != odin_pkg_name)) {
 						list_contents.push(`<div><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a></div>`);
 					} else {
 						list_contents.push(`<div><a href="${full_path}">${formatted_name}</a></div>`);
@@ -421,10 +441,16 @@ if (odin_search) {
 						"v": "variable",
 						"t": "type",
 						"p": "procedure",
-						"g": "procedure",
+						"g": "procedure&nbsp;group",
 						"b": "builtin",
 					};
-					list_contents.push(`&nbsp;<div class="kind">${entity_kind_map[entity.kind]}</div>`);
+
+					let entity_kind = entity_kind_map[entity.kind];
+					if (is_builtin) {
+						entity_kind = '(built-in)&nbsp;' + entity_kind;
+					}
+
+					list_contents.push(`&nbsp;<div class="kind">${entity_kind}</div>`);
 
 					list_contents.push(`</li>\n`);
 				}
