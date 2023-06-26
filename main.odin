@@ -521,7 +521,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		if .Param_No_Alias  in e.flags { io.write_string(w, `<span class="keyword-type"> #no_alias</span> `)  }
 		if .Param_Any_Int   in e.flags { io.write_string(w, `<span class="keyword-type"> #any_int</span> `)   }
 
-		init_string := str(e.init_string)
+		init_string := escape_html_string(str(e.init_string))
 		switch {
 		case init_string == "#caller_location":
 			assert(name != "")
@@ -1099,7 +1099,7 @@ write_doc_line :: proc(w: io.Writer, text: string) {
 
 write_markup_text :: proc(w: io.Writer, s_: string) {
 	// We need to ensure that we don't escape html tags in our docs
-	s, _ := strings.replace_all(s_, "<", HTML_LESS_THAN, context.temp_allocator)
+	s := escape_html_string(s_)
 	// Consume '- ' if the string begins with one
 	// this means we need to make a bullet point
 	is_list_element: bool
@@ -1356,7 +1356,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 			io.write_string(w, "<pre>")
 			for line in lines {
 				trimmed := strings.trim_prefix(line, "\t")
-				s, _ := strings.replace_all(trimmed, "<", HTML_LESS_THAN, context.temp_allocator)
+				s := escape_html_string(trimmed)
 				io.write_string(w, s)
 				io.write_string(w, "\n")
 			}
@@ -1377,7 +1377,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 				lines = lines[:len(lines) - 1]
 			}
 			for line in &lines {
-				line, _ = strings.replace_all(line, "<", HTML_LESS_THAN, context.temp_allocator)
+				line = escape_html_string(line)
 			}
 			return lines
 		}
