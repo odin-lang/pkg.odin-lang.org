@@ -424,6 +424,55 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 	write_entries(w, runtime_pkg, "Procedures",       "b", runtime_procs[:])
 	write_entries(w, runtime_pkg, "Procedure Groups", "g", runtime_groups[:])
 
-
 	fmt.wprintf(w, `<script type="text/javascript">var odin_pkg_name = "%s";</script>`+"\n", "builtin")
+	fmt.wprintln(w, `</section></article>`)
+
+	write_table_contents(w, runtime_pkg, runtime_consts[:], runtime_types[:], runtime_procs[:], runtime_groups[:])
+
+}
+
+@(private)
+write_table_contents :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, consts: []doc.Scope_Entry, types: []doc.Scope_Entry, procs: []doc.Scope_Entry, groups: []doc.Scope_Entry) {
+    write_link :: proc(w: io.Writer, id, text: string) {
+        fmt.wprintf(w, `<li><a href="#%s">%s</a></li>`, id, text)
+        fmt.wprintln(w, "")
+    }
+
+    write_table_entries :: proc(w: io.Writer, runetime_pkg: ^doc.Pkg, title: string, kind: string, entries: []doc.Scope_Entry) {
+        // if len(entries) == 0 do return
+        fmt.wprintln(w, `<li>`)
+        {
+                fmt.wprintf(w, `<a href="#pkg-{0:s}">{0:s}</a>`, title)
+                fmt.wprintln(w, `<ul>`)
+                for e in builtins do if e.kind == kind {
+                        fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", e.name)
+                }
+                fmt.wprintln(w, `</ul>`)
+        }
+        fmt.wprintln(w, `</li>`)
+    }
+
+    fmt.wprintln(w, `<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">`)
+    fmt.wprintln(w, `<nav id="TableOfContents">`)
+    fmt.wprintln(w, `<ul>`)
+
+    write_link(w, "pkg-overview", "Overview")
+
+    write_table_entries(w, runtime_pkg, "Constants", "c", consts)
+    write_table_entries(w, runtime_pkg, "Types", "t", types)
+    write_table_entries(w, runtime_pkg, "Procedures", "b", procs)
+    write_table_entries(w, runtime_pkg, "Procedure Groups", "g", groups)
+    
+    // for eo in pkg_entries.ordering do if len(eo.entries) != 0 {
+    // 	fmt.wprintf(w, `<li><a href="#pkg-{0:s}">{0:s}</a>`, eo.name)
+    // 	fmt.wprintln(w, `<ul>`)
+    // 	for e in eo.entries {
+    // 		fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", str(e.name))
+    // 	}
+    // 	fmt.wprintln(w, "</ul>")
+    // 	fmt.wprintln(w, "</li>")
+    // }
+    fmt.wprintln(w, `</ul>`)
+    fmt.wprintln(w, `</nav>`)
+    fmt.wprintln(w, `</div></div>`)
 }
