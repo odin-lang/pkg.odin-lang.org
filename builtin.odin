@@ -463,15 +463,6 @@ write_table_contents :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, consts: []doc.
     write_table_entries(w, runtime_pkg, "Procedures", "b", procs)
     write_table_entries(w, runtime_pkg, "Procedure Groups", "g", groups)
     
-    // for eo in pkg_entries.ordering do if len(eo.entries) != 0 {
-    // 	fmt.wprintf(w, `<li><a href="#pkg-{0:s}">{0:s}</a>`, eo.name)
-    // 	fmt.wprintln(w, `<ul>`)
-    // 	for e in eo.entries {
-    // 		fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", str(e.name))
-    // 	}
-    // 	fmt.wprintln(w, "</ul>")
-    // 	fmt.wprintln(w, "</li>")
-    // }
     fmt.wprintln(w, `</ul>`)
     fmt.wprintln(w, `</nav>`)
     fmt.wprintln(w, `</div></div>`)
