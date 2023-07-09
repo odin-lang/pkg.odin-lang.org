@@ -61,6 +61,15 @@ base_type :: proc(t: doc.Type) -> doc.Type {
 	return t
 }
 
+type_deref :: proc(t: doc.Type) -> doc.Type {
+	bt := base_type(t)
+	#partial switch bt.kind {
+	case .Pointer:
+		return types[array(bt.types)[0]]
+	}
+	return t
+}
+
 is_type_untyped :: proc(type: doc.Type) -> bool {
 	if type.kind == .Basic {
 		flags := transmute(doc.Type_Flags_Basic)type.flags

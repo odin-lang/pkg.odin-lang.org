@@ -507,6 +507,7 @@ calc_name_width :: proc(type_entities: []doc.Entity_Index) -> (name_width: int) 
 write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type_Flags) {
 	write_param_entity :: proc(using writer: ^Type_Writer, e, next_entity: ^doc.Entity, flags: Write_Type_Flags, name_width := 0) {
 		name := str(e.name)
+		name_width := name_width
 
 		write_padding :: proc(w: io.Writer, name: string, name_width: int) {
 			for _ in 0..<name_width-len(name) {
@@ -514,12 +515,14 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			}
 		}
 
-		if .Param_Using     in e.flags { io.write_string(w, `<span class="keyword-type"> using</span> `)      }
-		if .Param_Const     in e.flags { io.write_string(w, `<span class="keyword-type"> #const</span> `)     }
-		if .Param_Auto_Cast in e.flags { io.write_string(w, `<span class="keyword-type"> #auto_cast</span> `) }
-		if .Param_CVararg   in e.flags { io.write_string(w, `<span class="keyword-type"> #c_vararg</span> `)  }
-		if .Param_No_Alias  in e.flags { io.write_string(w, `<span class="keyword-type"> #no_alias</span> `)  }
-		if .Param_Any_Int   in e.flags { io.write_string(w, `<span class="keyword-type"> #any_int</span> `)   }
+
+		if .Param_Using     in e.flags { io.write_string(w, `<span class="keyword-type">using</span> `);      name_width -= 1+len("using")      }
+		if .Param_Const     in e.flags { io.write_string(w, `<span class="keyword-type">#const</span> `);     name_width -= 1+len("#const")     }
+		if .Param_Auto_Cast in e.flags { io.write_string(w, `<span class="keyword-type">#auto_cast</span> `); name_width -= 1+len("#auto_cast") }
+		if .Param_CVararg   in e.flags { io.write_string(w, `<span class="keyword-type">#c_vararg</span> `);  name_width -= 1+len("#c_vararg")  }
+		if .Param_No_Alias  in e.flags { io.write_string(w, `<span class="keyword-type">#no_alias</span> `);  name_width -= 1+len("#no_alias")  }
+		if .Param_Any_Int   in e.flags { io.write_string(w, `<span class="keyword-type">#any_int</span> `);   name_width -= 1+len("#any_int")   }
+
 
 		init_string := escape_html_string(str(e.init_string))
 		switch {
@@ -1812,6 +1815,160 @@ write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, met
 	}
 }
 
+write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, proc_names_seen: ^map[string]bool, is_inherited := false) {
+	Related_Proc :: struct {
+		e:  ^doc.Entity,
+		idx: int,
+		is_generic: bool,
+	}
+
+	check_proc :: proc(e: ^doc.Entity, parent: ^doc.Entity, related_procs: ^[dynamic]Related_Proc) -> (related_proc: Related_Proc, ok: bool) {
+		if e.kind != .Procedure {
+			return
+		}
+
+		parent_name := str(parent.name)
+
+		pt := base_type(types[e.type])
+		assert(pt.kind == .Proc)
+		params := array(types[array(pt.types)[0]].entities)
+		for param_idx, i in params {
+			param := &entities[param_idx]
+
+			t := type_deref(types[param.type])
+			#partial switch t.kind {
+			case .Named:
+				named_entity := &entities[array(t.entities)[0]]
+				if parent == named_entity {
+					return {e, i, false}, true
+				}
+
+				gt_name, _, _ := strings.partition(str(named_entity.name), "(")
+				if gt_name == parent_name {
+					return {e, i, true}, true
+				}
+			case .Generic:
+				type_types := array(t.types)
+				if len(type_types) != 1 {
+					continue
+				}
+				gt := types[type_types[0]]
+				if gt.kind != .Named {
+					continue
+				}
+
+				gt_name, _, _ := strings.partition(str(gt.name), "(")
+				if gt_name == parent_name {
+					return {e, i, true}, true
+				}
+			}
+		}
+		return
+	}
+
+
+
+	related_procs: [dynamic]Related_Proc
+
+	parent_name := str(parent.name)
+
+	for entry in array(pkg.entries) {
+		e := &entities[entry.entity]
+		#partial switch e.kind {
+		case .Procedure:
+			if rp, ok := check_proc(e, parent, &related_procs); ok {
+				append(&related_procs, rp)
+			}
+		case .Proc_Group:
+			for entity_idx in array(e.grouped_entities) {
+				pe := &entities[entity_idx]
+				if rp, ok := check_proc(pe, parent, &related_procs); ok {
+					append(&related_procs, rp)
+				}
+			}
+		}
+	}
+
+	slice.sort_by_cmp(related_procs[:], proc(a, b: Related_Proc) -> (cmp: slice.Ordering) {
+		cmp = slice.cmp(a.idx, b.idx)
+		if cmp != .Equal { return }
+		cmp = slice.cmp(a.e.kind, b.e.kind)
+		if cmp != .Equal { return }
+		cmp = slice.cmp(str(a.e.name), str(b.e.name))
+		return
+	})
+
+	seen_item := false
+	previous_idx := 0
+	loop: for p in related_procs {
+		proc_name := str(p.e.name)
+
+		if proc_names_seen[proc_name] {
+			continue loop
+		}
+		proc_names_seen[proc_name] = true
+		if !seen_item {
+			if is_inherited {
+				fmt.wprintf(w, "<h6>Procedures Through `using` From "+`<a href="%s/%s/#%s">%s</a></h6>`, pkg_to_collection[pkg].base_url, pkg_to_path[pkg], parent_name, parent_name)
+				fmt.wprintln(w)
+			} else {
+				if p.idx > previous_idx && previous_idx == 0 {
+					previous_idx = p.idx
+					fmt.wprintln(w, "<h5>Indirectly Associated Procedures</h5>")
+				} else {
+					fmt.wprintln(w, "<h5>Related Procedures</h5>")
+				}
+			}
+			fmt.wprintln(w, "<ul>")
+			seen_item = true
+		}
+
+		if seen_item && p.idx > previous_idx && previous_idx == 0 {
+			previous_idx = p.idx
+			fmt.wprintln(w, "</ul>")
+			fmt.wprintln(w, "<h5>Indirectly Associated Procedures</h5>")
+			fmt.wprintln(w, "<ul>")
+		}
+
+		fmt.wprintf(w, "<li>")
+		fmt.wprintf(w, `<a href="%s/%s/#%s">%s</a>`, pkg_to_collection[pkg].base_url, pkg_to_path[pkg], proc_name, proc_name)
+
+		if p.e.kind == .Proc_Group {
+			fmt.wprintf(w, `&nbsp;<em>(overloaded procedure group)</em>`)
+		}
+
+		fmt.wprintf(w, "</li>")
+
+		fmt.wprintln(w)
+	}
+
+	if seen_item {
+		fmt.wprintln(w, "</ul>")
+	}
+
+	delete(related_procs)
+
+	recursive_inheritance_check: {
+		parent_type := base_type(types[parent.type])
+		if parent_type.kind != .Struct {
+			return
+		}
+		fields := array(parent_type.entities)
+		for field_idx := len(fields)-1; field_idx >= 0; field_idx -= 1 {
+			field := &entities[fields[field_idx]]
+			if .Param_Using not_in field.flags {
+				continue
+			}
+			field_type := types[field.type]
+			if field_type.entities.length == 0 {
+				continue
+			}
+			field_type_entity := &entities[array(field_type.entities)[0]]
+			field_pkg := &pkgs[files[field.pos.file].pkg]
+			write_related_procedures(w, field_pkg, field_type_entity, proc_names_seen, true)
+		}
+	}
+}
 
 write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	write_attributes :: proc(w: io.Writer, e: ^doc.Entity) {
@@ -2019,6 +2176,10 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		case "objc_Metal":
 			fmt.wprintf(w, `<em>Apple's Metal Documentation: <a href="https://developer.apple.com/documentation/metal/%s?language=objc">%s</a></em>`, cls_name, cls_name)
 		}
+	} else {
+		proc_names_seen: map[string]bool
+		write_related_procedures(w, pkg, e, &proc_names_seen)
+		delete(proc_names_seen)
 
 	}
 }
