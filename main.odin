@@ -1816,147 +1816,165 @@ write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, met
 }
 
 write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, proc_names_seen: ^map[string]bool, is_inherited := false) {
-	Related_Proc :: struct {
-		e:  ^doc.Entity,
-		idx: int,
-		is_generic: bool,
-	}
+	related_procs_in_parameters, related_procs_in_return_types: [dynamic]^doc.Entity
 
-	check_proc :: proc(e: ^doc.Entity, parent: ^doc.Entity, related_procs: ^[dynamic]Related_Proc) -> (related_proc: Related_Proc, ok: bool) {
-		if e.kind != .Procedure {
+	for entry in array(pkg.entries) {
+		check_proc :: proc(e: ^doc.Entity, parent: ^doc.Entity, is_output: bool) -> (related_proc: ^doc.Entity, ok: bool) {
+			if e.kind != .Procedure {
+				return
+			}
+
+			parent_name := str(parent.name)
+
+			pt := base_type(types[e.type])
+			assert(pt.kind == .Proc)
+			params := array(types[array(pt.types)[int(is_output)]].entities)
+			for param_idx in params {
+				t := types[entities[param_idx].type]
+				#partial switch t.kind {
+				case .Named, .Generic:
+					// okay
+				case .Pointer:
+					t = types[array(t.types)[0]]
+				case:
+					continue
+				}
+
+				#partial switch t.kind {
+				case .Named:
+					named_entity := &entities[array(t.entities)[0]]
+					if parent == named_entity {
+						return e, true
+					}
+
+					gt_name, sep, _ := strings.partition(str(named_entity.name), "(")
+					if sep == "(" && gt_name == parent_name {
+						return e, true
+					}
+				case .Generic:
+					type_types := array(t.types)
+					if len(type_types) != 1 {
+						continue
+					}
+					gt := types[type_types[0]]
+					if gt.kind != .Named {
+						continue
+					}
+
+					gt_name, sep, _ := strings.partition(str(gt.name), "(")
+					if sep == "(" && gt_name == parent_name {
+						return e, true
+					}
+				}
+			}
 			return
 		}
 
-		parent_name := str(parent.name)
-
-		pt := base_type(types[e.type])
-		assert(pt.kind == .Proc)
-		params := array(types[array(pt.types)[0]].entities)
-		for param_idx, i in params {
-			param := &entities[param_idx]
-
-			t := type_deref(types[param.type])
-			#partial switch t.kind {
-			case .Named:
-				named_entity := &entities[array(t.entities)[0]]
-				if parent == named_entity {
-					return {e, i, false}, true
-				}
-
-				gt_name, _, _ := strings.partition(str(named_entity.name), "(")
-				if gt_name == parent_name {
-					return {e, i, true}, true
-				}
-			case .Generic:
-				type_types := array(t.types)
-				if len(type_types) != 1 {
-					continue
-				}
-				gt := types[type_types[0]]
-				if gt.kind != .Named {
-					continue
-				}
-
-				gt_name, _, _ := strings.partition(str(gt.name), "(")
-				if gt_name == parent_name {
-					return {e, i, true}, true
-				}
-			}
-		}
-		return
-	}
-
-
-
-	related_procs: [dynamic]Related_Proc
-
-	parent_name := str(parent.name)
-
-	for entry in array(pkg.entries) {
 		e := &entities[entry.entity]
 		#partial switch e.kind {
 		case .Procedure:
-			if rp, ok := check_proc(e, parent, &related_procs); ok {
-				append(&related_procs, rp)
+			if strings.has_prefix(str(e.name), "_") {
+				continue
+			}
+			if p, ok := check_proc(e, parent, false); ok {
+				append(&related_procs_in_parameters, p)
+			}
+			if !is_inherited {
+				if p, ok := check_proc(e, parent, true); ok {
+					append(&related_procs_in_return_types, p)
+				}
 			}
 		case .Proc_Group:
+			if strings.has_prefix(str(e.name), "_") {
+				continue
+			}
 			for entity_idx in array(e.grouped_entities) {
 				pe := &entities[entity_idx]
-				if rp, ok := check_proc(pe, parent, &related_procs); ok {
-					rp.e = e
-					append(&related_procs, rp)
+				if p, ok := check_proc(pe, parent, false); ok {
+					append(&related_procs_in_parameters, e)
+					break
+				}
+			}
+			if !is_inherited do for entity_idx in array(e.grouped_entities) {
+				pe := &entities[entity_idx]
+				if p, ok := check_proc(pe, parent, true); ok {
+					append(&related_procs_in_return_types, e)
+					break
 				}
 			}
 		}
 	}
 
-	slice.sort_by_cmp(related_procs[:], proc(a, b: Related_Proc) -> (cmp: slice.Ordering) {
-		cmp = slice.cmp(a.idx, b.idx)
+	the_sort_proc :: proc(a, b: ^doc.Entity) -> (cmp: slice.Ordering) {
+		cmp = slice.cmp(a.kind, b.kind)
 		if cmp != .Equal { return }
-		cmp = slice.cmp(a.e.kind, b.e.kind)
-		if cmp != .Equal { return }
-		cmp = slice.cmp(str(a.e.name), str(b.e.name))
+		cmp = slice.cmp(str(a.name), str(b.name))
 		return
-	})
+	}
 
-	seen_item := false
-	previous_idx := 0
-	loop: for p in related_procs {
-		proc_name := str(p.e.name)
+	slice.sort_by_cmp(related_procs_in_parameters[:],   the_sort_proc)
+	slice.sort_by_cmp(related_procs_in_return_types[:], the_sort_proc)
 
-		if proc_names_seen[proc_name] {
-			continue loop
-		}
-		proc_names_seen[proc_name] = true
-		if !seen_item {
-			if is_inherited {
-				fmt.wprintf(w, "<h6>Procedures Through `using` From "+`<a href="%s/%s/#%s">%s</a></h6>`, pkg_to_collection[pkg].base_url, pkg_to_path[pkg], parent_name, parent_name)
-				fmt.wprintln(w)
-			} else {
-				if p.idx > previous_idx && previous_idx == 0 {
-					previous_idx = p.idx
-					fmt.wprintln(w, "<h5>Indirectly Associated Procedures</h5>")
-				} else {
-					fmt.wprintln(w, "<h5>Related Procedures</h5>")
-				}
+	print_procs :: proc(w:               io.Writer,
+	                    pkg:             ^doc.Pkg,
+	                    parent:          ^doc.Entity,
+	                    related_procs:   []^doc.Entity,
+	                    proc_names_seen: ^map[string]bool,
+	                    is_inherited:    bool,
+	                    title:           string) {
+		parent_name := str(parent.name)
+		seen_item := false
+		parameter_loop: for e in related_procs {
+			proc_name := str(e.name)
+
+			if proc_names_seen[proc_name] {
+				continue parameter_loop
 			}
-			fmt.wprintln(w, "<ul>")
-			seen_item = true
+			proc_names_seen[proc_name] = true
+			if !seen_item {
+				if is_inherited {
+					fmt.wprintf(w, "<h6>Procedures Through `using` From "+`<a href="%s/%s/#%s">%s</a></h6>`, pkg_to_collection[pkg].base_url, pkg_to_path[pkg], parent_name, parent_name)
+					fmt.wprintln(w)
+				} else {
+					fmt.wprintf(w, "<h5>%s</h5>\n", title)
+				}
+				fmt.wprintln(w, "<ul>")
+				seen_item = true
+			}
+
+			fmt.wprintf(w, "<li>")
+			fmt.wprintf(w, `<a href="%s/%s/#%s">%s</a>`, pkg_to_collection[pkg].base_url, pkg_to_path[pkg], proc_name, proc_name)
+
+			if e.kind == .Proc_Group {
+				fmt.wprintf(w, `&nbsp;<em>(overloaded procedure group)</em>`)
+			}
+
+			fmt.wprintf(w, "</li>")
+
+			fmt.wprintln(w)
 		}
 
-		if seen_item && p.idx > previous_idx && previous_idx == 0 {
-			previous_idx = p.idx
+		if seen_item {
 			fmt.wprintln(w, "</ul>")
-			fmt.wprintln(w, "<h5>Indirectly Associated Procedures</h5>")
-			fmt.wprintln(w, "<ul>")
 		}
-
-		fmt.wprintf(w, "<li>")
-		fmt.wprintf(w, `<a href="%s/%s/#%s">%s</a>`, pkg_to_collection[pkg].base_url, pkg_to_path[pkg], proc_name, proc_name)
-
-		if p.e.kind == .Proc_Group {
-			fmt.wprintf(w, `&nbsp;<em>(overloaded procedure group)</em>`)
-		}
-
-		fmt.wprintf(w, "</li>")
-
-		fmt.wprintln(w)
 	}
 
-	if seen_item {
-		fmt.wprintln(w, "</ul>")
-	}
+	print_procs(w, pkg, parent, related_procs_in_parameters[:],   proc_names_seen, is_inherited, title="Related Procedures With Parameters")
+	print_procs(w, pkg, parent, related_procs_in_return_types[:], proc_names_seen, is_inherited, title="Related Procedures With Returns")
 
-	delete(related_procs)
+	delete(related_procs_in_parameters)
+	delete(related_procs_in_return_types)
 
-	recursive_inheritance_check: {
-		parent_type := base_type(types[parent.type])
+	{ // recursive_inheritance_check
+		parent_type := types[parent.type]
+		for parent_type.kind == .Named {
+			parent_type = types[array(parent_type.types)[0]]
+		}
 		if parent_type.kind != .Struct {
 			return
 		}
-		fields := array(parent_type.entities)
-		for field_idx := len(fields)-1; field_idx >= 0; field_idx -= 1 {
-			field := &entities[fields[field_idx]]
+		for entity_index in array(parent_type.entities) {
+			field := &entities[entity_index]
 			if .Param_Using not_in field.flags {
 				continue
 			}
@@ -2177,11 +2195,10 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		case "objc_Metal":
 			fmt.wprintf(w, `<em>Apple's Metal Documentation: <a href="https://developer.apple.com/documentation/metal/%s?language=objc">%s</a></em>`, cls_name, cls_name)
 		}
-	} else {
+	} else if e.kind == .Type_Name {
 		proc_names_seen: map[string]bool
 		write_related_procedures(w, pkg, e, &proc_names_seen)
 		delete(proc_names_seen)
-
 	}
 }
 
