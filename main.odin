@@ -1883,6 +1883,7 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 			for entity_idx in array(e.grouped_entities) {
 				pe := &entities[entity_idx]
 				if rp, ok := check_proc(pe, parent, &related_procs); ok {
+					rp.e = e
 					append(&related_procs, rp)
 				}
 			}
