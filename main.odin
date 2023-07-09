@@ -696,7 +696,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		if is_type_untyped(type) {
 			io.write_string(w, str(type.name))
 		} else {
-			fmt.wprintf(w, `<span class="doc-builtin">%s</span>`, str(type.name))
+			fmt.wprintf(w, `<a href="/core/builtin#{0:s}"><span class="doc-builtin">{0:s}</span></a>`, str(type.name))
 			// io.write_string(w, str(type.name))
 		}
 	case .Named:
@@ -1946,7 +1946,7 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 			fmt.wprintf(w, `<a href="%s/%s/#%s">%s</a>`, pkg_to_collection[pkg].base_url, pkg_to_path[pkg], proc_name, proc_name)
 
 			if e.kind == .Proc_Group {
-				fmt.wprintf(w, `&nbsp;<em>(overloaded procedure group)</em>`)
+				fmt.wprintf(w, `&nbsp;<em>(procedure groups)</em>`)
 			}
 
 			fmt.wprintf(w, "</li>")
