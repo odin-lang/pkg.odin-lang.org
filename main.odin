@@ -1063,7 +1063,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		write_type(writer, types[type_types[1]], flags)
 		io.write_string(w, ") ")
 		write_type(writer, types[type_types[0]], flags)
-	case .Relative_Slice:
+	case .Relative_Multi_Pointer:
 		io.write_string(w, "<span class=\"directive\">#relative</span>(")
 		write_type(writer, types[type_types[1]], flags)
 		io.write_string(w, ") ")
