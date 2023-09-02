@@ -1,107 +1,177 @@
 package odin_html_docs
 
-import doc "core:odin/doc-format"
 import "core:fmt"
+import "core:intrinsics"
 import "core:io"
+import "core:log"
 import "core:os"
-import "core:strings"
-import "core:strconv"
 import "core:path/slashpath"
 import "core:slice"
+import "core:strconv"
+import "core:strings"
 import "core:time"
-import "core:intrinsics"
+
+import doc "core:odin/doc-format"
+
+import cm "vendor:commonmark"
+
+BASE_CORE_URL :: "/core"
+
+cfg: Config
 
 main :: proc() {
-	if len(os.args) != 2 {
-		errorf("expected 1 .odin-doc file")
-	}
-	data, ok := os.read_entire_file(os.args[1])
-	if !ok {
-		errorf("unable to read file:", os.args[1])
-	}
-	err: doc.Reader_Error
-	header, err = doc.read_from_bytes(data)
-	switch err {
-	case .None:
-	case .Header_Too_Small:
-		errorf("file is too small for the file format")
-	case .Invalid_Magic:
-		errorf("invalid magic for the file format")
-	case .Data_Too_Small:
-		errorf("data is too small for the file format")
-	case .Invalid_Version:
-		errorf("invalid file format version")
-	}
-	files    = array(header.files)
-	pkgs     = array(header.pkgs)
-	entities = array(header.entities)
-	types    = array(header.types)
+	context.logger = log.create_console_logger(.Debug when ODIN_DEBUG else .Info)
 
-	core_collection := &Collection{
-		name        = "core",
-		pkgs_to_use = &core_pkgs_to_use,
-		github_url  = GITHUB_CORE_URL,
-		base_url    = BASE_CORE_URL,
-		root        = nil,
-	}
-	vendor_collection := &Collection{
-		name =        "vendor",
-		pkgs_to_use = &vendor_pkgs_to_use,
-		github_url =  GITHUB_VENDOR_URL,
-		base_url =    BASE_VENDOR_URL,
-		root =        nil,
+	{
+		if len(os.args) < 2 || len(os.args) > 3 || os.args[1] == "-h" || os.args[1] == "--help" {
+			print_usage()
+		}
 	}
 
 	{
-		fullpaths: [dynamic]string
-		defer delete(fullpaths)
+		cfg = config_default()
 
-		for pkg in pkgs[1:] {
-			append(&fullpaths, str(pkg.fullpath))
+		if len(os.args) > 2 {
+			file_ok, json_err := config_merge_from_file(&cfg, os.args[2])
+			if !file_ok {
+				errorf("unable to read config file at: %s", os.args[2])
+			}
+			if json_err != nil {
+				errorf(
+					"unable to decode the JSON inside the config file at: %s, error: %v",
+					os.args[2],
+					json_err,
+				)
+			}
 		}
-		path_prefix := common_prefix(fullpaths[:])
 
-		core_pkgs_to_use = make(map[string]^doc.Pkg)
-		vendor_pkgs_to_use = make(map[string]^doc.Pkg)
+		if len(cfg.collections) == 0 {
+			errorf("there must be collections defined in the config")
+		}
+
+		for _, &c in cfg.collections {
+			if err, has_err := collection_validate(&c).?; has_err {
+				errorf(err)
+			}
+		}
+	}
+
+	{
+		data, ok := os.read_entire_file(os.args[1])
+		if !ok {
+			errorf("unable to read Odin doc file at: %s", os.args[1])
+		}
+
+		err: doc.Reader_Error
+		cfg.header, err = doc.read_from_bytes(data)
+		switch err {
+		case .None:
+		case .Header_Too_Small:
+			errorf("file is too small for the file format")
+		case .Invalid_Magic:
+			errorf("invalid magic for the file format")
+		case .Data_Too_Small:
+			errorf("data is too small for the file format")
+		case .Invalid_Version:
+			errorf("invalid file format version")
+		}
+
+		cfg.files = array(cfg.header.files)
+		cfg.pkgs = array(cfg.header.pkgs)
+		cfg.entities = array(cfg.header.entities)
+		cfg.types = array(cfg.header.types)
+	}
+
+	when ODIN_DEBUG {
+		for _, c in cfg.collections {
+			log.debugf(`Collection %q configured with:
+	Source URL: %s
+	Base URL: %s
+	Root Path: %s
+	License: %s at %s
+	Hidden: %v
+	Home:
+		Title: %s
+		Description: %s
+		Readme: %s`,
+				c.name,
+				c.source_url,
+				c.base_url,
+				c.root_path,
+				c.license.text,
+				c.license.url,
+				c.hidden,
+				c.home.title,
+				c.home.description,
+				c.home.embed_readme,
+			)
+		}
+	}
+
+	// Based on paths, assign packages to collections, maybe ignore them.
+	{
+		fullpaths: [dynamic]string
+		for pkg in cfg.pkgs[1:] {
+			fp := str(pkg.fullpath)
+			append(&fullpaths, fp)
+		}
+
+		log.infof("%i packages", len(fullpaths))
+		log.debugf("Full package paths: %v", fullpaths)
+
 		fullpath_loop: for fullpath, i in fullpaths {
-			path := strings.trim_prefix(fullpath, path_prefix)
-			pkg := &pkgs[i+1]
+			pkg := &cfg.pkgs[i + 1]
 			if len(array(pkg.entries)) == 0 {
+				log.infof("Package at %s does not contain anything", fullpath)
 				continue fullpath_loop
 			}
 
-			switch {
-			case strings.has_prefix(path, "core/"):
-				trimmed_path := strings.trim_prefix(path, "core/")
-				if strings.has_prefix(trimmed_path, "sys") {
-					continue fullpath_loop
+			collection: ^Collection
+			for _, &c in cfg.collections {
+				if strings.has_prefix(fullpath, c.root_path) {
+					collection = &c
+					break
 				}
-				if strings.contains(trimmed_path, "/_") {
-					continue fullpath_loop
-				}
-
-				core_pkgs_to_use[trimmed_path] = pkg
-			case strings.has_prefix(path, "vendor/"):
-				trimmed_path := strings.trim_prefix(path, "vendor/")
-				if strings.contains(trimmed_path, "/_") {
-					continue fullpath_loop
-				}
-				vendor_pkgs_to_use[trimmed_path] = pkg
 			}
-		}
-		for path, pkg in core_pkgs_to_use {
-			pkg_to_path[pkg] = path
-			pkg_to_collection[pkg] = core_collection
-		}
-		for path, pkg in vendor_pkgs_to_use {
-			pkg_to_path[pkg] = path
-			pkg_to_collection[pkg] = vendor_collection
+
+			if collection == nil {
+				log.warnf(
+					"Package at %s does not match any configured collections, skipping it",
+					fullpath,
+				)
+				continue
+			}
+
+			log.debugf("Package %s belongs to collection %s", fullpath, collection.name)
+
+			trimmed := strings.trim_prefix(fullpath, collection.root_path)
+			trimmed = strings.trim_prefix(trimmed, collection.base_url[1:])
+			trimmed = strings.trim_prefix(trimmed, "/")
+
+			if strings.has_prefix(trimmed, "sys") || strings.contains(trimmed, "/_") {
+				log.infof(
+					"Package %s is a system/os specific package and will be skipped",
+					fullpath,
+				)
+				continue fullpath_loop
+			}
+
+			log.debugf("Final package path for %s: %q", str(pkg.name), trimmed)
+
+			collection.pkgs[trimmed] = pkg
+			collection.pkg_to_path[pkg] = trimmed
+			cfg.pkg_to_collection[pkg] = collection
 		}
 	}
 
 	b := strings.builder_make()
 	defer strings.builder_destroy(&b)
 	w := strings.to_writer(&b)
+
+	for _, &c in cfg.collections {
+		c.root = generate_directory_tree(c.pkgs)
+		generate_packages(&b, &c)
+	}
 
 	{
 		strings.builder_reset(&b)
@@ -111,23 +181,60 @@ main :: proc() {
 		os.write_entire_file("index.html", b.buf[:])
 	}
 
-	core_collection.root   = generate_directory_tree(core_pkgs_to_use)
-	vendor_collection.root = generate_directory_tree(vendor_pkgs_to_use)
+	not_hidden: [dynamic]^Collection
+	for _, &c in cfg.collections {
+		if cfg.hide_core && (c.name == "core" || c.name == "vendor") {
+			log.infof(
+				"Core is set to be hidden so collection %q will be excluded from search results",
+				c.name,
+			)
+			continue
+		}
 
-	generate_packages(&b, core_collection)
-	generate_packages(&b, vendor_collection)
+		append(&not_hidden, &c)
+	}
 
-	generate_json_pkg_data(&b, core_collection, vendor_collection)
+	generate_json_pkg_data(&b, not_hidden[:])
+
+	copy_assets()
 }
 
+print_usage :: proc() -> ! {
+	ln, p, f :: fmt.eprintln, fmt.eprint, fmt.eprintf
 
+	fmt.eprintf(
+		"%s is a program that generates a documentation website from a .odin-doc file and an optional config.",
+		os.args[0],
+	)
+	fmt.eprintln()
+	fmt.eprintln("usage:")
+	fmt.eprintf("\t%s odin-doc-file [config-file]", os.args[0])
+	fmt.eprintln()
+
+	os.exit(1)
+}
+
+copy_assets :: proc() {
+	if !os.write_entire_file("search.js", #load("resources/search.js")) {
+		errorf("unable to write the search.js file")
+	}
+
+	if !os.write_entire_file("style.css", #load("resources/style.css")) {
+		errorf("unable to write the style.css file")
+	}
+
+	if !os.write_entire_file("favicon.svg", #load("resources/favicon.svg")) {
+		errorf("unable to write favicon.svg file")
+	}
+}
 
 Header_Kind :: enum {
 	Normal,
 	Full_Width,
 }
+
 write_html_header :: proc(w: io.Writer, title: string, kind := Header_Kind.Normal) {
-	fmt.wprintf(w, string(#load("header.txt.html")), title)
+	fmt.wprintf(w, string(#load("resources/header.txt.html")), title)
 
 	when #config(ODIN_DOC_DEV, false) {
 		io.write_string(w, "\n")
@@ -136,7 +243,7 @@ write_html_header :: proc(w: io.Writer, title: string, kind := Header_Kind.Norma
 	}
 
 
-	io.write(w, #load("header-lower.txt.html"))
+	io.write(w, #load("resources/header-lower.txt.html"))
 	switch kind {
 	case .Normal:
 		io.write_string(w, `<div class="container">`+"\n")
@@ -145,15 +252,7 @@ write_html_header :: proc(w: io.Writer, title: string, kind := Header_Kind.Norma
 	}
 }
 
-write_html_footer :: proc(w: io.Writer, include_directory_js: bool) {
-	io.write_string(w, "\n")
-
-	io.write(w, #load("footer.txt.html"))
-	fmt.wprintf(w, "</body>\n</html>\n")
-}
-
-
-generate_json_pkg_data :: proc(b: ^strings.Builder, collections: ..^Collection) {
+generate_json_pkg_data :: proc(b: ^strings.Builder, collections: []^Collection) {
 	w := strings.to_writer(b)
 
 	strings.builder_reset(b)
@@ -170,9 +269,9 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: ..^Collection) 
 			break
 		}
 	}
-
+	
 	pkg_idx := 0
-	{
+	if core_collection != nil {
 		if pkg_idx != 0 { fmt.wprintln(w, ",") }
 		fmt.wprintf(w, "\t\"%s\": {{\n", "builtin")
 		fmt.wprintf(w, "\t\t\"name\": \"%s\",\n", "builtin")
@@ -199,7 +298,7 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: ..^Collection) 
 	}
 
 	for collection in collections {
-		for path, pkg in collection.pkgs_to_use {
+		for path, pkg in collection.pkgs {
 			entries := collection.pkg_entries_map[pkg]
 			if pkg_idx != 0 { fmt.wprintln(w, ",") }
 			fmt.wprintf(w, "\t\"%s\": {{\n", str(pkg.name))
@@ -211,7 +310,7 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: ..^Collection) 
 				if i != 0 { fmt.wprint(w, ",\n") }
 
 				kind_str := ""
-				switch entities[e.entity].kind {
+				switch cfg.entities[e.entity].kind {
 				case .Invalid:      kind_str = ""
 				case .Constant:     kind_str = "c"
 				case .Variable:     kind_str = "v"
@@ -229,7 +328,7 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: ..^Collection) 
 
 
 				if str(pkg.name) == "runtime" {
-					for attr in array(entities[e.entity].attributes) {
+					for attr in array(cfg.entities[e.entity].attributes) {
 						if str(attr.name) == "builtin" {
 							fmt.wprintf(w, `, "builtin": true`)
 							break
@@ -242,13 +341,19 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: ..^Collection) 
 			fmt.wprint(w, "\n\t\t]")
 			fmt.wprint(w, "\n\t}")
 			pkg_idx += 1
-	}
+		}
 	}
 	fmt.wprintln(w, "}};")
 
 	os.write_entire_file("pkg-data.js", b.buf[:])
 }
 
+write_html_footer :: proc(w: io.Writer, include_directory_js: bool) {
+	io.write_string(w, "\n")
+
+	io.write(w, #load("resources/footer.txt.html"))
+	fmt.wprintf(w, "</body>\n</html>\n")
+}
 
 generate_packages :: proc(b: ^strings.Builder, collection: ^Collection) {
 	w := strings.to_writer(b)
@@ -264,14 +369,14 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection) {
 		os.write_entire_file(fmt.tprintf("%s/index.html", dir), b.buf[:])
 	}
 
-	collection.pkg_entries_map = make(map[^doc.Pkg]Pkg_Entries, len(collection.pkgs_to_use))
-	for _, pkg in collection.pkgs_to_use {
+	collection.pkg_entries_map = make(map[^doc.Pkg]Pkg_Entries, len(collection.pkgs))
+	for _, pkg in collection.pkgs {
 		collection.pkg_entries_map[pkg] = pkg_entries_gather(pkg)
 	}
 
 	runtime_pkg: ^doc.Pkg
 
-	for path, pkg in collection.pkgs_to_use {
+	for path, pkg in collection.pkgs {
 		if str(pkg.name) == "runtime" {
 			runtime_pkg = pkg
 		}
@@ -296,7 +401,6 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection) {
 		os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
 	}
 }
-
 
 write_home_sidebar :: proc(w: io.Writer) {
 	fmt.wprintln(w, `<nav class="col-lg-2 odin-sidebar-border navbar-light">`)
@@ -326,17 +430,66 @@ write_home_page :: proc(w: io.Writer) {
 	fmt.wprintln(w, "<div>")
 	defer fmt.wprintln(w, "</div>")
 
-	fmt.wprintln(w, `<div class="mt-5">`)
-	fmt.wprintln(w, `<a href="/core" class="link-primary text-decoration-node"><h3>Core Library Collection</h3></a>`)
-	fmt.wprintln(w, `<p>Documentation for all the packages part of the <code>core</code> library collection.</p>`)
-	fmt.wprintln(w, `</div>`)
+	for _, c in cfg.collections {
+		if cfg.hide_core && (c.name == "core" || c.name == "vendor") {
+			continue
+		}
 
-	fmt.wprintln(w, `<div class="mt-5">`)
-	fmt.wprintln(w, `<a href="/vendor" class="link-primary text-decoration-node"><h3>Vendor Library Collection</h3></a>`)
-	fmt.wprintln(w, `<p>Documentation for all the packages part of the <code>vendor</code> library collection.</p>`)
-	fmt.wprintln(w, `</div>`)
+		fmt.wprintln(w, `<div class="mt-5">`)
+			defer fmt.wprintln(w, `</div>`)
+
+			fmt.wprintf(
+				w,
+				`<a href="%s" class="link-primary text-decoration-node"><h3>%s</h3></a>`,
+				c.base_url,
+				c.home.title.? or_else c.name,
+			)
+
+			if d, ok := c.home.description.?; ok {
+				fmt.wprintf(w, `<p>%s</p>`, d)
+			}
+
+		if path, ok := c.home.embed_readme.?; ok {
+			log.infof("Writing readme from path at: %s", path)
+			write_readme(w, path)
+		}
+	}
 }
 
+write_readme :: proc(w: io.Writer, path: string) {
+	data, ok := os.read_entire_file_from_filename(path)
+	if !ok {
+		log.errorf("Could not read the file %q to render the readme", path)
+		return
+	}
+	defer delete(data)
+
+	root := cm.parse_document_from_string(string(data), cm.DEFAULT_OPTIONS)
+	defer cm.node_free(root)
+
+	log.debug("Removing first h1 from the readme (checking first 5 nodes)")
+
+	iter := cm.iter_new(root)
+	defer cm.iter_free(iter)
+	for _ in 0 ..= 5 {
+		node := cm.iter_get_node(iter)
+		log.debugf("Checking node %s", cm.node_get_type_string(node))
+
+		if cm.node_get_heading_level(node) == 1 {
+			cm.node_unlink(node)
+			cm.node_free(node)
+			log.debug("Removing node")
+			break
+		}
+
+		cm.iter_next(iter)
+	}
+
+	html := cm.render_html(root, cm.DEFAULT_OPTIONS)
+	defer cm.free(html)
+
+	io.write_string(w, string(html))
+}
 
 write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 	get_line_doc :: proc(pkg: ^doc.Pkg) -> (line_doc: string, ok: bool) {
@@ -358,21 +511,29 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 	}
 
 
-	fmt.wprintln(w, `<div class="row odin-main">`)
+	fmt.wprintln(w, `<div class="row odin-main my-4">`)
 	defer fmt.wprintln(w, `</div>`)
 
-
-	write_home_sidebar(w)
+	write_pkg_sidebar(w, nil, collection)
 
 	fmt.wprintln(w, `<article class="col-lg-10 p-4">`)
 	defer fmt.wprintln(w, `</article>`)
 	{
 		fmt.wprintln(w, `<article class="p-4">`)
 		fmt.wprintln(w, `<header class="collection-header">`)
-		fmt.wprintf(w, "<h1 style=\"text-transform: capitalize\">%s Library Collection</h1>\n", collection.name)
+		fmt.wprintf(
+			w,
+			"<h1 style=\"text-transform: capitalize\">%s Library Collection</h1>\n",
+			collection.name,
+		)
 		fmt.wprintln(w, "<ul>")
-		fmt.wprintf(w, "<li>License: <a href=\"{0:s}\">BSD-3-Clause</a></li>\n", GITHUB_LICENSE_URL)
-		fmt.wprintf(w, "<li>Repository: <a href=\"{0:s}\">{0:s}</a></li>\n", collection.github_url)
+		fmt.wprintf(
+			w,
+			"<li>License: <a href=\"%s\">%s</a></li>\n",
+			collection.license.url,
+			collection.license.text,
+		)
+		fmt.wprintf(w, "<li>Repository: <a href=\"{0:s}\">{0:s}</a></li>\n", collection.source_url)
 		fmt.wprintln(w, "</ul>")
 
 		write_search(w, .Collection)
@@ -478,7 +639,6 @@ write_where_clauses :: proc(w: io.Writer, where_clauses: []doc.String) {
 	}
 }
 
-
 Write_Type_Flag :: enum {
 	Is_Results,
 	Variadic,
@@ -487,7 +647,9 @@ Write_Type_Flag :: enum {
 	Ignore_Name,
 	Allow_Multiple_Lines,
 }
+
 Write_Type_Flags :: distinct bit_set[Write_Type_Flag]
+
 Type_Writer :: struct {
 	w:      io.Writer,
 	pkg:    doc.Pkg_Index,
@@ -497,7 +659,7 @@ Type_Writer :: struct {
 
 calc_name_width :: proc(type_entities: []doc.Entity_Index) -> (name_width: int) {
 	for entity_index in type_entities {
-		e := &entities[entity_index]
+		e := &cfg.entities[entity_index]
 		name := str(e.name)
 		name_width = max(len(name), name_width)
 	}
@@ -540,7 +702,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			io.write_string(w, init_string)
 			io.write_string(w, `</a>`)
 		case:
-			the_type := types[e.type]
+			the_type := cfg.types[e.type]
 			type_flags := flags - {.Is_Results}
 			if .Param_Ellipsis in e.flags {
 				type_flags += {.Variadic}
@@ -596,7 +758,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 					io.write_string(w, "typeid")
 					if ts := array(the_type.types); len(ts) == 1 {
 						io.write_byte(w, '/')
-						write_type(writer, types[ts[0]], type_flags)
+						write_type(writer, cfg.types[ts[0]], type_flags)
 					}
 				} else {
 					write_type(writer, the_type, type_flags)
@@ -612,7 +774,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 	write_poly_params :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type_Flags) {
 		if type.polymorphic_params != 0 {
 			io.write_byte(w, '(')
-			write_type(writer, types[type.polymorphic_params], flags+{.Poly_Names})
+			write_type(writer, cfg.types[type.polymorphic_params], flags+{.Poly_Names})
 			io.write_byte(w, ')')
 		}
 
@@ -636,7 +798,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		name_width := calc_name_width(type_entities)
 
 		for entity_index in type_entities {
-			e := &entities[entity_index]
+			e := &cfg.entities[entity_index]
 			width := len(str(e.name))
 			init := len(str(e.init_string))
 			if init != 0 {
@@ -700,11 +862,11 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			// io.write_string(w, str(type.name))
 		}
 	case .Named:
-		e := entities[type_entities[0]]
+		e := cfg.entities[type_entities[0]]
 		name := str(type.name)
-		tn_pkg := files[e.pos.file].pkg
+		tn_pkg := cfg.files[e.pos.file].pkg
 		collection: Collection
-		if c := pkg_to_collection[&pkgs[tn_pkg]]; c != nil {
+		if c := cfg.pkg_to_collection[&cfg.pkgs[tn_pkg]]; c != nil {
 			collection = c^
 		}
 
@@ -715,16 +877,28 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 				name_prefix = name_prefix[:n]
 			}
 			if !strings.contains_rune(name_prefix, '.') {
-				fmt.wprintf(w, `%s.`, str(pkgs[tn_pkg].name))
+				fmt.wprintf(w, `%s.`, str(cfg.pkgs[tn_pkg].name))
 			}
 		}
 		if .Private in e.flags {
 			io.write_string(w, name)
 		} else if n := strings.index_rune(name, '('); n >= 0 {
-			fmt.wprintf(w, `<a class="code-typename" href="{2:s}/{0:s}/#{1:s}">{1:s}</a>`, pkg_to_path[&pkgs[tn_pkg]], name[:n], collection.base_url)
+			fmt.wprintf(
+				w,
+				`<a class="code-typename" href="{2:s}/{0:s}/#{1:s}">{1:s}</a>`,
+				collection.pkg_to_path[&cfg.pkgs[tn_pkg]],
+				name[:n],
+				collection.base_url,
+			)
 			io.write_string(w, name[n:])
 		} else {
-			fmt.wprintf(w, `<a class="code-typename" href="{2:s}/{0:s}/#{1:s}">{1:s}</a>`, pkg_to_path[&pkgs[tn_pkg]], name, collection.base_url)
+			fmt.wprintf(
+				w,
+				`<a class="code-typename" href="{2:s}/{0:s}/#{1:s}">{1:s}</a>`,
+				collection.pkg_to_path[&cfg.pkgs[tn_pkg]],
+				name,
+				collection.base_url,
+			)
 		}
 	case .Generic:
 		name := str(type.name)
@@ -734,37 +908,37 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		io.write_string(w, name)
 		if name not_in generic_scope && len(array(type.types)) == 1 {
 			io.write_byte(w, '/')
-			write_type(writer, types[type_types[0]], flags)
+			write_type(writer, cfg.types[type_types[0]], flags)
 		}
 	case .Pointer:
 		io.write_byte(w, '^')
-		write_type(writer, types[type_types[0]], flags)
+		write_type(writer, cfg.types[type_types[0]], flags)
 	case .Array:
 		assert(type.elem_count_len == 1)
 		io.write_byte(w, '[')
 		io.write_uint(w, uint(type.elem_counts[0]))
 		io.write_byte(w, ']')
-		write_type(writer, types[type_types[0]], flags)
+		write_type(writer, cfg.types[type_types[0]], flags)
 	case .Enumerated_Array:
 		io.write_byte(w, '[')
-		write_type(writer, types[type_types[0]], flags)
+		write_type(writer, cfg.types[type_types[0]], flags)
 		io.write_byte(w, ']')
-		write_type(writer, types[type_types[1]], flags)
+		write_type(writer, cfg.types[type_types[1]], flags)
 	case .Slice:
 		if .Variadic in flags {
 			io.write_string(w, "..")
 		} else {
 			io.write_string(w, "[]")
 		}
-		write_type(writer, types[type_types[0]], flags - {.Variadic})
+		write_type(writer, cfg.types[type_types[0]], flags - {.Variadic})
 	case .Dynamic_Array:
 		io.write_string(w, "[<span class=\"keyword\">dynamic</span>]")
-		write_type(writer, types[type_types[0]], flags)
+		write_type(writer, cfg.types[type_types[0]], flags)
 	case .Map:
 		io.write_string(w, "<span class=\"keyword-type\">map</span>[")
-		write_type(writer, types[type_types[0]], flags)
+		write_type(writer, cfg.types[type_types[0]], flags)
 		io.write_byte(w, ']')
-		write_type(writer, types[type_types[1]], flags)
+		write_type(writer, cfg.types[type_types[1]], flags)
 	case .Struct:
 		type_flags := transmute(doc.Type_Flags_Struct)type.flags
 		io.write_string(w, "<span class=\"keyword-type\">struct</span>")
@@ -785,10 +959,10 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			name_width := calc_name_width(type_entities)
 
 			for entity_index, i in type_entities {
-				e := &entities[entity_index]
+				e := &cfg.entities[entity_index]
 				next_entity: ^doc.Entity = nil
 				if i+1 < len(type_entities) {
-					next_entity = &entities[type_entities[i+1]]
+					next_entity = &cfg.entities[type_entities[i+1]]
 				}
 				docs, comment := str(e.docs), str(e.comment)
 
@@ -825,7 +999,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			indent += 1
 			for type_index in type_types {
 				do_indent(writer, flags)
-				write_type(writer, types[type_index], flags)
+				write_type(writer, cfg.types[type_index], flags)
 				io.write_string(w, ", ")
 				do_newline(writer, flags)
 			}
@@ -837,7 +1011,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		io.write_string(w, "<span class=\"keyword-type\">enum</span>")
 		if len(type_types) != 0 {
 			io.write_byte(w, ' ')
-			write_type(writer, types[type_types[0]], flags)
+			write_type(writer, cfg.types[type_types[0]], flags)
 		}
 		io.write_string(w, " {")
 		do_newline(writer, flags)
@@ -847,7 +1021,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		field_width := calc_field_width(type_entities)
 
 		for entity_index, i in type_entities {
-			e := &entities[entity_index]
+			e := &cfg.entities[entity_index]
 			docs, comment := str(e.docs), str(e.comment)
 
 			write_lead_comment(writer, flags, docs, i)
@@ -888,7 +1062,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		if require_parens { io.write_byte(w, '(') }
 		all_blank := true
 		for entity_index, i in type_entities {
-			e := &entities[entity_index]
+			e := &cfg.entities[entity_index]
 			if name := str(e.name); name == "" || name == "_" {
 				if str(e.init_string) != "" {
 					all_blank = false
@@ -903,7 +1077,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		if .Allow_Multiple_Lines in flags && .Is_Results not_in flags {
 			span_multiple_lines = len(type_entities) >= 6
 
-			if strings.has_prefix(str(pkgs[pkg].name), "objc_") {
+			if strings.has_prefix(str(cfg.pkgs[pkg].name), "objc_") {
 				span_multiple_lines = true
 			}
 		}
@@ -913,7 +1087,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 				if i > 0 {
 					width += 2
 				}
-				width += len(str(entities[entity_index].name))
+				width += len(str(cfg.entities[entity_index].name))
 			}
 			return
 		}
@@ -929,7 +1103,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			for i := 0; i <= len(type_entities); i += 1 {
 				e: ^doc.Entity
 				if i != len(type_entities) {
-					e = &entities[type_entities[i]]
+					e = &cfg.entities[type_entities[i]]
 				}
 				if i+1 >= len(type_entities) || prev_field_group_index != e.field_group_index {
 					if i != len(type_entities) {
@@ -953,10 +1127,10 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 					defer j += 1
 
 
-					e := &entities[entity_index]
+					e := &cfg.entities[entity_index]
 					next_entity: ^doc.Entity = nil
 					if j+1 < len(type_entities) {
-						next_entity = &entities[type_entities[j+1]]
+						next_entity = &cfg.entities[type_entities[j+1]]
 					}
 
 					name_width := 0
@@ -971,14 +1145,14 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			io.write_string(w, "\n")
 		} else {
 			for entity_index, i in type_entities {
-				e := &entities[entity_index]
+				e := &cfg.entities[entity_index]
 
 				if i > 0 {
 					io.write_string(w, ", ")
 				}
 				next_entity: ^doc.Entity = nil
 				if i+1 < len(type_entities) {
-					next_entity = &entities[type_entities[i+1]]
+					next_entity = &cfg.entities[type_entities[i+1]]
 				}
 
 				write_param_entity(writer, e, next_entity, flags)
@@ -1004,12 +1178,12 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		params := array(type.types)[0]
 		results := array(type.types)[1]
 		io.write_byte(w, '(')
-		write_type(writer, types[params], flags)
+		write_type(writer, cfg.types[params], flags)
 		io.write_byte(w, ')')
 		if results != 0 {
 			assert(.Diverging not_in type_flags)
 			io.write_string(w, " -> ")
-			write_type(writer, types[results], flags+{.Is_Results})
+			write_type(writer, cfg.types[results], flags+{.Is_Results})
 		}
 		if .Diverging in type_flags {
 			io.write_string(w, " -> !")
@@ -1030,54 +1204,54 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			io.write_string(w, "..=")
 			io.write_uint(w, uint(type.elem_counts[1]))
 		} else {
-			write_type(writer, types[type_types[0]], flags)
+			write_type(writer, cfg.types[type_types[0]], flags)
 		}
 		if .Underlying_Type in type_flags {
 			io.write_string(w, "; ")
-			write_type(writer, types[type_types[1]], flags)
+			write_type(writer, cfg.types[type_types[1]], flags)
 		}
 		io.write_string(w, "]")
 	case .Simd_Vector:
 		io.write_string(w, "<span class=\"directive\">#simd</span>[")
 		io.write_uint(w, uint(type.elem_counts[0]))
 		io.write_byte(w, ']')
-		write_type(writer, types[type_types[0]], flags)
+		write_type(writer, cfg.types[type_types[0]], flags)
 	case .SOA_Struct_Fixed:
 		io.write_string(w, "<span class=\"directive\">#soa</span>[")
 		io.write_uint(w, uint(type.elem_counts[0]))
 		io.write_byte(w, ']')
-		write_type(writer, types[type_types[0]], flags)
+		write_type(writer, cfg.types[type_types[0]], flags)
 	case .SOA_Struct_Slice:
 		io.write_string(w, "<span class=\"directive\">#soa</span>[]")
-		write_type(writer, types[type_types[0]], flags)
+		write_type(writer, cfg.types[type_types[0]], flags)
 	case .SOA_Struct_Dynamic:
 		io.write_string(w, "<span class=\"directive\">#soa</span>[<span class=\"keyword\">dynamic</span>]")
-		write_type(writer, types[type_types[0]], flags)
+		write_type(writer, cfg.types[type_types[0]], flags)
 	case .Soa_Pointer:
 		io.write_string(w, "<span class=\"directive\">#soa</span>^")
-		if len(type_types) != 0 && len(types) != 0 {
-			write_type(writer, types[type_types[0]], flags)
+		if len(type_types) != 0 && len(cfg.types) != 0 {
+			write_type(writer, cfg.types[type_types[0]], flags)
 		}
 	case .Relative_Pointer:
 		io.write_string(w, "<span class=\"directive\">#relative</span>(")
-		write_type(writer, types[type_types[1]], flags)
+		write_type(writer, cfg.types[type_types[1]], flags)
 		io.write_string(w, ") ")
-		write_type(writer, types[type_types[0]], flags)
+		write_type(writer, cfg.types[type_types[0]], flags)
 	case .Relative_Multi_Pointer:
 		io.write_string(w, "<span class=\"directive\">#relative</span>(")
-		write_type(writer, types[type_types[1]], flags)
+		write_type(writer, cfg.types[type_types[1]], flags)
 		io.write_string(w, ") ")
-		write_type(writer, types[type_types[0]], flags)
+		write_type(writer, cfg.types[type_types[0]], flags)
 	case .Multi_Pointer:
 		io.write_string(w, "[^]")
-		write_type(writer, types[type_types[0]], flags)
+		write_type(writer, cfg.types[type_types[0]], flags)
 	case .Matrix:
 		io.write_string(w, "<span class=\"keyword-type\">matrix</span>[")
 		io.write_uint(w, uint(type.elem_counts[0]))
 		io.write_string(w, ", ")
 		io.write_uint(w, uint(type.elem_counts[1]))
 		io.write_string(w, "]")
-		write_type(writer, types[type_types[0]], flags)
+		write_type(writer, cfg.types[type_types[0]], flags)
 	}
 }
 
@@ -1387,7 +1561,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 			for len(lines) > 0 && (strings.trim_space(lines[len(lines) - 1]) == "") {
 				lines = lines[:len(lines) - 1]
 			}
-			for line in &lines {
+			for &line in lines {
 				line = escape_html_string(line)
 			}
 			return lines
@@ -1491,7 +1665,11 @@ write_breadcrumbs :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection:
 		}
 
 		trimmed_path := strings.join(dirs[:i+1], "/", context.temp_allocator)
-		if _, ok := collection.pkgs_to_use[trimmed_path]; ok {
+
+		// When the collection and the package are at the same root path.
+		if trimmed_path == "" do continue
+
+		if _, ok := collection.pkgs[trimmed_path]; ok {
 			fmt.wprintf(w, "<li class=\"breadcrumb-item%s\"><a href=\"%s/%s\">%s</a></li>\n", is_active_string, collection.base_url, trimmed_path, dir)
 		} else {
 			fmt.wprintf(w, "<li class=\"breadcrumb-item\">%s</li>\n", dir)
@@ -1508,7 +1686,6 @@ find_entity_attribute :: proc(e: ^doc.Entity, key: string) -> (value: string, ok
 	}
 	return
 }
-
 
 Pkg_Entries :: struct {
 	procs:       [dynamic]doc.Scope_Entry,
@@ -1528,7 +1705,7 @@ entity_key :: proc(entry: doc.Scope_Entry) -> string {
 
 pkg_entries_gather :: proc(pkg: ^doc.Pkg) -> (entries: Pkg_Entries) {
 	for entry in array(pkg.entries) {
-		e := &entities[entry.entity]
+		e := &cfg.entities[entry.entity]
 		name := str(e.name)
 		if name == "" || name[0] == '_' {
 			continue
@@ -1627,7 +1804,7 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 
 	parent: ^doc.Entity
 	for entry in array(pkg.entries) {
-		e := &entities[entry.entity]
+		e := &cfg.entities[entry.entity]
 		if e.kind == .Type_Name && str(e.name) == objc_type {
 			parent = e
 			break
@@ -1654,11 +1831,11 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 
 	write_syntax_usage :: proc(w: io.Writer, e: ^doc.Entity, objc_name: string, parent: ^doc.Entity, is_class_method: bool) {
 		assert(e.kind == .Procedure)
-		pt := base_type(types[e.type])
+		pt := base_type(cfg.types[e.type])
 		pentities: []doc.Entity_Index
 		rentities: []doc.Entity_Index
 
-		params := &types[array(pt.types)[0]]
+		params := &cfg.types[array(pt.types)[0]]
 		if params.kind == .Tuple {
 			pentities = array(params.entities)
 			if !is_class_method {
@@ -1666,7 +1843,7 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 			}
 		}
 
-		results := &types[array(pt.types)[1]]
+		results := &cfg.types[array(pt.types)[1]]
 		if results.kind == .Tuple {
 			rentities = array(results.entities)
 		}
@@ -1676,7 +1853,7 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 				if i != 0 {
 					fmt.wprintf(w, ", ")
 				}
-				e := &entities[e_idx]
+				e := &cfg.entities[e_idx]
 				name := str(e.name)
 				if name != "" {
 					fmt.wprintf(w, "%s", name)
@@ -1701,7 +1878,7 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 		if len(pentities) > 1 {
 			fmt.wprintf(w, "\n")
 			for e_idx, i in pentities {
-				e := &entities[e_idx]
+				e := &cfg.entities[e_idx]
 				fmt.wprintf(w, "\t%s,\n", str(e.name))
 			}
 		} else {
@@ -1709,7 +1886,7 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 				if i != 0 {
 					fmt.wprintf(w, ", ")
 				}
-				entity := &entities[e_idx]
+				entity := &cfg.entities[e_idx]
 				fmt.wprintf(w, "%s", str(entity.name))
 			}
 		}
@@ -1721,7 +1898,7 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 		write_syntax_usage(w, e, objc_name, parent, is_class_method)
 	case .Proc_Group:
 		for e_idx in array(e.grouped_entities) {
-			entity := &entities[e_idx]
+			entity := &cfg.entities[e_idx]
 			write_syntax_usage(w, entity, objc_name, parent, is_class_method)
 		}
 	}
@@ -1736,7 +1913,7 @@ write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, met
 	parent_name := str(parent.name)
 
 	for entry in array(pkg.entries) {
-		e := &entities[entry.entity]
+		e := &cfg.entities[entry.entity]
 		if e.kind == .Proc_Group {
 			if type_name, ok := find_entity_attribute(e, "objc_type"); ok && parent_name == type_name {
 				append(&methods, e)
@@ -1744,7 +1921,7 @@ write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, met
 		}
 	}
 	for entry in array(pkg.entries) {
-		e := &entities[entry.entity]
+		e := &cfg.entities[entry.entity]
 		if e.kind == .Procedure {
 			if type_name, ok := find_entity_attribute(e, "objc_type"); ok && parent_name == type_name {
 				append(&methods, e)
@@ -1766,10 +1943,20 @@ write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, met
 		if method_names_seen[method_name] {
 			continue loop
 		}
+
+		collection := cfg.pkg_to_collection[pkg]
+
 		method_names_seen[method_name] = true
 		if !seen_item {
 			if is_inherited {
-				fmt.wprintf(w, `<h6>Methods Inherited From <a href="%s/%s/#%s">%s</a></h6>`, pkg_to_collection[pkg].base_url, pkg_to_path[pkg], parent_name, parent_name)
+				fmt.wprintf(
+					w,
+					`<h6>Methods Inherited From <a href="%s/%s/#%s">%s</a></h6>`,
+					collection.base_url,
+					collection.pkg_to_path[pkg],
+					parent_name,
+					parent_name,
+				)
 				fmt.wprintln(w)
 			} else {
 				fmt.wprintln(w, "<h5>Bound Objective-C Methods</h5>")
@@ -1779,7 +1966,14 @@ write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, met
 		}
 
 		fmt.wprintf(w, "<li>")
-		fmt.wprintf(w, `<a href="%s/%s/#%s">%s</a>`, pkg_to_collection[pkg].base_url, pkg_to_path[pkg], str(e.name), method_name)
+		fmt.wprintf(
+			w,
+			`<a href="%s/%s/#%s">%s</a>`,
+			collection.base_url,
+			collection.pkg_to_path[pkg],
+			str(e.name),
+			method_name,
+		)
 
 		if v, ok := find_entity_attribute(e, "objc_is_class_method"); ok && v == "true" {
 			fmt.wprintf(w, `&nbsp;<em>(class method)</em>`)
@@ -1800,15 +1994,15 @@ write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, met
 	delete(methods)
 
 	recursive_inheritance_check: {
-		parent_type := base_type(types[parent.type])
+		parent_type := base_type(cfg.types[parent.type])
 		assert(parent_type.kind == .Struct)
 		fields := array(parent_type.entities)
 		for field_idx := len(fields)-1; field_idx >= 0; field_idx -= 1 {
-			field := &entities[fields[field_idx]]
+			field := &cfg.entities[fields[field_idx]]
 			if .Param_Using in field.flags {
-				field_type := types[field.type]
-				field_type_entity := &entities[array(field_type.entities)[0]]
-				field_pkg := &pkgs[files[field.pos.file].pkg]
+				field_type := cfg.types[field.type]
+				field_type_entity := &cfg.entities[array(field_type.entities)[0]]
+				field_pkg := &cfg.pkgs[cfg.files[field.pos.file].pkg]
 				write_objc_methods(w, field_pkg, field_type_entity, method_names_seen, true)
 			}
 		}
@@ -1826,23 +2020,23 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 
 			parent_name := str(parent.name)
 
-			pt := base_type(types[e.type])
+			pt := base_type(cfg.types[e.type])
 			assert(pt.kind == .Proc)
-			params := array(types[array(pt.types)[int(is_output)]].entities)
+			params := array(cfg.types[array(pt.types)[int(is_output)]].entities)
 			for param_idx in params {
-				t := types[entities[param_idx].type]
+				t := cfg.types[cfg.entities[param_idx].type]
 				#partial switch t.kind {
 				case .Named, .Generic:
 					// okay
 				case .Pointer:
-					t = types[array(t.types)[0]]
+					t = cfg.types[array(t.types)[0]]
 				case:
 					continue
 				}
 
 				#partial switch t.kind {
 				case .Named:
-					named_entity := &entities[array(t.entities)[0]]
+					named_entity := &cfg.entities[array(t.entities)[0]]
 					if parent == named_entity {
 						return e, true
 					}
@@ -1856,7 +2050,7 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 					if len(type_types) != 1 {
 						continue
 					}
-					gt := types[type_types[0]]
+					gt := cfg.types[type_types[0]]
 					if gt.kind != .Named {
 						continue
 					}
@@ -1870,7 +2064,7 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 			return
 		}
 
-		e := &entities[entry.entity]
+		e := &cfg.entities[entry.entity]
 		#partial switch e.kind {
 		case .Procedure:
 			if strings.has_prefix(str(e.name), "_") {
@@ -1889,14 +2083,14 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 				continue
 			}
 			for entity_idx in array(e.grouped_entities) {
-				pe := &entities[entity_idx]
+				pe := &cfg.entities[entity_idx]
 				if p, ok := check_proc(pe, parent, false); ok {
 					append(&related_procs_in_parameters, e)
 					break
 				}
 			}
 			if !is_inherited do for entity_idx in array(e.grouped_entities) {
-				pe := &entities[entity_idx]
+				pe := &cfg.entities[entity_idx]
 				if p, ok := check_proc(pe, parent, true); ok {
 					append(&related_procs_in_return_types, e)
 					break
@@ -1930,10 +2124,20 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 			if proc_names_seen[proc_name] {
 				continue parameter_loop
 			}
+
+			collection := cfg.pkg_to_collection[pkg]
+
 			proc_names_seen[proc_name] = true
 			if !seen_item {
 				if is_inherited {
-					fmt.wprintf(w, "<h6>Procedures Through `using` From "+`<a href="%s/%s/#%s">%s</a></h6>`, pkg_to_collection[pkg].base_url, pkg_to_path[pkg], parent_name, parent_name)
+					fmt.wprintf(
+						w,
+						"<h6>Procedures Through `using` From "+`<a href="%s/%s/#%s">%s</a></h6>`,
+						collection.base_url,
+						collection.pkg_to_path[pkg],
+						parent_name,
+						parent_name,
+					)
 					fmt.wprintln(w)
 				} else {
 					fmt.wprintf(w, "<h5>%s</h5>\n", title)
@@ -1943,7 +2147,14 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 			}
 
 			fmt.wprintf(w, "<li>")
-			fmt.wprintf(w, `<a href="%s/%s/#%s">%s</a>`, pkg_to_collection[pkg].base_url, pkg_to_path[pkg], proc_name, proc_name)
+			fmt.wprintf(
+				w,
+				`<a href="%s/%s/#%s">%s</a>`,
+				collection.base_url,
+				collection.pkg_to_path[pkg],
+				proc_name,
+				proc_name,
+			)
 
 			if e.kind == .Proc_Group {
 				fmt.wprintf(w, `&nbsp;<em>(procedure groups)</em>`)
@@ -1966,24 +2177,24 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 	delete(related_procs_in_return_types)
 
 	{ // recursive_inheritance_check
-		parent_type := types[parent.type]
+		parent_type := cfg.types[parent.type]
 		for parent_type.kind == .Named {
-			parent_type = types[array(parent_type.types)[0]]
+			parent_type = cfg.types[array(parent_type.types)[0]]
 		}
 		if parent_type.kind != .Struct {
 			return
 		}
 		for entity_index in array(parent_type.entities) {
-			field := &entities[entity_index]
+			field := &cfg.entities[entity_index]
 			if .Param_Using not_in field.flags {
 				continue
 			}
-			field_type := types[field.type]
+			field_type := cfg.types[field.type]
 			if field_type.entities.length == 0 {
 				continue
 			}
-			field_type_entity := &entities[array(field_type.entities)[0]]
-			field_pkg := &pkgs[files[field.pos.file].pkg]
+			field_type_entity := &cfg.entities[array(field_type.entities)[0]]
+			field_pkg := &cfg.pkgs[cfg.files[field.pos.file].pkg]
 			write_related_procedures(w, field_pkg, field_type_entity, proc_names_seen, true)
 		}
 	}
@@ -2007,7 +2218,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	write_entity_reference :: proc(w: io.Writer, pkg: ^doc.Pkg, entity: ^doc.Entity) {
 		name := str(entity.name)
 
-		this_pkg := &pkgs[files[entity.pos.file].pkg]
+		this_pkg := &cfg.pkgs[cfg.files[entity.pos.file].pkg]
 		if .Builtin_Pkg_Builtin in entity.flags {
 			fmt.wprintf(w, `<a href="/core/builtin#{0:s}">builtin</a>.{0:s}`, name)
 			return
@@ -2017,39 +2228,38 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		} else if pkg != this_pkg {
 			fmt.wprintf(w, "%s.", str(this_pkg.name))
 		}
-		collection := pkg_to_collection[this_pkg]
+		collection := cfg.pkg_to_collection[this_pkg]
 
 		class := ""
 		if entity.kind == .Procedure {
 			class = "code-procedure"
 		}
 
-		fmt.wprintf(w, `<a class="{3:s}" href="{2:s}/{0:s}/#{1:s}">`, pkg_to_path[this_pkg], name, collection.base_url, class)
+		fmt.wprintf(w, `<a class="{3:s}" href="{2:s}/{0:s}/#{1:s}">`, collection.pkg_to_path[this_pkg], name, collection.base_url, class)
 		io.write_string(w, name)
 		io.write_string(w, `</a>`)
 	}
 
 	name := str(entry.name)
-	e := &entities[entry.entity]
+	e := &cfg.entities[entry.entity]
 	entity_name := str(e.name)
 
 
-	entity_pkg_index := files[e.pos.file].pkg
-	entity_pkg := &pkgs[entity_pkg_index]
+	entity_pkg_index := cfg.files[e.pos.file].pkg
+	entity_pkg := &cfg.pkgs[entity_pkg_index]
 	writer := &Type_Writer{
 		w = w,
-		pkg = doc.Pkg_Index(intrinsics.ptr_sub(pkg, &pkgs[0])),
+		pkg = doc.Pkg_Index(intrinsics.ptr_sub(pkg, &cfg.pkgs[0])),
 	}
 	defer delete(writer.generic_scope)
-	collection := pkg_to_collection[pkg]
-	github_url := collection.github_url if collection != nil else GITHUB_CORE_URL
+	collection := cfg.pkg_to_collection[pkg]
 
-	path := pkg_to_path[pkg]
-	filename := slashpath.base(str(files[e.pos.file].name))
+	path := collection.pkg_to_path[pkg]
+	filename := slashpath.base(str(cfg.files[e.pos.file].name))
 	fmt.wprintf(w, "<h3 id=\"{0:s}\"><span><a class=\"doc-id-link\" href=\"#{0:s}\">{0:s}", name)
 	fmt.wprintf(w, "<span class=\"a-hidden\">&nbsp;¶</span></a></span>")
 	if e.pos.file != 0 && e.pos.line > 0 {
-		src_url := fmt.tprintf("%s/%s/%s#L%d", github_url, path, filename, e.pos.line)
+		src_url := fmt.tprintf("%s/%s/%s#L%d", collection.source_url, path, filename, e.pos.line)
 		fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", src_url)
 	}
 	fmt.wprintf(w, "</h3>\n")
@@ -2066,7 +2276,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			// ignore
 		case .Constant:
 			fmt.wprint(w, `<pre class="doc-code">`)
-			the_type := types[e.type]
+			the_type := cfg.types[e.type]
 
 			init_string := str(e.init_string)
 			assert(init_string != "")
@@ -2096,7 +2306,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			fmt.wprint(w, `<pre class="doc-code">`)
 			write_attributes(w, e)
 			fmt.wprintf(w, "%s: ", name)
-			write_type(writer, types[e.type], {.Allow_Indent})
+			write_type(writer, cfg.types[e.type], {.Allow_Indent})
 			init_string := str(e.init_string)
 			if init_string != "" {
 				io.write_string(w, " = ")
@@ -2110,7 +2320,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 
 			// write_attributes(w, e)
 			fmt.wprintf(w, "%s :: ", name)
-			the_type := types[e.type]
+			the_type := cfg.types[e.type]
 			type_to_print := the_type
 			if base_type(type_to_print).kind == .Basic && str(pkg.name) == "c" {
 				io.write_string(w, str(e.init_string))
@@ -2118,7 +2328,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			}
 
 			if the_type.kind == .Named && .Type_Alias not_in e.flags {
-				if e.pos == entities[array(the_type.entities)[0]].pos {
+				if e.pos == cfg.entities[array(the_type.entities)[0]].pos {
 					bt := base_type(the_type)
 					#partial switch bt.kind {
 					case .Struct, .Union, .Proc, .Enum:
@@ -2138,7 +2348,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		case .Procedure:
 			fmt.wprint(w, `<pre class="doc-code">`)
 			fmt.wprintf(w, "%s :: ", name)
-			write_type(writer, types[e.type], {.Allow_Multiple_Lines})
+			write_type(writer, cfg.types[e.type], {.Allow_Multiple_Lines})
 			write_where_clauses(w, array(e.where_clauses))
 			if .Foreign in e.flags {
 				fmt.wprint(w, " ---")
@@ -2153,7 +2363,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			fmt.wprint(w, `<pre class="doc-code">`)
 			fmt.wprintf(w, "%s :: proc{{\n", name)
 			for entity_index in array(e.grouped_entities) {
-				this_proc := &entities[entity_index]
+				this_proc := &cfg.entities[entity_index]
 				io.write_byte(w, '\t')
 				write_entity_reference(w, pkg, this_proc)
 				io.write_byte(w, ',')
@@ -2203,7 +2413,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 }
 
 write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^Collection, pkg_entries: Pkg_Entries) {
-	fmt.wprintln(w, `<div class="row odin-main" id="pkg">`)
+	fmt.wprintln(w, `<div class="row odin-main my-4" id="pkg">`)
 	defer fmt.wprintln(w, `</div>`)
 
 	write_pkg_sidebar(w, pkg, collection)
@@ -2212,9 +2422,14 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 
 	write_breadcrumbs(w, path, pkg, collection)
 
-	fmt.wprintf(w, "<h1>package %s:%s", strings.to_lower(collection.name, context.temp_allocator), path)
+	fmt.wprintf(w, "<h1>package %s", strings.to_lower(collection.name, context.temp_allocator))
 
-	pkg_src_url := fmt.tprintf("%s/%s", collection.github_url, path)
+	// Is empty when the collection and package are at the same root path.
+	if path != "" {
+		fmt.wprintf(w, ":%s", path)
+	}
+
+	pkg_src_url := fmt.tprintf("%s/%s", collection.source_url, path)
 	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", pkg_src_url)
 	fmt.wprintf(w, "</h1>\n")
 
@@ -2299,7 +2514,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	fmt.wprintln(w, "<ul>")
 	any_hidden := false
 	source_file_loop: for file_index in array(pkg.files) {
-		file := files[file_index]
+		file := cfg.files[file_index]
 		filename := slashpath.base(str(file.name))
 		switch {
 		case
@@ -2320,7 +2535,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			any_hidden = true
 			continue source_file_loop
 		}
-		fmt.wprintf(w, `<li><a href="%s/%s/%s">%s</a></li>`, collection.github_url, path, filename, filename)
+		fmt.wprintf(w, `<li><a href="%s/%s/%s">%s</a></li>`, collection.source_url, path, filename, filename)
 		fmt.wprintln(w)
 	}
 	if any_hidden {
@@ -2366,3 +2581,4 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	fmt.wprintf(w, `<script type="text/javascript">var odin_pkg_name = "%s";</script>`+"\n", str(pkg.name))
 
 }
+

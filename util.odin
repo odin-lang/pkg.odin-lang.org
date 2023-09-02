@@ -1,54 +1,20 @@
 package odin_html_docs
 
-import doc "core:odin/doc-format"
 import "core:fmt"
-import "core:os"
-import "core:strings"
-import "core:slice"
 import "core:intrinsics"
+import "core:os"
+import "core:slice"
+import "core:strings"
 
-GITHUB_LICENSE_URL :: "https://github.com/odin-lang/Odin/tree/master/LICENSE"
-GITHUB_CORE_URL    :: "https://github.com/odin-lang/Odin/tree/master/core"
-GITHUB_VENDOR_URL  :: "https://github.com/odin-lang/Odin/tree/master/vendor"
-BASE_CORE_URL      :: "/core"
-BASE_VENDOR_URL    :: "/vendor"
-
-//
-// Format Specific
-//
-
-// global of things from the file itself
-header:   ^doc.Header
-files:    []doc.File
-pkgs:     []doc.Pkg
-entities: []doc.Entity
-types:    []doc.Type
-
-// global maps
-core_pkgs_to_use:   map[string]^doc.Pkg // trimmed path
-vendor_pkgs_to_use: map[string]^doc.Pkg // trimmed path
-pkg_to_path:        map[^doc.Pkg]string // trimmed path
-pkg_to_collection:  map[^doc.Pkg]^Collection
-
-
-
-Collection :: struct {
-	name: string,
-	pkgs_to_use: ^map[string]^doc.Pkg,
-	github_url: string,
-	base_url:   string,
-	root: ^Dir_Node,
-
-	pkg_entries_map: map[^doc.Pkg]Pkg_Entries,
-}
+import doc "core:odin/doc-format"
 
 array :: proc(a: $A/doc.Array($T)) -> []T {
-	return doc.from_array(header, a)
-}
-str :: proc(s: $A/doc.String) -> string {
-	return doc.from_string(header, s)
+	return doc.from_array(cfg.header, a)
 }
 
+str :: proc(s: $A/doc.String) -> string {
+	return doc.from_string(cfg.header, s)
+}
 
 base_type :: proc(t: doc.Type) -> doc.Type {
 	t := t
@@ -56,7 +22,7 @@ base_type :: proc(t: doc.Type) -> doc.Type {
 		if t.kind != .Named {
 			break
 		}
-		t = types[array(t.types)[0]]
+		t = cfg.types[array(t.types)[0]]
 	}
 	return t
 }
@@ -65,7 +31,7 @@ type_deref :: proc(t: doc.Type) -> doc.Type {
 	bt := base_type(t)
 	#partial switch bt.kind {
 	case .Pointer:
-		return types[array(bt.types)[0]]
+		return cfg.types[array(bt.types)[0]]
 	}
 	return t
 }
@@ -79,17 +45,15 @@ is_type_untyped :: proc(type: doc.Type) -> bool {
 }
 
 is_entity_blank :: proc(e: doc.Entity_Index) -> bool {
-	name := str(entities[e].name)
+	name := str(cfg.entities[e].name)
 	return name == ""
 }
 
-
-
 Dir_Node :: struct {
-	dir: string,
-	path: string,
-	name: string,
-	pkg: ^doc.Pkg,
+	dir:      string,
+	path:     string,
+	name:     string,
+	pkg:      ^doc.Pkg,
 	children: [dynamic]^Dir_Node,
 }
 
