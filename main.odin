@@ -409,9 +409,18 @@ write_home_sidebar :: proc(w: io.Writer) {
 	defer fmt.wprintln(w, `</div>`)
 
 	fmt.wprintln(w, `<ul class="nav nav-pills d-flex flex-column">`)
-	fmt.wprintln(w, `<li class="nav-item"><a class="nav-link" href="/core">Core Library</a></li>`)
-	fmt.wprintln(w, `<li class="nav-item"><a class="nav-link" href="/vendor">Vendor Library</a></li>`)
-	fmt.wprintln(w, `</ul>`)
+	defer fmt.wprintln(w, `</ul>`)
+
+	for _, c in cfg.collections {
+		if c.hidden do continue
+
+		fmt.wprintf(
+			w,
+			`<li class="nav-item"><a class="nav-link" style="text-transform: capitalize;" href="%s">%s Library</a></li>`,
+			c.base_url,
+			c.name,
+		)
+	}
 }
 
 write_home_page :: proc(w: io.Writer) {
@@ -526,16 +535,8 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 			"<h1 style=\"text-transform: capitalize\">%s Library Collection</h1>\n",
 			collection.name,
 		)
-		fmt.wprintln(w, "<ul>")
-		fmt.wprintf(
-			w,
-			"<li>License: <a href=\"%s\">%s</a></li>\n",
-			collection.license.url,
-			collection.license.text,
-		)
-		fmt.wprintf(w, "<li>Repository: <a href=\"{0:s}\">{0:s}</a></li>\n", collection.source_url)
-		fmt.wprintln(w, "</ul>")
 
+		write_license(w, collection)
 		write_search(w, .Collection)
 
 		fmt.wprintln(w, "</header>")
@@ -625,6 +626,18 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 	fmt.wprintln(w, "\t\t</tbody>")
 	fmt.wprintln(w, "\t</table>")
 	fmt.wprintln(w, "</div>")
+}
+
+write_license :: proc(w: io.Writer, collection: ^Collection) {
+	fmt.wprintln(w, "<ul class=\"license\">")
+	fmt.wprintf(
+		w,
+		"<li>License: <a href=\"%s\">%s</a></li>\n",
+		collection.license.url,
+		collection.license.text,
+	)
+	fmt.wprintf(w, "<li>Repository: <a href=\"{0:s}\">{0:s}</a></li>\n", collection.source_url)
+	fmt.wprintln(w, "</ul>")
 }
 
 write_where_clauses :: proc(w: io.Writer, where_clauses: []doc.String) {
@@ -1602,7 +1615,12 @@ write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collect
 	fmt.wprintln(w, `<div class="py-3">`)
 	defer fmt.wprintln(w, `</div>`)
 
-	fmt.wprintf(w, "<h4 style=\"text-transform: capitalize\">%s Library</h4>\n", collection.name)
+	fmt.wprintf(
+		w,
+		"<h4><a style=\"text-transform: capitalize; color: inherit;\" href=\"%s\">%s Library</a></h4>\n",
+		collection.base_url,
+		collection.name,
+	)
 
 	fmt.wprintln(w, `<ul>`)
 	defer fmt.wprintln(w, `</ul>`)
@@ -2425,13 +2443,20 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	fmt.wprintf(w, "<h1>package %s", strings.to_lower(collection.name, context.temp_allocator))
 
 	// Is empty when the collection and package are at the same root path.
-	if path != "" {
+	collection_root_is_package := path == ""
+
+	if !collection_root_is_package {
 		fmt.wprintf(w, ":%s", path)
 	}
 
 	pkg_src_url := fmt.tprintf("%s/%s", collection.source_url, path)
 	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", pkg_src_url)
 	fmt.wprintf(w, "</h1>\n")
+
+	// When this is the case, the collection page does not exists, so show license here.
+	if collection_root_is_package {
+		write_license(w, collection)
+	}
 
 	write_search(w, .Package)
 
