@@ -2,6 +2,7 @@ package odin_html_docs
 
 import "core:encoding/json"
 import "core:fmt"
+import "core:log"
 import "core:os"
 import "core:strings"
 
@@ -89,21 +90,14 @@ collection_validate :: proc(c: ^Collection) -> Maybe(Collection_Error) {
 	c.base_url = strings.trim_suffix(c.base_url, "/")
 	c.source_url = strings.trim_suffix(c.source_url, "/")
 
-	resolved_root, was_alloc := strings.replace(c.root_path, "$ODIN_ROOT", ODIN_ROOT, 1)
-	if was_alloc {
-		delete(c.root_path)
-		c.root_path = resolved_root
-	}
+	new_root_path, was_alloc := do_replacements(c.root_path)
+	if was_alloc do delete(c.root_path)
+	c.root_path = new_root_path
 
-	if strings.contains(c.root_path, "$PWD") {
-		@(static) pwd: Maybe(string)
-		if pwd == nil {
-			pwd = os.get_current_directory()
-		}
-
-		resolved_cwd, _ := strings.replace(c.root_path, "$PWD", pwd.?, 1)
-		delete(c.root_path)
-		c.root_path = resolved_cwd
+	if rm, ok := c.home.embed_readme.?; ok {
+		new_rm, was_rm_alloc := do_replacements(rm)
+		if was_rm_alloc do delete(rm)
+		c.home.embed_readme = new_rm
 	}
 
 	return nil
@@ -115,7 +109,7 @@ config_default :: proc() -> (c: Config) {
 	return
 }
 
-config_merge_from_file :: proc(c: ^Config, file: string,) -> (file_ok: bool, err: json.Unmarshal_Error) {
+config_merge_from_file :: proc(c: ^Config, file: string) -> (file_ok: bool, err: json.Unmarshal_Error) {
 	data: []byte
 	data, file_ok = os.read_entire_file_from_filename(file)
 	if !file_ok do return
@@ -129,6 +123,35 @@ config_merge_from_file :: proc(c: ^Config, file: string,) -> (file_ok: bool, err
 			}
 		}
 	}
+
+	return
+}
+
+// Replaces $ODIN_ROOT with ODIN_ROOT, $PWD with the pwd and turns it into an absolute path.
+do_replacements :: proc(path: string) -> (res: string, allocated: bool) {
+	res, allocated = strings.replace(path, "$ODIN_ROOT", ODIN_ROOT, 1)
+
+	if strings.contains(res, "$PWD") {
+		@(static) pwd: Maybe(string)
+		if pwd == nil {
+			pwd = os.get_current_directory()
+		}
+
+		resolved_cwd, _ := strings.replace(res, "$PWD", pwd.?, 1)
+		if allocated do delete(res)
+		res = resolved_cwd
+		allocated = true
+	}
+
+	abs, errno := os.absolute_path_from_relative(res)
+	if errno != os.ERROR_NONE {
+		log.warnf("Could not resolve absolute path from %q, errno: %i", res, errno)
+		return
+	}
+
+	if allocated do delete(res)
+	res = abs
+	allocated = true
 
 	return
 }
