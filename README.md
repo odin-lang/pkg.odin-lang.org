@@ -90,10 +90,9 @@ Here is an example config file with comments, you should remove any comments so 
 			"source_url": "https://github.com/odin-lang/Odin/blob/main",
 			// This URL is the prefix of your collection, core will be at /core, vendor at /vendor.
 			"base_url": "/foo",
-			// The root of the project, because you will probably be in a subdirectory, you can use
-			// $PWD and it will be replaced with the current directory when you invoke the `odin-doc` program.
+			// The root of the project, because you will probably be in a subdirectory, you can use a relative path.
 			// You can also use $ODIN_ROOT which is replaced by the directory that contains the Odin core and vendor collections.
-			"root_path": "$PWD/../..",
+			"root_path": "$ODIN_ROOTfoo",
 			"license": {
 				"text": "BSD-3-Clause",
 				"url": "https://github.com/odin-lang/Odin/tree/master/LICENSE"
@@ -104,7 +103,7 @@ Here is an example config file with comments, you should remove any comments so 
 				// The program can turn a readme into HTML and put it on the homepage.
 				// The first h1 it finds will be replaced by one with a link and the title above.
 				// You can leave this empty and provide a "description" instead.
-				"embed_readme": "$PWD/../../README.md",
+				"embed_readme": "../../README.md",
 				// Instead of embedding the readme, you can provide a simple description.
 				"description": "Hello Foo!"
 			}

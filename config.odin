@@ -97,13 +97,13 @@ collection_validate :: proc(c: ^Collection) -> Maybe(Collection_Error) {
 	c.base_url = strings.trim_suffix(c.base_url, "/")
 	c.source_url = strings.trim_suffix(c.source_url, "/")
 
-	new_root_path, was_alloc := config_do_replacements(c.root_path)
-	if was_alloc do delete(c.root_path)
+	new_root_path := config_do_replacements(c.root_path)
+	delete(c.root_path)
 	c.root_path = new_root_path
 
 	if rm, ok := c.home.embed_readme.?; ok {
-		new_rm, was_rm_alloc := config_do_replacements(rm)
-		if was_rm_alloc do delete(rm)
+		new_rm := config_do_replacements(rm)
+		delete(rm)
 		c.home.embed_readme = new_rm
 	}
 
@@ -148,31 +148,16 @@ config_sort_collections :: proc(c: ^Config) {
 	)
 }
 
-// Replaces $ODIN_ROOT with ODIN_ROOT, $PWD with the pwd and turns it into an absolute path.
-config_do_replacements :: proc(path: string) -> (res: string, allocated: bool) {
-	res, allocated = strings.replace(path, "$ODIN_ROOT", ODIN_ROOT, 1)
-
-	if strings.contains(res, "$PWD") {
-		@(static) pwd: Maybe(string)
-		if pwd == nil {
-			pwd = os.get_current_directory()
-		}
-
-		resolved_cwd, _ := strings.replace(res, "$PWD", pwd.?, 1)
-		if allocated do delete(res)
-		res = resolved_cwd
-		allocated = true
-	}
+// Replaces $ODIN_ROOT with ODIN_ROOT, and turns it into an absolute path.
+config_do_replacements :: proc(path: string) -> string {
+	res, allocated := strings.replace(path, "$ODIN_ROOT", ODIN_ROOT, 1)
 
 	abs, errno := os.absolute_path_from_relative(res)
 	if errno != os.ERROR_NONE {
 		log.warnf("Could not resolve absolute path from %q, errno: %i", res, errno)
-		return
+		return res
 	}
 
 	if allocated do delete(res)
-	res = abs
-	allocated = true
-
-	return
+	return abs
 }
