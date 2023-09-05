@@ -49,8 +49,8 @@ main :: proc() {
 			errorf("there must be collections defined in the config")
 		}
 
-		for _, &c in cfg.collections {
-			if err, has_err := collection_validate(&c).?; has_err {
+		for c in cfg.collections {
+			if err, has_err := collection_validate(c).?; has_err {
 				errorf(err)
 			}
 		}
@@ -83,7 +83,7 @@ main :: proc() {
 	}
 
 	when ODIN_DEBUG {
-		for _, c in cfg.collections {
+		for c in cfg.collections {
 			log.debugf(`Collection %q configured with:
 	Source URL: %s
 	Base URL: %s
@@ -127,9 +127,9 @@ main :: proc() {
 			}
 
 			collection: ^Collection
-			for _, &c in cfg.collections {
+			for c in cfg.collections {
 				if strings.has_prefix(fullpath, c.root_path) {
-					collection = &c
+					collection = c
 					break
 				}
 			}
@@ -168,9 +168,9 @@ main :: proc() {
 	defer strings.builder_destroy(&b)
 	w := strings.to_writer(&b)
 
-	for _, &c in cfg.collections {
+	for c in cfg.collections {
 		c.root = generate_directory_tree(c.pkgs)
-		generate_packages(&b, &c)
+		generate_packages(&b, c)
 	}
 
 	{
@@ -182,7 +182,7 @@ main :: proc() {
 	}
 
 	not_hidden: [dynamic]^Collection
-	for _, &c in cfg.collections {
+	for c in cfg.collections {
 		if cfg.hide_core && (c.name == "core" || c.name == "vendor") {
 			log.infof(
 				"Core is set to be hidden so collection %q will be excluded from search results",
@@ -191,7 +191,7 @@ main :: proc() {
 			continue
 		}
 
-		append(&not_hidden, &c)
+		append(&not_hidden, c)
 	}
 
 	generate_json_pkg_data(&b, not_hidden[:])
@@ -411,7 +411,7 @@ write_home_sidebar :: proc(w: io.Writer) {
 	fmt.wprintln(w, `<ul class="nav nav-pills d-flex flex-column">`)
 	defer fmt.wprintln(w, `</ul>`)
 
-	for _, c in cfg.collections {
+	for c in cfg.collections {
 		if c.hidden do continue
 
 		fmt.wprintf(
@@ -439,7 +439,7 @@ write_home_page :: proc(w: io.Writer) {
 	fmt.wprintln(w, "<div>")
 	defer fmt.wprintln(w, "</div>")
 
-	for _, c in cfg.collections {
+	for c in cfg.collections {
 		if cfg.hide_core && (c.name == "core" || c.name == "vendor") {
 			continue
 		}

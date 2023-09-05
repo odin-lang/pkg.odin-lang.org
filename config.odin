@@ -4,21 +4,28 @@ import "core:encoding/json"
 import "core:fmt"
 import "core:log"
 import "core:os"
+import "core:slice"
 import "core:strings"
 
 import doc "core:odin/doc-format"
 
 Config :: struct {
-	hide_core:         bool,
-	collections:       map[string]Collection,
+	hide_core:    bool,
+	_collections: map[string]Collection `json:"collections"`,
 
 	// -- Start non configurable --
-	header:            ^doc.Header,
-	files:             []doc.File,
-	pkgs:              []doc.Pkg,
-	entities:          []doc.Entity,
-	types:             []doc.Type,
-	pkg_to_collection: map[^doc.Pkg]^Collection,
+	header:   ^doc.Header,
+	files:    []doc.File,
+	pkgs:     []doc.Pkg,
+	entities: []doc.Entity,
+	types:    []doc.Type,
+
+	// Maps are unordered, we want an order to places where it matters, like the homepage.
+	// Why is 'collections' not a slice? Because the JSON package overwrites the full slice when
+	// you unmarshal into it, with a map, when unmarshalling into it, the entries are added to existing ones.
+	collections: [dynamic]^Collection,
+
+	pkg_to_collection:  map[^doc.Pkg]^Collection,
 }
 
 Collection :: struct {
@@ -90,12 +97,12 @@ collection_validate :: proc(c: ^Collection) -> Maybe(Collection_Error) {
 	c.base_url = strings.trim_suffix(c.base_url, "/")
 	c.source_url = strings.trim_suffix(c.source_url, "/")
 
-	new_root_path, was_alloc := do_replacements(c.root_path)
+	new_root_path, was_alloc := config_do_replacements(c.root_path)
 	if was_alloc do delete(c.root_path)
 	c.root_path = new_root_path
 
 	if rm, ok := c.home.embed_readme.?; ok {
-		new_rm, was_rm_alloc := do_replacements(rm)
+		new_rm, was_rm_alloc := config_do_replacements(rm)
 		if was_rm_alloc do delete(rm)
 		c.home.embed_readme = new_rm
 	}
@@ -106,6 +113,7 @@ collection_validate :: proc(c: ^Collection) -> Maybe(Collection_Error) {
 config_default :: proc() -> (c: Config) {
 	err := json.unmarshal(#load("resources/odin-doc.json"), &c)
 	fmt.assertf(err == nil, "Unable to load default config: %v", err)
+	config_sort_collections(&c)
 	return
 }
 
@@ -117,18 +125,31 @@ config_merge_from_file :: proc(c: ^Config, file: string) -> (file_ok: bool, err:
 	err = json.unmarshal(data, c)
 
 	if c.hide_core {
-		for _, &c in c.collections {
+		for _, &c in c._collections {
 			if c.name == "core" || c.name == "vendor" {
 				c.hidden = true
 			}
 		}
 	}
 
+	config_sort_collections(c)
 	return
 }
 
+config_sort_collections :: proc(c: ^Config) {
+	clear(&c.collections)
+	for _, &collection in c._collections {
+		append(&c.collections, &collection)
+	}
+
+	slice.sort_by(
+		c.collections[:],
+		proc(a, b: ^Collection) -> bool { return a.name < b.name },
+	)
+}
+
 // Replaces $ODIN_ROOT with ODIN_ROOT, $PWD with the pwd and turns it into an absolute path.
-do_replacements :: proc(path: string) -> (res: string, allocated: bool) {
+config_do_replacements :: proc(path: string) -> (res: string, allocated: bool) {
 	res, allocated = strings.replace(path, "$ODIN_ROOT", ODIN_ROOT, 1)
 
 	if strings.contains(res, "$PWD") {
