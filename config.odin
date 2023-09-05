@@ -4,6 +4,7 @@ import "core:encoding/json"
 import "core:fmt"
 import "core:log"
 import "core:os"
+import "core:path/filepath"
 import "core:slice"
 import "core:strings"
 
@@ -150,11 +151,11 @@ config_sort_collections :: proc(c: ^Config) {
 config_do_replacements :: proc(path: string) -> string {
 	res, allocated := strings.replace(path, "$ODIN_ROOT", ODIN_ROOT, 1)
 
-	abs, errno := os.absolute_path_from_relative(res)
-	if errno != os.ERROR_NONE {
-		log.warnf("Could not resolve absolute path from %q, errno: %i", res, errno)
-		return res
-	}
+    abs, ok := filepath.abs(res)
+    if !ok {
+        log.warnf("Could not resolve absolute path from %q", res)
+        return res
+    }
 
 	if allocated do delete(res)
 	return abs
