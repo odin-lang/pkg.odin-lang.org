@@ -15,8 +15,6 @@ import doc "core:odin/doc-format"
 
 import cm "vendor:commonmark"
 
-BASE_CORE_URL :: "/core"
-
 cfg: Config
 
 main :: proc() {
@@ -698,6 +696,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		if .Param_No_Alias  in e.flags { io.write_string(w, `<span class="keyword-type">#no_alias</span> `);  name_width -= 1+len("#no_alias")  }
 		if .Param_Any_Int   in e.flags { io.write_string(w, `<span class="keyword-type">#any_int</span> `);   name_width -= 1+len("#any_int")   }
 
+        core := cfg._collections["core"]
 
 		init_string := escape_html_string(str(e.init_string))
 		switch {
@@ -705,13 +704,13 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			assert(name != "")
 			io.write_string(w, name)
 			io.write_string(w, " := ")
-			fmt.wprintf(w, `<a href="%s/runtime/#Source_Code_Location">`, BASE_CORE_URL)
+			fmt.wprintf(w, `<a href="%s/runtime/#Source_Code_Location">`, core.base_url)
 			io.write_string(w, init_string)
 			io.write_string(w, `</a>`)
 		case strings.has_prefix(init_string, "context."):
 			io.write_string(w, name)
 			io.write_string(w, " := ")
-			fmt.wprintf(w, `<a href="%s/runtime/#Context">`, BASE_CORE_URL)
+			fmt.wprintf(w, `<a href="%s/runtime/#Context">`, core.base_url)
 			io.write_string(w, init_string)
 			io.write_string(w, `</a>`)
 		case:
