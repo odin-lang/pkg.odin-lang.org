@@ -151,20 +151,20 @@ config_sort_collections :: proc(c: ^Config) {
 config_do_replacements :: proc(path: string) -> string {
 	res, allocated := strings.replace(path, "$ODIN_ROOT", ODIN_ROOT, 1)
 
-    abs, ok := filepath.abs(res)
-    if !ok {
-        log.warnf("Could not resolve absolute path from %q", res)
-        return res
-    }
+	abs, ok := filepath.abs(res)
+	if !ok {
+		log.warnf("Could not resolve absolute path from %q", res)
+		return res
+	}
 
 	if allocated do delete(res)
 
-    // The `odin doc` spits paths out the other way.
-    when ODIN_OS == .Windows {
-        replaced, replace_was_alloc := strings.replace_all(abs, "\\", "/")
-        if replace_was_alloc do delete(abs)
-        return replaced
-    } else {
-        return abs
-    }
+	// The `odin doc` spits paths out the other way.
+	when ODIN_OS == .Windows {
+		replaced, replace_was_alloc := strings.replace_all(abs, "\\", "/")
+		if replace_was_alloc do delete(abs)
+		return replaced
+	} else {
+		return abs
+	}
 }
