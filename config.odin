@@ -158,5 +158,13 @@ config_do_replacements :: proc(path: string) -> string {
     }
 
 	if allocated do delete(res)
-	return abs
+
+    // The `odin doc` spits paths out the other way.
+    when ODIN_OS == .Windows {
+        replaced, replace_was_alloc := strings.replace_all(abs, "\\", "/")
+        if replace_was_alloc do delete(abs)
+        return replaced
+    } else {
+        return abs
+    }
 }
