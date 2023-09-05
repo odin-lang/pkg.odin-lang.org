@@ -83,12 +83,16 @@ Here is an example config file with comments, you should remove any comments so 
 	// Hides the core packages from the menu, homepage and search results,
 	// they are still there so that links from your own packages work.
 	"hide_core": true,
+	// If your docs are going to be on a subpath of your domain, for example: `name.github.io/repo`
+	// You can provide a url_prefix here to make the paths line up, if your docs will be at the root of the domain, leave this out.
+	"url_prefix": "/repo",
 	// This is where you define collections, you will probably have only one.
 	"collections": {
 		"foo": {
 			"name": "foo",
 			"source_url": "https://github.com/odin-lang/Odin/blob/main",
 			// This URL is the prefix of your collection, core will be at /core, vendor at /vendor.
+			// This is prefixed with the url_prefix field above if that is set.
 			"base_url": "/foo",
 			// The root of the project, because you will probably be in a subdirectory, you can use a relative path.
 			// You can also use $ODIN_ROOT which is replaced by the directory that contains the Odin core and vendor collections.
@@ -118,9 +122,6 @@ You can automatically generate and publish your documentation to GitHub pages.
 
 The only thing you need to configure in GitHub is enabling pages, go to your repo -> settings -> pages
 and enable it, select GitHub actions as the deploy method.
-
-You need to set up a domain where the documentation is at the root, the default root is `name.github.io/repo`
-but this generator assumes the homepage is at `/`, not at `/repo`.
 
 Here is an example configuration, this goes at `.github/workflows/docs.yml`:
 

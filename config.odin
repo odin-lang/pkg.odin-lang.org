@@ -12,6 +12,7 @@ import doc "core:odin/doc-format"
 Config :: struct {
 	hide_core:    bool,
 	_collections: map[string]Collection `json:"collections"`,
+	url_prefix:   string,
 
 	// -- Start non configurable --
 	header:   ^doc.Header,
@@ -124,11 +125,15 @@ config_merge_from_file :: proc(c: ^Config, file: string) -> (file_ok: bool, err:
 
 	err = json.unmarshal(data, c)
 
-	if c.hide_core {
-		for _, &c in c._collections {
-			if c.name == "core" || c.name == "vendor" {
-				c.hidden = true
-			}
+	for _, &collection in c._collections {
+		if c.hide_core && (collection.name == "core" || collection.name == "vendor") {
+			collection.hidden = true
+		}
+
+		if c.url_prefix != "" {
+			new_base_url := strings.concatenate({c.url_prefix, collection.base_url})
+			delete(collection.base_url)
+			collection.base_url = new_base_url
 		}
 	}
 
