@@ -61,13 +61,6 @@ Collection_Home :: struct {
 Collection_Error :: string
 
 collection_validate :: proc(c: ^Collection) -> Maybe(Collection_Error) {
-	c.name = strings.trim_space(c.name)
-	c.source_url = strings.trim_space(c.source_url)
-	c.base_url = strings.trim_space(c.base_url)
-	c.license.text = strings.trim_space(c.license.text)
-	c.license.url = strings.trim_space(c.license.url)
-	c.root_path = strings.trim_space(c.root_path)
-
 	if c.name == "" {
 		return "collection requires the key \"name\" to be set to the name of the collection, example: \"core\"" \
 	}
