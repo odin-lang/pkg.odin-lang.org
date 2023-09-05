@@ -198,8 +198,6 @@ main :: proc() {
 }
 
 print_usage :: proc() -> ! {
-	ln, p, f :: fmt.eprintln, fmt.eprint, fmt.eprintf
-
 	fmt.eprintf(
 		"%s is a program that generates a documentation website from a .odin-doc file and an optional config.",
 		os.args[0],

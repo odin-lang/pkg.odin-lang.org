@@ -63,22 +63,22 @@ Collection_Error :: string
 
 collection_validate :: proc(c: ^Collection) -> Maybe(Collection_Error) {
 	if c.name == "" {
-		return "collection requires the key \"name\" to be set to the name of the collection, example: \"core\"" \
+		return "collection requires the key \"name\" to be set to the name of the collection, example: \"core\""
 	}
 	if c.source_url == "" {
-		return "collection requires the key \"source_url\" to be set to a URL that points to the root of collection on a website like GitHub, example: \"https://github.com/odin-lang/Odin/tree/master/core\"" \
+		return "collection requires the key \"source_url\" to be set to a URL that points to the root of collection on a website like GitHub, example: \"https://github.com/odin-lang/Odin/tree/master/core\""
 	}
 	if c.base_url == "" {
-		return "collection requires the key \"base_url\" to be set to the relative URL to your collection, example: \"/core\"" \
+		return "collection requires the key \"base_url\" to be set to the relative URL to your collection, example: \"/core\""
 	}
 	if c.license.text == "" {
-		return "collection requires the key \"license.text\" to be set to the name of the license of your collection, example: \"BSD-3-Clause\"" \
+		return "collection requires the key \"license.text\" to be set to the name of the license of your collection, example: \"BSD-3-Clause\""
 	}
 	if c.license.url == "" {
-		return "collection requires the key \"license.url\" to be set to a URL that points to the license of your collection, example: \"https://github.com/odin-lang/Odin/tree/master/LICENSE\"" \
+		return "collection requires the key \"license.url\" to be set to a URL that points to the license of your collection, example: \"https://github.com/odin-lang/Odin/tree/master/LICENSE\""
 	}
 	if c.root_path == "" {
-		return "collection requires the key \"root_path\" to be set to part of the path of all packages in the collection that should be removed, you can use $ODIN_ROOT, or $PWD as variables" \
+		return "collection requires the key \"root_path\" to be set to part of the path of all packages in the collection that should be removed, you can use $ODIN_ROOT, or $PWD as variables"
 	}
 
 	if strings.contains_rune(c.name, '/') {

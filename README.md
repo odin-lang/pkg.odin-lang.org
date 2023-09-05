@@ -22,7 +22,7 @@ The generator uses simple markup rules to generate more structured documentation
 
 There can be only 1 example, and only 1 output (or possible output) block in a doc block.
 
-To make these work, you should not use a doc block with lines that start with spaces or starts or anything.
+To make these work, you should not use a doc block with lines that start with spaces or stars or anything.
 The convention is doc blocks like the following:
 
 ```odin
