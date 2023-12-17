@@ -243,6 +243,7 @@ if (odin_search) {
 	{
 		const IS_PACKAGE_PAGE = odin_search.className == "odin-search-package";
 		const IS_PACKAGE_BUILTIN = IS_PACKAGE_PAGE && odin_pkg_name == "builtin";
+		const IS_COLLECTION_PAGE = odin_search.className == "odin-search-collection"
 
 		let entities = [];
 		function add_entity(odin_pkg_name, e) {
@@ -274,8 +275,18 @@ if (odin_search) {
 			}
 		} else {
 			let all_packages = Object.entries(odin_pkg_data.packages);
-			for (let i = 0; i < all_packages.length; i++) {
-				let [pkg_name, pkg] = all_packages[i];
+			let packages = all_packages;
+			if (IS_COLLECTION_PAGE) {
+				let current_url = window.location.pathname;
+				let collection = current_url.includes("core") ? "core" : "vendor";
+				packages = all_packages.filter(
+					function ([_, pkg]) {
+						return pkg.collection == collection;
+					}
+				)
+			}
+			for (let i = 0; i < packages.length; i++) {
+				let [pkg_name, pkg] = packages[i];
 				let entities = pkg.entities;
 				for (let j = 0; j < entities.length; j++) {
 					let e = entities[j];
