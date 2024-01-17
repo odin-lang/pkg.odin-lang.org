@@ -1,17 +1,18 @@
 package odin_html_docs
 
-import doc "core:odin/doc-format"
-import "core:io"
 import "core:fmt"
-import "core:strings"
+import "core:io"
 import "core:slice"
+import "core:strings"
+
+import doc "core:odin/doc-format"
 
 Builtin :: struct {
-	name: string,
-	kind: string,
-	type: string,
+	name:    string,
+	kind:    string,
+	type:    string,
 	comment: string,
-	value: string,
+	value:   string,
 }
 
 builtins := []Builtin{
@@ -137,7 +138,7 @@ builtins := []Builtin{
 		"The size does not include any memory possibly referenced by a value. For instance, if a slice was given, `size_of` returns the size of the internal slice data structure and not the size of the memory referenced by the slice. " +
 		"For a struct, the size includes any padding introduced by field alignment (if not specified with `#packed`. " +
 		"Other types follow similar rules. " +
-		"The return value of `size_of` is a compile time known integer constant."
+		"The return value of `size_of` is a compile time known integer constant.",
 	},
 	{name = "align_of", kind = "b", type = "proc($T: typeid) -> int",
 		comment = "`align_of` takes an expression or type, and returns the alignment in bytes of the type of the expression if it was hypothetically instantiated as a variable `v`. " +
@@ -218,7 +219,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 
 	fmt.wprintf(w, "<h1>package %s:%s", strings.to_lower(collection.name, context.temp_allocator), path)
 
-	pkg_src_url := fmt.tprintf("%s/%s", collection.github_url, path)
+	pkg_src_url := fmt.tprintf("%s/%s", collection.source_url, path)
 	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", pkg_src_url)
 	fmt.wprintf(w, "</h1>\n")
 
@@ -238,7 +239,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 		entry_count := 0
 
 		for entry in runtime_entries {
-			e := &entities[entry.entity]
+			e := &cfg.entities[entry.entity]
 			ok := false
 			for attr in array(e.attributes) {
 				if str(attr.name) == "builtin" {
@@ -302,7 +303,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 
 			if any_builtin {
 				for entry in builtin_entities {
-					e := &entities[entry.entity]
+					e := &cfg.entities[entry.entity]
 					fmt.wprintf(w, "<li><a href=\"/core/runtime\">runtime</a>.<a href=\"#{0:s}\">{0:s}</a></li>\n", str(e.name))
 				}
 			}
@@ -341,8 +342,9 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 
 	write_entries :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, title: string, kind: string, entries: []doc.Scope_Entry) {
 		fmt.wprintf(w, "<h2 id=\"pkg-{0:s}\" class=\"pkg-header\">{0:s}</h2>\n", title)
-
-		runtime_url := fmt.aprintf("%s/%s", pkg_to_collection[runtime_pkg].base_url, pkg_to_path[runtime_pkg])
+		
+		collection := cfg.pkg_to_collection[runtime_pkg]
+		runtime_url := fmt.aprintf("%s/%s", collection.base_url, collection.pkg_to_path[runtime_pkg])
 		defer delete(runtime_url)
 
 		// builtin entries
@@ -369,7 +371,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 						fmt.wprintf(w, `{0:s} : {2:s}.<a href="{1:s}#{3:s}">{3:s}</a> : `, name, runtime_url, pkg, type)
 
 						for entry in array(runtime_pkg.entries) {
-							e := &entities[entry.entity]
+							e := &cfg.entities[entry.entity]
 							if e.kind == .Type_Name && str(e.name) == type {
 								extra_comment = strings.trim_space(str(e.docs))
 								if extra_comment == "" {
