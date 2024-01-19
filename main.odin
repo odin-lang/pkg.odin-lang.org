@@ -1266,7 +1266,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 }
 
 write_doc_line :: proc(w: io.Writer, text: string) {
-	text := text
+	text := escape_html_string(text)
 	for len(text) != 0 {
 		if strings.count(text, "`") >= 2 {
 			n := strings.index_byte(text, '`')
