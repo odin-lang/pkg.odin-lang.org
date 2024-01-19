@@ -824,6 +824,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		if docs == "" {
 			return
 		}
+		docs = escape_html_string(docs)
 		lines := strings.split_lines(docs)
 		defer delete(lines)
 		for i := len(lines)-1; i >= 0; i -= 1 {
@@ -848,6 +849,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		if comment == "" {
 			return
 		}
+		comment = escape_html_string(comment)
 		for _ in 0..< padding {
 			io.write_byte(w, ' ')
 		}
