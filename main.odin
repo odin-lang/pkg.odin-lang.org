@@ -265,7 +265,7 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: []^Collection) 
 			break
 		}
 	}
-	
+
 	pkg_idx := 0
 	if core_collection != nil {
 		if pkg_idx != 0 { fmt.wprintln(w, ",") }
@@ -2295,7 +2295,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			fmt.wprint(w, `<pre class="doc-code">`)
 			the_type := cfg.types[e.type]
 
-			init_string := str(e.init_string)
+			init_string := escape_html_string(str(e.init_string))
 			assert(init_string != "")
 
 			ignore_type := true
@@ -2605,4 +2605,3 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	fmt.wprintf(w, `<script type="text/javascript">var odin_pkg_name = "%s";</script>`+"\n", str(pkg.name))
 
 }
-
