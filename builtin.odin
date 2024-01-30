@@ -810,7 +810,7 @@ write_intrinsics_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.
 
 	// write_index(w, "Constants",        "c")
 	write_index(w, "Types",            "t")
-	write_index(w, "Procedures",       "b")
+	write_index(w, "Procedures",       "p")
 	// write_index(w, "Procedure Groups", "g")
 
 	fmt.wprintln(w, "</div>")
@@ -871,7 +871,7 @@ write_intrinsics_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.
 	fmt.wprintln(w, `<section class="documentation">`)
 	// write_entries(w, runtime_pkg, "Constants",        "c")
 	write_entries(w, runtime_pkg, "Types",            "t")
-	write_entries(w, runtime_pkg, "Procedures",       "b")
+	write_entries(w, runtime_pkg, "Procedures",       "p")
 	// write_entries(w, runtime_pkg, "Procedure Groups", "g")
 
 	fmt.wprintf(w, `<script type="text/javascript">var odin_pkg_name = "%s";</script>`+"\n", "intrinsics")
