@@ -304,7 +304,7 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: []^Collection) 
 			fmt.wprintf(w, `"kind": %q, `, b.kind)
 			fmt.wprintf(w, `"name": %q, `, b.name)
 			fmt.wprintf(w, `"type": %q, `, b.type)
-			fmt.wprintf(w, `"builtin": %v, `, true)
+			fmt.wprintf(w, `"builtin": %v, `, false)
 			if len(b.comment) != 0 {
 				fmt.wprintf(w, `"comment": %q`, b.comment)
 			}
