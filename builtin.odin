@@ -469,3 +469,411 @@ write_table_contents :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, consts: []doc.
     fmt.wprintln(w, `</nav>`)
     fmt.wprintln(w, `</div></div>`)
 }
+
+intrinsics_entities := []Builtin{
+	{name = "is_package_imported", kind = "b", type = "proc(package_name: string) -> bool"},
+
+	{name = "transpose", kind = "b", type = "proc(m: $T/matrix[$R, $C]$E) -> matrix[C, R]E"},
+	{name = "outer_product", kind = "b", type = "proc(m: $A/[$X]$E, b: $B/[$Y]E) -> matrix[A, B]E"},
+	{name = "hadamard_product", kind = "b", type = "proc(a, b: $T/matrix[$R, $C]$E) -> T"},
+	{name = "matrix_flatten", kind = "b", type = "proc(m: $T/matrix[$R, $C]$E) -> [R*E]E"},
+
+	{name = "soa_struct", kind = "b", type = "proc($N: int, $T: typeid) -> type/#soa[N]T"},
+
+	{name = "volatile_load", kind = "b", type = "proc(dst: ^$T) -> T"},
+	{name = "volatile_store", kind = "b", type = "proc(dst: ^$T, val: T)"},
+
+	{name = "non_temporal_load", kind = "b", type = "proc(dst: ^$T) -> T"},
+	{name = "non_temporal_store", kind = "b", type = "proc(dst: ^$T, val: T)"},
+
+	{name = "debug_trap", kind = "b", type = "proc()"},
+	{name = "trap", kind = "b", type = "proc() -> !"},
+
+	{name = "alloca", kind = "b", type = "proc(size, align: int) -> [^]u8"},
+	{name = "cpu_relax", kind = "b", type = "proc()"},
+	{name = "read_cycle_counter", kind = "b", type = "proc() -> i64"},
+
+	{name = "count_ones", kind = "b", type = "proc(x: $T) -> T"},
+	{name = "count_zeros", kind = "b", type = "proc(x: $T) -> T"},
+	{name = "count_trailing_zeros", kind = "b", type = "proc(x: $T) -> T"},
+	{name = "count_leading_zeros", kind = "b", type = "proc(x: $T) -> T"},
+	{name = "reverse_bits", kind = "b", type = "proc(x: $T) -> T"},
+	{name = "byte_swap", kind = "b", type = "proc(x: $T) -> T"},
+
+	{name = "overflow_add", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool)"},
+	{name = "overflow_sub", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool)"},
+	{name = "overflow_mul", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool)"},
+
+	{name = "sqrt", kind = "b", type = "proc(x: $T) -> T"},
+
+	{name = "fused_mul_add", kind = "b", type = "proc(a, b, c: $T) -> T"},
+
+	{name = "mem_copy", kind = "b", type = "proc(dst, src: rawptr, len: int)"},
+	{name = "mem_copy_non_overlapping", kind = "b", type = "proc(dst, src: rawptr, len: int)"},
+	{name = "mem_zero", kind = "b", type = "proc(ptr: rawptr, len: int)"},
+	{name = "mem_zero_volatile", kind = "b", type = "proc(ptr: rawptr, len: int)"},
+
+	{name = "ptr_offset", kind = "b", type = "proc(ptr: ^$T, offset: int) -> ^T", comment = "Prefer [^]T operations if possible."},
+	{name = "ptr_sub", kind = "b", type = "proc(a, b: ^$T) -> int", comment = "Prefer [^]T operations if possible."},
+
+	{name = "unaligned_load", kind = "b", type = "proc(src: ^$T) -> T"},
+	{name = "unaligned_store", kind = "b", type = "proc(src: ^$T, val: T) -> T"},
+
+	{name = "fixed_point_mul", kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T"},
+	{name = "fixed_point_div", kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T"},
+	{name = "fixed_point_mul_sat", kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T"},
+	{name = "fixed_point_div_sat", kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T"},
+
+	{name = "prefetch_read_instruction", kind = "b", type = "proc(address: rawptr, #const locality: i32)", comment = "`locality` must be in the range `0..=3`"},
+	{name = "prefetch_read_data", kind = "b", type = "proc(address: rawptr, #const locality: i32)", comment = "`locality` must be in the range `0..=3`"},
+	{name = "prefetch_write_instruction", kind = "b", type = "proc(address: rawptr, #const locality: i32)", comment = "`locality` must be in the range `0..=3`"},
+	{name = "prefetch_write_data", kind = "b", type = "proc(address: rawptr, #const locality: i32)", comment = "`locality` must be in the range `0..=3`"},
+
+	{name = "expect", kind = "b", type = "proc(val, expected_val: T) -> T", comment = "A compiler hint."},
+
+	{name = "syscall", kind = "b", type = "proc(id: uintptr, args: ..uintptr) -> uintptr", comment = "Linux and Darwin only."},
+
+	{name = "Atomic_Memory_Order", kind = "t", value = "Atomic_Memory_Order :: enum {\n\tRelaxed = 0, // Unordered\n\tConsume = 1, // Monotonic\n\tAcquire = 2,\n\tRelease = 3,\n\tAcq_Rel = 4,\n\tSeq_Cst = 5,\n}"},
+
+	{name = "atomic_type_is_lock_free", kind = "b", type = "proc($T: typeid) -> bool"},
+
+	{name = "atomic_thread_fence", kind = "b", type = "proc(order: Atomic_Memory_Order)"},
+	{name = "atomic_signal_fence", kind = "b", type = "proc(order: Atomic_Memory_Order)"},
+
+	{name = "atomic_store", kind = "b", type = "proc(dst: ^$T, val: T)"},
+	{name = "atomic_store_explicit", kind = "b", type = "proc(dst: ^$T, val: T, order: Atomic_Memory_Order)"},
+
+	{name = "atomic_load", kind = "b", type = "proc(dst: ^$T) -> T"},
+	{name = "atomic_load_explicit", kind = "b", type = "proc(dst: ^$T, order: Atomic_Memory_Order) -> T"},
+
+	{name = "atomic_sub", kind = "b", type = "proc(dst: ^$T, val: T) -> T"},
+	{name = "atomic_sub_explicit", kind = "b", type = "proc(dst: ^$T, val: T, order: Atomic_Memory_Order) -> T"},
+
+	{name = "atomic_and", kind = "b", type = "proc(dst: ^$T, val: T) -> T"},
+	{name = "atomic_and_explicit", kind = "b", type = "proc(dst: ^$T, val: T, order: Atomic_Memory_Order) -> T"},
+
+	{name = "atomic_nand", kind = "b", type = "proc(dst: ^$T, val: T) -> T"},
+	{name = "atomic_nand_explicit", kind = "b", type = "proc(dst: ^$T, val: T, order: Atomic_Memory_Order) -> T"},
+
+	{name = "atomic_or", kind = "b", type = "proc(dst: ^$T, val: T) -> T"},
+	{name = "atomic_or_explicit", kind = "b", type = "proc(dst: ^$T, val: T, order: Atomic_Memory_Order) -> T"},
+
+	{name = "atomic_xor", kind = "b", type = "proc(dst: ^$T, val: T) -> T"},
+	{name = "atomic_xor_explicit", kind = "b", type = "proc(dst: ^$T, val: T, order: Atomic_Memory_Order) -> T"},
+
+	{name = "atomic_exchange", kind = "b", type = "proc(dst: ^$T, val: T) -> T"},
+	{name = "atomic_exchange_explicit", kind = "b", type = "proc(dst: ^$T, val: T, order: Atomic_Memory_Order) -> T"},
+
+	{name = "atomic_compare_exchange_strong", kind = "b", type = "proc(dst: ^$T, old, new: T) -> (T, bool)"},
+	{name = "atomic_compare_exchange_strong_explicit", kind = "b", type = "proc(dst: ^$T, old, new: T, success, failure: Atomic_Memory_Order) -> (T, bool)"},
+
+	{name = "atomic_compare_exchange_weak", kind = "b", type = "proc(dst: ^$T, old, new: T) -> (T, bool)"},
+	{name = "atomic_compare_exchange_weak_explicit", kind = "b", type = "proc(dst: ^$T, old, new: T, success, failure: Atomic_Memory_Order) -> (T, bool)"},
+
+	{name = "type_base_type", kind = "b", type = "proc($T: typeid) -> type"},
+	{name = "type_core_type", kind = "b", type = "proc($T: typeid) -> type"},
+	{name = "type_elem_type", kind = "b", type = "proc($T: typeid) -> type"},
+
+	{name = "type_is_boolean", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_integer", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_rune", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_float", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_complex", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_quaternion", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_string", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_typeid", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_any", kind = "b", type = "proc($T: typeid) -> bool"},
+
+	{name = "type_is_endian_platform", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_endian_little", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_endian_big", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_unsigned", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_numeric", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_ordered", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_ordered_numeric", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_indexable", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_sliceable", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_comparable", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_simple_compare", kind = "b", type = "proc($T: typeid) -> bool", comment = "Easily compared using memcmp (== and !=)."},
+	{name = "type_is_dereferenceable", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_valid_map_key", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_matrix_elements", kind = "b", type = "proc($T: typeid) -> bool"},
+
+	{name = "type_is_named", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_pointer", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_multi_pointer", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_array", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_enumerated_array", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_slice", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_dynamic_array", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_map", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_struct", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_union", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_enum", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_proc", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_bit_set", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_simd_vector", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_matrix", kind = "b", type = "proc($T: typeid) -> bool"},
+
+	{name = "type_has_nil", kind = "b", type = "proc($T: typeid) -> bool"},
+
+	{name = "type_is_specialization_of", kind = "b", type = "proc($T, $S: typeid) -> bool"},
+
+	{name = "type_is_variant_of", kind = "b", type = "proc($U, $V: typeid) -> bool"},
+	{name = "type_union_tag_type", kind = "b", type = "proc($T: typeid) -> typeid"},
+	{name = "type_union_tag_offset", kind = "b", type = "proc($T: typeid) -> uintptr"},
+	{name = "type_union_base_tag_value", kind = "b", type = "proc($T: typeid) -> int"},
+	{name = "type_union_variant_count", kind = "b", type = "proc($T: typeid) -> int"},
+	{name = "type_variant_type_of", kind = "b", type = "proc($T: typeid, $index: int) -> typeid"},
+	{name = "type_variant_index_of", kind = "b", type = "proc($U, $V: typeid) -> int"},
+
+	{name = "type_has_field", kind = "b", type = "proc($T: typeid, $name: string) -> bool"},
+	{name = "type_field_type", kind = "b", type = "proc($T: typeid, $name: string) -> typeid"},
+
+	{name = "type_proc_parameter_count", kind = "b", type = "proc($T: typeid) -> int"},
+	{name = "type_proc_return_count", kind = "b", type = "proc($T: typeid) -> int"},
+
+	{name = "type_proc_parameter_type", kind = "b", type = "proc($T: typeid, index: int) -> typeid"},
+	{name = "type_proc_return_type", kind = "b", type = "proc($T: typeid, index: int) -> typeid"},
+
+	{name = "type_struct_field_count", kind = "b", type = "proc($T: typeid) -> int"},
+
+	{name = "type_polymorphic_record_parameter_count", kind = "b", type = "proc($T: typeid) -> typeid"},
+	{name = "type_polymorphic_record_parameter_value", kind = "b", type = "proc($T: typeid, index: int) -> $V"},
+
+	{name = "type_is_specialized_polymorphic_record", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_unspecialized_polymorphic_record", kind = "b", type = "proc($T: typeid) -> bool"},
+
+	{name = "type_is_subtype_of", kind = "b", type = "proc($T, $U: typeid) -> bool"},
+
+	{name = "type_field_index_of", kind = "b", type = "proc($T: typeid, $name: string) -> uintptr"},
+
+	{name = "type_equal_proc", kind = "b", type = "proc($T: typeid) -> (equal: proc \"contextless\" (rawptr, rawptr) -> bool)"},
+	{name = "type_hasher_proc", kind = "b", type = "proc($T: typeid) -> (hasher: proc \"contextless\" (data: rawptr, seed: rawptr) -> uintptr)"},
+
+	{name = "type_map_info", kind = "b", type = "proc($T: typeid/map[$K]$V) -> ^runtime.Map_Info"},
+	{name = "type_map_cell_info", kind = "b", type = "proc($T: typeid) -> ^runtime.Map_Cell_Info"},
+
+	{name = "type_convert_variants_to_pointers", kind = "b", type = "proc($T: typeid) -> typeid"},
+	{name = "type_merge", kind = "b", type = "proc($U, $V: typeid) -> typeid"},
+
+	{name = "constant_utf16_cstring", kind = "b", type = "proc($literal: string) -> [^]u16"},
+
+	{name = "simd_add", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
+	{name = "simd_sub", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
+	{name = "simd_mul", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
+	{name = "simd_div", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
+
+	{name = "simd_shl", kind = "b", type = "proc(a: #simd[N]T, b: #simd[N]Unsigned_Integer) -> #simd[N]T", comment = "Keep Odin's behaviour: `(x << y) if y <= mask else 0`."},
+	{name = "simd_shr", kind = "b", type = "proc(a: #simd[N]T, b: #simd[N]Unsigned_Integer) -> #simd[N]T", comment = "Keep Odin's behaviour: `(x << y) if y <= mask else 0`."},
+
+	{name = "simd_shl_masked", kind = "b", type = "proc(a: #simd[N]T, b: #simd[N]Unsigned_Integer) -> #simd[N]T", comment = "Similar to C's behaviour: `x << (y & mask)`."},
+	{name = "simd_shr_masked", kind = "b", type = "proc(a: #simd[N]T, b: #simd[N]Unsigned_Integer) -> #simd[N]T", comment = "Similar to C's behaviour: `x << (y & mask)`."},
+
+	{name = "simd_add_sat", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
+	{name = "simd_sub_sat", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
+
+	{name = "simd_bit_and", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
+	{name = "simd_bit_or", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
+	{name = "simd_bit_xor", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
+	{name = "simd_bit_and_not", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
+
+	{name = "simd_neg", kind = "b", type = "proc(a: #simd[N]T) -> #simd[N]T"},
+
+	{name = "simd_abs", kind = "b", type = "proc(a: #simd[N]T) -> #simd[N]T"},
+
+	{name = "simd_min", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
+	{name = "simd_max", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
+	{name = "simd_clamp", kind = "b", type = "proc(v, min, max: #simd[N]T) -> #simd[N]T"},
+
+	{name = "simd_lanes_eq", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]Integer", comment = "Returns an unsigned integer of the same size as the input type.\nNOT A BOOLEAN.\nElement-wise:\n\tfalse => 0x00...00\n\ttrue => 0xff...ff"},
+	{name = "simd_lanes_ne", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]Integer", comment = "Returns an unsigned integer of the same size as the input type.\nNOT A BOOLEAN.\nElement-wise:\n\tfalse => 0x00...00\n\ttrue => 0xff...ff"},
+	{name = "simd_lanes_lt", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]Integer", comment = "Returns an unsigned integer of the same size as the input type.\nNOT A BOOLEAN.\nElement-wise:\n\tfalse => 0x00...00\n\ttrue => 0xff...ff"},
+	{name = "simd_lanes_le", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]Integer", comment = "Returns an unsigned integer of the same size as the input type.\nNOT A BOOLEAN.\nElement-wise:\n\tfalse => 0x00...00\n\ttrue => 0xff...ff"},
+	{name = "simd_lanes_gt", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]Integer", comment = "Returns an unsigned integer of the same size as the input type.\nNOT A BOOLEAN.\nElement-wise:\n\tfalse => 0x00...00\n\ttrue => 0xff...ff"},
+	{name = "simd_lanes_ge", kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]Integer", comment = "Returns an unsigned integer of the same size as the input type.\nNOT A BOOLEAN.\nElement-wise:\n\tfalse => 0x00...00\n\ttrue => 0xff...ff"},
+
+	{name = "simd_extract", kind = "b", type = "proc(a: #simd[N]T, idx: uint) -> T"},
+	{name = "simd_replace", kind = "b", type = "proc(a: #simd[N]T, idx: uint, elem: T) -> #simd[N]T"},
+
+	{name = "simd_reduce_add_ordered", kind = "b", type = "proc(a: #simd[N]T) -> T"},
+	{name = "simd_reduce_mul_ordered", kind = "b", type = "proc(a: #simd[N]T) -> T"},
+	{name = "simd_reduce_min", kind = "b", type = "proc(a: #simd[N]T) -> T"},
+	{name = "simd_reduce_max", kind = "b", type = "proc(a: #simd[N]T) -> T"},
+	{name = "simd_reduce_and", kind = "b", type = "proc(a: #simd[N]T) -> T"},
+	{name = "simd_reduce_or", kind = "b", type = "proc(a: #simd[N]T) -> T"},
+	{name = "simd_reduce_xor", kind = "b", type = "proc(a: #simd[N]T) -> T"},
+
+	{name = "simd_shuffle", kind = "b", type = "proc(a, b: #simd[N]T, indices: ..int) -> #simd[len(indices)]T"},
+	{name = "simd_select", kind = "b", type = "proc(cond: #simd[N]boolean_or_integer, true, false: #simd[N]T) -> #simd[N]T"},
+
+	{name = "simd_ceil", kind = "b", type = "proc(a: #simd[N]any_float) -> #simd[N]any_float"},
+	{name = "simd_floor", kind = "b", type = "proc(a: #simd[N]any_float) -> #simd[N]any_float"},
+	{name = "simd_trunc", kind = "b", type = "proc(a: #simd[N]any_float) -> #simd[N]any_float"},
+	{name = "simd_nearest", kind = "b", type = "proc(a: #simd[N]any_float) -> #simd[N]any_float", comment = "Rounding to the nearest integral value; If two values are equally near, rounds to the even one."},
+
+	{name = "simd_to_bits", kind = "b", type = "proc(v: #simd[N]T) -> #simd[N]Integer"},
+
+	{name = "simd_reverse", kind = "b", type = "proc(a: #simd[N]T) -> #simd[N]T", comment = "Equivalent to a swizzle with descending indices, e.g. `reserve(a, 3, 2, 1, 0)`."},
+
+	{name = "simd_rotate_left", kind = "b", type = "proc(a: #simd[N]T, $offset: int) -> #simd[N]T"},
+	{name = "simd_rotate_right", kind = "b", type = "proc(a: #simd[N]T, $offset: int) -> #simd[N]T"},
+
+	{name = "wasm_memory_grow", kind = "b", type = "proc(index, delta: uintptr) -> int"},
+	{name = "wasm_memory_size", kind = "b", type = "proc(index: uintptr) -> int"},
+
+	{name = "wasm_memory_atomic_wait32", kind = "b", type = "proc(ptr: ^u32, expected: u32, timeout_ns: i64) -> u32", comment = "`timeout_ns` is maximum number of nanoseconds the calling thread will be blocked for.\nA negative value will be blocked forever.\nReturn value:\n0 - Indicates that the thread blocked and then was woken up.\n1 - The loaded value from `ptr` did not match `expected`, the thread did not block.\n2 - The thread blocked."},
+	{name = "wasm_memory_atomic_notify32", kind = "b", type = "proc(ptr: ^u32, waiters: u32) -> (waiters_woken_up: u32)"},
+
+	{name = "x86_cpuid", kind = "b", type = "proc(ax, cx: u32) -> (eax, ebx, ecx, edx: u32)"},
+	{name = "x86_xgetbv", kind = "b", type = "proc(cx: u32) -> (eax, edx: u32)"},
+
+	{name = "objc_object", kind = "t", value = "struct{}"},
+	{name = "objc_selector", kind = "t", value = "struct{}"},
+	{name = "objc_class", kind = "t", value = "struct{}"},
+	{name = "objc_id", kind = "t", value = "^objc_object"},
+	{name = "objc_SEL", kind = "t", value = "^objc_selector"},
+	{name = "objc_Class", kind = "t", value = "^objc_class"},
+
+	{name = "objc_find_selector", kind = "b", type = "proc($name: string) -> objc_SEL"},
+	{name = "objc_register_selector", kind = "b", type = "proc($name: string) -> objc_SEL"},
+	{name = "objc_find_class", kind = "b", type = "proc($name: string) -> objc_Class"},
+	{name = "objc_register_class", kind = "b", type = "proc($name: string) -> objc_Class"},
+
+	{name = "valgrind_client_request", kind = "b", type = "proc(default, request, a0, a1, a2, a3, a4: uintptr) -> uintptr"},
+
+	{name = "__entry_point", kind = "b", type = "proc()", comment = "Internal compiler use only."},
+}
+
+intrinsics_docs := `package intrinsics provides documentation for Odin's compiler intrinsics.`
+
+write_intrinsics_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg, collection: ^Collection) {
+	fmt.wprintln(w, `<div class="row odin-main" id="pkg">`)
+	defer fmt.wprintln(w, `</div>`)
+
+	write_pkg_sidebar(w, nil, collection)
+
+	fmt.wprintln(w, `<article class="col-lg-8 p-4 documentation odin-article">`)
+
+	write_breadcrumbs(w, path, runtime_pkg, collection)
+
+	fmt.wprintf(w, "<h1>package %s:%s", strings.to_lower(collection.name, context.temp_allocator), path)
+
+	pkg_src_url := fmt.tprintf("%s/%s", collection.source_url, path)
+	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", pkg_src_url)
+	fmt.wprintf(w, "</h1>\n")
+
+	write_search(w, .Package)
+
+	fmt.wprintln(w, `<div id="pkg-top">`)
+
+	{
+		fmt.wprintln(w, "<h2>Overview</h2>")
+		fmt.wprintln(w, "<div id=\"pkg-overview\">")
+		defer fmt.wprintln(w, "</div>")
+
+		write_docs(w, intrinsics_docs)
+	}
+
+	write_index :: proc(w: io.Writer, name: string, kind: string) {
+		entry_count := 0
+		for b in intrinsics_entities do if b.kind == kind {
+			entry_count += 1
+		}
+
+		fmt.wprintln(w, `<div>`)
+		defer fmt.wprintln(w, `</div>`)
+
+		fmt.wprintf(w, `<details class="doc-index" id="doc-index-{0:s}" aria-labelledby="#doc-index-{0:s}-header">`+"\n", name)
+		fmt.wprintf(w, `<summary id="#doc-index-{0:s}-header">`+"\n", name)
+		io.write_string(w, name)
+		io.write_string(w, " (")
+		io.write_int(w, entry_count)
+		io.write_string(w, ")")
+		fmt.wprintln(w, `</summary>`)
+		defer fmt.wprintln(w, `</details>`)
+
+		if entry_count == 0 {
+			io.write_string(w, "<p class=\"pkg-empty-section\">This section is empty.</p>\n")
+		} else {
+			fmt.wprintln(w, "<ul>")
+			for b in intrinsics_entities do if b.kind == kind {
+				fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", b.name)
+			}
+
+			fmt.wprintln(w, "</ul>")
+		}
+	}
+
+	fmt.wprintln(w, `<div id="pkg-index">`)
+	fmt.wprintln(w, `<h2>Index</h2>`)
+
+	// write_index(w, "Constants",        "c")
+	write_index(w, "Types",            "t")
+	write_index(w, "Procedures",       "b")
+	// write_index(w, "Procedure Groups", "g")
+
+	fmt.wprintln(w, "</div>")
+	fmt.wprintln(w, "</div>")
+
+	write_entries :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, title: string, kind: string) {
+		fmt.wprintf(w, "<h2 id=\"pkg-{0:s}\" class=\"pkg-header\">{0:s}</h2>\n", title)
+		
+		collection := cfg.pkg_to_collection[runtime_pkg]
+		runtime_url := fmt.aprintf("%s/%s", collection.base_url, collection.pkg_to_path[runtime_pkg])
+		defer delete(runtime_url)
+
+		// intrinsics entries
+		for b in intrinsics_entities do if b.kind == kind {
+			fmt.wprintln(w, `<div class="pkg-entity">`)
+			defer fmt.wprintln(w, `</div>`)
+
+			name := b.name
+
+			fmt.wprintf(w, "<h3 id=\"{0:s}\"><span><a class=\"doc-id-link\" href=\"#{0:s}\">{0:s}", name)
+			fmt.wprintf(w, "<span class=\"a-hidden\">&nbsp;¶</span></a></span>")
+			fmt.wprintf(w, "</h3>\n")
+			fmt.wprintln(w, `<div>`)
+
+			the_comment := b.comment
+			extra_comment := ""
+
+			switch b.kind {
+			case "c", "t":
+				fmt.wprint(w, `<pre class="doc-code">`)
+				fmt.wprintf(w, "%s", b.value if len(b.value) != 0 else
+				                     "…"     if b.kind == "c"     else
+				                     name)
+				if strings.contains(b.type, "untyped") {
+					fmt.wprintf(w, " <span class=\"comment\">// %s</span>", b.type)
+				}
+
+				fmt.wprintln(w, "</pre>")
+			case "b":
+				fmt.wprint(w, `<pre class="doc-code">`)
+				fmt.wprintf(w, "%s :: %s", name, b.type)
+				io.write_string(w, " {…}")
+				fmt.wprintln(w, "</pre>")
+			}
+
+			fmt.wprintln(w, `</div>`)
+
+			if len(the_comment) != 0 || len(extra_comment) != 0 {
+				fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
+				fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
+				write_docs(w, the_comment, name)
+				write_docs(w, extra_comment, name)
+				fmt.wprintln(w, `</details>`)
+			}
+		}
+	}
+
+	fmt.wprintln(w, `<section class="documentation">`)
+	// write_entries(w, runtime_pkg, "Constants",        "c")
+	write_entries(w, runtime_pkg, "Types",            "t")
+	write_entries(w, runtime_pkg, "Procedures",       "b")
+	// write_entries(w, runtime_pkg, "Procedure Groups", "g")
+
+	fmt.wprintf(w, `<script type="text/javascript">var odin_pkg_name = "%s";</script>`+"\n", "intrinsics")
+	fmt.wprintln(w, `</section></article>`)
+}
