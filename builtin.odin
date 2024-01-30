@@ -876,4 +876,40 @@ write_intrinsics_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.
 
 	fmt.wprintf(w, `<script type="text/javascript">var odin_pkg_name = "%s";</script>`+"\n", "intrinsics")
 	fmt.wprintln(w, `</section></article>`)
+
+
+
+    write_link :: proc(w: io.Writer, id, text: string) {
+        fmt.wprintf(w, `<li><a href="#%s">%s</a></li>`, id, text)
+        fmt.wprintln(w, "")
+    }
+
+    write_table_entries :: proc(w: io.Writer, title: string, kind: string) {
+        // if len(entries) == 0 do return
+        fmt.wprintln(w, `<li>`)
+        {
+                fmt.wprintf(w, `<a href="#pkg-{0:s}">{0:s}</a>`, title)
+                fmt.wprintln(w, `<ul>`)
+                for e in intrinsics_entities do if e.kind == kind {
+                        fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", e.name)
+                }
+                fmt.wprintln(w, `</ul>`)
+        }
+        fmt.wprintln(w, `</li>`)
+    }
+
+    fmt.wprintln(w, `<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">`)
+    fmt.wprintln(w, `<nav id="TableOfContents">`)
+    fmt.wprintln(w, `<ul>`)
+
+    write_link(w, "pkg-overview", "Overview")
+
+    // write_table_entries(w, runtime_pkg, "Constants", "c", consts)
+    write_table_entries(w, "Types", "t")
+    write_table_entries(w, "Procedures", "p")
+    // write_table_entries(w, runtime_pkg, "Procedure Groups", "g", groups)
+    
+    fmt.wprintln(w, `</ul>`)
+    fmt.wprintln(w, `</nav>`)
+    fmt.wprintln(w, `</div></div>`)
 }
