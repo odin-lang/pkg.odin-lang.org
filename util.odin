@@ -1,7 +1,7 @@
 package odin_html_docs
 
+import "base:intrinsics"
 import "core:fmt"
-import "core:intrinsics"
 import "core:os"
 import "core:slice"
 import "core:strings"

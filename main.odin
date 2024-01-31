@@ -1,7 +1,7 @@
 package odin_html_docs
 
+import "base:intrinsics"
 import "core:fmt"
-import "core:intrinsics"
 import "core:io"
 import "core:log"
 import "core:os"
@@ -300,6 +300,33 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: []^Collection) 
 		pkg_idx += 1
 	}
 
+	if base_collection != nil {
+		if pkg_idx != 0 { fmt.wprintln(w, ",") }
+		fmt.wprintf(w, "\t\"%s\": {{\n", "intrinsics")
+		fmt.wprintf(w, "\t\t\"name\": \"%s\",\n", "intrinsics")
+		fmt.wprintf(w, "\t\t\"collection\": \"%s\",\n", base_collection.name)
+		fmt.wprintf(w, "\t\t\"path\": \"%s/%s\",\n", base_collection.base_url, "intrinsics")
+		fmt.wprint(w, "\t\t\"entities\": [\n")
+
+		for b, i in intrinsics_table {
+			if i != 0 { fmt.wprint(w, ",\n") }
+			fmt.wprint(w, "\t\t\t{")
+			fmt.wprintf(w, `"kind": %q, `, b.kind)
+			fmt.wprintf(w, `"name": %q, `, b.name)
+			fmt.wprintf(w, `"type": %q, `, b.type)
+			fmt.wprintf(w, `"intrinsics": %v, `, true)
+			if len(b.comment) != 0 {
+				fmt.wprintf(w, `"comment": %q`, b.comment)
+			}
+			fmt.wprint(w, "}")
+		}
+
+		fmt.wprint(w, "\n\t\t]")
+		fmt.wprint(w, "\n\t}")
+		pkg_idx += 1
+	}
+
+
 	for collection in collections {
 		for path, pkg in collection.pkgs {
 			entries := collection.pkg_entries_map[pkg]
@@ -398,7 +425,16 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection) {
 
 		strings.builder_reset(b)
 		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width)
-		write_builtin_pkg(w, dir, path, runtime_pkg, collection)
+		write_builtin_pkg(w, dir, path, runtime_pkg, collection, "builtin", builtin_docs)
+		write_html_footer(w, false)
+		recursive_make_directory(path, dir)
+		os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
+
+
+		path = "intrinsics"
+		strings.builder_reset(b)
+		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width)
+		write_builtin_pkg(w, dir, path, runtime_pkg, collection, "intrinsics", intrinsics_docs)
 		write_html_footer(w, false)
 		recursive_make_directory(path, dir)
 		os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
@@ -529,7 +565,7 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 	fmt.wprintln(w, `<div class="row odin-main my-4">`)
 	defer fmt.wprintln(w, `</div>`)
 
-	write_pkg_sidebar(w, nil, collection)
+	write_pkg_sidebar(w, nil, collection, "")
 
 	fmt.wprintln(w, `<article class="col-lg-10 p-4">`)
 	defer fmt.wprintln(w, `</article>`)
@@ -575,7 +611,7 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 
 		if dir.pkg != nil {
 			fmt.wprintf(w, `<a href="%s/%s">%s</a>`, collection.base_url, dir.path, dir.name)
-		} else if dir.name == "builtin" {
+		} else if dir.name == "builtin" || dir.name == "intrinsics" {
 			fmt.wprintf(w, `<a href="%s/%s">%s</a>`, collection.base_url, dir.path, dir.name)
 		} else {
 			fmt.wprintf(w, "%s", dir.name)
@@ -586,6 +622,10 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 			write_doc_line(w, line_doc)
 		} else if dir.name == "builtin" {
 			first, _, _ := strings.partition(builtin_docs, ".")
+			write_doc_line(w, first)
+			io.write_string(w, `.`)
+		} else if dir.name == "intrinsics" {
+			first, _, _ := strings.partition(intrinsics_docs, ".")
 			write_doc_line(w, first)
 			io.write_string(w, `.`)
 		} else {
@@ -620,6 +660,13 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 			dir = "builtin",
 			path = "builtin",
 			name = "builtin",
+			pkg = nil,
+			children = nil,
+		}, collection)
+		write_directory(w, &Dir_Node{
+			dir = "intrinsics",
+			path = "intrinsics",
+			name = "intrinsics",
 			pkg = nil,
 			children = nil,
 		}, collection)
@@ -1620,7 +1667,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 	}
 }
 
-write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collection) {
+write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collection, pkg_name: string) {
 
 	fmt.wprintln(w, `<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">`)
 	defer fmt.wprintln(w, `</nav>`)
@@ -1637,12 +1684,12 @@ write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collect
 	fmt.wprintln(w, `<ul>`)
 	defer fmt.wprintln(w, `</ul>`)
 
-	write_side_bar_item :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collection, dir: ^Dir_Node) {
+	write_side_bar_item :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collection, dir: ^Dir_Node, is_active: bool) {
 		fmt.wprint(w, `<li class="nav-item">`)
 		defer fmt.wprintln(w, `</li>`)
-		if dir.pkg == curr_pkg && (curr_pkg != nil || dir.name == "builtin") {
+		if dir.pkg == curr_pkg && (curr_pkg != nil || is_active) {
 			fmt.wprintf(w, `<a class="active" href="%s/%s">%s</a>`, collection.base_url, dir.path, dir.name)
-		} else if dir.pkg != nil || dir.name == "builtin" {
+		} else if dir.pkg != nil || dir.name == "builtin" || dir.name == "intrinsics" {
 			fmt.wprintf(w, `<a href="%s/%s">%s</a>`, collection.base_url, dir.path, dir.name)
 		} else {
 			fmt.wprintf(w, "%s", dir.name)
@@ -1666,16 +1713,27 @@ write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collect
 
 	if collection.name == "base" {
 		write_side_bar_item(w, curr_pkg, collection, &Dir_Node{
-			dir = "builtin",
-			path = "builtin",
-			name = "builtin",
-			pkg = nil,
-			children = nil,
-		})
+				dir = "builtin",
+				path = "builtin",
+				name = "builtin",
+				pkg = nil,
+				children = nil,
+			},
+			is_active = pkg_name=="builtin",
+		)
+		write_side_bar_item(w, curr_pkg, collection, &Dir_Node{
+				dir = "intrinsics",
+				path = "intrinsics",
+				name = "intrinsics",
+				pkg = nil,
+				children = nil,
+			},
+			is_active = pkg_name=="intrinsics",
+		)
 	}
 
 	for dir in collection.root.children {
-		write_side_bar_item(w, curr_pkg, collection, dir)
+		write_side_bar_item(w, curr_pkg, collection, dir, false)
 	}
 }
 
@@ -2253,7 +2311,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			fmt.wprintf(w, `<a href="/base/builtin#{0:s}">builtin</a>.{0:s}`, name)
 			return
 		} else if .Builtin_Pkg_Intrinsics in entity.flags {
-			fmt.wprintf(w, "intrinsics.%s", name)
+			fmt.wprintf(w, `<a href="/base/intrinsics#{0:s}">intrinsics</a>.{0:s}`, name)
 			return
 		} else if pkg != this_pkg {
 			fmt.wprintf(w, "%s.", str(this_pkg.name))
@@ -2446,7 +2504,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	fmt.wprintln(w, `<div class="row odin-main my-4" id="pkg">`)
 	defer fmt.wprintln(w, `</div>`)
 
-	write_pkg_sidebar(w, pkg, collection)
+	write_pkg_sidebar(w, pkg, collection, str(pkg.name))
 
 	fmt.wprintln(w, `<article class="col-lg-8 p-4 documentation odin-article">`)
 

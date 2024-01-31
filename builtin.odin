@@ -15,6 +15,8 @@ Builtin :: struct {
 	value:   string,
 }
 
+builtin_docs := `package builtin provides documentation for Odin's predeclared identifiers. The items documented here are not actually in package builtin but here to allow for better documentation for the language's special identifiers.`
+
 builtins := []Builtin{
 	{name = "nil",          kind = "c", type = "untyped nil", comment = "`nil` is a predecared identifier representing the zero value for a pointer, multi-pointer, enum, bit_set, slice, dynamic array, map, procedure, any, typeid, cstring, union, #soa array, #soa pointer, #relative type"},
 	{name = "false",        kind = "c", type = "untyped boolean", value = "0 != 0"},
@@ -198,9 +200,7 @@ builtins := []Builtin{
 
 }
 
-builtin_docs := `package builtin provides documentation for Odin's predeclared identifiers. The items documented here are not actually in package builtin but here to allow for better documentation for the language's special identifiers.`
-
-write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg, collection: ^Collection) {
+write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg, collection: ^Collection, pkg_name: string, pkg_docs: string) {
 	// slice.sort_by(builtins, proc(a, b: Builtin) -> bool {
 	// 	if a.kind == b.kind {
 	// 		return a.name < b.name
@@ -211,7 +211,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 	fmt.wprintln(w, `<div class="row odin-main" id="pkg">`)
 	defer fmt.wprintln(w, `</div>`)
 
-	write_pkg_sidebar(w, nil, collection)
+	write_pkg_sidebar(w, nil, collection, pkg_name)
 
 	fmt.wprintln(w, `<article class="col-lg-8 p-4 documentation odin-article">`)
 
@@ -232,51 +232,53 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 		fmt.wprintln(w, "<div id=\"pkg-overview\">")
 		defer fmt.wprintln(w, "</div>")
 
-		write_docs(w, builtin_docs)
+		write_docs(w, pkg_docs)
 	}
 
-	write_index :: proc(w: io.Writer, runtime_entries: []doc.Scope_Entry, name: string, kind: string, builtin_entities: ^[dynamic]doc.Scope_Entry) {
+	write_index :: proc(w: io.Writer, runtime_entries: []doc.Scope_Entry, name: string, kind: string, builtin_entities: ^[dynamic]doc.Scope_Entry, pkg_name: string, entry_table: []Builtin) {
 		entry_count := 0
 
-		for entry in runtime_entries {
-			e := &cfg.entities[entry.entity]
-			ok := false
-			for attr in array(e.attributes) {
-				if str(attr.name) == "builtin" {
-					ok = true
-					break
+		if pkg_name == "builtin" {
+			for entry in runtime_entries {
+				e := &cfg.entities[entry.entity]
+				ok := false
+				for attr in array(e.attributes) {
+					if str(attr.name) == "builtin" {
+						ok = true
+						break
+					}
 				}
-			}
-			if !ok {
-				continue
-			}
-			#partial switch e.kind {
-			case .Constant:
-				if kind == "c" {
-					append(builtin_entities, entry)
-					entry_count += 1
+				if !ok {
+					continue
 				}
-			case .Type_Name:
-				if kind == "t" {
-					append(builtin_entities, entry)
-					entry_count += 1
-				}
-			case .Procedure:
-				if kind == "b" {
-					append(builtin_entities, entry)
-					entry_count += 1
-				}
-			case .Proc_Group:
-				if kind == "g" {
-					append(builtin_entities, entry)
-					entry_count += 1
+				#partial switch e.kind {
+				case .Constant:
+					if kind == "c" {
+						append(builtin_entities, entry)
+						entry_count += 1
+					}
+				case .Type_Name:
+					if kind == "t" {
+						append(builtin_entities, entry)
+						entry_count += 1
+					}
+				case .Procedure:
+					if kind == "b" {
+						append(builtin_entities, entry)
+						entry_count += 1
+					}
+				case .Proc_Group:
+					if kind == "g" {
+						append(builtin_entities, entry)
+						entry_count += 1
+					}
 				}
 			}
 		}
 
 		any_builtin := entry_count > 0
 
-		for b in builtins do if b.kind == kind {
+		for b in entry_table do if b.kind == kind {
 			entry_count += 1
 		}
 
@@ -297,14 +299,14 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 			io.write_string(w, "<p class=\"pkg-empty-section\">This section is empty.</p>\n")
 		} else {
 			fmt.wprintln(w, "<ul>")
-			for b in builtins do if b.kind == kind {
+			for b in entry_table do if b.kind == kind {
 				fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", b.name)
 			}
 
 			if any_builtin {
 				for entry in builtin_entities {
 					e := &cfg.entities[entry.entity]
-					fmt.wprintf(w, "<li><a href=\"/core/runtime\">runtime</a>.<a href=\"#{0:s}\">{0:s}</a></li>\n", str(e.name))
+					fmt.wprintf(w, "<li><a href=\"/base/runtime\">runtime</a>.<a href=\"#{0:s}\">{0:s}</a></li>\n", str(e.name))
 				}
 			}
 
@@ -314,6 +316,11 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 
 	fmt.wprintln(w, `<div id="pkg-index">`)
 	fmt.wprintln(w, `<h2>Index</h2>`)
+
+	entry_table := builtins
+	if pkg_name == "intrinsics" {
+		entry_table = intrinsics_table
+	}
 
 	runtime_entries := array(runtime_pkg.entries)
 
@@ -331,16 +338,16 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 	slice.sort_by_key(runtime_procs[:],  entity_key)
 	slice.sort_by_key(runtime_groups[:], entity_key)
 
-	write_index(w, runtime_entries, "Constants",        "c", &runtime_consts)
-	write_index(w, runtime_entries, "Types",            "t", &runtime_types)
-	write_index(w, runtime_entries, "Procedures",       "b", &runtime_procs)
-	write_index(w, runtime_entries, "Procedure Groups", "g", &runtime_groups)
+	write_index(w, runtime_entries, "Constants",        "c", &runtime_consts, pkg_name, entry_table)
+	write_index(w, runtime_entries, "Types",            "t", &runtime_types,  pkg_name, entry_table)
+	write_index(w, runtime_entries, "Procedures",       "b", &runtime_procs,  pkg_name, entry_table)
+	write_index(w, runtime_entries, "Procedure Groups", "g", &runtime_groups, pkg_name, entry_table)
 
 	fmt.wprintln(w, "</div>")
 	fmt.wprintln(w, "</div>")
 
 
-	write_entries :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, title: string, kind: string, entries: []doc.Scope_Entry) {
+	write_entries :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, title: string, kind: string, entries: []doc.Scope_Entry, entry_table: []Builtin) {
 		fmt.wprintf(w, "<h2 id=\"pkg-{0:s}\" class=\"pkg-header\">{0:s}</h2>\n", title)
 		
 		collection := cfg.pkg_to_collection[runtime_pkg]
@@ -348,7 +355,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 		defer delete(runtime_url)
 
 		// builtin entries
-		for b in builtins do if b.kind == kind {
+		for b in entry_table do if b.kind == kind {
 			fmt.wprintln(w, `<div class="pkg-entity">`)
 			defer fmt.wprintln(w, `</div>`)
 
@@ -386,8 +393,9 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 				} else {
 					fmt.wprintf(w, "%s :: ", name)
 				}
-				fmt.wprintf(w, "%s", b.value if len(b.value) != 0 else
-				                     "…"     if b.kind == "c"     else
+				fmt.wprintf(w, "%s", b.type  if len(b.type)  != 0 && b.kind == "t" else
+				                     b.value if len(b.value) != 0                  else
+				                     "…"     if b.kind == "c"                      else
 				                     name)
 				if strings.contains(b.type, "untyped") {
 					fmt.wprintf(w, " <span class=\"comment\">// %s</span>", b.type)
@@ -420,33 +428,34 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 		}
 	}
 
-	fmt.wprintln(w, `<section class="documentation">`)
-	write_entries(w, runtime_pkg, "Constants",        "c", runtime_consts[:])
-	write_entries(w, runtime_pkg, "Types",            "t", runtime_types[:])
-	write_entries(w, runtime_pkg, "Procedures",       "b", runtime_procs[:])
-	write_entries(w, runtime_pkg, "Procedure Groups", "g", runtime_groups[:])
 
-	fmt.wprintf(w, `<script type="text/javascript">var odin_pkg_name = "%s";</script>`+"\n", "builtin")
+	fmt.wprintln(w, `<section class="documentation">`)
+	write_entries(w, runtime_pkg, "Constants",        "c", runtime_consts[:], entry_table)
+	write_entries(w, runtime_pkg, "Types",            "t", runtime_types[:],  entry_table)
+	write_entries(w, runtime_pkg, "Procedures",       "b", runtime_procs[:],  entry_table)
+	write_entries(w, runtime_pkg, "Procedure Groups", "g", runtime_groups[:], entry_table)
+
+	fmt.wprintf(w, `<script type="text/javascript">var odin_pkg_name = "%s";</script>`+"\n", pkg_name)
 	fmt.wprintln(w, `</section></article>`)
 
-	write_table_contents(w, runtime_pkg, runtime_consts[:], runtime_types[:], runtime_procs[:], runtime_groups[:])
+	write_table_contents(w, runtime_pkg, runtime_consts[:], runtime_types[:], runtime_procs[:], runtime_groups[:], entry_table)
 
 }
 
 @(private)
-write_table_contents :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, consts: []doc.Scope_Entry, types: []doc.Scope_Entry, procs: []doc.Scope_Entry, groups: []doc.Scope_Entry) {
+write_table_contents :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, consts: []doc.Scope_Entry, types: []doc.Scope_Entry, procs: []doc.Scope_Entry, groups: []doc.Scope_Entry, entry_table: []Builtin) {
     write_link :: proc(w: io.Writer, id, text: string) {
         fmt.wprintf(w, `<li><a href="#%s">%s</a></li>`, id, text)
         fmt.wprintln(w, "")
     }
 
-    write_table_entries :: proc(w: io.Writer, runetime_pkg: ^doc.Pkg, title: string, kind: string, entries: []doc.Scope_Entry) {
+    write_table_entries :: proc(w: io.Writer, runetime_pkg: ^doc.Pkg, title: string, kind: string, entries: []doc.Scope_Entry, entry_table: []Builtin) {
         // if len(entries) == 0 do return
         fmt.wprintln(w, `<li>`)
         {
                 fmt.wprintf(w, `<a href="#pkg-{0:s}">{0:s}</a>`, title)
                 fmt.wprintln(w, `<ul>`)
-                for e in builtins do if e.kind == kind {
+                for e in entry_table do if e.kind == kind {
                         fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", e.name)
                 }
                 fmt.wprintln(w, `</ul>`)
@@ -460,10 +469,10 @@ write_table_contents :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, consts: []doc.
 
     write_link(w, "pkg-overview", "Overview")
 
-    write_table_entries(w, runtime_pkg, "Constants", "c", consts)
-    write_table_entries(w, runtime_pkg, "Types", "t", types)
-    write_table_entries(w, runtime_pkg, "Procedures", "b", procs)
-    write_table_entries(w, runtime_pkg, "Procedure Groups", "g", groups)
+    write_table_entries(w, runtime_pkg, "Constants", "c", consts, entry_table)
+    write_table_entries(w, runtime_pkg, "Types", "t", types, entry_table)
+    write_table_entries(w, runtime_pkg, "Procedures", "b", procs, entry_table)
+    write_table_entries(w, runtime_pkg, "Procedure Groups", "g", groups, entry_table)
     
     fmt.wprintln(w, `</ul>`)
     fmt.wprintln(w, `</nav>`)

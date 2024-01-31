@@ -427,7 +427,7 @@ if (odin_search) {
 					if (formatted_str.includes(".")) {
 						[formatted_pkg, formatted_name] = formatted_str.split(".", 2);
 					} else {
-						is_builtin = entity.pkg == "builtin" || entity.pkg == "runtime";
+						is_builtin = entity.pkg == "builtin" || entity.pkg == "intrinsics" || entity.pkg == "runtime";
 						formatted_name = formatted_str;
 					}
 					if (formatted_pkg !== null && (!IS_PACKAGE_PAGE || entity.pkg != odin_pkg_name)) {
@@ -442,7 +442,7 @@ if (odin_search) {
 						"t": "type",
 						"p": "procedure",
 						"g": "procedure&nbsp;group",
-						"b": "builtin",
+						"b": (entity.pkg == "intrinsics") ? "intrinsics" : "builtin",
 					};
 
 					let entity_kind = entity_kind_map[entity.kind];
