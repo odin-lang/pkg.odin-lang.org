@@ -29,7 +29,7 @@ intrinsics_table := []Builtin{
 	{name = "trap", kind = "b", type = "proc() -> !"},
 
 
-	{name = "alloca", kind = "b", type = "proc(size, align: int) -> [^]u8", comment = "A procedure that allocates `size` bytes of space in the stack from of the caller, aligned to `align` bytes. This temporary space is automatically freed when the procedure that called `alloca` returns to its caller."},
+	{name = "alloca", kind = "b", type = "proc(size, align: int) -> [^]u8", comment = "A procedure that allocates `size` bytes of space in the stack frame of the caller, aligned to `align` bytes. This temporary space is automatically freed when the procedure that called `alloca` returns to its caller."},
 	{name = "cpu_relax", kind = "b", type = "proc()",
 		comment = "On i386/amd64, it should map to the `pause` instruction. On arm64, it should map to `isb` instruction (see https://bugs.java.com/bugdatabase/view_bug.do?bug_id=8258604 for more information).",
 	},
@@ -290,7 +290,7 @@ intrinsics_table := []Builtin{
 
 	{name = "simd_shuffle",            kind = "b", type = "proc(a, b: #simd[N]T, $indices: ..int) -> #simd[len(indices)]T",
 		comment =
-		"The first two operators of `simd_shuffle` are `#simd` vectors of the same time. The indices following these represent the shuffle mask values. The mask elements must be constant integers. The result of the procedure is a vector whose length is the same as the number of indices passed to the procedure type.\n\n"+
+		"The first two operators of `simd_shuffle` are `#simd` vectors of the same type. The indices following these represent the shuffle mask values. The mask elements must be constant integers. The result of the procedure is a vector whose length is the same as the number of indices passed to the procedure type.\n\n"+
 		"The elements of the two input `#simd` vectors are numbers from left to right across both of the vectors. For each element of the result `#simd` vector, the shuffle indices selement an element from one of the two input vectors to copy to the result.\n\n"+
 		"Example:\n"+
 		"\ta, b: #simd[4]T = ...\n"+
@@ -329,7 +329,7 @@ intrinsics_table := []Builtin{
 
 	// x86 Targets (i386, amd64)
 	{name = "x86_cpuid",  kind = "b", type = "proc(ax, cx: u32) -> (eax, ebx, ecx, edx: u32)", comment = X86_COMMENT + "\nImplements the `cpuid` instruction."},
-	{name = "x86_xgetbv", kind = "b", type = "proc(cx: u32) -> (eax, edx: u32)", comment = X86_COMMENT+"\nImplements in `xgetbv` instruct."},
+	{name = "x86_xgetbv", kind = "b", type = "proc(cx: u32) -> (eax, edx: u32)", comment = X86_COMMENT+"\nImplements in `xgetbv` instruction."},
 
 	// Darwin targets only
 	{name = "objc_object",            kind = "t", type="struct{}",                              comment = DARWIN_COMMENT + "\nRepresents an Objective-C `object` type."},
@@ -340,9 +340,9 @@ intrinsics_table := []Builtin{
 	{name = "objc_Class",             kind = "t", type="^objc_class",                           comment = DARWIN_COMMENT + "\nRepresents an Objective-C `Class` type."},
 
 	{name = "objc_find_selector",     kind = "b", type="proc($name: string) -> objc_SEL   ---", comment = DARWIN_COMMENT + "\nWill return a run-time cached selector value for the given constant string value."},
-	{name = "objc_register_selector", kind = "b", type="proc($name: string) -> objc_SEL   ---", comment = DARWIN_COMMENT + "\nWill register selector value at run-time for the given constant string value."},
+	{name = "objc_register_selector", kind = "b", type="proc($name: string) -> objc_SEL   ---", comment = DARWIN_COMMENT + "\nWill register a selector value at run-time for the given constant string value."},
 	{name = "objc_find_class",        kind = "b", type="proc($name: string) -> objc_Class ---", comment = DARWIN_COMMENT + "\nWill return a run-time cached class value for the given constant string value."},
-	{name = "objc_register_class",    kind = "b", type="proc($name: string) -> objc_Class ---", comment = DARWIN_COMMENT + "\nWill register class value at run-time for the given constant string value."},
+	{name = "objc_register_class",    kind = "b", type="proc($name: string) -> objc_Class ---", comment = DARWIN_COMMENT + "\nWill register a class value at run-time for the given constant string value."},
 }
 
 
