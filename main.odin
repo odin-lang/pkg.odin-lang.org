@@ -1644,7 +1644,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 		io.write_string(w, "<details open class=\"code-example\">\n")
 		defer io.write_string(w, "</details>\n")
 		io.write_string(w, "<summary><b>Example:</b></summary>\n")
-		io.write_string(w, `<pre><code class="hljs" data-lang="odin">`)
+		io.write_string(w, `<pre><code class="hljs language-odin" data-lang="odin">`)
 		for line in example_lines {
 			io.write_string(w, strings.trim_prefix(line, "\t"))
 			io.write_string(w, "\n")

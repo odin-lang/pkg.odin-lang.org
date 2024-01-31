@@ -12,10 +12,10 @@ intrinsics_docs := `package intrinsics provides documentation for Odin's compile
 
 intrinsics_table := []Builtin{
 	// Package Related
-	{name = "is_package_imported", kind = "p", type = "proc($package_name: string) -> bool", comment = ""},
+	{name = "is_package_imported", kind = "p", type = "proc($package_name: string) -> bool", comment = "Returns a constant boolean as to whether or not that package has been imported anywhere in the project. This is only needed for very rare edge cases."},
 
 	// Types
-	{name = "soa_struct", kind = "b", type = "proc($N: int, $T: typeid) -> type/#soa[N]T", comment = ""},
+	{name = "soa_struct", kind = "b", type = "proc($N: int, $T: typeid) -> type/#soa[N]T", comment = "A call-like way to construct an #soa struct. Possibly to deprecated in the future."},
 
 	// Volatile
 	{name = "volatile_load", kind = "b", type = "proc(dst: ^$T) -> T"},
@@ -29,9 +29,13 @@ intrinsics_table := []Builtin{
 	{name = "trap", kind = "b", type = "proc() -> !"},
 
 
-	{name = "alloca", kind = "b", type = "proc(size, align: int) -> [^]u8"},
-	{name = "cpu_relax", kind = "b", type = "proc()"},
-	{name = "read_cycle_counter", kind = "b", type = "proc() -> i64"},
+	{name = "alloca", kind = "b", type = "proc(size, align: int) -> [^]u8", comment = "A procedure that allocates `size` bytes of space in the stack from of the caller, aligned to `align` bytes. This temporary space is automatically freed when the procedure that called `alloca` returns to its caller."},
+	{name = "cpu_relax", kind = "b", type = "proc()",
+		comment = "On i386/amd64, it should map to the `pause` instruction. On arm64, it should map to `isb` instruction (see https://bugs.java.com/bugdatabase/view_bug.do?bug_id=8258604 for more information).",
+	},
+	{name = "read_cycle_counter", kind = "b", type = "proc() -> i64",
+		comment = "This provides access to the cycle counter register (or similar low latency, high accuracy clocks) on the targets that support it. On i386/amd64, it should map to the `rdtsc` instruction. On arm64, it should map to the `cntvct_el0` instruction.",
+	},
 
 	{name = "count_ones",           kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)"},
 	{name = "count_zeros",          kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)"},
@@ -40,30 +44,30 @@ intrinsics_table := []Builtin{
 	{name = "reverse_bits",         kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)"},
 	{name = "byte_swap",            kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_float(T)"},
 
-	{name = "overflow_add", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool) #optional_ok"},
-	{name = "overflow_sub", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool) #optional_ok"},
-	{name = "overflow_mul", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool) #optional_ok"},
+	{name = "overflow_add", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool) #optional_ok", comment = "The second return value will be true if an overflow occurs."},
+	{name = "overflow_sub", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool) #optional_ok", comment = "The second return value will be true if an overflow occurs."},
+	{name = "overflow_mul", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool) #optional_ok", comment = "The second return value will be true if an overflow occurs."},
 
 	{name = "sqrt", kind = "b", type = "proc(x: $T) -> T where type_is_float(T) || (type_is_simd_vector(T) && type_is_float(type_elem_type(T)))"},
 
 	{name = "fused_mul_add", kind = "b", type = "proc(a, b, c: $T) -> T where type_is_float(T) || (type_is_simd_vector(T) && type_is_float(type_elem_type(T)))"},
 
-	{name = "mem_copy",                 kind = "b", type = "proc(dst, src: rawptr, len: int)"},
-	{name = "mem_copy_non_overlapping", kind = "b", type = "proc(dst, src: rawptr, len: int)"},
-	{name = "mem_zero",                 kind = "b", type = "proc(ptr: rawptr, len: int)"},
-	{name = "mem_zero_volatile",        kind = "b", type = "proc(ptr: rawptr, len: int)"},
+	{name = "mem_copy",                 kind = "b", type = "proc(dst, src: rawptr, len: int)", comment = "Copies a block of memory from the `src` location to the `dst` location but assumes that the memory ranges could be overlapping. It is equivalent to C's `memmove`, but unlike the C's libc procedure, it does not return value."},
+	{name = "mem_copy_non_overlapping", kind = "b", type = "proc(dst, src: rawptr, len: int)", comment = "Copies a block of memory from the `src` location to the `dst` location but it does not assume the memory ranges could be overlapping. It is equivalent to C's `memcpy`, but unlike the C's libc procedure, it does not return value."},
+	{name = "mem_zero",                 kind = "b", type = "proc(ptr: rawptr, len: int)", comment = "Zeroes a block of memory at the `ptr` location for `len` bytes."},
+	{name = "mem_zero_volatile",        kind = "b", type = "proc(ptr: rawptr, len: int)", comment = "Zeroes a block of memory at the `ptr` location for `len` bytes with volatile semantics."},
 
 	// prefer [^]T operations if possible
-	{name = "ptr_offset",                 kind = "b", type = "proc(ptr: ^$T, offset: int) -> ^T"},
-	{name = "ptr_sub",                    kind = "b", type = "proc(a, b: ^$T) -> int"},
+	{name = "ptr_offset",                 kind = "b", type = "proc(ptr: ^$T, offset: int) -> ^T", comment = "Prefer using [^]T operations if possible. e.g. `ptr[offset:]`"},
+	{name = "ptr_sub",                    kind = "b", type = "proc(a, b: ^$T) -> int", comment = "Equivalent to `int(uintptr(a) - uintptr(b)) / size_of(T)`"},
 
-	{name = "unaligned_load",             kind = "b", type = "proc(src: ^$T) -> T"},
-	{name = "unaligned_store",            kind = "b", type = "proc(dst: ^$T, val: T) -> T"},
+	{name = "unaligned_load",             kind = "b", type = "proc(src: ^$T) -> T", comment = "Performs a load on an unaligned value `src`."},
+	{name = "unaligned_store",            kind = "b", type = "proc(dst: ^$T, val: T) -> T", comment = "Performs a store on an unaligned value `dst`."},
 
-	{name = "fixed_point_mul",            kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T where type_is_integer(T)"},
-	{name = "fixed_point_div",            kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T where type_is_integer(T)"},
-	{name = "fixed_point_mul_sat",        kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T where type_is_integer(T)"},
-	{name = "fixed_point_div_sat",        kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T where type_is_integer(T)"},
+	{name = "fixed_point_mul",            kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T where type_is_integer(T)", comment = FIXED_POINT_COMMENT},
+	{name = "fixed_point_div",            kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T where type_is_integer(T)", comment = FIXED_POINT_COMMENT},
+	{name = "fixed_point_mul_sat",        kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T where type_is_integer(T)", comment = FIXED_POINT_COMMENT},
+	{name = "fixed_point_div_sat",        kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T where type_is_integer(T)", comment = FIXED_POINT_COMMENT},
 
 	{name = "prefetch_read_instruction",  kind = "b", type = "proc(address: rawptr, #const locality: i32 /* 0..=3 */)"},
 	{name = "prefetch_read_data",         kind = "b", type = "proc(address: rawptr, #const locality: i32 /* 0..=3 */)"},
@@ -157,11 +161,17 @@ intrinsics_table := []Builtin{
 	{name = "type_is_ordered_numeric",       kind = "b", type = "proc($T: typeid) -> bool"},
 	{name = "type_is_indexable",             kind = "b", type = "proc($T: typeid) -> bool"},
 	{name = "type_is_sliceable",             kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_comparable",            kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_comparable",            kind = "b", type = "proc($T: typeid) -> bool",
+		comment = ""+
+		"Returns true if the type is comparable, which allows for the use of `==` and `!=` binary operators.\n\n"+
+		"One of the following non-compound types (as well as any `distinct` forms): `rune`, `string`, `cstring`, `typeid`, pointer, `#soa` related pointer, multi-pointer, enum, procedure, matrix, `bit_set`, `#simd` vector.\n\n"+
+		"One of the following compound types (as well as any `distinct` forms): any array or enumerated array where its element type is also comparable; any `struct` where all of its fields are comparable; any `struct #raw_union` were all of its fields are simply comparable (see `type_is_simple_compare`); any `union` where all of its variants are comparable.\n"+
+		""
+	},
 	{name = "type_is_simple_compare",        kind = "b", type = "proc($T: typeid) -> bool", comment = "easily compared using memcmp (== and !=)"},
-	{name = "type_is_dereferenceable",       kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_valid_map_key",         kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_valid_matrix_elements", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_dereferenceable",       kind = "b", type = "proc($T: typeid) -> bool", comment = "Must be a pointer type `^T` (not `rawptr`) or an `#soa` related pointer type."},
+	{name = "type_is_valid_map_key",         kind = "b", type = "proc($T: typeid) -> bool", comment = "Any comparable type which is not-untyped nor generic."},
+	{name = "type_is_valid_matrix_elements", kind = "b", type = "proc($T: typeid) -> bool", comment = "Any integer, float, or complex number type (not-untyped)."},
 
 	{name = "type_is_named",                 kind = "b", type = "proc($T: typeid) -> bool"},
 	{name = "type_is_pointer",               kind = "b", type = "proc($T: typeid) -> bool"},
@@ -267,18 +277,30 @@ intrinsics_table := []Builtin{
 	{name = "simd_lanes_gt",           kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]Integer", comment = SIMD_LANES_COMMENT},
 	{name = "simd_lanes_ge",           kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]Integer", comment = SIMD_LANES_COMMENT},
 
-	{name = "simd_extract",            kind = "b", type = "proc(a: #simd[N]T, idx: uint) -> T"},
-	{name = "simd_replace",            kind = "b", type = "proc(a: #simd[N]T, idx: uint, elem: T) -> #simd[N]T"},
+	{name = "simd_extract",            kind = "b", type = "proc(a: #simd[N]T, idx: uint) -> T", comment = "Extracts a single scalar element from a `#simd` vector at a specified index."},
+	{name = "simd_replace",            kind = "b", type = "proc(a: #simd[N]T, idx: uint, elem: T) -> #simd[N]T", comment = "Replaces a single scalar element from a `#simd` vector and returns a new vector."},
 
-	{name = "simd_reduce_add_ordered", kind = "b", type = "proc(a: #simd[N]T) -> T"},
-	{name = "simd_reduce_mul_ordered", kind = "b", type = "proc(a: #simd[N]T) -> T"},
-	{name = "simd_reduce_min",         kind = "b", type = "proc(a: #simd[N]T) -> T"},
-	{name = "simd_reduce_max",         kind = "b", type = "proc(a: #simd[N]T) -> T"},
-	{name = "simd_reduce_and",         kind = "b", type = "proc(a: #simd[N]T) -> T"},
-	{name = "simd_reduce_or",          kind = "b", type = "proc(a: #simd[N]T) -> T"},
-	{name = "simd_reduce_xor",         kind = "b", type = "proc(a: #simd[N]T) -> T"},
+	{name = "simd_reduce_add_ordered", kind = "b", type = "proc(a: #simd[N]T) -> T", comment = SIMD_REDUCE_PREFIX + "simd_reduce_add_ordered" + SIMD_REDUCE_MID + "result = result + e"     + SIMD_REDUCE_SUFFIX},
+	{name = "simd_reduce_mul_ordered", kind = "b", type = "proc(a: #simd[N]T) -> T", comment = SIMD_REDUCE_PREFIX + "simd_reduce_mul_ordered" + SIMD_REDUCE_MID + "result = result * e"     + SIMD_REDUCE_SUFFIX},
+	{name = "simd_reduce_min",         kind = "b", type = "proc(a: #simd[N]T) -> T", comment = SIMD_REDUCE_PREFIX + "simd_reduce_min"         + SIMD_REDUCE_MID + "result = min(result, e)" + SIMD_REDUCE_SUFFIX},
+	{name = "simd_reduce_max",         kind = "b", type = "proc(a: #simd[N]T) -> T", comment = SIMD_REDUCE_PREFIX + "simd_reduce_max"         + SIMD_REDUCE_MID + "result = max(result, e)" + SIMD_REDUCE_SUFFIX},
+	{name = "simd_reduce_and",         kind = "b", type = "proc(a: #simd[N]T) -> T", comment = SIMD_REDUCE_PREFIX + "simd_reduce_and"         + SIMD_REDUCE_MID + "result = result & e"     + SIMD_REDUCE_SUFFIX},
+	{name = "simd_reduce_or",          kind = "b", type = "proc(a: #simd[N]T) -> T", comment = SIMD_REDUCE_PREFIX + "simd_reduce_or"          + SIMD_REDUCE_MID + "result = result | e"     + SIMD_REDUCE_SUFFIX},
+	{name = "simd_reduce_xor",         kind = "b", type = "proc(a: #simd[N]T) -> T", comment = SIMD_REDUCE_PREFIX + "simd_reduce_xor"         + SIMD_REDUCE_MID + "result = result ~ e"     + SIMD_REDUCE_SUFFIX},
 
-	{name = "simd_shuffle",            kind = "b", type = "proc(a, b: #simd[N]T, indices: ..int) -> #simd[len(indices)]T"},
+	{name = "simd_shuffle",            kind = "b", type = "proc(a, b: #simd[N]T, $indices: ..int) -> #simd[len(indices)]T",
+		comment =
+		"The first two operators of `simd_shuffle` are `#simd` vectors of the same time. The indices following these represent the shuffle mask values. The mask elements must be constant integers. The result of the procedure is a vector whose length is the same as the number of indices passed to the procedure type.\n\n"+
+		"The elements of the two input `#simd` vectors are numbers from left to right across both of the vectors. For each element of the result `#simd` vector, the shuffle indices selement an element from one of the two input vectors to copy to the result.\n\n"+
+		"Example:\n"+
+		"\ta, b: #simd[4]T = ...\n"+
+		"\tx: #simd[4]T = intrinsics.simd_shuffle(a, b, 0, 1, 2, 3) // identity shuffle of `a`\n"+
+		"\ty: #simd[4]T = intrinsics.simd_shuffle(a, b, 4, 5, 6, 7) // identity shuffle of `b`\n"+
+		"\tz: #simd[4]T = intrinsics.simd_shuffle(a, b, 0, 4, 1, 5)\n"+
+		"\tw: #simd[8]T = intrinsics.simd_shuffle(a, b, 0, 1, 2, 3, 4, 5, 6, 7)\n"+
+		"\tv: #simd[6]T = intrinsics.simd_shuffle(a, b, 0, 1, 0, 3, 0, 4) // repeated indices and different sized vector\n"+
+		"",
+	},
 	{name = "simd_select",             kind = "b", type = "proc(cond: #simd[N]boolean_or_integer, true, false: #simd[N]T) -> #simd[N]T"},
 
 	// Lane-wise operations
@@ -306,22 +328,21 @@ intrinsics_table := []Builtin{
 	{name = "wasm_memory_atomic_notify32", kind = "b", type ="proc(ptr: ^u32, waiters: u32) -> (waiters_woken_up: u32)", comment = WASM_ATOMIC_COMMENT},
 
 	// x86 Targets (i386, amd64)
-	{name = "x86_cpuid",  kind = "b", type = "proc(ax, cx: u32) -> (eax, ebx, ecx, edx: u32)", comment = X86_COMMENT},
-	{name = "x86_xgetbv", kind = "b", type = "proc(cx: u32) -> (eax, edx: u32)", comment = X86_COMMENT},
-
+	{name = "x86_cpuid",  kind = "b", type = "proc(ax, cx: u32) -> (eax, ebx, ecx, edx: u32)", comment = X86_COMMENT + "\nImplements the `cpuid` instruction."},
+	{name = "x86_xgetbv", kind = "b", type = "proc(cx: u32) -> (eax, edx: u32)", comment = X86_COMMENT+"\nImplements in `xgetbv` instruct."},
 
 	// Darwin targets only
-	{name = "objc_object",            kind = "t", type="struct{}",                              comment = DARWIN_COMMENT},
-	{name = "objc_selector",          kind = "t", type="struct{}",                              comment = DARWIN_COMMENT},
-	{name = "objc_class",             kind = "t", type="struct{}",                              comment = DARWIN_COMMENT},
-	{name = "objc_id",                kind = "t", type="^objc_object",                          comment = DARWIN_COMMENT},
-	{name = "objc_SEL",               kind = "t", type="^objc_selector",                        comment = DARWIN_COMMENT},
-	{name = "objc_Class",             kind = "t", type="^objc_class",                           comment = DARWIN_COMMENT},
+	{name = "objc_object",            kind = "t", type="struct{}",                              comment = DARWIN_COMMENT + "\nRepresents an Objective-C `object` type."},
+	{name = "objc_selector",          kind = "t", type="struct{}",                              comment = DARWIN_COMMENT + "\nRepresents an Objective-C `selector` type."},
+	{name = "objc_class",             kind = "t", type="struct{}",                              comment = DARWIN_COMMENT + "\nRepresents an Objective-C `class` type."},
+	{name = "objc_id",                kind = "t", type="^objc_object",                          comment = DARWIN_COMMENT + "\nRepresents an Objective-C `id` type."},
+	{name = "objc_SEL",               kind = "t", type="^objc_selector",                        comment = DARWIN_COMMENT + "\nRepresents an Objective-C `SEL` type."},
+	{name = "objc_Class",             kind = "t", type="^objc_class",                           comment = DARWIN_COMMENT + "\nRepresents an Objective-C `Class` type."},
 
-	{name = "objc_find_selector",     kind = "b", type="proc($name: string) -> objc_SEL   ---", comment = DARWIN_COMMENT},
-	{name = "objc_register_selector", kind = "b", type="proc($name: string) -> objc_SEL   ---", comment = DARWIN_COMMENT},
-	{name = "objc_find_class",        kind = "b", type="proc($name: string) -> objc_Class ---", comment = DARWIN_COMMENT},
-	{name = "objc_register_class",    kind = "b", type="proc($name: string) -> objc_Class ---", comment = DARWIN_COMMENT},
+	{name = "objc_find_selector",     kind = "b", type="proc($name: string) -> objc_SEL   ---", comment = DARWIN_COMMENT + "\nWill return a run-time cached selector value for the given constant string value."},
+	{name = "objc_register_selector", kind = "b", type="proc($name: string) -> objc_SEL   ---", comment = DARWIN_COMMENT + "\nWill register selector value at run-time for the given constant string value."},
+	{name = "objc_find_class",        kind = "b", type="proc($name: string) -> objc_Class ---", comment = DARWIN_COMMENT + "\nWill return a run-time cached class value for the given constant string value."},
+	{name = "objc_register_class",    kind = "b", type="proc($name: string) -> objc_Class ---", comment = DARWIN_COMMENT + "\nWill register class value at run-time for the given constant string value."},
 }
 
 
@@ -339,3 +360,18 @@ WASM_ATOMIC_COMMENT :: "`timeout_ns` is maximum number of nanoseconds the callin
 
 X86_COMMENT :: "x86 Targets Only (i386, amd64)"
 DARWIN_COMMENT :: "Darwin targets only"
+
+FIXED_POINT_COMMENT :: "A fixed point number represents a real data type for a number that has a fixed number of digits after a radix point. The number of digits after the radix point is referred to as `scale`."
+
+
+SIMD_REDUCE_PREFIX :: "Performs a reduction of a `#simd` vector `a`, returning the result as a scalar. The return type matches the element-type `T` of the `#simd` vector input. See the following pseudocode:\n\t"
+SIMD_REDUCE_MID :: " :: proc(v: #simd[N]T) -> T {\n"+
+	"\t\tresult := simd_extract(v, 0)\n"+
+	"\t\tfor i in 1..<N {\n"+
+	"\t\t\te := simd_extract(v, i)\n"+
+	"\t\t\t"
+
+SIMD_REDUCE_SUFFIX :: "\n"+
+	"\t\t}\n"+
+	"\t\treturn result\n"+
+	"\t}"
