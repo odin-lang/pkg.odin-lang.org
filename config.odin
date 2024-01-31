@@ -11,6 +11,7 @@ import "core:strings"
 import doc "core:odin/doc-format"
 
 Config :: struct {
+	hide_base:    bool,
 	hide_core:    bool,
 	_collections: map[string]Collection `json:"collections"`,
 	url_prefix:   string,

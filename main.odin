@@ -183,7 +183,14 @@ main :: proc() {
 	for c in cfg.collections {
 		if cfg.hide_core && (c.name == "core" || c.name == "vendor") {
 			log.infof(
-				"Core is set to be hidden so collection %q will be excluded from search results",
+				"'core' is set to be hidden so collection %q will be excluded from search results",
+				c.name,
+			)
+			continue
+		}
+		if cfg.hide_base && (c.name == "base") {
+			log.infof(
+				"'base' is set to be hidden so collection %q will be excluded from search results",
 				c.name,
 			)
 			continue
@@ -258,21 +265,21 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: []^Collection) 
 	fmt.wprintln(w, `"packages": {`)
 
 
-	core_collection: ^Collection
+	base_collection: ^Collection
 	for c in collections {
-		if c.name == "core" {
-			core_collection = c
+		if c.name == "base" {
+			base_collection = c
 			break
 		}
 	}
 
 	pkg_idx := 0
-	if core_collection != nil {
+	if base_collection != nil {
 		if pkg_idx != 0 { fmt.wprintln(w, ",") }
 		fmt.wprintf(w, "\t\"%s\": {{\n", "builtin")
 		fmt.wprintf(w, "\t\t\"name\": \"%s\",\n", "builtin")
-		fmt.wprintf(w, "\t\t\"collection\": \"%s\",\n", core_collection.name)
-		fmt.wprintf(w, "\t\t\"path\": \"%s/%s\",\n", core_collection.base_url, "builtin")
+		fmt.wprintf(w, "\t\t\"collection\": \"%s\",\n", base_collection.name)
+		fmt.wprintf(w, "\t\t\"path\": \"%s/%s\",\n", base_collection.base_url, "builtin")
 		fmt.wprint(w, "\t\t\"entities\": [\n")
 
 		for b, i in builtins {
@@ -385,7 +392,7 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection) {
 		os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
 	}
 
-	if collection.name == "core" {
+	if collection.name == "base" {
 		assert(runtime_pkg != nil)
 		path := "builtin"
 
@@ -436,6 +443,9 @@ write_home_page :: proc(w: io.Writer) {
 	defer fmt.wprintln(w, "</div>")
 
 	for c in cfg.collections {
+		if cfg.hide_base && (c.name == "base") {
+			continue
+		}
 		if cfg.hide_core && (c.name == "core" || c.name == "vendor") {
 			continue
 		}
@@ -605,7 +615,7 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 		}
 	}
 
-	if collection.name == "core" {
+	if collection.name == "base" {
 		write_directory(w, &Dir_Node{
 			dir = "builtin",
 			path = "builtin",
@@ -694,7 +704,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		if .Param_No_Alias  in e.flags { io.write_string(w, `<span class="keyword-type">#no_alias</span> `);  name_width -= 1+len("#no_alias")  }
 		if .Param_Any_Int   in e.flags { io.write_string(w, `<span class="keyword-type">#any_int</span> `);   name_width -= 1+len("#any_int")   }
 
-        core := cfg._collections["core"]
+		base := cfg._collections["base"]
 
 		init_string := escape_html_string(str(e.init_string))
 		switch {
@@ -702,13 +712,13 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			assert(name != "")
 			io.write_string(w, name)
 			io.write_string(w, " := ")
-			fmt.wprintf(w, `<a href="%s/runtime/#Source_Code_Location">`, core.base_url)
+			fmt.wprintf(w, `<a href="%s/runtime/#Source_Code_Location">`, base.base_url)
 			io.write_string(w, init_string)
 			io.write_string(w, `</a>`)
 		case strings.has_prefix(init_string, "context."):
 			io.write_string(w, name)
 			io.write_string(w, " := ")
-			fmt.wprintf(w, `<a href="%s/runtime/#Context">`, core.base_url)
+			fmt.wprintf(w, `<a href="%s/runtime/#Context">`, base.base_url)
 			io.write_string(w, init_string)
 			io.write_string(w, `</a>`)
 		case:
@@ -821,10 +831,11 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 	}
 
 	write_lead_comment :: proc(using writer: ^Type_Writer, flags: Write_Type_Flags, docs: string, index: int) {
+		docs := docs
 		if docs == "" {
 			return
 		}
-		docs := escape_html_string(docs)
+		docs = escape_html_string(docs)
 		lines := strings.split_lines(docs)
 		defer delete(lines)
 		for i := len(lines)-1; i >= 0; i -= 1 {
@@ -846,10 +857,11 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		}
 	}
 	write_line_comment :: proc(using writer: ^Type_Writer, flags: Write_Type_Flags, padding: int, comment: string) {
+		comment := comment
 		if comment == "" {
 			return
 		}
-		comment := escape_html_string(comment)
+		comment = escape_html_string(comment)
 		for _ in 0..< padding {
 			io.write_byte(w, ' ')
 		}
@@ -870,7 +882,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		if is_type_untyped(type) {
 			io.write_string(w, str(type.name))
 		} else {
-			fmt.wprintf(w, `<a href="/core/builtin#{0:s}"><span class="doc-builtin">{0:s}</span></a>`, str(type.name))
+			fmt.wprintf(w, `<a href="/base/builtin#{0:s}"><span class="doc-builtin">{0:s}</span></a>`, str(type.name))
 			// io.write_string(w, str(type.name))
 		}
 	case .Named:
@@ -1268,7 +1280,8 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 }
 
 write_doc_line :: proc(w: io.Writer, text: string) {
-	text := escape_html_string(text)
+	text := text
+	text = escape_html_string(text)
 	for len(text) != 0 {
 		if strings.count(text, "`") >= 2 {
 			n := strings.index_byte(text, '`')
@@ -1651,7 +1664,7 @@ write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collect
 		}
 	}
 
-	if collection.name == "core" {
+	if collection.name == "base" {
 		write_side_bar_item(w, curr_pkg, collection, &Dir_Node{
 			dir = "builtin",
 			path = "builtin",
@@ -2237,7 +2250,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 
 		this_pkg := &cfg.pkgs[cfg.files[entity.pos.file].pkg]
 		if .Builtin_Pkg_Builtin in entity.flags {
-			fmt.wprintf(w, `<a href="/core/builtin#{0:s}">builtin</a>.{0:s}`, name)
+			fmt.wprintf(w, `<a href="/base/builtin#{0:s}">builtin</a>.{0:s}`, name)
 			return
 		} else if .Builtin_Pkg_Intrinsics in entity.flags {
 			fmt.wprintf(w, "intrinsics.%s", name)
