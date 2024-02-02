@@ -4,6 +4,8 @@ import "core:fmt"
 import "core:io"
 import "core:slice"
 import "core:strings"
+import "core:text/scanner"
+import "core:unicode"
 
 import doc "core:odin/doc-format"
 
@@ -369,6 +371,109 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 			the_comment := b.comment
 			extra_comment := ""
 
+			add_styling :: proc(txt: string) -> string {
+				s := scanner.init(&{}, txt)
+				s.flags -= {.Skip_Comments}
+				s.is_ident_rune = proc(ch: rune, i: int) -> bool {
+					if i == 0 {
+						if ch == '#' {
+							return true
+						}
+						if unicode.is_digit(ch) {
+							return false
+						}
+					}
+					return ch == '_' || unicode.is_letter(ch) || unicode.is_digit(ch)
+				}
+
+				b: [dynamic]byte
+				b.allocator = context.temp_allocator
+				prev_offset := 0
+
+
+				loop: for {
+					append_span :: proc(b: ^[dynamic]byte, s: ^scanner.Scanner, class: string, text: string, prev_offset: ^int) {
+						append(b, s.src[prev_offset^:s.tok_pos])
+						append(b, `<span class="`)
+						append(b, class)
+						append(b, `">`)
+						append(b, text)
+						append(b, `</span>`)
+						prev_offset^ = s.tok_end
+					}
+					append_anchored_span :: proc(b: ^[dynamic]byte, s: ^scanner.Scanner, anchor: string, class: string, text: string, prev_offset: ^int) {
+						append(b, s.src[prev_offset^:s.tok_pos])
+						append(b, `<a href="`)
+						append(b, anchor)
+						append(b, `#`)
+						append(b, text)
+						append(b, `">`)
+						append(b, `<span class="`)
+						append(b, class)
+						append(b, `">`)
+						append(b, text)
+						append(b, `</span></a>`)
+						prev_offset^ = s.tok_end
+					}
+
+					switch scanner.scan(s) {
+					case scanner.EOF:
+						break loop
+					case scanner.Ident:
+						ident := scanner.token_text(s)
+						if strings.has_prefix(ident, "type_is_") {
+							append_anchored_span(&b, s, "/base/intrinsics", "code-procedure", ident, &prev_offset)
+						} else {
+							switch ident {
+							case "runtime":
+								if scanner.peek(s) == '.' {
+									_ = scanner.scan(s)
+
+									assert(scanner.scan(s) == scanner.Ident)
+									ident := scanner.token_text(s)
+
+									append_anchored_span(&b, s, "/base/runtime", "code-typename", ident, &prev_offset)
+								}
+
+							case "where", "distinct":
+								append_span(&b, s, "keyword", ident, &prev_offset)
+								prev_offset = s.tok_end
+							case "proc", "enum", "struct", "union", "map", "typeid", "matrix", "dynamic":
+								append_span(&b, s, "keyword-type", ident, &prev_offset)
+
+							case "#soa", "#simd", "#const", "#optional_ok":
+								append_span(&b, s, "directive", ident, &prev_offset)
+
+							case "Atomic_Memory_Order",
+							     "objc_object", "objc_selector", "objc_class",
+							     "objc_id", "objc_SEL", "objc_Class":
+								append_anchored_span(&b, s, "/base/intrinsics", "code-typename", ident, &prev_offset)
+							case "uintptr", "uint", "int",
+							     "u64", "i64",
+							     "u32", "i32",
+							     "u16", "i16",
+							     "u8",
+							     "bool",
+							     "string", "cstring",
+							     "rawptr":
+								append_anchored_span(&b, s, "/base/builtin", "doc-builtin", ident, &prev_offset)
+							}
+						}
+					case scanner.Comment:
+						comment := scanner.token_text(s)
+						append_span(&b, s, "comment", comment, &prev_offset)
+					}
+				}
+
+				if len(b) != 0 {
+					append(&b, s.src[prev_offset:])
+
+					return string(b[:])
+				}
+
+				return txt
+			}
+
 			switch b.kind {
 			case "c", "t":
 				fmt.wprint(w, `<pre class="doc-code">`)
@@ -393,10 +498,16 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 				} else {
 					fmt.wprintf(w, "%s :: ", name)
 				}
-				fmt.wprintf(w, "%s", b.type  if len(b.type)  != 0 && b.kind == "t" else
-				                     b.value if len(b.value) != 0                  else
-				                     "…"     if b.kind == "c"                      else
-				                     name)
+
+				if len(b.type) != 0 && b.kind == "t" {
+					io.write_string(w, add_styling(b.type))
+				} else if len(b.value) != 0 && b.kind == "t" {
+					io.write_string(w, add_styling(b.value))
+				} else {
+					fmt.wprintf(w, "%s", b.value if len(b.value) != 0 else
+					                     "…"     if b.kind == "c"     else
+					                     name)
+				}
 				if strings.contains(b.type, "untyped") {
 					fmt.wprintf(w, " <span class=\"comment\">// %s</span>", b.type)
 				}
@@ -404,7 +515,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 				fmt.wprintln(w, "</pre>")
 			case "b":
 				fmt.wprint(w, `<pre class="doc-code">`)
-				fmt.wprintf(w, "%s :: %s", name, b.type)
+				fmt.wprintf(w, "%s :: %s", name, add_styling(b.type))
 				io.write_string(w, " {…}")
 				fmt.wprintln(w, "</pre>")
 			}

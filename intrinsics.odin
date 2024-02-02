@@ -227,7 +227,7 @@ intrinsics_table := []Builtin{
 	{name = "type_hasher_proc",                         kind = "b", type = "proc($T: typeid) -> (hasher: proc \"contextless\" (data: rawptr, seed: uintptr) -> uintptr) where type_is_comparable(T)"},
 
 	{name = "type_map_info",                            kind = "b", type = "proc($T: typeid/map[$K]$V) -> ^runtime.Map_Info"},
-	{name = "type_map_cell_info",                       kind = "b", type = "proc($T: typeid)           -> ^runtime.Map_Cell_Info"},
+	{name = "type_map_cell_info",                       kind = "b", type = "proc($T: typeid) -> ^runtime.Map_Cell_Info"},
 
 	{name = "type_convert_variants_to_pointers",        kind = "b", type = "proc($T: typeid) -> typeid where type_is_union(T)"},
 	{name = "type_merge",                               kind = "b", type = "proc($U, $V: typeid) -> typeid where type_is_union(U), type_is_union(V)"},
@@ -332,17 +332,17 @@ intrinsics_table := []Builtin{
 	{name = "x86_xgetbv", kind = "b", type = "proc(cx: u32) -> (eax, edx: u32)", comment = X86_COMMENT+"\nImplements in `xgetbv` instruction."},
 
 	// Darwin targets only
-	{name = "objc_object",            kind = "t", type="struct{}",                              comment = DARWIN_COMMENT + "\nRepresents an Objective-C `object` type."},
-	{name = "objc_selector",          kind = "t", type="struct{}",                              comment = DARWIN_COMMENT + "\nRepresents an Objective-C `selector` type."},
-	{name = "objc_class",             kind = "t", type="struct{}",                              comment = DARWIN_COMMENT + "\nRepresents an Objective-C `class` type."},
+	{name = "objc_object",            kind = "t", type="struct {}",                             comment = DARWIN_COMMENT + "\nRepresents an Objective-C `object` type."},
+	{name = "objc_selector",          kind = "t", type="struct {}",                             comment = DARWIN_COMMENT + "\nRepresents an Objective-C `selector` type."},
+	{name = "objc_class",             kind = "t", type="struct {}",                             comment = DARWIN_COMMENT + "\nRepresents an Objective-C `class` type."},
 	{name = "objc_id",                kind = "t", type="^objc_object",                          comment = DARWIN_COMMENT + "\nRepresents an Objective-C `id` type."},
 	{name = "objc_SEL",               kind = "t", type="^objc_selector",                        comment = DARWIN_COMMENT + "\nRepresents an Objective-C `SEL` type."},
 	{name = "objc_Class",             kind = "t", type="^objc_class",                           comment = DARWIN_COMMENT + "\nRepresents an Objective-C `Class` type."},
 
-	{name = "objc_find_selector",     kind = "b", type="proc($name: string) -> objc_SEL   ---", comment = DARWIN_COMMENT + "\nWill return a run-time cached selector value for the given constant string value."},
-	{name = "objc_register_selector", kind = "b", type="proc($name: string) -> objc_SEL   ---", comment = DARWIN_COMMENT + "\nWill register a selector value at run-time for the given constant string value."},
-	{name = "objc_find_class",        kind = "b", type="proc($name: string) -> objc_Class ---", comment = DARWIN_COMMENT + "\nWill return a run-time cached class value for the given constant string value."},
-	{name = "objc_register_class",    kind = "b", type="proc($name: string) -> objc_Class ---", comment = DARWIN_COMMENT + "\nWill register a class value at run-time for the given constant string value."},
+	{name = "objc_find_selector",     kind = "b", type="proc($name: string) -> objc_SEL", comment = DARWIN_COMMENT + "\nWill return a run-time cached selector value for the given constant string value."},
+	{name = "objc_register_selector", kind = "b", type="proc($name: string) -> objc_SEL", comment = DARWIN_COMMENT + "\nWill register a selector value at run-time for the given constant string value."},
+	{name = "objc_find_class",        kind = "b", type="proc($name: string) -> objc_Class", comment = DARWIN_COMMENT + "\nWill return a run-time cached class value for the given constant string value."},
+	{name = "objc_register_class",    kind = "b", type="proc($name: string) -> objc_Class", comment = DARWIN_COMMENT + "\nWill register a class value at run-time for the given constant string value."},
 }
 
 

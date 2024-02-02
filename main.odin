@@ -822,7 +822,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 				io.write_string(w, ": ")
 				write_padding(w, name, name_width)
 				if the_type.kind == .Generic {
-					io.write_string(w, "typeid")
+					io.write_string(w, `<span class="keyword-type">typeid</span>`)
 					if ts := array(the_type.types); len(ts) == 1 {
 						io.write_byte(w, '/')
 						write_type(writer, cfg.types[ts[0]], type_flags)
@@ -2449,7 +2449,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 
 		case .Proc_Group:
 			fmt.wprint(w, `<pre class="doc-code">`)
-			fmt.wprintf(w, "%s :: proc{{\n", name)
+			fmt.wprintf(w, "%s :: <span class=\"keyword-type\">proc</span>{{\n", name)
 			for entity_index in array(e.grouped_entities) {
 				this_proc := &cfg.entities[entity_index]
 				io.write_byte(w, '\t')
