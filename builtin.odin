@@ -27,10 +27,29 @@ builtins := []Builtin{
 	{name = "ODIN_OS",      kind = "c", type = "runtime.Odin_OS_Type",     comment = "An enum value specifying the target platform's operating system."},
 	{name = "ODIN_ARCH",    kind = "c", type = "runtime.Odin_Arch_Type",   comment = "An enum value specifying the target platform's architecture."},
 	{name = "ODIN_ENDIAN",  kind = "c", type = "runtime.Odin_Endian_Type", comment = "An enum value specifying the target platform's endiannes."},
+	{name = "ODIN_BUILD_MODE",  kind = "c", type = "runtime.Odin_Build_Mode_Type", comment = "An enum value specifying the \"build-mode\"."},
+	{name = "ODIN_ERROR_POS_STYLE",  kind = "c", type = "runtime.Odin_Error_Pos_Style_Type",
+		comment = "An enum value specifying whether errors should be stylized in the default (MSVC-like) style or a UNIX (GCC-like) style.\n\n"+
+		"- Default = `path(1:2)\n"+
+		"- Unix = `path:1:2:\n"+
+		"",
+	},
+	{name = "ODIN_PLATFORM_SUBTARGET",  kind = "c", type = "runtime.Odin_Platform_Subtarget_Type", comment = "An enum value specifying the selected subtarget type, only useful for Darwin targets."},
+	{name = "ODIN_WINDOWS_SUBSYSTEM",  kind = "c", type = "untyped string", comment = "A string specifying the current Windows subsystem, only useful on Windows targets."},
+
+
 	{name = "ODIN_VENDOR",  kind = "c", type = "untyped string",           comment = "A string specifying the current Odin compiler vendor."},
 	{name = "ODIN_VERSION", kind = "c", type = "untyped string",           comment = "A string specifying the current Odin version."},
 	{name = "ODIN_ROOT",    kind = "c", type = "untyped string",           comment = "The path to the root Odin directory."},
 	{name = "ODIN_DEBUG",   kind = "c", type = "untyped boolean",          comment = "Equal to `true` if the `-debug` flag has been set during compilation, otherwise `false`."},
+	{name = "ODIN_DISABLE_ASSERT", kind = "c", type = "untyped boolean", comment = "Equal to `true` if the `-disable-assert` flag has been set during compilation, otherwise `false`."},
+	{name = "ODIN_DEFAULT_TO_NIL_ALLOCATOR", kind = "c", type = "untyped boolean", comment = "Equal to `true` if the `-default-to-nil-allocator` flag has been set during compilation or whether the current target defaults to the \"nil allocator\", otherwise `false`."},
+	{name = "ODIN_DEFAULT_TO_PANIC_ALLOCATOR", kind = "c", type = "untyped boolean", comment = "Equal to `true` if the `-default-to-panic-allocator` flag has been set during compilation or whether the current target defaults to the \"panic allocator\", otherwise `false`."},
+	{name = "ODIN_NO_CRT", kind = "c", type = "untyped boolean", comment = "Equal to `true` if the `-no-crt` flag has been set during compilation (disallowing the C Run-Time library), otherwise `false`."},
+	{name = "ODIN_NO_ENTRY_POINT", kind = "c", type = "untyped boolean", comment = "Equal to `true` if the `-no-entry-point` flag has been set during compilation, otherwise `false`."},
+	{name = "ODIN_NO_RTTI", kind = "c", type = "untyped boolean", comment = "Equal to `true` if the `-no-rtti` flag has been set during compilation (disabling Odin's Run-Time Type Information, only allowed on freestanding targets), otherwise `false`."},
+	{name = "ODIN_COMPILE_TIMESTAMP", kind = "c", type = "untyped integer", comment = "Equal to the UNIX timestamp in nanoseconds at the time of the program's compilation."},
+
 
 	{name = "byte", kind = "t", value = "u8", comment = "`byte` is an alias for `u8` and is equivalent to `u8` in all ways. It is used as a convention to distinguish values from 8-bit unsigned integer values."},
 
