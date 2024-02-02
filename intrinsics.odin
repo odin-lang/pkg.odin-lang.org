@@ -12,24 +12,30 @@ intrinsics_docs := `package intrinsics provides documentation for Odin's compile
 
 intrinsics_table := []Builtin{
 	// Package Related
-	{name = "is_package_imported", kind = "p", type = "proc($package_name: string) -> bool", comment = "Returns a constant boolean as to whether or not that package has been imported anywhere in the project. This is only needed for very rare edge cases."},
+	{name = "is_package_imported", kind = "p", type = "proc($package_name: string) -> bool",
+		comment = "Returns a constant boolean as to whether or not that package has been imported anywhere in the project. This is only needed for very rare edge cases.",
+	},
 
 	// Types
-	{name = "soa_struct", kind = "b", type = "proc($N: int, $T: typeid) -> type/#soa[N]T", comment = "A call-like way to construct an #soa struct. Possibly to deprecated in the future."},
+	{name = "soa_struct", kind = "b", type = "proc($N: int, $T: typeid) -> type/#soa[N]T",
+		comment = "A call-like way to construct an #soa struct. Possibly to be deprecated in the future.",
+	},
 
 	// Volatile
-	{name = "volatile_load", kind = "b", type = "proc(dst: ^$T) -> T"},
-	{name = "volatile_store", kind = "b", type = "proc(dst: ^$T, val: T)"},
+	{name = "volatile_load", kind = "b", type = "proc(dst: ^$T) -> T", comment = VOLATILE_COMMENT},
+	{name = "volatile_store", kind = "b", type = "proc(dst: ^$T, val: T)", comment = VOLATILE_COMMENT},
 
-	{name = "non_temporal_load", kind = "b", type = "proc(dst: ^$T) -> T"},
-	{name = "non_temporal_store", kind = "b", type = "proc(dst: ^$T, val: T)"},
-
-
-	{name = "debug_trap", kind = "b", type = "proc()"},
-	{name = "trap", kind = "b", type = "proc() -> !"},
+	{name = "non_temporal_load", kind = "b", type = "proc(dst: ^$T) -> T", comment = NON_TEMPORAL_COMMENT},
+	{name = "non_temporal_store", kind = "b", type = "proc(dst: ^$T, val: T)", comment = NON_TEMPORAL_COMMENT},
 
 
-	{name = "alloca", kind = "b", type = "proc(size, align: int) -> [^]u8", comment = "A procedure that allocates `size` bytes of space in the stack frame of the caller, aligned to `align` bytes. This temporary space is automatically freed when the procedure that called `alloca` returns to its caller."},
+	{name = "debug_trap", kind = "b", type = "proc()", comment = "A call intended to cause an execution trap with the intention of requesting a debugger's attention."},
+	{name = "trap", kind = "b", type = "proc() -> !", comment = "Lowered to a target dependent trap instruction."},
+
+
+	{name = "alloca", kind = "b", type = "proc(size, align: int) -> [^]u8",
+		comment = "A procedure that allocates `size` bytes of space in the stack frame of the caller, aligned to `align` bytes. This temporary space is automatically freed when the procedure that called `alloca` returns to its caller.",
+	},
 	{name = "cpu_relax", kind = "b", type = "proc()",
 		comment = "On i386/amd64, it should map to the `pause` instruction. On arm64, it should map to `isb` instruction (see https://bugs.java.com/bugdatabase/view_bug.do?bug_id=8258604 for more information).",
 	},
@@ -37,44 +43,82 @@ intrinsics_table := []Builtin{
 		comment = "This provides access to the cycle counter register (or similar low latency, high accuracy clocks) on the targets that support it. On i386/amd64, it should map to the `rdtsc` instruction. On arm64, it should map to the `cntvct_el0` instruction.",
 	},
 
-	{name = "count_ones",           kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)"},
-	{name = "count_zeros",          kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)"},
-	{name = "count_trailing_zeros", kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)"},
-	{name = "count_leading_zeros",  kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)"},
-	{name = "reverse_bits",         kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)"},
-	{name = "byte_swap",            kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_float(T)"},
+	{name = "count_ones",           kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)",
+		comment = "Counts the number of set bits (`1`s).",
+	},
+	{name = "count_zeros",          kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)",
+		comment = "Counts the number of unset bits (`0`s).",
+	},
+	{name = "count_trailing_zeros", kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)",
+		comment = "Counts the number of trailing unset bits (`0`s) until a set bit (`1`)` is seen or if at all.",
+	},
+	{name = "count_leading_zeros",  kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)",
+		comment = "Counts the number of leading unset bits (`0`s) until a set bit (`1`)` is seen or if at all.",
+	},
+	{name = "reverse_bits",         kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)",
+		comment = "Reverses the bits from ascending order to descending order e.g. 0b01110101 -> 0b10101110",
+	},
+	{name = "byte_swap",            kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_float(T)",
+		comment = "Reverses the bytes from ascending order to descending order e.g. 0xfe_ed_01_12 -> `0x12_01_ed_fe",
+	},
 
-	{name = "overflow_add", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool) #optional_ok", comment = "The second return value will be true if an overflow occurs."},
-	{name = "overflow_sub", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool) #optional_ok", comment = "The second return value will be true if an overflow occurs."},
-	{name = "overflow_mul", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool) #optional_ok", comment = "The second return value will be true if an overflow occurs."},
+	{name = "overflow_add", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool) #optional_ok",
+		comment = "Performs an \"add\" operation with an overflow check. The second return value will be true if an overflow occurs.",
+	},
+	{name = "overflow_sub", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool) #optional_ok",
+		comment = "Performs an \"multiply\" operation with an overflow check. The second return value will be true if an overflow occurs.",
+	},
+	{name = "overflow_mul", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool) #optional_ok",
+		comment = "Performs an \"subtract\" operation with an overflow check. The second return value will be true if an overflow occurs.",
+	},
 
-	{name = "sqrt", kind = "b", type = "proc(x: $T) -> T where type_is_float(T) || (type_is_simd_vector(T) && type_is_float(type_elem_type(T)))"},
+	{name = "sqrt", kind = "b", type = "proc(x: $T) -> T where type_is_float(T) || (type_is_simd_vector(T) && type_is_float(type_elem_type(T)))",
+		comment = "Returns the square root of a value. If the input value is negative, this is platform defined behaviour.",
+	},
 
 	{name = "fused_mul_add", kind = "b", type = "proc(a, b, c: $T) -> T where type_is_float(T) || (type_is_simd_vector(T) && type_is_float(type_elem_type(T)))"},
 
-	{name = "mem_copy",                 kind = "b", type = "proc(dst, src: rawptr, len: int)", comment = "Copies a block of memory from the `src` location to the `dst` location but assumes that the memory ranges could be overlapping. It is equivalent to C's `memmove`, but unlike the C's libc procedure, it does not return value."},
-	{name = "mem_copy_non_overlapping", kind = "b", type = "proc(dst, src: rawptr, len: int)", comment = "Copies a block of memory from the `src` location to the `dst` location but it does not assume the memory ranges could be overlapping. It is equivalent to C's `memcpy`, but unlike the C's libc procedure, it does not return value."},
-	{name = "mem_zero",                 kind = "b", type = "proc(ptr: rawptr, len: int)", comment = "Zeroes a block of memory at the `ptr` location for `len` bytes."},
-	{name = "mem_zero_volatile",        kind = "b", type = "proc(ptr: rawptr, len: int)", comment = "Zeroes a block of memory at the `ptr` location for `len` bytes with volatile semantics."},
+	{name = "mem_copy",                 kind = "b", type = "proc(dst, src: rawptr, len: int)",
+		comment = "Copies a block of memory from the `src` location to the `dst` location but assumes that the memory ranges could be overlapping. It is equivalent to C's `memmove`, but unlike the C's libc procedure, it does not return value.",
+	},
+	{name = "mem_copy_non_overlapping", kind = "b", type = "proc(dst, src: rawptr, len: int)",
+		comment = "Copies a block of memory from the `src` location to the `dst` location but it does not assume the memory ranges could be overlapping. It is equivalent to C's `memcpy`, but unlike the C's libc procedure, it does not return value.",
+	},
+	{name = "mem_zero",                 kind = "b", type = "proc(ptr: rawptr, len: int)",
+		comment = "Zeroes a block of memory at the `ptr` location for `len` bytes.",
+	},
+	{name = "mem_zero_volatile",        kind = "b", type = "proc(ptr: rawptr, len: int)",
+		comment = "Zeroes a block of memory at the `ptr` location for `len` bytes with volatile semantics.",
+	},
 
 	// prefer [^]T operations if possible
-	{name = "ptr_offset",                 kind = "b", type = "proc(ptr: ^$T, offset: int) -> ^T", comment = "Prefer using [^]T operations if possible. e.g. `ptr[offset:]`"},
-	{name = "ptr_sub",                    kind = "b", type = "proc(a, b: ^$T) -> int", comment = "Equivalent to `int(uintptr(a) - uintptr(b)) / size_of(T)`"},
+	{name = "ptr_offset",                 kind = "b", type = "proc(ptr: ^$T, offset: int) -> ^T",
+		comment = "Prefer using [^]T operations if possible. e.g. `ptr[offset:]`",
+	},
+	{name = "ptr_sub",                    kind = "b", type = "proc(a, b: ^$T) -> int",
+		comment = "Equivalent to `int(uintptr(a) - uintptr(b)) / size_of(T)`",
+	},
 
-	{name = "unaligned_load",             kind = "b", type = "proc(src: ^$T) -> T", comment = "Performs a load on an unaligned value `src`."},
-	{name = "unaligned_store",            kind = "b", type = "proc(dst: ^$T, val: T) -> T", comment = "Performs a store on an unaligned value `dst`."},
+	{name = "unaligned_load",             kind = "b", type = "proc(src: ^$T) -> T",
+		comment = "Performs a load on an unaligned value `src`.",
+	},
+	{name = "unaligned_store",            kind = "b", type = "proc(dst: ^$T, val: T) -> T",
+		comment = "Performs a store on an unaligned value `dst`.",
+	},
 
 	{name = "fixed_point_mul",            kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T where type_is_integer(T)", comment = FIXED_POINT_COMMENT},
 	{name = "fixed_point_div",            kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T where type_is_integer(T)", comment = FIXED_POINT_COMMENT},
 	{name = "fixed_point_mul_sat",        kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T where type_is_integer(T)", comment = FIXED_POINT_COMMENT},
 	{name = "fixed_point_div_sat",        kind = "b", type = "proc(lhs, rhs: $T, #const scale: uint) -> T where type_is_integer(T)", comment = FIXED_POINT_COMMENT},
 
-	{name = "prefetch_read_instruction",  kind = "b", type = "proc(address: rawptr, #const locality: i32 /* 0..=3 */)"},
-	{name = "prefetch_read_data",         kind = "b", type = "proc(address: rawptr, #const locality: i32 /* 0..=3 */)"},
-	{name = "prefetch_write_instruction", kind = "b", type = "proc(address: rawptr, #const locality: i32 /* 0..=3 */)"},
-	{name = "prefetch_write_data",        kind = "b", type = "proc(address: rawptr, #const locality: i32 /* 0..=3 */)"},
+	{name = "prefetch_read_instruction",  kind = "b", type = "proc(address: rawptr, #const locality: i32 /* 0..=3 */)", comment = PREFETCH_COMMENT},
+	{name = "prefetch_read_data",         kind = "b", type = "proc(address: rawptr, #const locality: i32 /* 0..=3 */)", comment = PREFETCH_COMMENT},
+	{name = "prefetch_write_instruction", kind = "b", type = "proc(address: rawptr, #const locality: i32 /* 0..=3 */)", comment = PREFETCH_COMMENT},
+	{name = "prefetch_write_data",        kind = "b", type = "proc(address: rawptr, #const locality: i32 /* 0..=3 */)", comment = PREFETCH_COMMENT},
 
-	{name = "constant_utf16_cstring", kind = "b", type = "proc($literal: string) -> [^]u16"},
+	{name = "constant_utf16_cstring", kind = "b", type = "proc($literal: string) -> [^]u16",
+		comment = "Returns a run-time value of a constant string UTF-8 value encoded as a UTF-16 NUL terminated string value, useful for interfacing with UTF-16 procedure such as the Windows API.",
+	},
 
 	// Matrix Related
 
@@ -84,7 +128,9 @@ intrinsics_table := []Builtin{
 	{name = "matrix_flatten",   kind = "b", type = "proc(m: $M/matrix[$R, $C]$E) -> [R*C]E"},
 
 	// Compiler Hints
-	{name = "expect", kind = "b", type = "proc(val, expected_val: T) -> T", comment="Compiler Hint"},
+	{name = "expect", kind = "b", type = "proc(val, expected_val: T) -> T",
+		comment = "Provides information about expected (the most probable) value of `val`, which can be used by optimizing backends.",
+	},
 
 	// Linux and Darwin Only
 	{name = "syscall", kind = "b", type = "proc(id: uintptr, args: ..uintptr) -> uintptr", comment="Linux and Darwin Only"},
@@ -100,13 +146,19 @@ intrinsics_table := []Builtin{
 	Acq_Rel = 4,
 	Seq_Cst = 5,
 }`,
+		comment = "An enumeration of atomic memory orderings used by the `atomic_*_explicit` intrinsics that determines which atomic instructions on the same address they synchronize with."+
+		"This follows the same memory model as C11/C++11.",
 	},
 
 
 	{ name = "atomic_type_is_lock_free",                kind = "b", type = "proc($T: typeid) -> bool"},
 
-	{ name = "atomic_thread_fence",                     kind = "b", type = "proc(order: Atomic_Memory_Order)"},
-	{ name = "atomic_signal_fence",                     kind = "b", type = "proc(order: Atomic_Memory_Order)"},
+	{ name = "atomic_thread_fence",                     kind = "b", type = "proc(order: Atomic_Memory_Order)",
+		comment = "Adds a \"fence\" to introduce a \"happens-before\" edges between operations.",
+	},
+	{ name = "atomic_signal_fence",                     kind = "b", type = "proc(order: Atomic_Memory_Order)",
+		comment = "Adds a \"fence\" to introduce a \"happens-before\" edges between operations.",
+	},
 
 	{ name = "atomic_store",                            kind = "b", type = "proc(dst: ^$T, val: T)"},
 	{ name = "atomic_store_explicit",                   kind = "b", type = "proc(dst: ^$T, val: T, order: Atomic_Memory_Order)"},
@@ -138,9 +190,24 @@ intrinsics_table := []Builtin{
 
 	// Constant type tests
 
-	{name = "type_base_type",                kind = "b", type = "proc($T: typeid) -> type"},
-	{name = "type_core_type",                kind = "b", type = "proc($T: typeid) -> type"},
-	{name = "type_elem_type",                kind = "b", type = "proc($T: typeid) -> type"},
+	{name = "type_base_type",                kind = "b", type = "proc($T: typeid) -> type",
+		comment = "Returns the type without any `distinct` indirection e.g. `Foo :: distinct int`, `type_base_type(Foo) == int`",
+	},
+	{name = "type_core_type",                kind = "b", type = "proc($T: typeid) -> type",
+		comment = "Returns the type without any `distinct` indirection and the underlying integer type for an enum e.g. `Foo :: distinct int`, `type_core_type(Foo) == int`, or `Bar :: enum u8 {A}`, `type_core_type(Bar) == u8`",
+
+	},
+	{name = "type_elem_type",                kind = "b", type = "proc($T: typeid) -> type",
+		comment = "Returns the element type of an compound type.\n\n"+
+		"- Complex number: the underlying float type (e.g. `complex64 -> f32`)\n"+
+		"- Quaternion: the underlying float type (e.g. `quaternion256 -> f64`)\n"+
+		"- Pointer: the base type (e.g. `^T -> T`)\n"+
+		"- Array: the element type (e.g. `[N]T -> T`)\n"+
+		"- Enumerated Array: the element type (e.g. `[Enum]T -> T`)\n"+
+		"- Slice: the element type (e.g. `[]T -> T`)\n"+
+		"- Dynamic Array: the element type (e.g. `[dynamic]T -> T`)\n"+
+		"",
+	},
 
 	{name = "type_is_boolean",               kind = "b", type = "proc($T: typeid) -> bool"},
 	{name = "type_is_integer",               kind = "b", type = "proc($T: typeid) -> bool"},
@@ -155,7 +222,16 @@ intrinsics_table := []Builtin{
 	{name = "type_is_endian_platform",       kind = "b", type = "proc($T: typeid) -> bool"},
 	{name = "type_is_endian_little",         kind = "b", type = "proc($T: typeid) -> bool"},
 	{name = "type_is_endian_big",            kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_unsigned",              kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_unsigned",              kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Returns true if a \"numeric\" in nature:\n\n"+
+		"- Any integer\n"+
+		"- Any float\n"+
+		"- Any complex number\n"+
+		"- Any quaternion\n"+
+		"- Any enum\n"+
+		"- Any fixed-array of a numeric type\n"+
+		"",
+	},
 	{name = "type_is_numeric",               kind = "b", type = "proc($T: typeid) -> bool"},
 	{name = "type_is_ordered",               kind = "b", type = "proc($T: typeid) -> bool"},
 	{name = "type_is_ordered_numeric",       kind = "b", type = "proc($T: typeid) -> bool"},
@@ -166,7 +242,7 @@ intrinsics_table := []Builtin{
 		"Returns true if the type is comparable, which allows for the use of `==` and `!=` binary operators.\n\n"+
 		"One of the following non-compound types (as well as any `distinct` forms): `rune`, `string`, `cstring`, `typeid`, pointer, `#soa` related pointer, multi-pointer, enum, procedure, matrix, `bit_set`, `#simd` vector.\n\n"+
 		"One of the following compound types (as well as any `distinct` forms): any array or enumerated array where its element type is also comparable; any `struct` where all of its fields are comparable; any `struct #raw_union` were all of its fields are simply comparable (see `type_is_simple_compare`); any `union` where all of its variants are comparable.\n"+
-		""
+		"",
 	},
 	{name = "type_is_simple_compare",        kind = "b", type = "proc($T: typeid) -> bool", comment = "easily compared using memcmp (== and !=)"},
 	{name = "type_is_dereferenceable",       kind = "b", type = "proc($T: typeid) -> bool", comment = "Must be a pointer type `^T` (not `rawptr`) or an `#soa` related pointer type."},
@@ -190,7 +266,26 @@ intrinsics_table := []Builtin{
 	{name = "type_is_matrix",                kind = "b", type = "proc($T: typeid) -> bool"},
 
 
-	{name = "type_has_nil",                             kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_has_nil",                             kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Types that support `nil`:\n\n"+
+		"- `rawptr`\n"+
+		"- `any`\n"+
+		"- `cstring`\n"+
+		"- `typeid`\n"+
+		"- `enum`\n"+
+		"- `bit_set`\n"+
+		"- Slices\n"+
+		"- `proc` values\n"+
+		"- Pointers\n"+
+		"- #soa Pointers\n"+
+		"- Multi-Pointers\n"+
+		"- Dynamic Arrays\n"+
+		"- `map`\n"+
+		"- `union` without the `#no_nil` directive\n"+
+		"- `#soa` slices\n"+
+		"- `#soa` dynamic arrays\n"+
+		"",
+	},
 
 	{name = "type_is_specialization_of",                kind = "b", type = "proc($T, $S: typeid) -> bool"},
 
@@ -223,13 +318,23 @@ intrinsics_table := []Builtin{
 
 	{name = "type_field_index_of",                      kind = "b", type = "proc($T: typeid, $name: string) -> uintptr"},
 
-	{name = "type_equal_proc",                          kind = "b", type = "proc($T: typeid) -> (equal:  proc \"contextless\" (rawptr, rawptr) -> bool)                 where type_is_comparable(T)"},
-	{name = "type_hasher_proc",                         kind = "b", type = "proc($T: typeid) -> (hasher: proc \"contextless\" (data: rawptr, seed: uintptr) -> uintptr) where type_is_comparable(T)"},
+	{name = "type_equal_proc",                          kind = "b", type = "proc($T: typeid) -> (equal:  proc \"contextless\" (rawptr, rawptr) -> bool)                 where type_is_comparable(T)",
+		comment = "Returns the underlying procedure that is used to compare pointers to two values of the same time together. This is used by the `map` type and general complicated comparisons.",
+	},
+	{name = "type_hasher_proc",                         kind = "b", type = "proc($T: typeid) -> (hasher: proc \"contextless\" (data: rawptr, seed: uintptr) -> uintptr) where type_is_comparable(T)",
+		comment = "Returns the underlying procedure that is used to hash a pointer to a value used by the `map` type.",
+	},
 
 	{name = "type_map_info",                            kind = "b", type = "proc($T: typeid/map[$K]$V) -> ^runtime.Map_Info"},
 	{name = "type_map_cell_info",                       kind = "b", type = "proc($T: typeid) -> ^runtime.Map_Cell_Info"},
 
-	{name = "type_convert_variants_to_pointers",        kind = "b", type = "proc($T: typeid) -> typeid where type_is_union(T)"},
+	{name = "type_convert_variants_to_pointers",        kind = "b", type = "proc($T: typeid) -> typeid where type_is_union(T)",
+		comment = "Returns a type which converts all of the variants of a `union` to be pointer types of those variants.\n\n"+
+		"Example:\n"+
+		"	Foo :: union {A, B, C}\n"+
+		"	type_convert_variants_to_pointers(Foo) == union {^A, ^B, ^C}\n"+
+		"",
+	},
 	{name = "type_merge",                               kind = "b", type = "proc($U, $V: typeid) -> typeid where type_is_union(U), type_is_union(V)"},
 
 
@@ -375,3 +480,17 @@ SIMD_REDUCE_SUFFIX :: "\n"+
 	"\t\t}\n"+
 	"\t\treturn result\n"+
 	"\t}"
+
+PREFETCH_COMMENT :: ""+
+	"The `prefetch_read_instruction` intrinsic is a hint to the code gnerator to insert a prefetch instruction if supported; otherwise, it is a no-op. Prefetches have no affect on the behaviour of the program but can change its performance characteristics.\n\n"+
+	"The `locality` parameter must be a constant integer, and its temporal locality value ranges from `0` (no locality) to `3` (extremely local, keep in cache)."
+
+
+
+VOLATILE_COMMENT :: ""+
+	"Tells the optimizing backend of a compiler to not change the number of 'volatile' operations nor change their order of execution relative to other 'volatile' operations. "+
+	"Optimizers are allowed to change the order of volatile operations relative to non-volatile operations.\n\n"+
+	"NOTE: This has nothing to do with Java's 'volatile' and has no cross-thread synchronization behaviour. Use atomics if this behaviour is wanted."
+
+NON_TEMPORAL_COMMENT :: ""+
+	"Tells the code generator of a compiler that this operation is not expected to be reused in the cache. The code generator may select special instructions to save cache bandwidth (e.g. on x86, `movnt` instruct might be used)."
