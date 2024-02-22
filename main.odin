@@ -1031,16 +1031,12 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 
 			for entity_index, i in type_entities {
 				e := &cfg.entities[entity_index]
-				next_entity: ^doc.Entity = nil
-				if i+1 < len(type_entities) {
-					next_entity = &cfg.entities[type_entities[i+1]]
-				}
 				docs, comment := str(e.docs), str(e.comment)
 
 				write_lead_comment(writer, flags, docs, i)
 
 				do_indent(writer, flags)
-				write_param_entity(writer, e, next_entity, flags, name_width)
+				write_param_entity(writer, e, /*next_entity*/nil, flags, name_width)
 
 				if tag := str(tags[i]); tag != "" {
 					io.write_byte(w, ' ')
@@ -1323,6 +1319,40 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		io.write_uint(w, uint(type.elem_counts[1]))
 		io.write_string(w, "]")
 		write_type(writer, cfg.types[type_types[0]], flags)
+
+	case .Bit_Field:
+		io.write_string(w, "<span class=\"keyword-type\">bit_field</span>&nbsp;")
+		write_type(writer, cfg.types[type_types[0]], flags)
+		io.write_string(w, " {")
+
+		if len(type_entities) != 0 {
+			do_newline(writer, flags)
+			indent += 1
+			name_width := calc_name_width(type_entities)
+
+			for entity_index, i in type_entities {
+				e := &cfg.entities[entity_index]
+				next_entity: ^doc.Entity = nil
+				if i+1 < len(type_entities) {
+					next_entity = &cfg.entities[type_entities[i+1]]
+				}
+				docs, comment := str(e.docs), str(e.comment)
+				_ = comment
+
+				write_lead_comment(writer, flags, docs, i)
+
+				do_indent(writer, flags)
+				write_param_entity(writer, e, next_entity, flags, name_width)
+
+				io.write_string(w, " | ")
+				io.write_int(w, max(int(-e.field_group_index), 0))
+				io.write_byte(w, ',')
+				do_newline(writer, flags)
+			}
+			indent -= 1
+			do_indent(writer, flags)
+		}
+		io.write_string(w, "}")
 	}
 }
 
