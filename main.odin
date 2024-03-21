@@ -732,6 +732,33 @@ calc_name_width :: proc(type_entities: []doc.Entity_Index) -> (name_width: int) 
 	return
 }
 
+entity_flag_strings := #sparse[doc.Entity_Flag]string{
+	.Foreign                = "",
+	.Export                 = "",
+
+	.Param_Using            = "using",
+	.Param_Const            = "#const",
+	.Param_Auto_Cast        = "#auto_cast",
+	.Param_Ellipsis         = "..",
+	.Param_CVararg          = "#c_vararg",
+	.Param_No_Alias         = "#no_alias",
+	.Param_Any_Int          = "#any_int",
+	.Param_By_Ptr           = "#by_ptr",
+	.Param_No_Broadcast     = "#no_broadcast",
+
+	.Bit_Field_Field        = "",
+
+	.Type_Alias             = "",
+
+	.Builtin_Pkg_Builtin    = "",
+	.Builtin_Pkg_Intrinsics = "",
+
+	.Var_Thread_Local       = "",
+	.Var_Static             = "",
+
+	.Private                = "",
+}
+
 write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type_Flags) {
 	write_param_entity :: proc(using writer: ^Type_Writer, e, next_entity: ^doc.Entity, flags: Write_Type_Flags, name_width := 0) {
 		name := str(e.name)
@@ -743,13 +770,14 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			}
 		}
 
-
-		if .Param_Using     in e.flags { io.write_string(w, `<span class="keyword-type">using</span> `);      name_width -= 1+len("using")      }
-		if .Param_Const     in e.flags { io.write_string(w, `<span class="keyword-type">#const</span> `);     name_width -= 1+len("#const")     }
-		if .Param_Auto_Cast in e.flags { io.write_string(w, `<span class="keyword-type">#auto_cast</span> `); name_width -= 1+len("#auto_cast") }
-		if .Param_CVararg   in e.flags { io.write_string(w, `<span class="keyword-type">#c_vararg</span> `);  name_width -= 1+len("#c_vararg")  }
-		if .Param_No_Alias  in e.flags { io.write_string(w, `<span class="keyword-type">#no_alias</span> `);  name_width -= 1+len("#no_alias")  }
-		if .Param_Any_Int   in e.flags { io.write_string(w, `<span class="keyword-type">#any_int</span> `);   name_width -= 1+len("#any_int")   }
+		for flag in doc.Entity_Flag do if flag in e.flags {
+			if str := entity_flag_strings[flag]; str != "" {
+				io.write_string(w, `<span class="keyword-type">`)
+				io.write_string(w, str)
+				io.write_string(w, `</span> `)
+				name_width -= 1+len(str)
+			}
+		}
 
 		base := cfg._collections["base"]
 
