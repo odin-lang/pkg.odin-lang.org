@@ -29,10 +29,11 @@ Config :: struct {
 	// you unmarshal into it, with a map, when unmarshalling into it, the entries are added to existing ones.
 	collections: [dynamic]^Collection,
 
-	pkg_to_collection:  map[^doc.Pkg]^Collection,
-	handled_packages:   map[string]struct{},
+	pkg_to_collection:   map[^doc.Pkg]^Collection,
+	pkg_to_header:       map[^doc.Pkg]^doc.Header,
+	handled_packages:    map[string]struct{},
 
-	pkgs_line_docs:     map[^doc.Pkg]string,
+	pkgs_line_docs:     map[string]string,
 }
 
 Collection :: struct {

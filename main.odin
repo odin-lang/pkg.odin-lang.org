@@ -57,15 +57,52 @@ main :: proc() {
 
 	not_hidden: [dynamic]^Collection
 
-	for arg in os.args[1:] {
-		strings.has_suffix(arg, ".odin-doc") or_continue
-		generate_from_path(arg, &not_hidden, strings.has_suffix(arg, "all.odin-doc"))
+	generate_from_path(os.args[1], true)
+
+	if len(os.args) >= 3 && os.args[2] == "--merge" {
+		for arg in os.args[3:] {
+			strings.has_suffix(arg, ".odin-doc") or_continue
+			generate_from_path(arg, false)
+		}
 	}
+
 
 	b := strings.builder_make()
 	defer strings.builder_destroy(&b)
 	w := strings.to_writer(&b)
 
+	for c in cfg.collections {
+		generate_packages_in_collection(&b, c)
+	}
+
+
+	for c in cfg.collections {
+		if cfg.hide_core && (c.name == "core" || c.name == "vendor") {
+			log.infof(
+				"'core' is set to be hidden so collection %q will be excluded from search results",
+				c.name,
+			)
+			continue
+		}
+		if cfg.hide_base && (c.name == "base") {
+			log.infof(
+				"'base' is set to be hidden so collection %q will be excluded from search results",
+				c.name,
+			)
+			continue
+		}
+
+		found := false
+		for other in not_hidden {
+			if other.name == c.name {
+				found = true
+				break
+			}
+		}
+		if !found {
+			append(&not_hidden, c)
+		}
+	}
 
 	for collection in not_hidden {
 		dir := collection.name
@@ -98,22 +135,28 @@ main :: proc() {
 	log.infof("[DONE]")
 }
 
+init_cfg_from_header :: proc(header: ^doc.Header, loc := #caller_location) {
+	assert(header != nil, loc=loc)
+	cfg.header   = header
+	cfg.files    = array(cfg.header.files)
+	cfg.pkgs     = array(cfg.header.pkgs)
+	cfg.entities = array(cfg.header.entities)
+	cfg.types    = array(cfg.header.types)
+}
+init_cfg_from_pkg :: proc(pkg: ^doc.Pkg, loc := #caller_location) {
+	assert(pkg != nil, loc=loc)
+	init_cfg_from_header(cfg.pkg_to_header[pkg], loc)
+}
 
-generate_from_path :: proc(path: string, not_hidden: ^[dynamic]^Collection, all_packages: bool) {
-	for &collection in cfg.collections {
-		clear(&collection.pkgs)
-		clear(&collection.pkg_to_path)
-		clear(&collection.pkg_entries_map)
-	}
 
+generate_from_path :: proc(path: string, all_packages: bool) {
 	{
 		data, ok := os.read_entire_file(path)
 		if !ok {
 			errorf("unable to read Odin doc file at: %s", path)
 		}
 
-		err: doc.Reader_Error
-		cfg.header, err = doc.read_from_bytes(data)
+		header, err := doc.read_from_bytes(data)
 		switch err {
 		case .None:
 		case .Header_Too_Small:
@@ -126,10 +169,7 @@ generate_from_path :: proc(path: string, not_hidden: ^[dynamic]^Collection, all_
 			errorf("invalid file format version")
 		}
 
-		cfg.files    = array(cfg.header.files)
-		cfg.pkgs     = array(cfg.header.pkgs)
-		cfg.entities = array(cfg.header.entities)
-		cfg.types    = array(cfg.header.types)
+		init_cfg_from_header(header)
 
 	}
 
@@ -161,25 +201,24 @@ generate_from_path :: proc(path: string, not_hidden: ^[dynamic]^Collection, all_
 
 	// Based on paths, assign packages to collections, maybe ignore them.
 	{
-		fullpaths: [dynamic]string
-		for pkg in cfg.pkgs[1:] {
+		pkgs: [dynamic]^doc.Pkg
+		defer delete(pkgs)
+
+		for &pkg in cfg.pkgs[1:] {
 			fp := str(pkg.fullpath)
 			if fp in cfg.handled_packages {
 				continue
 			}
-			append(&fullpaths, fp)
+			append(&pkgs, &pkg)
 			cfg.handled_packages[fp] = {}
+			cfg.pkg_to_header[&pkg] = cfg.header
 		}
 
-		log.infof("%d packages - %s", len(fullpaths), path)
-		log.debugf("Full package paths: %v", fullpaths)
+		log.infof("%d packages - %s", len(pkgs), path)
+		log.infof("Full package paths: %#v", pkgs)
 
-		fullpath_loop: for fullpath, i in fullpaths {
-			if !all_packages && !strings.contains(fullpath, "/sys/") {
-				continue
-			}
-
-			pkg := &cfg.pkgs[i + 1]
+		fullpath_loop: for pkg in pkgs {
+			fullpath := str(pkg.fullpath)
 			if len(array(pkg.entries)) == 0 {
 				log.infof("Package at %s does not contain anything", fullpath)
 				continue fullpath_loop
@@ -217,45 +256,23 @@ generate_from_path :: proc(path: string, not_hidden: ^[dynamic]^Collection, all_
 
 			log.debugf("Final package path for %s: %q", str(pkg.name), trimmed)
 
-			collection.pkgs[trimmed] = pkg
+			if trimmed not_in collection.pkgs {
+				collection.pkgs[trimmed] = pkg
+			}
 			collection.pkg_to_path[pkg] = trimmed
 			cfg.pkg_to_collection[pkg] = collection
+			cfg.pkg_to_header[pkg] = cfg.header
 		}
 	}
 
-	b := strings.builder_make()
-	defer strings.builder_destroy(&b)
 
 	for c in cfg.collections {
-		if all_packages {
-			c.root = generate_directory_tree(c.pkgs)
-		} else {
-			assert(c.root != nil)
-			insert_into_directory_tree(c.root, c.pkgs)
+		if c.root == nil {
+			assert(all_packages)
+			c.root = new(Dir_Node)
+			c.root.children = make([dynamic]^Dir_Node)
 		}
-		generate_packages(&b, c)
-	}
-
-	for c in cfg.collections {
-
-		cfg.handled_packages[c.name] = {}
-
-		if cfg.hide_core && (c.name == "core" || c.name == "vendor") {
-			log.infof(
-				"'core' is set to be hidden so collection %q will be excluded from search results",
-				c.name,
-			)
-			continue
-		}
-		if cfg.hide_base && (c.name == "base") {
-			log.infof(
-				"'base' is set to be hidden so collection %q will be excluded from search results",
-				c.name,
-			)
-			continue
-		}
-
-		append(not_hidden, c)
+		insert_into_directory_tree(c.root, c.pkgs)
 	}
 }
 
@@ -386,6 +403,7 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: []^Collection) 
 
 	for collection in collections {
 		for path, pkg in collection.pkgs {
+			init_cfg_from_pkg(pkg)
 			entries := collection.pkg_entries_map[pkg]
 			if pkg_idx != 0 { fmt.wprintln(w, ",") }
 			fmt.wprintf(w, "\t\"%s\": {{\n", str(pkg.name))
@@ -442,36 +460,62 @@ write_html_footer :: proc(w: io.Writer, include_directory_js: bool) {
 	fmt.wprintf(w, "</body>\n</html>\n")
 }
 
-generate_packages :: proc(b: ^strings.Builder, collection: ^Collection) {
-	w := strings.to_writer(b)
-
-	dir := collection.name
-
-	collection.pkg_entries_map = make(map[^doc.Pkg]Pkg_Entries, len(collection.pkgs))
-	for _, pkg in collection.pkgs {
-		collection.pkg_entries_map[pkg] = pkg_entries_gather(pkg)
+init_pkg_entries_map :: proc(collection: ^Collection, node: ^Dir_Node) {
+	if node.pkg != nil {
+		init_cfg_from_pkg(node.pkg)
+		collection.pkg_entries_map[node.pkg] = pkg_entries_gather(node.pkg)
 	}
+	for child in node.children {
+		init_pkg_entries_map(collection, child)
+	}
+}
 
-	runtime_pkg: ^doc.Pkg
 
-	for path, pkg in collection.pkgs {
+generate_package_from_directory_tree :: proc(b: ^strings.Builder, node: ^Dir_Node) -> (runtime_pkg: ^doc.Pkg) {
+	if node.pkg != nil {
+		pkg  := node.pkg
+		collection := cfg.pkg_to_collection[pkg]
+		path := collection.pkg_to_path[pkg]
+		dir  := collection.name
+		init_cfg_from_pkg(pkg)
+
 		if str(pkg.name) == "runtime" {
 			runtime_pkg = pkg
 		}
 
-		if pkg not_in cfg.pkgs_line_docs {
+		if str(pkg.fullpath) not_in cfg.pkgs_line_docs {
 			line_doc, _, _ := strings.partition(str(pkg.docs), "\n")
 			line_doc = strings.trim_space(line_doc)
-			cfg.pkgs_line_docs[pkg] = strings.clone(line_doc)
+			cfg.pkgs_line_docs[strings.clone(str(pkg.fullpath))] = strings.clone(line_doc)
 		}
 
 		strings.builder_reset(b)
+		w := strings.to_writer(b)
+
 		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width)
 		write_pkg(w, dir, path, pkg, collection, collection.pkg_entries_map[pkg])
 		write_html_footer(w, false)
 		recursive_make_directory(path, dir)
 		os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
 	}
+	for child in node.children {
+		res := generate_package_from_directory_tree(b, child)
+		if runtime_pkg == nil {
+			runtime_pkg = res
+		}
+	}
+
+	return runtime_pkg
+}
+
+generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collection) {
+	w := strings.to_writer(b)
+
+	dir := collection.name
+
+	init_pkg_entries_map(collection, collection.root)
+
+	runtime_pkg := generate_package_from_directory_tree(b, collection.root)
 
 	if runtime_pkg != nil &&
 	   collection.name == "base" {
@@ -601,7 +645,7 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 		if pkg == nil {
 			return
 		}
-		line_doc = cfg.pkgs_line_docs[pkg]
+		line_doc = cfg.pkgs_line_docs[str(pkg.fullpath)]
 		if line_doc == "" {
 			return
 		}
@@ -704,7 +748,12 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 				if dir.dir == "sys" {
 					target := "windows_amd64"
 					switch child.name {
-					case "darwin": target = "darwin_arm64"
+					case "darwin":
+						target = "darwin_arm64"
+					case "linux", "unix":
+						target = "linux_arm64"
+					case "haiku":
+						target = "haiku_arm64"
 					}
 					fmt.wprintf(w, `<em>(Generated with <code>-target:%s</code>, please read the source code directly)</em>`, target)
 				}
@@ -1879,7 +1928,7 @@ write_breadcrumbs :: proc(w: io.Writer, path: string, pkg: ^doc.Pkg, collection:
 		// When the collection and the package are at the same root path.
 		if trimmed_path == "" do continue
 
-		if _, ok := collection.pkgs[trimmed_path]; ok {
+		if trimmed_path in collection.pkgs {
 			fmt.wprintf(w, "<li class=\"breadcrumb-item%s\"><a href=\"%s/%s\">%s</a></li>\n", is_active_string, collection.base_url, trimmed_path, dir)
 		} else {
 			fmt.wprintf(w, "<li class=\"breadcrumb-item\">%s</li>\n", dir)
