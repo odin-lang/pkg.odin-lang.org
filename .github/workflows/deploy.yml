@@ -37,7 +37,11 @@ jobs:
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
           cd Odin
-          odin doc examples/all -all-packages -doc-format -show-debug-messages -target:windows_amd64
+          odin doc examples/all    -all-packages -doc-format -show-debug-messages -target:windows_amd64
+          odin doc core/sys/darwin -all-packages -doc-format -show-debug-messages -target:darwin_arm64
+          odin doc core/sys/linux  -all-packages -doc-format -show-debug-messages -target:linux_amd64
+          odin doc core/sys/unix   -all-packages -doc-format -show-debug-messages -target:linux_amd64
+          odin doc core/sys/haiku  -all-packages -doc-format -show-debug-messages -target:haiku_amd64
       - name: Generate Tool
         shell: cmd
         run: |
@@ -46,11 +50,15 @@ jobs:
       - name: Generate Website
         shell: cmd
         run: |
-          copy odin-html-docs.exe website\odin-html-docs.exe
-          copy Odin\all.odin-doc  website\all.odin-doc
+          copy odin-html-docs.exe    website\odin-html-docs.exe
+          copy Odin\all.odin-doc     website\all.odin-doc
+          copy Odin\darwin.odin-doc  website\darwin.odin-doc
+          copy Odin\linux.odin-doc   website\linux.odin-doc
+          copy Odin\unix.odin-doc    website\unix.odin-doc
+          copy Odin\haiku.odin-doc   website\haiku.odin-doc
           copy resources\CNAME    website\static\CNAME
           pushd website\static
-          ..\odin-html-docs.exe ..\all.odin-doc
+          ..\odin-html-docs.exe ..\all.odin-doc --merge ..\darwin.odin-doc ..\linux.odin-doc ..\unix.odin-doc ..\haiku.odin-doc
           popd
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
