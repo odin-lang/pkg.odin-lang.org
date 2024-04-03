@@ -56,16 +56,16 @@ Dir_Node :: struct {
 	pkg:      ^doc.Pkg,
 	children: [dynamic]^Dir_Node,
 }
+sort_directory_tree :: proc(node: ^Dir_Node) {
+	slice.sort_by_key(node.children[:], proc(node: ^Dir_Node) -> string {
+		return strings.to_lower(node.name, context.temp_allocator)
+	})
+	for child in node.children {
+		sort_directory_tree(child)
+	}
+}
 
 generate_directory_tree :: proc(pkgs_to_use: map[string]^doc.Pkg) -> (root: ^Dir_Node) {
-	sort_tree :: proc(node: ^Dir_Node) {
-		slice.sort_by_key(node.children[:], proc(node: ^Dir_Node) -> string {
-			return strings.to_lower(node.name, context.temp_allocator)
-		})
-		for child in node.children {
-			sort_tree(child)
-		}
-	}
 	root = new(Dir_Node)
 	root.children = make([dynamic]^Dir_Node)
 	children := make([dynamic]^Dir_Node)
@@ -107,10 +107,65 @@ generate_directory_tree :: proc(pkgs_to_use: map[string]^doc.Pkg) -> (root: ^Dir
 		append(&parent.children, child)
 	}
 
-	sort_tree(root)
+	sort_directory_tree(root)
 
 	return
 }
+
+
+insert_into_directory_tree :: proc(root: ^Dir_Node, pkgs_to_use: map[string]^doc.Pkg) {
+	children := make([dynamic]^Dir_Node)
+	for path, pkg in pkgs_to_use {
+		dir, _, inner := strings.partition(path, "/")
+		if inner == "" {
+			node := new_clone(Dir_Node{
+				dir  = dir,
+				name = dir,
+				path = path,
+				pkg  = pkg,
+			})
+			append(&root.children, node)
+		} else {
+			node := new_clone(Dir_Node{
+				dir  = dir,
+				name = inner,
+				path = path,
+				pkg  = pkg,
+			})
+			append(&children, node)
+		}
+	}
+
+	child_loop: for child in children {
+		dir, _, _ := strings.partition(child.path, "/")
+		for node in root.children {
+			if node.dir == dir {
+				for c in node.children {
+					if c.name == child.name {
+						continue child_loop
+					}
+				}
+				append(&node.children, child)
+				continue child_loop
+			}
+		}
+
+		parent := new_clone(Dir_Node{
+			dir  = dir,
+			name = dir,
+			path = dir,
+			pkg  = nil,
+		})
+		append(&root.children, parent)
+		append(&parent.children, child)
+	}
+
+
+	sort_directory_tree(root)
+
+	return
+}
+
 
 
 //

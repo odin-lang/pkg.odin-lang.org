@@ -449,9 +449,9 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 									_ = scanner.scan(s)
 
 									assert(scanner.scan(s) == scanner.Ident)
-									ident := scanner.token_text(s)
+									code_ident := scanner.token_text(s)
 
-									append_anchored_span(&b, s, "/base/runtime", "code-typename", ident, &prev_offset)
+									append_anchored_span(&b, s, "/base/runtime", "code-typename", code_ident, &prev_offset)
 								}
 
 							case "where", "distinct":

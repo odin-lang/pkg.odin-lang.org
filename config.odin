@@ -16,6 +16,7 @@ Config :: struct {
 	_collections: map[string]Collection `json:"collections"`,
 	url_prefix:   string,
 
+
 	// -- Start non configurable --
 	header:   ^doc.Header,
 	files:    []doc.File,
@@ -29,6 +30,9 @@ Config :: struct {
 	collections: [dynamic]^Collection,
 
 	pkg_to_collection:  map[^doc.Pkg]^Collection,
+	handled_packages:   map[string]struct{},
+
+	pkgs_line_docs:     map[^doc.Pkg]string,
 }
 
 Collection :: struct {

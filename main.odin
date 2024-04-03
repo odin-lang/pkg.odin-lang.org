@@ -20,26 +20,27 @@ cfg: Config
 main :: proc() {
 	context.logger = log.create_console_logger(.Debug when ODIN_DEBUG else .Info)
 
-	{
-		if len(os.args) < 2 || len(os.args) > 3 || os.args[1] == "-h" || os.args[1] == "--help" {
-			print_usage()
-		}
+	if len(os.args) < 2 || os.args[1] == "-h" || os.args[1] == "--help" {
+		print_usage()
 	}
 
 	{
 		cfg = config_default()
 
 		if len(os.args) > 2 {
-			file_ok, json_err := config_merge_from_file(&cfg, os.args[2])
-			if !file_ok {
-				errorf("unable to read config file at: %s", os.args[2])
-			}
-			if json_err != nil {
-				errorf(
-					"unable to decode the JSON inside the config file at: %s, error: %v",
-					os.args[2],
-					json_err,
-				)
+			last_arg := os.args[len(os.args)-1]
+			if strings.has_suffix(last_arg, ".json") {
+				file_ok, json_err := config_merge_from_file(&cfg, last_arg)
+				if !file_ok {
+					errorf("unable to read config file at: %s", last_arg)
+				}
+				if json_err != nil {
+					errorf(
+						"unable to decode the JSON inside the config file at: %s, error: %v",
+						last_arg,
+						json_err,
+					)
+				}
 			}
 		}
 
@@ -54,10 +55,61 @@ main :: proc() {
 		}
 	}
 
+	not_hidden: [dynamic]^Collection
+
+	for arg in os.args[1:] {
+		strings.has_suffix(arg, ".odin-doc") or_continue
+		generate_from_path(arg, &not_hidden, strings.has_suffix(arg, "all.odin-doc"))
+	}
+
+	b := strings.builder_make()
+	defer strings.builder_destroy(&b)
+	w := strings.to_writer(&b)
+
+
+	for collection in not_hidden {
+		dir := collection.name
+
+		strings.builder_reset(&b)
+		write_html_header(w, fmt.tprintf("%s library - pkg.odin-lang.org", dir))
+		write_collection_directory(w, collection)
+		write_html_footer(w, true)
+		os.make_directory(dir, DIRECTORY_MODE)
+		os.write_entire_file(fmt.tprintf("%s/index.html", dir), b.buf[:])
+	}
+
+
 	{
-		data, ok := os.read_entire_file(os.args[1])
+
+		strings.builder_reset(&b)
+		write_html_header(w, "Packages - pkg.odin-lang.org")
+		write_home_page(w)
+		write_html_footer(w, true)
+		os.write_entire_file("index.html", b.buf[:])
+	}
+
+
+	log.infof("generate json pkg data")
+	generate_json_pkg_data(&b, not_hidden[:])
+
+	log.infof("copy_assets")
+	copy_assets()
+
+	log.infof("[DONE]")
+}
+
+
+generate_from_path :: proc(path: string, not_hidden: ^[dynamic]^Collection, all_packages: bool) {
+	for &collection in cfg.collections {
+		clear(&collection.pkgs)
+		clear(&collection.pkg_to_path)
+		clear(&collection.pkg_entries_map)
+	}
+
+	{
+		data, ok := os.read_entire_file(path)
 		if !ok {
-			errorf("unable to read Odin doc file at: %s", os.args[1])
+			errorf("unable to read Odin doc file at: %s", path)
 		}
 
 		err: doc.Reader_Error
@@ -74,10 +126,11 @@ main :: proc() {
 			errorf("invalid file format version")
 		}
 
-		cfg.files = array(cfg.header.files)
-		cfg.pkgs = array(cfg.header.pkgs)
+		cfg.files    = array(cfg.header.files)
+		cfg.pkgs     = array(cfg.header.pkgs)
 		cfg.entities = array(cfg.header.entities)
-		cfg.types = array(cfg.header.types)
+		cfg.types    = array(cfg.header.types)
+
 	}
 
 	when ODIN_DEBUG {
@@ -111,13 +164,21 @@ main :: proc() {
 		fullpaths: [dynamic]string
 		for pkg in cfg.pkgs[1:] {
 			fp := str(pkg.fullpath)
+			if fp in cfg.handled_packages {
+				continue
+			}
 			append(&fullpaths, fp)
+			cfg.handled_packages[fp] = {}
 		}
 
-		log.infof("%i packages", len(fullpaths))
+		log.infof("%d packages - %s", len(fullpaths), path)
 		log.debugf("Full package paths: %v", fullpaths)
 
 		fullpath_loop: for fullpath, i in fullpaths {
+			if !all_packages && !strings.contains(fullpath, "/sys/") {
+				continue
+			}
+
 			pkg := &cfg.pkgs[i + 1]
 			if len(array(pkg.entries)) == 0 {
 				log.infof("Package at %s does not contain anything", fullpath)
@@ -146,7 +207,7 @@ main :: proc() {
 			trimmed = strings.trim_prefix(trimmed, collection.base_url[1:])
 			trimmed = strings.trim_prefix(trimmed, "/")
 
-			if strings.has_prefix(trimmed, "sys") || strings.contains(trimmed, "/_") {
+			if strings.contains(trimmed, "/_") {
 				log.infof(
 					"Package %s is a system/os specific package and will be skipped",
 					fullpath,
@@ -164,23 +225,21 @@ main :: proc() {
 
 	b := strings.builder_make()
 	defer strings.builder_destroy(&b)
-	w := strings.to_writer(&b)
 
 	for c in cfg.collections {
-		c.root = generate_directory_tree(c.pkgs)
+		if all_packages {
+			c.root = generate_directory_tree(c.pkgs)
+		} else {
+			assert(c.root != nil)
+			insert_into_directory_tree(c.root, c.pkgs)
+		}
 		generate_packages(&b, c)
 	}
 
-	{
-		strings.builder_reset(&b)
-		write_html_header(w, "Packages - pkg.odin-lang.org")
-		write_home_page(w)
-		write_html_footer(w, true)
-		os.write_entire_file("index.html", b.buf[:])
-	}
-
-	not_hidden: [dynamic]^Collection
 	for c in cfg.collections {
+
+		cfg.handled_packages[c.name] = {}
+
 		if cfg.hide_core && (c.name == "core" || c.name == "vendor") {
 			log.infof(
 				"'core' is set to be hidden so collection %q will be excluded from search results",
@@ -196,13 +255,11 @@ main :: proc() {
 			continue
 		}
 
-		append(&not_hidden, c)
+		append(not_hidden, c)
 	}
-
-	generate_json_pkg_data(&b, not_hidden[:])
-
-	copy_assets()
 }
+
+
 
 print_usage :: proc() -> ! {
 	fmt.eprintf(
@@ -390,15 +447,6 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection) {
 
 	dir := collection.name
 
-	{
-		strings.builder_reset(b)
-		write_html_header(w, fmt.tprintf("%s library - pkg.odin-lang.org", dir))
-		write_collection_directory(w, collection)
-		write_html_footer(w, true)
-		os.make_directory(dir, DIRECTORY_MODE)
-		os.write_entire_file(fmt.tprintf("%s/index.html", dir), b.buf[:])
-	}
-
 	collection.pkg_entries_map = make(map[^doc.Pkg]Pkg_Entries, len(collection.pkgs))
 	for _, pkg in collection.pkgs {
 		collection.pkg_entries_map[pkg] = pkg_entries_gather(pkg)
@@ -411,6 +459,12 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection) {
 			runtime_pkg = pkg
 		}
 
+		if pkg not_in cfg.pkgs_line_docs {
+			line_doc, _, _ := strings.partition(str(pkg.docs), "\n")
+			line_doc = strings.trim_space(line_doc)
+			cfg.pkgs_line_docs[pkg] = strings.clone(line_doc)
+		}
+
 		strings.builder_reset(b)
 		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width)
 		write_pkg(w, dir, path, pkg, collection, collection.pkg_entries_map[pkg])
@@ -419,8 +473,8 @@ generate_packages :: proc(b: ^strings.Builder, collection: ^Collection) {
 		os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
 	}
 
-	if collection.name == "base" {
-		assert(runtime_pkg != nil)
+	if runtime_pkg != nil &&
+	   collection.name == "base" {
 		path := "builtin"
 
 		strings.builder_reset(b)
@@ -547,8 +601,7 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 		if pkg == nil {
 			return
 		}
-		line_doc, _, _ = strings.partition(str(pkg.docs), "\n")
-		line_doc = strings.trim_space(line_doc)
+		line_doc = cfg.pkgs_line_docs[pkg]
 		if line_doc == "" {
 			return
 		}
@@ -598,11 +651,11 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 		if len(dir.children) != 0 {
 			fmt.wprint(w, `<tr aria-controls="`)
 			for child in dir.children {
-				fmt.wprintf(w, "pkg-%s ", str(child.pkg.name))
+				fmt.wprintf(w, "pkg-%s ", child.name)
 			}
 			fmt.wprint(w, `" class="directory-pkg"><td class="pkg-line pkg-name" data-aria-owns="`)
 			for child in dir.children {
-				fmt.wprintf(w, "pkg-%s ", str(child.pkg.name))
+				fmt.wprintf(w, "pkg-%s ", child.name)
 			}
 			fmt.wprintf(w, `" id="pkg-%s">`, dir.dir)
 		} else {
@@ -629,23 +682,32 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 			write_doc_line(w, first)
 			io.write_string(w, `.`)
 		} else {
-			io.write_string(w, `&nbsp;`)
+			if dir.dir == "sys" {
+				io.write_string(w, `Platform specific packages - documentation may be for a specific platform only`)
+			} else {
+				io.write_string(w, `&nbsp;`)
+			}
 		}
 		io.write_string(w, `</td>`)
 		fmt.wprintf(w, "</tr>\n")
 
 		for child in dir.children {
 			assert(child.pkg != nil)
-			fmt.wprintf(w, `<tr id="pkg-%s" class="directory-pkg directory-child"><td class="pkg-line pkg-name">`, str(child.pkg.name))
+			fmt.wprintf(w, `<tr id="pkg-%s" class="directory-pkg directory-child"><td class="pkg-line pkg-name">`, child.name)
 			fmt.wprintf(w, `<a href="%s/%s/">%s</a>`, collection.base_url, child.path, child.name)
 			io.write_string(w, `</td>`)
 
-			line_doc, _, _ := strings.partition(str(child.pkg.docs), "\n")
-			line_doc = strings.trim_space(line_doc)
 			io.write_string(w, `<td class="pkg-line pkg-line-doc">`)
 			if child_line_doc, ok := get_line_doc(child.pkg); ok {
 				write_doc_line(w, child_line_doc)
 			} else {
+				if dir.dir == "sys" {
+					target := "windows_amd64"
+					switch child.name {
+					case "darwin": target = "darwin_arm64"
+					}
+					fmt.wprintf(w, `<em>(Generated with <code>-target:%s</code>, please read the source code directly)</em>`, target)
+				}
 				io.write_string(w, `&nbsp;`)
 			}
 			io.write_string(w, `</td>`)
@@ -954,6 +1016,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		// ignore
 	case .Basic:
 		type_flags := transmute(doc.Type_Flags_Basic)type.flags
+		_ = type_flags
 		if is_type_untyped(type) {
 			io.write_string(w, str(type.name))
 		} else {
@@ -1060,6 +1123,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			for entity_index, i in type_entities {
 				e := &cfg.entities[entity_index]
 				docs, comment := str(e.docs), str(e.comment)
+				_ = comment
 
 				write_lead_comment(writer, flags, docs, i)
 
@@ -1156,7 +1220,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		require_parens := (.Is_Results in flags) && (len(type_entities) > 1 || !is_entity_blank(type_entities[0]))
 		if require_parens { io.write_byte(w, '(') }
 		all_blank := true
-		for entity_index, i in type_entities {
+		for entity_index in type_entities {
 			e := &cfg.entities[entity_index]
 			if name := str(e.name); name == "" || name == "_" {
 				if str(e.init_string) != "" {
@@ -1215,7 +1279,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			}
 
 			j := 0
-			for group, group_idx in groups {
+			for group in groups {
 				io.write_string(w, "\n\t")
 				group_name_width := full_name_width(group)
 				for entity_index, i in group {
@@ -1628,7 +1692,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 		}
 		prev_line = strings.trim_space(prev_line)
 
-		lines := block.lines[:]
+		block_lines := block.lines[:]
 
 		switch block.kind {
 		case .Paragraph:
@@ -1636,21 +1700,21 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 
 			subtitles_to_markup := [?]string{ "Inputs:", "Returns:" }
 			for subtitle in subtitles_to_markup {
-				if ! strings.has_prefix(lines[0], subtitle) {
+				if ! strings.has_prefix(block_lines[0], subtitle) {
 					continue
 				}
 				fmt.wprintf(w, "<b>%v</b><br>", subtitle)
-				removed_subtitle := strings.trim_prefix(lines[0], subtitle)
+				removed_subtitle := strings.trim_prefix(block_lines[0], subtitle)
 				removed_subtitle = strings.trim_left_space(removed_subtitle)
 				if removed_subtitle == "" {
-					lines = lines[1:]
+					block_lines = block_lines[1:]
 				} else {
-					lines[0] = removed_subtitle
+					block_lines[0] = removed_subtitle
 				}
 				break
 			}
 
-			for line, line_idx in lines {
+			for line, line_idx in block_lines {
 				if line_idx > 0 {
 					io.write_string(w, "\n")
 				}
@@ -1658,8 +1722,8 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 			}
 			io.write_string(w, "</p>\n")
 		case .Code:
-			all_blank := len(lines) > 0
-			for line in lines {
+			all_blank := len(block_lines) > 0
+			for line in block_lines {
 				if strings.trim_space(line) != "" {
 					all_blank = false
 				}
@@ -1950,9 +2014,9 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 
 	parent: ^doc.Entity
 	for entry in array(pkg.entries) {
-		e := &cfg.entities[entry.entity]
-		if e.kind == .Type_Name && str(e.name) == objc_type {
-			parent = e
+		entity := &cfg.entities[entry.entity]
+		if entity.kind == .Type_Name && str(entity.name) == objc_type {
+			parent = entity
 			break
 		}
 	}
@@ -1999,8 +2063,8 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 				if i != 0 {
 					fmt.wprintf(w, ", ")
 				}
-				e := &cfg.entities[e_idx]
-				name := str(e.name)
+				entity := &cfg.entities[e_idx]
+				name := str(entity.name)
 				if name != "" {
 					fmt.wprintf(w, "%s", name)
 				} else {
@@ -2023,9 +2087,9 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 		fmt.wprintf(w, `<a href="#{0:s}">{1:s}</a>(`, str(e.name), objc_name)
 		if len(pentities) > 1 {
 			fmt.wprintf(w, "\n")
-			for e_idx, i in pentities {
-				e := &cfg.entities[e_idx]
-				fmt.wprintf(w, "\t%s,\n", str(e.name))
+			for entity_idx in pentities {
+				entity := &cfg.entities[entity_idx]
+				fmt.wprintf(w, "\t%s,\n", str(entity.name))
 			}
 		} else {
 			for e_idx, i in pentities {
@@ -2230,14 +2294,14 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 			}
 			for entity_idx in array(e.grouped_entities) {
 				pe := &cfg.entities[entity_idx]
-				if p, ok := check_proc(pe, parent, false); ok {
+				if _, ok := check_proc(pe, parent, false); ok {
 					append(&related_procs_in_parameters, e)
 					break
 				}
 			}
 			if !is_inherited do for entity_idx in array(e.grouped_entities) {
 				pe := &cfg.entities[entity_idx]
-				if p, ok := check_proc(pe, parent, true); ok {
+				if _, ok := check_proc(pe, parent, true); ok {
 					append(&related_procs_in_return_types, e)
 					break
 				}
@@ -2674,6 +2738,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			strings.has_suffix(filename, "_windows.odin"),
 			strings.has_suffix(filename, "_darwin.odin"),
 			strings.has_suffix(filename, "_essence.odin"),
+			strings.has_suffix(filename, "_haiku.odin"),
 			strings.has_suffix(filename, "_freebsd.odin"),
 			strings.has_suffix(filename, "_wasi.odin"),
 			strings.has_suffix(filename, "_js.odin"),
@@ -2684,6 +2749,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			strings.has_suffix(filename, "_arch64.odin"),
 			strings.has_suffix(filename, "_wasm32.odin"),
 			strings.has_suffix(filename, "_wasm64.odin"),
+			strings.has_suffix(filename, "_wasm64p32.odin"),
 			false:
 			any_hidden = true
 			continue source_file_loop
