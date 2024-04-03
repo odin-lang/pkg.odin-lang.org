@@ -215,7 +215,6 @@ generate_from_path :: proc(path: string, all_packages: bool) {
 		}
 
 		log.infof("%d packages - %s", len(pkgs), path)
-		log.infof("Full package paths: %#v", pkgs)
 
 		fullpath_loop: for pkg in pkgs {
 			fullpath := str(pkg.fullpath)
