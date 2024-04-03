@@ -640,6 +640,28 @@ write_readme :: proc(w: io.Writer, path: string) {
 	io.write_string(w, string(html))
 }
 
+target_from_pkg :: proc(pkg: ^doc.Pkg) -> (target: string, ok: bool) {
+	if pkg == nil {
+		return
+	}
+	path := cfg.pkg_to_collection[pkg].pkg_to_path[pkg]
+	dir, _, name := strings.partition(path, "/")
+	if strings.contains(dir, "sys") {
+		target = "windows_amd64"
+		ok = true
+		switch name {
+		case "darwin":
+			target = "darwin_arm64"
+		case "linux", "unix":
+			target = "linux_arm64"
+		case "haiku":
+			target = "haiku_arm64"
+		}
+	}
+	return
+}
+
+
 write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 	get_line_doc :: proc(pkg: ^doc.Pkg) -> (line_doc: string, ok: bool) {
 		if pkg == nil {
@@ -744,19 +766,9 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 			io.write_string(w, `<td class="pkg-line pkg-line-doc">`)
 			if child_line_doc, ok := get_line_doc(child.pkg); ok {
 				write_doc_line(w, child_line_doc)
+			} else if target, target_ok := target_from_pkg(child.pkg); target_ok {
+				fmt.wprintf(w, `<em>(Generated with <code>-target:%s</code>, please read the source code directly)</em>`, target)
 			} else {
-				if dir.dir == "sys" {
-					target := "windows_amd64"
-					switch child.name {
-					case "darwin":
-						target = "darwin_arm64"
-					case "linux", "unix":
-						target = "linux_arm64"
-					case "haiku":
-						target = "haiku_arm64"
-					}
-					fmt.wprintf(w, `<em>(Generated with <code>-target:%s</code>, please read the source code directly)</em>`, target)
-				}
 				io.write_string(w, `&nbsp;`)
 			}
 			io.write_string(w, `</td>`)
@@ -2694,19 +2706,16 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", pkg_src_url)
 	fmt.wprintf(w, "</h1>\n")
 
+	if specific_target, ok := target_from_pkg(pkg); ok {
+		fmt.wprintf(w, "<h4><strong>Warning:&nbsp;</strong>This was generated for <code>-target:%s</code> and might not represet every target this package supports.</h4>", specific_target)
+	}
+
 	// When this is the case, the collection page does not exists, so show license here.
 	if collection_root_is_package {
 		write_license(w, collection)
 	}
 
 	write_search(w, .Package)
-
-	// // TODO(bill): determine decent approach for performance
-	// if len(array(pkg.entries)) <= 1000 {
-	// 	io.write_string(w, `<div class="input-group">`)
-	// 	io.write_string(w, `<input type="text" id="pkg-fuzzy-search" class="form-control" placeholder="Search Docs...">`+"\n")
-	// 	io.write_string(w, `</div>`+"\n")
-	// }
 
 	fmt.wprintln(w, `<div id="pkg-top">`)
 
