@@ -1634,6 +1634,9 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 		return
 	}
 
+	is_fmt := strings.has_prefix(docs, "package fmt")
+	_ = is_fmt
+
 	Block_Kind :: enum {
 		Paragraph,
 		Code,
@@ -1645,7 +1648,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 		lines: []string,
 	}
 
-	lines := strings.split_lines(docs)
+	lines_to_process := strings.split_lines(docs)
 	curr_block_kind := Block_Kind.Paragraph
 	start := 0
 	blocks: [dynamic]Block
@@ -1674,7 +1677,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 		}
 	}
 
-	for line, i in lines {
+	for line, i in lines_to_process {
 		text := strings.trim_space(line)
 		next_block_kind := curr_block_kind
 		force_write_block := false
@@ -1682,8 +1685,10 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 		switch curr_block_kind {
 		case .Paragraph:
 			switch {
-			case strings.has_prefix(line, "Example:"): next_block_kind = .Example
-			case strings.has_prefix(line, "Output:"): next_block_kind = .Output
+			case strings.has_prefix(line, "Example:"):
+				next_block_kind = .Example
+			case strings.has_prefix(line, "Output:"):
+				next_block_kind = .Output
 			case strings.has_prefix(line, "Possible Output:"):
 				next_block_kind = .Output
 				has_possible = true
@@ -1692,36 +1697,44 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 			}
 		case .Code:
 			switch {
-			case strings.has_prefix(line, "Example:"): next_block_kind = .Example
-			case strings.has_prefix(line, "Output:"): next_block_kind = .Output
+			case strings.has_prefix(line, "Example:"):
+				next_block_kind = .Example
+			case strings.has_prefix(line, "Output:"):
+				next_block_kind = .Output
 			case strings.has_prefix(line, "Possible Output:"):
 				next_block_kind = .Output
 				has_possible = true
-			case ! (text == "" || strings.has_prefix(line, "\t")): next_block_kind = .Paragraph
+			case !strings.has_prefix(line, "\t") && text != "":
+				next_block_kind = .Paragraph
 			}
 		case .Example:
 			switch {
-			case strings.has_prefix(line, "Output:"): next_block_kind = .Output
+			case strings.has_prefix(line, "Output:"):
+				next_block_kind = .Output
 			case strings.has_prefix(line, "Possible Output:"):
 				next_block_kind = .Output
 				has_possible = true
-			case ! (text == "" || strings.has_prefix(line, "\t")): next_block_kind = .Paragraph
+			case !strings.has_prefix(line, "\t") && text != "":
+				next_block_kind = .Paragraph
 			}
 		case .Output:
 			switch {
-			case strings.has_prefix(line, "Example:"): next_block_kind = .Example
-			case ! (text == "" || strings.has_prefix(line, "\t")): next_block_kind = .Paragraph
+			case strings.has_prefix(line, "Example:"):
+				next_block_kind = .Example
+			case !strings.has_prefix(line, "\t") && text != "":
+				next_block_kind = .Paragraph
 			}
 		}
 
 		if i-start > 0 && (curr_block_kind != next_block_kind || force_write_block) {
-			insert_block(Block{curr_block_kind, lines[start:i]}, &blocks, &example_block, &output_block, name)
-			curr_block_kind, start = next_block_kind, i
+			insert_block(Block{curr_block_kind, lines_to_process[start:i]}, &blocks, &example_block, &output_block, name)
+			curr_block_kind = next_block_kind
+			start = i
 		}
 	}
 
-	if start < len(lines) {
-		insert_block(Block{curr_block_kind, lines[start:]}, &blocks, &example_block, &output_block, name)
+	if start < len(lines_to_process) {
+		insert_block(Block{curr_block_kind, lines_to_process[start:]}, &blocks, &example_block, &output_block, name)
 	}
 
 	if output_block.kind == .Output && example_block.kind != .Example {
@@ -1793,7 +1806,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 			}
 
 			io.write_string(w, "<pre>")
-			for line in lines {
+			for line in block.lines {
 				trimmed := strings.trim_prefix(line, "\t")
 				s := escape_html_string(trimmed)
 				io.write_string(w, s)
