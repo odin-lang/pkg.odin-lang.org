@@ -2292,6 +2292,68 @@ write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, met
 	}
 }
 
+write_related_constants :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity) {
+	#partial switch pt := cfg.types[parent.type]; pt.kind {
+	case .Invalid, .Basic, .Generic:
+		// ignore non-useful types
+		return
+	}
+
+	related_constants: [dynamic]^doc.Entity
+	defer delete(related_constants)
+
+	for entry in array(pkg.entries) {
+		e := &cfg.entities[entry.entity]
+		if e.kind == .Constant && e.type == parent.type {
+			if strings.has_prefix(str(e.name), "_") {
+				continue
+			}
+			append(&related_constants, e)
+		}
+	}
+
+	if len(related_constants) == 0 {
+		return
+	}
+
+	the_sort_proc :: proc(a, b: ^doc.Entity) -> (cmp: slice.Ordering) {
+		cmp = slice.cmp(a.kind, b.kind)
+		if cmp != .Equal { return }
+		cmp = slice.cmp(str(a.name), str(b.name))
+		return
+	}
+
+	slice.sort_by_cmp(related_constants[:], the_sort_proc)
+
+	constants_seen := make(map[string]bool)
+	defer delete(constants_seen)
+
+	fmt.wprintfln(w, "<h5>Related Constants</h5>")
+	fmt.wprintln(w, "<ul>")
+	parameter_loop: for e in related_constants {
+		proc_name := str(e.name)
+
+		if constants_seen[proc_name] {
+			continue parameter_loop
+		}
+		constants_seen[proc_name] = true
+
+		collection := cfg.pkg_to_collection[pkg]
+		fmt.wprintf(w, "<li>")
+		fmt.wprintf(
+			w,
+			`<a href="%s/%s/#%s">%s</a>`,
+			collection.base_url,
+			collection.pkg_to_path[pkg],
+			proc_name,
+			proc_name,
+		)
+		fmt.wprintfln(w, "</li>")
+	}
+	fmt.wprintln(w, "</ul>")
+
+}
+
 write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, proc_names_seen: ^map[string]bool, is_inherited := false) {
 	related_procs_in_parameters, related_procs_in_return_types: [dynamic]^doc.Entity
 
@@ -2691,6 +2753,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	} else if e.kind == .Type_Name {
 		proc_names_seen: map[string]bool
 		write_related_procedures(w, pkg, e, &proc_names_seen)
+		write_related_constants(w, pkg, e)
 		delete(proc_names_seen)
 	}
 }
