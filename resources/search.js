@@ -466,6 +466,12 @@ if (odin_search) {
 			return;
 		}
 
+		let url_parameters = new URLSearchParams(window.location.search);
+		if (url_parameters.has("q")) {
+			let search_query = url_parameters.get("q");
+			odin_search.value = search_query.trim();
+			odin_search_input(null);
+		}
 
 		odin_search.addEventListener("input", ev => {
 			odin_search_input(ev);
