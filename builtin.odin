@@ -191,11 +191,11 @@ builtins := []Builtin{
 
 	{name = "min",       kind = "b", type = "proc(values: ..T) -> T",
 		comment = "`min` returns the minimum value of passed arguments of all the same type.\n" +
-		          "If one argument is passed and it is an enum type, then `min` returns the minimum value of the fields of that enum type.",
+		          "If one argument is passed and it is an enum or numeric type, then `min` returns the minimum value of the enum type's fields or its minimum / most negative numeric value respectively.",
 	},
 	{name = "max",       kind = "b", type = "proc(values: ..T) -> T",
 		comment = "`max` returns the maximum value of passed arguments of all the same type.\n" +
-		          "If one argument is passed and it is an enum type, then `max` returns the maximum value of the fields of that enum type.",
+		          "If one argument is passed and it is an enum or numeric type, then `max` returns the maximum value of the enum type's fields or its maximum numeric value respectively."
 	},
 	{name = "abs",       kind = "b", type = "proc(value: T) -> T",
 		comment = "`abs` returns the absolute value of passed argument.\n" +
