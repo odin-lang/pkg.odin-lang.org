@@ -1741,7 +1741,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 		errorf("The documentation for %q has an output block but no example\n", name)
 	}
 
-	for block in &blocks {
+	for &block in blocks {
 		trim_amount := 0
 		for trim_amount = 0; trim_amount < len(block.lines); trim_amount += 1 {
 			line := block.lines[trim_amount]
@@ -2278,7 +2278,7 @@ write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, met
 
 	recursive_inheritance_check: {
 		parent_type := base_type(cfg.types[parent.type])
-		assert(parent_type.kind == .Struct)
+		(parent_type.kind == .Struct) or_break recursive_inheritance_check
 		fields := array(parent_type.entities)
 		for field_idx := len(fields)-1; field_idx >= 0; field_idx -= 1 {
 			field := &cfg.entities[fields[field_idx]]
@@ -2366,7 +2366,7 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 			parent_name := str(parent.name)
 
 			pt := base_type(cfg.types[e.type])
-			assert(pt.kind == .Proc)
+			(pt.kind == .Proc) or_return
 			params := array(cfg.types[array(pt.types)[int(is_output)]].entities)
 			for param_idx in params {
 				t := cfg.types[cfg.entities[param_idx].type]
