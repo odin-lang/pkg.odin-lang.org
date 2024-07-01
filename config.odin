@@ -130,6 +130,10 @@ config_merge_from_file :: proc(c: ^Config, file: string) -> (file_ok: bool, err:
 			collection.hidden = true
 		}
 
+		if c.hide_base && (collection.name == "base") {
+			collection.hidden = true
+		}
+
 		if c.url_prefix != "" {
 			new_base_url := strings.concatenate({c.url_prefix, collection.base_url})
 			delete(collection.base_url)
