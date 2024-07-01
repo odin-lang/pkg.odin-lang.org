@@ -83,6 +83,7 @@ Here is an example config file with comments, you should remove any comments so 
 	// Hides the core packages from the menu, homepage and search results,
 	// they are still there so that links from your own packages work.
 	"hide_core": true,
+	"hide_base": false,
 	// If your docs are going to be on a subpath of your domain, for example: `name.github.io/repo`
 	// You can provide a url_prefix here to make the paths line up, if your docs will be at the root of the domain, leave this out.
 	"url_prefix": "/repo",
