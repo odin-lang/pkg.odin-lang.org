@@ -71,10 +71,6 @@ main :: proc() {
 	defer strings.builder_destroy(&b)
 	w := strings.to_writer(&b)
 
-	for c in cfg.collections {
-		generate_packages_in_collection(&b, c)
-	}
-
 
 	for c in cfg.collections {
 		if cfg.hide_core && (c.name == "core" || c.name == "vendor") {
@@ -113,6 +109,8 @@ main :: proc() {
 		write_html_footer(w, true)
 		os.make_directory(dir, DIRECTORY_MODE)
 		os.write_entire_file(fmt.tprintf("%s/index.html", dir), b.buf[:])
+
+		generate_packages_in_collection(&b, collection)
 	}
 
 
