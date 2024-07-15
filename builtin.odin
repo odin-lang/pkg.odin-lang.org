@@ -195,7 +195,7 @@ builtins := []Builtin{
 	},
 	{name = "max",       kind = "b", type = "proc(values: ..T) -> T",
 		comment = "`max` returns the maximum value of passed arguments of all the same type.\n" +
-		          "If one argument is passed and it is an enum or numeric type, then `max` returns the maximum value of the enum type's fields or its maximum numeric value respectively."
+		          "If one argument is passed and it is an enum or numeric type, then `max` returns the maximum value of the enum type's fields or its maximum numeric value respectively.",
 	},
 	{name = "abs",       kind = "b", type = "proc(value: T) -> T",
 		comment = "`abs` returns the absolute value of passed argument.\n" +
@@ -574,37 +574,37 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 
 @(private)
 write_table_contents :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, consts: []doc.Scope_Entry, types: []doc.Scope_Entry, procs: []doc.Scope_Entry, groups: []doc.Scope_Entry, entry_table: []Builtin) {
-    write_link :: proc(w: io.Writer, id, text: string) {
-        fmt.wprintf(w, `<li><a href="#%s">%s</a></li>`, id, text)
-        fmt.wprintln(w, "")
-    }
+	write_link :: proc(w: io.Writer, id, text: string) {
+		fmt.wprintf(w, `<li><a href="#%s">%s</a></li>`, id, text)
+		fmt.wprintln(w, "")
+	}
 
-    write_table_entries :: proc(w: io.Writer, runetime_pkg: ^doc.Pkg, title: string, kind: string, entries: []doc.Scope_Entry, entry_table: []Builtin) {
-        // if len(entries) == 0 do return
-        fmt.wprintln(w, `<li>`)
-        {
-                fmt.wprintf(w, `<a href="#pkg-{0:s}">{0:s}</a>`, title)
-                fmt.wprintln(w, `<ul>`)
-                for e in entry_table do if e.kind == kind {
-                        fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", e.name)
-                }
-                fmt.wprintln(w, `</ul>`)
-        }
-        fmt.wprintln(w, `</li>`)
-    }
+	write_table_entries :: proc(w: io.Writer, runetime_pkg: ^doc.Pkg, title: string, kind: string, entries: []doc.Scope_Entry, entry_table: []Builtin) {
+		// if len(entries) == 0 do return
+		fmt.wprintln(w, `<li>`)
+		{
+			fmt.wprintf(w, `<a href="#pkg-{0:s}">{0:s}</a>`, title)
+			fmt.wprintln(w, `<ul>`)
+			for e in entry_table do if e.kind == kind {
+				fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", e.name)
+			}
+			fmt.wprintln(w, `</ul>`)
+		}
+		fmt.wprintln(w, `</li>`)
+	}
 
-    fmt.wprintln(w, `<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">`)
-    fmt.wprintln(w, `<nav id="TableOfContents">`)
-    fmt.wprintln(w, `<ul>`)
+	fmt.wprintln(w, `<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">`)
+	fmt.wprintln(w, `<nav id="TableOfContents">`)
+	fmt.wprintln(w, `<ul>`)
 
-    write_link(w, "pkg-overview", "Overview")
+	write_link(w, "pkg-overview", "Overview")
 
-    write_table_entries(w, runtime_pkg, "Constants", "c", consts, entry_table)
-    write_table_entries(w, runtime_pkg, "Types", "t", types, entry_table)
-    write_table_entries(w, runtime_pkg, "Procedures", "b", procs, entry_table)
-    write_table_entries(w, runtime_pkg, "Procedure Groups", "g", groups, entry_table)
-    
-    fmt.wprintln(w, `</ul>`)
-    fmt.wprintln(w, `</nav>`)
-    fmt.wprintln(w, `</div></div>`)
+	write_table_entries(w, runtime_pkg, "Constants", "c", consts, entry_table)
+	write_table_entries(w, runtime_pkg, "Types", "t", types, entry_table)
+	write_table_entries(w, runtime_pkg, "Procedures", "b", procs, entry_table)
+	write_table_entries(w, runtime_pkg, "Procedure Groups", "g", groups, entry_table)
+
+	fmt.wprintln(w, `</ul>`)
+	fmt.wprintln(w, `</nav>`)
+	fmt.wprintln(w, `</div></div>`)
 }
