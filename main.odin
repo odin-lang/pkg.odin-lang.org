@@ -516,6 +516,8 @@ generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collec
 
 	if runtime_pkg != nil &&
 	   collection.name == "base" {
+        init_cfg_from_pkg(runtime_pkg)
+
 		path := "builtin"
 
 		strings.builder_reset(b)
@@ -726,6 +728,7 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 		}
 
 		if dir.pkg != nil {
+            init_cfg_from_pkg(dir.pkg)
 			fmt.wprintf(w, `<a href="%s/%s">%s</a>`, collection.base_url, dir.path, dir.name)
 		} else if dir.name == "builtin" || dir.name == "intrinsics" {
 			fmt.wprintf(w, `<a href="%s/%s">%s</a>`, collection.base_url, dir.path, dir.name)
@@ -756,6 +759,8 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 
 		for child in dir.children {
 			assert(child.pkg != nil)
+            init_cfg_from_pkg(child.pkg)
+
 			fmt.wprintf(w, `<tr id="pkg-%s" class="directory-pkg directory-child"><td class="pkg-line pkg-name">`, child.name)
 			fmt.wprintf(w, `<a href="%s/%s/">%s</a>`, collection.base_url, child.path, child.name)
 			io.write_string(w, `</td>`)
