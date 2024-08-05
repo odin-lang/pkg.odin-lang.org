@@ -72,10 +72,10 @@ intrinsics_table := []Builtin{
 		comment = "Performs an \"subtract\" operation with an overflow check. The second return value will be true if an overflow occurs.",
 	},
 
-	{name = "add_sat", kind = "b", type = "proc(lhs, rhs: $T) -> T -> where type_is_integer(T)",
+	{name = "saturating_add", kind = "b", type = "proc(lhs, rhs: $T) -> T -> where type_is_integer(T)",
 		comment = "Performs a saturating \"add\" operation, where the return value is clamped between `min(T)` and `max(T)`.",
 	},
-	{name = "sub_sat", kind = "b", type = "proc(lhs, rhs: $T) -> T -> where type_is_integer(T)",
+	{name = "saturating_sub", kind = "b", type = "proc(lhs, rhs: $T) -> T -> where type_is_integer(T)",
 		comment = "Performs a saturating \"subtract\" operation, where the return value is clamped between `min(T)` and `max(T)`.",
 	},
 
@@ -361,8 +361,8 @@ intrinsics_table := []Builtin{
 	{name = "simd_shl_masked",         kind = "b", type = "proc(a: #simd[N]T, b: #simd[N]Unsigned_Integer) -> #simd[N]T", comment = "Similar to C's behaviour: `x << (y & mask)`"},
 	{name = "simd_shr_masked",         kind = "b", type = "proc(a: #simd[N]T, b: #simd[N]Unsigned_Integer) -> #simd[N]T", comment = "Similar to C's behaviour: `x >> (y & mask)"},
 
-	{name = "simd_add_sat",            kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
-	{name = "simd_sub_sat",            kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
+	{name = "simd_saturating_add",     kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
+	{name = "simd_saturating_sub",     kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
 
 	{name = "simd_bit_and",            kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
 	{name = "simd_bit_or",             kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
