@@ -66,10 +66,10 @@ intrinsics_table := []Builtin{
 		comment = "Performs an \"add\" operation with an overflow check. The second return value will be true if an overflow occurs.",
 	},
 	{name = "overflow_sub", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool) where type_is_integer(T) #optional_ok",
-		comment = "Performs an \"multiply\" operation with an overflow check. The second return value will be true if an overflow occurs.",
+		comment = "Performs a \"subtract\" operation with an overflow check. The second return value will be true if an overflow occurs.",
 	},
 	{name = "overflow_mul", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool) where type_is_integer(T) #optional_ok",
-		comment = "Performs an \"subtract\" operation with an overflow check. The second return value will be true if an overflow occurs.",
+		comment = "Performs a \"multiply\" operation with an overflow check. The second return value will be true if an overflow occurs.",
 	},
 
 	{name = "saturating_add", kind = "b", type = "proc(lhs, rhs: $T) -> T -> where type_is_integer(T)",
