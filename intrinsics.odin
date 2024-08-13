@@ -16,6 +16,12 @@ intrinsics_table := []Builtin{
 		comment = "Returns a constant boolean as to whether or not that package has been imported anywhere in the project. This is only needed for very rare edge cases.",
 	},
 
+	// Matrix Related
+	{name = "transpose",        kind = "b", type = "proc(m: $M/matrix[$R, $C]$E) -> matrix[C, R]E"},
+	{name = "outer_product",    kind = "b", type = "proc(a: $A/[$X]$E, b: $B/[$Y]E) -> matrix[X, Y]E"},
+	{name = "hadamard_product", kind = "b", type = "proc(a, b: $T/matrix[$R, $C]$E) -> T"},
+	{name = "matrix_flatten",   kind = "b", type = "proc(m: $T/matrix[$R, $C]$E) -> [R*C]E"},
+
 	// Types
 	{name = "soa_struct", kind = "b", type = "proc($N: int, $T: typeid) -> type/#soa[N]T",
 		comment = "A call-like way to construct an #soa struct. Possibly to be deprecated in the future.",
@@ -28,12 +34,12 @@ intrinsics_table := []Builtin{
 	{name = "non_temporal_load", kind = "b", type = "proc(dst: ^$T) -> T", comment = NON_TEMPORAL_COMMENT},
 	{name = "non_temporal_store", kind = "b", type = "proc(dst: ^$T, val: T)", comment = NON_TEMPORAL_COMMENT},
 
-
+	// Trapping
 	{name = "debug_trap", kind = "b", type = "proc()", comment = "A call intended to cause an execution trap with the intention of requesting a debugger's attention."},
 	{name = "trap", kind = "b", type = "proc() -> !", comment = "Lowered to a target dependent trap instruction."},
 
 
-	{name = "alloca", kind = "b", type = "proc(size, align: int) -> [^]u8",
+	{name = "alloca", kind = "b", type = "proc(size, align: int) -> [^]byte",
 		comment = "A procedure that allocates `size` bytes of space in the stack frame of the caller, aligned to `align` bytes. This temporary space is automatically freed when the procedure that called `alloca` returns to its caller.",
 	},
 	{name = "cpu_relax", kind = "b", type = "proc()",
@@ -50,10 +56,10 @@ intrinsics_table := []Builtin{
 		comment = "Counts the number of unset bits (`0`s).",
 	},
 	{name = "count_trailing_zeros", kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)",
-		comment = "Counts the number of trailing unset bits (`0`s) until a set bit (`1`)` is seen or if at all.",
+		comment = "Counts the number of trailing unset bits (`0`s) until a set bit (`1`) is seen or all bits have been counted.",
 	},
 	{name = "count_leading_zeros",  kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)",
-		comment = "Counts the number of leading unset bits (`0`s) until a set bit (`1`)` is seen or if at all.",
+		comment = "Counts the number of leading unset bits (`0`s) until a set bit (`1`) is seen or all bits have been counted.",
 	},
 	{name = "reverse_bits",         kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)",
 		comment = "Reverses the bits from ascending order to descending order e.g. 0b01110101 -> 0b10101110",
@@ -123,17 +129,6 @@ intrinsics_table := []Builtin{
 	{name = "prefetch_write_instruction", kind = "b", type = "proc(address: rawptr, #const locality: i32 /* 0..=3 */)", comment = PREFETCH_COMMENT},
 	{name = "prefetch_write_data",        kind = "b", type = "proc(address: rawptr, #const locality: i32 /* 0..=3 */)", comment = PREFETCH_COMMENT},
 
-	{name = "constant_utf16_cstring", kind = "b", type = "proc($literal: string) -> [^]u16",
-		comment = "Returns a run-time value of a constant string UTF-8 value encoded as a UTF-16 NUL terminated string value, useful for interfacing with UTF-16 procedure such as the Windows API.",
-	},
-
-	// Matrix Related
-
-	{name = "transpose",        kind = "b", type = "proc(m: $M/matrix[$R, $C]$E) -> matrix[C, R]E"},
-	{name = "outer_product",    kind = "b", type = "proc(a: $A/[$I]$E, b: $B/[$J]E) -> (c: [I*J]E)"},
-	{name = "hadamard_product", kind = "b", type = "proc(a, b: $M/matrix[$R, $C]$E) -> (c: M)"},
-	{name = "matrix_flatten",   kind = "b", type = "proc(m: $M/matrix[$R, $C]$E) -> [R*C]E"},
-
 	// Compiler Hints
 	{name = "expect", kind = "b", type = "proc(val, expected_val: T) -> T",
 		comment = "Provides information about expected (the most probable) value of `val`, which can be used by optimizing backends.",
@@ -141,6 +136,8 @@ intrinsics_table := []Builtin{
 
 	// Linux and Darwin Only
 	{name = "syscall", kind = "b", type = "proc(id: uintptr, args: ..uintptr) -> uintptr", comment="Linux and Darwin Only"},
+	// FreeBSD, NetBSD, et cetera
+	{name = "syscall_bsd", kind = "b", type = "proc(id: uintptr, args: ..uintptr) -> (uintptr, bool)", comment="FreeBSD, NetBSD, etc." },
 
 	// Atomics
 	{
@@ -229,7 +226,8 @@ intrinsics_table := []Builtin{
 	{name = "type_is_endian_platform",       kind = "b", type = "proc($T: typeid) -> bool"},
 	{name = "type_is_endian_little",         kind = "b", type = "proc($T: typeid) -> bool"},
 	{name = "type_is_endian_big",            kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_unsigned",              kind = "b", type = "proc($T: typeid) -> bool",
+	{name = "type_is_unsigned",              kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_numeric",               kind = "b", type = "proc($T: typeid) -> bool",
 		comment = "Returns true if a \"numeric\" in nature:\n\n"+
 		"- Any integer\n"+
 		"- Any float\n"+
@@ -239,7 +237,6 @@ intrinsics_table := []Builtin{
 		"- Any fixed-array of a numeric type\n"+
 		"",
 	},
-	{name = "type_is_numeric",               kind = "b", type = "proc($T: typeid) -> bool"},
 	{name = "type_is_ordered",               kind = "b", type = "proc($T: typeid) -> bool"},
 	{name = "type_is_ordered_numeric",       kind = "b", type = "proc($T: typeid) -> bool"},
 	{name = "type_is_indexable",             kind = "b", type = "proc($T: typeid) -> bool"},
@@ -294,6 +291,9 @@ intrinsics_table := []Builtin{
 		"",
 	},
 
+	{name = "type_is_matrix_row_major",    kind = "b", type = "proc($T: typeid) -> bool where type_is_matrix(T)"},
+	{name = "type_is_matrix_column_major", kind = "b", type = "proc($T: typeid) -> bool where type_is_matrix(T)"},
+
 	{name = "type_is_specialization_of",                kind = "b", type = "proc($T, $S: typeid) -> bool"},
 
 	{name = "type_is_variant_of",                       kind = "b", type = "proc($U, $V: typeid) -> bool where type_is_union(U)"},
@@ -303,6 +303,9 @@ intrinsics_table := []Builtin{
 	{name = "type_union_variant_count",                 kind = "b", type = "proc($T: typeid) -> int where type_is_union(T)"},
 	{name = "type_variant_type_of",                     kind = "b", type = "proc($T: typeid, $index: int) -> typeid where type_is_union(T)"},
 	{name = "type_variant_index_of",                    kind = "b", type = "proc($U, $V: typeid) -> int where type_is_union(U)"},
+
+	{name = "type_bit_set_elem_type",       kind = "b", type = "proc($T: typeid) -> typeid where type_is_bit_set(T)" },
+	{name = "type_bit_set_underlying_type", kind = "b", type = "proc($T: typeid) -> typeid where type_is_bit_set(T)" },
 
 	{name = "type_has_field",                           kind = "b", type = "proc($T: typeid, $name: string) -> bool"},
 	{name = "type_field_type",                          kind = "b", type = "proc($T: typeid, $name: string) -> typeid"},
@@ -314,6 +317,7 @@ intrinsics_table := []Builtin{
 	{name = "type_proc_return_type",                    kind = "b", type = "proc($T: typeid, index: int) -> typeid where type_is_proc(T)"},
 
 	{name = "type_struct_field_count",                  kind = "b", type = "proc($T: typeid) -> int where type_is_struct(T)"},
+	{name = "type_struct_has_implicit_padding",         kind = "b", type = "proc($T: typeid) -> bool where type_is_struct(T)"},
 
 	{name = "type_polymorphic_record_parameter_count",  kind = "b", type = "proc($T: typeid) -> typeid"},
 	{name = "type_polymorphic_record_parameter_value",  kind = "b", type = "proc($T: typeid, index: int) -> $V"},
@@ -344,14 +348,18 @@ intrinsics_table := []Builtin{
 	},
 	{name = "type_merge",                               kind = "b", type = "proc($U, $V: typeid) -> typeid where type_is_union(U), type_is_union(V)"},
 
-
-
+	{name = "constant_utf16_cstring", kind = "b", type = "proc($literal: string) -> [^]u16",
+		comment = "Returns a runtime value of a constant string UTF-8 value encoded as a UTF-16 NULL terminated string value, useful for interfacing with UTF-16 procedure such as the Windows API.",
+	},
 
 	// SIMD related
 	{name = "simd_add",                kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
 	{name = "simd_sub",                kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
 	{name = "simd_mul",                kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
 	{name = "simd_div",                kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T where type_is_float(T)"},
+
+	{name = "simd_saturating_add",     kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T where type_is_integer(T)"},
+	{name = "simd_saturating_sub",     kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T where type_is_integer(T)"},
 
 	{name = "simd_shl",                kind = "b", type = "proc(a: #simd[N]T, b: #simd[N]Unsigned_Integer) -> #simd[N]T", comment = "Keeps Odin's behaviour: `(x << y) if y <= mask else 0`"},
 	{name = "simd_shr",                kind = "b", type = "proc(a: #simd[N]T, b: #simd[N]Unsigned_Integer) -> #simd[N]T", comment = "Keeps Odin's behaviour: `(x >> y) if y <= mask else 0"},
@@ -360,9 +368,6 @@ intrinsics_table := []Builtin{
 	// x << (y & mask)
 	{name = "simd_shl_masked",         kind = "b", type = "proc(a: #simd[N]T, b: #simd[N]Unsigned_Integer) -> #simd[N]T", comment = "Similar to C's behaviour: `x << (y & mask)`"},
 	{name = "simd_shr_masked",         kind = "b", type = "proc(a: #simd[N]T, b: #simd[N]Unsigned_Integer) -> #simd[N]T", comment = "Similar to C's behaviour: `x >> (y & mask)"},
-
-	{name = "simd_saturating_add",     kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
-	{name = "simd_saturating_sub",     kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
 
 	{name = "simd_bit_and",            kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
 	{name = "simd_bit_or",             kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
@@ -400,6 +405,18 @@ intrinsics_table := []Builtin{
 	{name = "simd_reduce_or",          kind = "b", type = "proc(a: #simd[N]T) -> T", comment = SIMD_REDUCE_PREFIX + "simd_reduce_or"          + SIMD_REDUCE_MID + "result = result | e"     + SIMD_REDUCE_SUFFIX},
 	{name = "simd_reduce_xor",         kind = "b", type = "proc(a: #simd[N]T) -> T", comment = SIMD_REDUCE_PREFIX + "simd_reduce_xor"         + SIMD_REDUCE_MID + "result = result ~ e"     + SIMD_REDUCE_SUFFIX},
 
+	{name = "simd_reduce_any",         kind = "b", type = "proc(a: #simd[N]T) -> T where type_is_boolean(T)" },
+	{name = "simd_reduce_all",         kind = "b", type = "proc(a: #simd[N]T) -> T where type_is_boolean(T)" },
+
+	{name = "simd_gather",             kind = "b", type = "proc(ptr: #simd[N]rawptr, val: #simd[N]T, mask: #simd[N]U) -> #simd[N]T where type_is_integer(U) || type_is_boolean(U)"},
+	{name = "simd_scatter",            kind = "b", type = "proc(ptr: rawptr, val: #simd[N]T, mask: #simd[N]U) where type_is_integer(U) || type_is_boolean(U)"},
+
+	{name = "simd_masked_load",        kind = "b", type = "proc(ptr: rawptr, val: #simd[N]T, mask: #simd[N]U) -> #simd[N]T where type_is_integer(U) || type_is_boolean(U)"},
+	{name = "simd_masked_store",       kind = "b", type = "proc(ptr: rawptr, val: #simd[N]T, mask: #simd[N]U) where type_is_integer(U) || type_is_boolean(U)"},
+
+	{name = "simd_masked_expand_load",    kind = "b", type = "proc(ptr: rawptr, val: #simd[N]T, mask: #simd[N]U) -> #simd[N]T where type_is_integer(U) || type_is_boolean(U)"},
+	{name = "simd_masked_compress_store", kind = "b", type = "proc(ptr: rawptr, val: #simd[N]T, mask: #simd[N]U) where type_is_integer(U) || type_is_boolean(U)"},
+
 	{name = "simd_shuffle",            kind = "b", type = "proc(a, b: #simd[N]T, $indices: ..int) -> #simd[len(indices)]T",
 		comment =
 		"The first two operators of `simd_shuffle` are `#simd` vectors of the same type. The indices following these represent the shuffle mask values. The mask elements must be constant integers. The result of the procedure is a vector whose length is the same as the number of indices passed to the procedure type.\n\n"+
@@ -424,13 +441,20 @@ intrinsics_table := []Builtin{
 
 	{name = "simd_to_bits",            kind = "b", type = "proc(v: #simd[N]T) -> #simd[N]Integer where size_of(T) == size_of(Integer), type_is_unsigned(Integer)"},
 
-	{name = "simd_reverse",            kind = "b", type = "proc(a: #simd[N]T) -> #simd[N]T", comment = "equivalent a swizzle with descending indices, e.g. reserve(a, 3, 2, 1, 0)"},
+	{name = "simd_lanes_reverse",      kind = "b", type = "proc(a: #simd[N]T) -> #simd[N]T", comment = "equivalent a swizzle with descending indices, e.g. reserve(a, 3, 2, 1, 0)"},
 
-	{name = "simd_rotate_left",        kind = "b", type = "proc(a: #simd[N]T, $offset: int) -> #simd[N]T"},
-	{name = "simd_rotate_right",       kind = "b", type = "proc(a: #simd[N]T, $offset: int) -> #simd[N]T"},
+	{name = "simd_lanes_rotate_left",  kind = "b", type = "proc(a: #simd[N]T, $offset: int) -> #simd[N]T"},
+	{name = "simd_lanes_rotate_right", kind = "b", type = "proc(a: #simd[N]T, $offset: int) -> #simd[N]T"},
 
+	{name = "has_target_feature", kind = "b", type = "proc($test: $T) -> bool where type_is_string(T) || type_is_proc(T)",
+		comment =
+		"Checks if the current target supports the given target features.\n\n" +
+		"Takes a constant comma-separated string (eg: \"sha512,sse4.1\"), or a procedure type which has either " +
+		"`@(require_target_feature)` or `@(enable_target_feature)` as its input and returns a boolean indicating " +
+		"if all listed features are supported.",
+	},
 
-
+	{name = "procedure_of", kind = "b", type = "proc(x: $T) -> T where type_is_proc(T)", comment = "Returns the value of the procedure where `x` must be a call expression." },
 
 	// WASM targets only
 	{name = "wasm_memory_grow", kind = "b", type = "proc(index, delta: uintptr) -> int", comment = "WASM targets only"},
@@ -455,6 +479,8 @@ intrinsics_table := []Builtin{
 	{name = "objc_register_selector", kind = "b", type="proc($name: string) -> objc_SEL", comment = DARWIN_COMMENT + "\nWill register a selector value at run-time for the given constant string value."},
 	{name = "objc_find_class",        kind = "b", type="proc($name: string) -> objc_Class", comment = DARWIN_COMMENT + "\nWill return a run-time cached class value for the given constant string value."},
 	{name = "objc_register_class",    kind = "b", type="proc($name: string) -> objc_Class", comment = DARWIN_COMMENT + "\nWill register a class value at run-time for the given constant string value."},
+
+	{name = "valgrind_client_request", kind = "b", type = "proc(default: uintptr, request: uintptr, a0, a1, a2, a3, a4: uintptr) -> uintptr" },
 }
 
 
@@ -489,7 +515,7 @@ SIMD_REDUCE_SUFFIX :: "\n"+
 	"\t}"
 
 PREFETCH_COMMENT :: ""+
-	"The `prefetch_read_instruction` intrinsic is a hint to the code gnerator to insert a prefetch instruction if supported; otherwise, it is a no-op. Prefetches have no affect on the behaviour of the program but can change its performance characteristics.\n\n"+
+	"The `prefetch_*` intrinsic are a hint to the code generator to insert a prefetch instruction if supported; otherwise, it is a no-op. Prefetches have no affect on the behaviour of the program but can change its performance characteristics.\n\n"+
 	"The `locality` parameter must be a constant integer, and its temporal locality value ranges from `0` (no locality) to `3` (extremely local, keep in cache)."
 
 
