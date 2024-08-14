@@ -44,6 +44,21 @@ is_type_untyped :: proc(type: doc.Type) -> bool {
 	return false
 }
 
+is_type_string_or_rune :: proc(type: doc.Type) -> bool {
+	type := type
+	type = base_type(type)
+	if type.kind == .Basic {
+		switch str(type.name) {
+		case "string", "cstring", "untyped string":
+			return true
+		case "rune", "untyped rune":
+			return true
+		}
+	}
+	return false
+}
+
+
 is_entity_blank :: proc(e: doc.Entity_Index) -> bool {
 	name := str(cfg.entities[e].name)
 	return name == ""

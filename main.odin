@@ -895,7 +895,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			}
 		}
 
-		for flag in doc.Entity_Flag do if flag in e.flags {
+		for flag in e.flags {
 			if str := entity_flag_strings[flag]; str != "" {
 				io.write_string(w, `<span class="keyword-type">`)
 				io.write_string(w, str)
@@ -1194,8 +1194,11 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 				write_param_entity(writer, e, /*next_entity*/nil, flags, name_width)
 
 				if tag := str(tags[i]); tag != "" {
-					io.write_byte(w, ' ')
-					io.write_quoted_string(w, tag)
+					io.write_string(w, " <span class=\"string\">`")
+					io.write_string(w, tag)
+					io.write_string(w, "`</span>")
+					// io.write_byte(w, ' ')
+					// io.write_quoted_string(w, tag)
 				}
 
 				io.write_byte(w, ',')
@@ -1295,6 +1298,11 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 				break
 			}
 		}
+		flags := flags
+		if all_blank {
+			flags += {.Ignore_Name}
+		}
+
 		span_multiple_lines := false
 		if .Allow_Multiple_Lines in flags && .Is_Results not_in flags {
 			span_multiple_lines = len(type_entities) >= 6
@@ -1393,9 +1401,9 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			cc = "c"
 		}
 		if cc != "" {
-			io.write_byte(w, ' ')
+			io.write_string(w, " <span class=\"string\">")
 			io.write_quoted_string(w, cc)
-			io.write_byte(w, ' ')
+			io.write_string(w, "</span> ")
 		}
 		params := array(type.types)[0]
 		results := array(type.types)[1]
@@ -2376,7 +2384,7 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 				#partial switch t.kind {
 				case .Named, .Generic:
 					// okay
-				case .Pointer:
+				case .Pointer, .Multi_Pointer:
 					t = cfg.types[array(t.types)[0]]
 				case:
 					continue
@@ -2647,8 +2655,18 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 				fmt.wprintf(w, " : ")
 			}
 
-
-			io.write_string(w, init_string)
+			if is_type_string_or_rune(the_type) {
+				switch init_string[0] {
+				case '"', '`', '\'':
+					io.write_string(w, "<span class=\"string\">")
+					io.write_string(w, init_string)
+					io.write_string(w, "</span>")
+				case:
+					io.write_string(w, init_string)
+				}
+			} else {
+				io.write_string(w, init_string)
+			}
 			fmt.wprintln(w, "</pre>")
 		case .Variable:
 			fmt.wprint(w, `<pre class="doc-code">`)
