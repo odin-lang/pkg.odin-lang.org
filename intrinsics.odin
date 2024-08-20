@@ -352,6 +352,10 @@ intrinsics_table := []Builtin{
 		comment = "Returns a runtime value of a constant string UTF-8 value encoded as a UTF-16 NULL terminated string value, useful for interfacing with UTF-16 procedure such as the Windows API.",
 	},
 
+	{name = "constant_log2", kind = "b", type = "proc($v: $T) -> T where type_is_integer(T)",
+		comment = "Returns the log2 value of the given constant integer.",
+	},
+
 	// SIMD related
 	{name = "simd_add",                kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
 	{name = "simd_sub",                kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
