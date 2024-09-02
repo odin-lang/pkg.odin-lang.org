@@ -1641,18 +1641,31 @@ write_markup_text :: proc(w: io.Writer, s_: string) {
 }
 
 write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
+
+	trim_empty_and_subtitle_lines_and_replace_lt :: proc(lines: []string, subtitle: string) -> []string {
+		lines := lines
+		for len(lines) > 0 && (strings.trim_space(lines[0]) == "" || strings.has_prefix(lines[0], subtitle)) {
+			lines = lines[1:]
+		}
+		for len(lines) > 0 && (strings.trim_space(lines[len(lines) - 1]) == "") {
+			lines = lines[:len(lines) - 1]
+		}
+		for &line in lines {
+			line = escape_html_string(line)
+		}
+		return lines
+	}
+
 	if docs == "" {
 		return
 	}
-
-	is_fmt := strings.has_prefix(docs, "package fmt")
-	_ = is_fmt
 
 	Block_Kind :: enum {
 		Paragraph,
 		Code,
 		Example,
 		Output,
+		Possible_Output,
 	}
 	Block :: struct {
 		kind: Block_Kind,
@@ -1664,27 +1677,36 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 	start := 0
 	blocks: [dynamic]Block
 
-	has_possible: bool
-	example_block: Block // when set the kind should be Example
-	output_block: Block // when set the kind should be Output
-	// rely on zii that the kinds have not been set
-	assert(example_block.kind != .Example)
-	assert(output_block.kind != .Output)
+	has_any_output: bool
+	has_example: bool
 
-	insert_block :: proc(block: Block, blocks: ^[dynamic]Block, example: ^Block, output: ^Block, name: string) {
-		switch block.kind {
-		case .Paragraph: fallthrough
-		case .Code: append(blocks, block)
-		case .Example:
-			if example.kind == .Example {
-				errorf("The documentation for %q has multiple examples which is not allowed\n", name)
+	// Find the minimum common prefix length of tabs, so an entire doc comment can be indented
+	// without it rendering in a <pre> tag.
+	first_line_special := strings.has_prefix(lines_to_process[0], "Example:") || strings.has_prefix(lines_to_process[0], "Output:") || strings.has_prefix(lines_to_process[0], "Possible Output:")
+	if !first_line_special && len(lines_to_process) > 1 {
+		min_tabs: Maybe(int)
+		for line in lines_to_process[1:] {
+			if len(strings.trim_space(line)) == 0 {
+				continue
 			}
-			example^ = block
-		case .Output:
-			if example.kind == .Output {
-				errorf("The documentation for %q has multiple output which is not allowed\n", name)
+
+			tabs: int
+			for ch in line {
+				if ch == '\t' {
+					tabs += 1
+				} else {
+					break
+				}
 			}
-			output^ = block
+			min_tabs = min(tabs, min_tabs.? or_else max(int))
+		}
+		if min, has_min := min_tabs.?; has_min {
+			for &line in lines_to_process[1:] {
+				if len(strings.trim_space(line)) == 0 {
+					continue
+				}
+				line = line[min:]
+			}
 		}
 	}
 
@@ -1698,11 +1720,13 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 			switch {
 			case strings.has_prefix(line, "Example:"):
 				next_block_kind = .Example
+				has_example = true
 			case strings.has_prefix(line, "Output:"):
 				next_block_kind = .Output
+				has_any_output = true
 			case strings.has_prefix(line, "Possible Output:"):
-				next_block_kind = .Output
-				has_possible = true
+				next_block_kind = .Possible_Output
+				has_any_output = true
 			case strings.has_prefix(line, "\t"): next_block_kind = .Code
 			case text == "": force_write_block = true
 			}
@@ -1710,11 +1734,13 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 			switch {
 			case strings.has_prefix(line, "Example:"):
 				next_block_kind = .Example
+				has_example = true
 			case strings.has_prefix(line, "Output:"):
 				next_block_kind = .Output
+				has_any_output = true
 			case strings.has_prefix(line, "Possible Output:"):
-				next_block_kind = .Output
-				has_possible = true
+				next_block_kind = .Possible_Output
+				has_any_output = true
 			case !strings.has_prefix(line, "\t") && text != "":
 				next_block_kind = .Paragraph
 			}
@@ -1722,33 +1748,35 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 			switch {
 			case strings.has_prefix(line, "Output:"):
 				next_block_kind = .Output
+				has_any_output = true
 			case strings.has_prefix(line, "Possible Output:"):
-				next_block_kind = .Output
-				has_possible = true
+				next_block_kind = .Possible_Output
+				has_any_output = true
 			case !strings.has_prefix(line, "\t") && text != "":
 				next_block_kind = .Paragraph
 			}
-		case .Output:
+		case .Output, .Possible_Output:
 			switch {
 			case strings.has_prefix(line, "Example:"):
 				next_block_kind = .Example
+				has_example = true
 			case !strings.has_prefix(line, "\t") && text != "":
 				next_block_kind = .Paragraph
 			}
 		}
 
-		if i-start > 0 && (curr_block_kind != next_block_kind || force_write_block) {
-			insert_block(Block{curr_block_kind, lines_to_process[start:i]}, &blocks, &example_block, &output_block, name)
+		if curr_block_kind != next_block_kind || force_write_block {
+			append(&blocks, Block{curr_block_kind, lines_to_process[start:i]})
 			curr_block_kind = next_block_kind
 			start = i
 		}
 	}
 
 	if start < len(lines_to_process) {
-		insert_block(Block{curr_block_kind, lines_to_process[start:]}, &blocks, &example_block, &output_block, name)
+		append(&blocks, Block{curr_block_kind, lines_to_process[start:]})
 	}
 
-	if output_block.kind == .Output && example_block.kind != .Example {
+	if has_any_output && !has_example {
 		errorf("The documentation for %q has an output block but no example\n", name)
 	}
 
@@ -1824,45 +1852,25 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 				io.write_string(w, "\n")
 			}
 			io.write_string(w, "</pre>\n")
-		case .Example: panic("We should not have example blocks in the block array")
-		case .Output: panic("We should not have output blocks in the block array")
-		}
-	}
+		case .Example:
+			// Example block starts with `Example:` and a number of white spaces,
+			example_lines := trim_empty_and_subtitle_lines_and_replace_lt(block.lines, "Example:")
 
-	// Write example and output block if required
-	if example_block.kind == .Example {
-		trim_empty_and_subtitle_lines_and_replace_lt :: proc(lines: []string, subtitle: string) -> []string {
-			lines := lines
-			for len(lines) > 0 && (strings.trim_space(lines[0]) == "" || strings.has_prefix(lines[0], subtitle)) {
-				lines = lines[1:]
+			io.write_string(w, "<details open class=\"code-example\">\n")
+			defer io.write_string(w, "</details>\n")
+			io.write_string(w, "<summary><b>Example:</b></summary>\n")
+			io.write_string(w, `<pre><code class="hljs language-odin" data-lang="odin">`)
+			for line in example_lines {
+				io.write_string(w, strings.trim_prefix(line, "\t"))
+				io.write_string(w, "\n")
 			}
-			for len(lines) > 0 && (strings.trim_space(lines[len(lines) - 1]) == "") {
-				lines = lines[:len(lines) - 1]
-			}
-			for &line in lines {
-				line = escape_html_string(line)
-			}
-			return lines
-		}
-		// Example block starts with `Example:` and a number of white spaces,
-		example_lines := trim_empty_and_subtitle_lines_and_replace_lt(example_block.lines, "Example:")
+			io.write_string(w, "</code></pre>\n")
 
-		io.write_string(w, "<details open class=\"code-example\">\n")
-		defer io.write_string(w, "</details>\n")
-		io.write_string(w, "<summary><b>Example:</b></summary>\n")
-		io.write_string(w, `<pre><code class="hljs language-odin" data-lang="odin">`)
-		for line in example_lines {
-			io.write_string(w, strings.trim_prefix(line, "\t"))
-			io.write_string(w, "\n")
-		}
-		io.write_string(w, "</code></pre>\n")
-
-		// Add the output block if it is present
-		if output_block.kind == .Output {
+		case .Output, .Possible_Output:
 			// Output block starts with `Output:` or `Possible Output:` and a number of white spaces,
-			output_lines := trim_empty_and_subtitle_lines_and_replace_lt(output_block.lines, has_possible ? "Possible Output:" : "Output:")
+			output_lines := trim_empty_and_subtitle_lines_and_replace_lt(block.lines, block.kind == .Possible_Output ? "Possible Output:" : "Output:")
 
-			io.write_string(w, has_possible ? "<b>Possible Output:</b>" : "<b>Output:</b>\n")
+			io.write_string(w, block.kind == .Possible_Output ? "<b>Possible Output:</b>" : "<b>Output:</b>\n")
 			io.write_string(w, `<pre class="doc-code">`)
 			for line in output_lines {
 				io.write_string(w, strings.trim_prefix(line, "\t"))
