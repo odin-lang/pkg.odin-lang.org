@@ -1640,7 +1640,8 @@ write_markup_text :: proc(w: io.Writer, s_: string) {
 	io.write_string(w, s[latest_index:])
 }
 
-write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
+write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller_location) {
+	docs := docs
 
 	trim_empty_and_subtitle_lines_and_replace_lt :: proc(lines: []string, subtitle: string) -> []string {
 		lines := lines
@@ -1656,9 +1657,15 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 		return lines
 	}
 
-	if docs == "" {
-		return
-	}
+	assert(strings.trim_space(docs) != "", loc=loc)
+
+	// Trim off space (not tabs) from the left.
+	// Tabs actually have meaning.
+	docs = strings.trim_left_proc(docs, proc(ch: rune) -> bool {
+		if ch == '\t' { return false }
+		return strings.is_space(ch)
+	})
+	docs = strings.trim_right_space(docs)
 
 	Block_Kind :: enum {
 		Paragraph,
@@ -1682,10 +1689,9 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 
 	// Find the minimum common prefix length of tabs, so an entire doc comment can be indented
 	// without it rendering in a <pre> tag.
-	first_line_special := strings.has_prefix(lines_to_process[0], "Example:") || strings.has_prefix(lines_to_process[0], "Output:") || strings.has_prefix(lines_to_process[0], "Possible Output:")
-	if !first_line_special && len(lines_to_process) > 1 {
+	if len(lines_to_process) > 0 {
 		min_tabs: Maybe(int)
-		for line in lines_to_process[1:] {
+		for line in lines_to_process {
 			if len(strings.trim_space(line)) == 0 {
 				continue
 			}
@@ -1701,7 +1707,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "") {
 			min_tabs = min(tabs, min_tabs.? or_else max(int))
 		}
 		if min, has_min := min_tabs.?; has_min {
-			for &line in lines_to_process[1:] {
+			for &line in lines_to_process {
 				if len(strings.trim_space(line)) == 0 {
 					continue
 				}
@@ -2751,11 +2757,12 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	}
 	fmt.wprintln(w, `</div>`)
 
-	the_docs := strings.trim_space(str(e.docs))
-	if the_docs == "" {
-		the_docs = strings.trim_space(str(e.comment))
+	the_docs := str(e.docs)
+	if strings.trim_space(the_docs) == "" {
+		the_docs = str(e.comment)
 	}
-	if the_docs != "" {
+
+	if strings.trim_space(the_docs) != "" {
 		fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
 		fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
 		write_docs(w, the_docs, str(e.name))
@@ -2823,8 +2830,8 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 
 	fmt.wprintln(w, `<div id="pkg-top">`)
 
-	overview_docs := strings.trim_space(str(pkg.docs))
-	if overview_docs != "" {
+	overview_docs := str(pkg.docs)
+	if strings.trim_space(overview_docs) != "" {
 		fmt.wprintln(w, "<h2>Overview</h2>")
 		fmt.wprintln(w, "<div id=\"pkg-overview\">")
 		defer fmt.wprintln(w, "</div>")

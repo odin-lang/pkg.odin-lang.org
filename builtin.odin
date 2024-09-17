@@ -545,7 +545,9 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 				fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
 				fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
 				write_docs(w, the_comment, name)
-				write_docs(w, extra_comment, name)
+				if len(extra_comment) > 0 {
+					write_docs(w, extra_comment, name)
+				}
 				fmt.wprintln(w, `</details>`)
 			}
 		}
