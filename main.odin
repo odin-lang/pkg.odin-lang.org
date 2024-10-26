@@ -2818,7 +2818,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	fmt.wprintf(w, "</h1>\n")
 
 	if specific_target, ok := target_from_pkg(pkg); ok {
-		fmt.wprintf(w, "<h4><strong>Warning:&nbsp;</strong>This was generated for <code>-target:%s</code> and might not represet every target this package supports.</h4>", specific_target)
+		fmt.wprintf(w, "<h4><strong>Warning:&nbsp;</strong>This was generated for <code>-target:%s</code> and might not represent every target this package supports.</h4>", specific_target)
 	}
 
 	// When this is the case, the collection page does not exists, so show license here.
