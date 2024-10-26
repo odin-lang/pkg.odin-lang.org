@@ -20,7 +20,7 @@ Builtin :: struct {
 builtin_docs := `package builtin provides documentation for Odin's predeclared identifiers. The items documented here are not actually in package builtin but here to allow for better documentation for the language's special identifiers.`
 
 builtins := []Builtin{
-	{name = "nil",          kind = "c", type = "untyped nil", comment = "`nil` is a predecared identifier representing the zero value for a pointer, multi-pointer, enum, bit_set, slice, dynamic array, map, procedure, any, typeid, cstring, union, #soa array, #soa pointer, #relative type"},
+	{name = "nil",          kind = "c", type = "untyped nil", comment = "`nil` is a predeclared identifier representing the zero value for a pointer, multi-pointer, enum, bit_set, slice, dynamic array, map, procedure, any, typeid, cstring, union, #soa array, #soa pointer, #relative type"},
 	{name = "false",        kind = "c", type = "untyped boolean", value = "0 != 0"},
 	{name = "true",         kind = "c", type = "untyped boolean", value = "0 == 0"},
 
