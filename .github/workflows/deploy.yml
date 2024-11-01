@@ -37,11 +37,13 @@ jobs:
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
           cd Odin
-          odin doc examples/all    -all-packages -doc-format -show-debug-messages -target:windows_amd64
-          odin doc core/sys/darwin -all-packages -doc-format -show-debug-messages -target:darwin_arm64
-          odin doc core/sys/linux  -all-packages -doc-format -show-debug-messages -target:linux_amd64
-          odin doc core/sys/unix   -all-packages -doc-format -show-debug-messages -target:linux_amd64
-          odin doc core/sys/haiku  -all-packages -doc-format -show-debug-messages -target:haiku_amd64
+          odin doc examples/all                      -all-packages -doc-format -show-debug-messages -target:windows_amd64
+          odin doc examples/all/all_posix.odin -file -all-packages -doc-format -show-debug-messages -target:darwin_arm64
+          odin doc core/sys/darwin                   -all-packages -doc-format -show-debug-messages -target:darwin_arm64
+          odin doc core/sys/freebsd                  -all-packages -doc-format -show-debug-messages -target:freebsd_amd64
+          odin doc core/sys/linux                    -all-packages -doc-format -show-debug-messages -target:linux_amd64
+          odin doc core/sys/unix                     -all-packages -doc-format -show-debug-messages -target:linux_amd64
+          odin doc core/sys/haiku                    -all-packages -doc-format -show-debug-messages -target:haiku_amd64
       - name: Generate Tool
         shell: cmd
         run: |
@@ -55,7 +57,7 @@ jobs:
           copy resources\CNAME       website\static\CNAME
           copy resources\favicon.svg website\static\favicon.svg
           pushd website\static
-          ..\odin-html-docs.exe ..\all.odin-doc --merge ..\darwin.odin-doc ..\linux.odin-doc ..\unix.odin-doc ..\haiku.odin-doc
+          ..\odin-html-docs.exe ..\all.odin-doc --merge ..\darwin.odin-doc ..\all_posix.odin-doc ..\freebsd.odin-doc ..\linux.odin-doc ..\unix.odin-doc ..\haiku.odin-doc
           popd
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

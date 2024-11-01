@@ -655,6 +655,8 @@ target_from_pkg :: proc(pkg: ^doc.Pkg) -> (target: string, ok: bool) {
 			target = "linux_arm64"
 		case "haiku":
 			target = "haiku_arm64"
+		case "freebsd":
+			target = "freebsd_amd64"
 		}
 	}
 	return
