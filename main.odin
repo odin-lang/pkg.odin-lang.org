@@ -649,7 +649,7 @@ target_from_pkg :: proc(pkg: ^doc.Pkg) -> (target: string, ok: bool) {
 		target = "windows_amd64"
 		ok = true
 		switch name {
-		case "darwin", "posix", "kqueue", "Foundation", "CoreFoundation", "Security":
+		case "darwin", "posix", "kqueue", "darwin/Foundation", "darwin/CoreFoundation", "darwin/Security":
 			target = "darwin_arm64"
 		case "linux", "unix":
 			target = "linux_arm64"
