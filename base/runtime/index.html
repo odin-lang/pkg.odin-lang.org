@@ -1713,6 +1713,7 @@ Odin_Sanitizer_Flags :: distinct bit_set[Odin_Sanitizer_Flag; u32]</p>
 <li><a href="/base/runtime/#make_dynamic_array_error_loc">make_dynamic_array_error_loc</a></li>
 <li><a href="/base/runtime/#make_dynamic_array_len">make_dynamic_array_len</a></li>
 <li><a href="/base/runtime/#make_dynamic_array_len_cap">make_dynamic_array_len_cap</a></li>
+<li><a href="/base/runtime/#make_map">make_map</a></li>
 <li><a href="/base/runtime/#make_map_cap">make_map_cap</a></li>
 <li><a href="/base/runtime/#make_map_expr_error_loc">make_map_expr_error_loc</a></li>
 <li><a href="/base/runtime/#make_multi_pointer">make_multi_pointer</a></li>
@@ -3300,7 +3301,7 @@ Unlike <code>new</code>, <code>make</code>'s return value is the same as the typ
 <div class="pkg-entity">
 <h3 id="make_map"><span><a class="doc-id-link" href="#make_map">make_map<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L391"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_map :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="keyword-type">map</span>[T]T, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (m: T) {…}</pre>
+<pre class="doc-code">make_map :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="keyword-type">map</span>[T]T, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (m: T) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3312,7 +3313,7 @@ Unlike <code>new</code>, <code>make</code>'s return value is the same as the typ
 <div class="pkg-entity">
 <h3 id="make_map_cap"><span><a class="doc-id-link" href="#make_map_cap">make_map_cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L402"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_map_cap :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="keyword-type">map</span>[T]T, <span class="keyword-type">#any_int</span> capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = 1 &lt;&lt; MAP_MIN_LOG2_CAPACITY, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (m: T, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">make_map_cap :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="keyword-type">map</span>[T]T, <span class="keyword-type">#any_int</span> capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (m: T, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -4926,7 +4927,7 @@ Make uses the specified allocator, default is context.allocator.</p>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2024-11 (vendor "odin") Windows_amd64 @ 2024-11-15 21:11:27.924285500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2024-11 (vendor "odin") Windows_amd64 @ 2024-11-16 21:10:09.703658000 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
