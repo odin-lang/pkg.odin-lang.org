@@ -135,6 +135,11 @@
 </li>
 <li class="nav-item"><a href="/vendor/vulkan">vulkan</a></li>
 <li class="nav-item"><a href="/vendor/wgpu">wgpu</a></li>
+<li class="nav-item">x11<ul>
+<li><a href="/vendor/x11/xlib">xlib</a></li>
+</ul>
+
+</li>
 <li class="nav-item"><a href="/vendor/zlib">zlib</a></li>
 </ul>
 </div>
@@ -173,7 +178,7 @@
 <div>
 <details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
 <summary id="#doc-index-Types-header">
-Types (61)</summary>
+Types (63)</summary>
 <ul>
 <li><a href="#accessor">accessor</a></li>
 <li><a href="#accessor_sparse">accessor_sparse</a></li>
@@ -182,6 +187,7 @@ Types (61)</summary>
 <li><a href="#animation_channel">animation_channel</a></li>
 <li><a href="#animation_path_type">animation_path_type</a></li>
 <li><a href="#animation_sampler">animation_sampler</a></li>
+<li><a href="#anisotropy">anisotropy</a></li>
 <li><a href="#asset">asset</a></li>
 <li><a href="#attribute">attribute</a></li>
 <li><a href="#attribute_type">attribute_type</a></li>
@@ -196,6 +202,7 @@ Types (61)</summary>
 <li><a href="#component_type">component_type</a></li>
 <li><a href="#data">data</a></li>
 <li><a href="#data_free_method">data_free_method</a></li>
+<li><a href="#dispersion">dispersion</a></li>
 <li><a href="#draco_mesh_compression">draco_mesh_compression</a></li>
 <li><a href="#emissive_strength">emissive_strength</a></li>
 <li><a href="#extension">extension</a></li>
@@ -256,23 +263,43 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (18)</summary>
+Procedures (38)</summary>
 <ul>
+<li><a href="#accessor_index">accessor_index</a></li>
 <li><a href="#accessor_read_float">accessor_read_float</a></li>
 <li><a href="#accessor_read_index">accessor_read_index</a></li>
 <li><a href="#accessor_read_uint">accessor_read_uint</a></li>
 <li><a href="#accessor_unpack_floats">accessor_unpack_floats</a></li>
+<li><a href="#accessor_unpack_indices">accessor_unpack_indices</a></li>
+<li><a href="#animation_channel_index">animation_channel_index</a></li>
+<li><a href="#animation_index">animation_index</a></li>
+<li><a href="#animation_sampler_index">animation_sampler_index</a></li>
+<li><a href="#buffer_index">buffer_index</a></li>
+<li><a href="#buffer_view_data">buffer_view_data</a></li>
+<li><a href="#buffer_view_index">buffer_view_index</a></li>
+<li><a href="#calc_size">calc_size</a></li>
+<li><a href="#camera_index">camera_index</a></li>
+<li><a href="#component_size">component_size</a></li>
 <li><a href="#copy_extras_json">copy_extras_json</a></li>
 <li><a href="#decode_string">decode_string</a></li>
 <li><a href="#decode_uri">decode_uri</a></li>
 <li><a href="#free">free</a></li>
+<li><a href="#image_index">image_index</a></li>
+<li><a href="#light_index">light_index</a></li>
 <li><a href="#load_buffer_base64">load_buffer_base64</a></li>
 <li><a href="#load_buffers">load_buffers</a></li>
+<li><a href="#material_index">material_index</a></li>
+<li><a href="#mesh_index">mesh_index</a></li>
+<li><a href="#node_index">node_index</a></li>
 <li><a href="#node_transform_local">node_transform_local</a></li>
 <li><a href="#node_transform_world">node_transform_world</a></li>
 <li><a href="#num_components">num_components</a></li>
 <li><a href="#parse">parse</a></li>
 <li><a href="#parse_file">parse_file</a></li>
+<li><a href="#sampler_index">sampler_index</a></li>
+<li><a href="#scene_index">scene_index</a></li>
+<li><a href="#skin_index">skin_index</a></li>
+<li><a href="#texture_index">texture_index</a></li>
 <li><a href="#validate">validate</a></li>
 <li><a href="#write">write</a></li>
 <li><a href="#write_file">write_file</a></li>
@@ -291,7 +318,7 @@ Procedure Groups (0)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="accessor"><span><a class="doc-id-link" href="#accessor">accessor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L236"><em>Source</em></a></div></h3>
+<h3 id="accessor"><span><a class="doc-id-link" href="#accessor">accessor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L228"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">accessor :: <span class="keyword-type">struct</span> {
 	name:             <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -315,36 +342,29 @@ Procedure Groups (0)</summary>
 </div>
 <h5>Related Procedures With Parameters</h5>
 <ul>
+<li><a href="/vendor/cgltf/#accessor_index">accessor_index</a></li>
 <li><a href="/vendor/cgltf/#accessor_read_float">accessor_read_float</a></li>
 <li><a href="/vendor/cgltf/#accessor_read_index">accessor_read_index</a></li>
 <li><a href="/vendor/cgltf/#accessor_read_uint">accessor_read_uint</a></li>
 <li><a href="/vendor/cgltf/#accessor_unpack_floats">accessor_unpack_floats</a></li>
+<li><a href="/vendor/cgltf/#accessor_unpack_indices">accessor_unpack_indices</a></li>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="accessor_sparse"><span><a class="doc-id-link" href="#accessor_sparse">accessor_sparse<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L218"><em>Source</em></a></div></h3>
+<h3 id="accessor_sparse"><span><a class="doc-id-link" href="#accessor_sparse">accessor_sparse<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L219"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">accessor_sparse :: <span class="keyword-type">struct</span> {
-	count:                    <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
-	indices_buffer_view:      ^<a class="code-typename" href="/vendor/cgltf/#buffer_view">buffer_view</a>,
-	indices_byte_offset:      <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
-	indices_component_type:   <a class="code-typename" href="/vendor/cgltf/#component_type">component_type</a>,
-	values_buffer_view:       ^<a class="code-typename" href="/vendor/cgltf/#buffer_view">buffer_view</a>,
-	values_byte_offset:       <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
-	extras:                   <a class="code-typename" href="/vendor/cgltf/#extras_t">extras_t</a>,
-	indices_extras:           <a class="code-typename" href="/vendor/cgltf/#extras_t">extras_t</a>,
-	values_extras:            <a class="code-typename" href="/vendor/cgltf/#extras_t">extras_t</a>,
-	extensions_count:         <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
-	extensions:               [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,extensions_count"`</span>,
-	indices_extensions_count: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
-	indices_extensions:       [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,indices_extensions_count"`</span>,
-	values_extensions_count:  <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
-	values_extensions:        [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,values_extensions_count"`</span>,
+	count:                  <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
+	indices_buffer_view:    ^<a class="code-typename" href="/vendor/cgltf/#buffer_view">buffer_view</a>,
+	indices_byte_offset:    <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
+	indices_component_type: <a class="code-typename" href="/vendor/cgltf/#component_type">component_type</a>,
+	values_buffer_view:     ^<a class="code-typename" href="/vendor/cgltf/#buffer_view">buffer_view</a>,
+	values_byte_offset:     <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
 }</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="alpha_mode"><span><a class="doc-id-link" href="#alpha_mode">alpha_mode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L117"><em>Source</em></a></div></h3>
+<h3 id="alpha_mode"><span><a class="doc-id-link" href="#alpha_mode">alpha_mode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L118"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">alpha_mode :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	opaque, 
@@ -354,7 +374,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="animation"><span><a class="doc-id-link" href="#animation">animation<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L564"><em>Source</em></a></div></h3>
+<h3 id="animation"><span><a class="doc-id-link" href="#animation">animation<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L566"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">animation :: <span class="keyword-type">struct</span> {
 	name:             <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -365,9 +385,15 @@ Procedure Groups (0)</summary>
 	extensions:       [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,extensions_count"`</span>,
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/cgltf/#animation_channel_index">animation_channel_index</a></li>
+<li><a href="/vendor/cgltf/#animation_index">animation_index</a></li>
+<li><a href="/vendor/cgltf/#animation_sampler_index">animation_sampler_index</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="animation_channel"><span><a class="doc-id-link" href="#animation_channel">animation_channel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L555"><em>Source</em></a></div></h3>
+<h3 id="animation_channel"><span><a class="doc-id-link" href="#animation_channel">animation_channel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L557"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">animation_channel :: <span class="keyword-type">struct</span> {
 	sampler:          ^<a class="code-typename" href="/vendor/cgltf/#animation_sampler">animation_sampler</a>,
@@ -378,9 +404,13 @@ Procedure Groups (0)</summary>
 	extensions:       [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,extensions_count"`</span>,
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/cgltf/#animation_channel_index">animation_channel_index</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="animation_path_type"><span><a class="doc-id-link" href="#animation_path_type">animation_path_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L123"><em>Source</em></a></div></h3>
+<h3 id="animation_path_type"><span><a class="doc-id-link" href="#animation_path_type">animation_path_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L124"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">animation_path_type :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	invalid, 
@@ -392,7 +422,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="animation_sampler"><span><a class="doc-id-link" href="#animation_sampler">animation_sampler<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L546"><em>Source</em></a></div></h3>
+<h3 id="animation_sampler"><span><a class="doc-id-link" href="#animation_sampler">animation_sampler<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L548"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">animation_sampler :: <span class="keyword-type">struct</span> {
 	input:            ^<a class="code-typename" href="/vendor/cgltf/#accessor">accessor</a>,
@@ -403,9 +433,23 @@ Procedure Groups (0)</summary>
 	extensions:       [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,extensions_count"`</span>,
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/cgltf/#animation_sampler_index">animation_sampler_index</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="asset"><span><a class="doc-id-link" href="#asset">asset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L578"><em>Source</em></a></div></h3>
+<h3 id="anisotropy"><span><a class="doc-id-link" href="#anisotropy">anisotropy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L373"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">anisotropy :: <span class="keyword-type">struct</span> {
+	anisotropy_strength: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	anisotropy_rotation: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	anisotropy_texture:  <a class="code-typename" href="/vendor/cgltf/#texture_view">texture_view</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="asset"><span><a class="doc-id-link" href="#asset">asset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L580"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">asset :: <span class="keyword-type">struct</span> {
 	copyright:        <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -419,7 +463,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="attribute"><span><a class="doc-id-link" href="#attribute">attribute<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L256"><em>Source</em></a></div></h3>
+<h3 id="attribute"><span><a class="doc-id-link" href="#attribute">attribute<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L248"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">attribute :: <span class="keyword-type">struct</span> {
 	name:  <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -446,7 +490,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="buffer"><span><a class="doc-id-link" href="#buffer">buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L168"><em>Source</em></a></div></h3>
+<h3 id="buffer"><span><a class="doc-id-link" href="#buffer">buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L169"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buffer :: <span class="keyword-type">struct</span> {
 	name:             <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -460,9 +504,13 @@ Procedure Groups (0)</summary>
 	extensions:       [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,extensions_count"`</span>,
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/cgltf/#buffer_index">buffer_index</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="buffer_view"><span><a class="doc-id-link" href="#buffer_view">buffer_view<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L203"><em>Source</em></a></div></h3>
+<h3 id="buffer_view"><span><a class="doc-id-link" href="#buffer_view">buffer_view<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L204"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buffer_view :: <span class="keyword-type">struct</span> {
 	name:                    <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -481,6 +529,11 @@ Procedure Groups (0)</summary>
 	extensions:              [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,extensions_count"`</span>,
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/cgltf/#buffer_view_data">buffer_view_data</a></li>
+<li><a href="/vendor/cgltf/#buffer_view_index">buffer_view_index</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
 <h3 id="buffer_view_type"><span><a class="doc-id-link" href="#buffer_view_type">buffer_view_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L68"><em>Source</em></a></div></h3>
@@ -493,7 +546,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="camera"><span><a class="doc-id-link" href="#camera">camera<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L491"><em>Source</em></a></div></h3>
+<h3 id="camera"><span><a class="doc-id-link" href="#camera">camera<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L493"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">camera :: <span class="keyword-type">struct</span> {
 	name:             <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -507,9 +560,13 @@ Procedure Groups (0)</summary>
 	extensions:       [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,extensions_count"`</span>,
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/cgltf/#camera_index">camera_index</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="camera_orthographic"><span><a class="doc-id-link" href="#camera_orthographic">camera_orthographic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L483"><em>Source</em></a></div></h3>
+<h3 id="camera_orthographic"><span><a class="doc-id-link" href="#camera_orthographic">camera_orthographic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L485"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">camera_orthographic :: <span class="keyword-type">struct</span> {
 	xmag:   <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
@@ -521,7 +578,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="camera_perspective"><span><a class="doc-id-link" href="#camera_perspective">camera_perspective<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L473"><em>Source</em></a></div></h3>
+<h3 id="camera_perspective"><span><a class="doc-id-link" href="#camera_perspective">camera_perspective<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L475"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">camera_perspective :: <span class="keyword-type">struct</span> {
 	has_aspect_ratio: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>,
@@ -535,7 +592,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="camera_type"><span><a class="doc-id-link" href="#camera_type">camera_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L137"><em>Source</em></a></div></h3>
+<h3 id="camera_type"><span><a class="doc-id-link" href="#camera_type">camera_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L138"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">camera_type :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	invalid, 
@@ -545,7 +602,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="clearcoat"><span><a class="doc-id-link" href="#clearcoat">clearcoat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L332"><em>Source</em></a></div></h3>
+<h3 id="clearcoat"><span><a class="doc-id-link" href="#clearcoat">clearcoat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L321"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">clearcoat :: <span class="keyword-type">struct</span> {
 	clearcoat_texture:           <a class="code-typename" href="/vendor/cgltf/#texture_view">texture_view</a>,
@@ -569,9 +626,14 @@ Procedure Groups (0)</summary>
 	r_32f,   <span class="comment">// FLOAT</span>
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/cgltf/#calc_size">calc_size</a></li>
+<li><a href="/vendor/cgltf/#component_size">component_size</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="data"><span><a class="doc-id-link" href="#data">data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L588"><em>Source</em></a></div></h3>
+<h3 id="data"><span><a class="doc-id-link" href="#data">data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L590"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">data :: <span class="keyword-type">struct</span> {
 	file_type:             <a class="code-typename" href="/vendor/cgltf/#file_type">file_type</a>,
@@ -606,9 +668,23 @@ Procedure Groups (0)</summary>
 </div>
 <h5>Related Procedures With Parameters</h5>
 <ul>
+<li><a href="/vendor/cgltf/#accessor_index">accessor_index</a></li>
+<li><a href="/vendor/cgltf/#animation_index">animation_index</a></li>
+<li><a href="/vendor/cgltf/#buffer_index">buffer_index</a></li>
+<li><a href="/vendor/cgltf/#buffer_view_index">buffer_view_index</a></li>
+<li><a href="/vendor/cgltf/#camera_index">camera_index</a></li>
 <li><a href="/vendor/cgltf/#copy_extras_json">copy_extras_json</a></li>
 <li><a href="/vendor/cgltf/#free">free</a></li>
+<li><a href="/vendor/cgltf/#image_index">image_index</a></li>
+<li><a href="/vendor/cgltf/#light_index">light_index</a></li>
 <li><a href="/vendor/cgltf/#load_buffers">load_buffers</a></li>
+<li><a href="/vendor/cgltf/#material_index">material_index</a></li>
+<li><a href="/vendor/cgltf/#mesh_index">mesh_index</a></li>
+<li><a href="/vendor/cgltf/#node_index">node_index</a></li>
+<li><a href="/vendor/cgltf/#sampler_index">sampler_index</a></li>
+<li><a href="/vendor/cgltf/#scene_index">scene_index</a></li>
+<li><a href="/vendor/cgltf/#skin_index">skin_index</a></li>
+<li><a href="/vendor/cgltf/#texture_index">texture_index</a></li>
 <li><a href="/vendor/cgltf/#validate">validate</a></li>
 <li><a href="/vendor/cgltf/#write">write</a></li>
 <li><a href="/vendor/cgltf/#write_file">write_file</a></li>
@@ -620,7 +696,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="data_free_method"><span><a class="doc-id-link" href="#data_free_method">data_free_method<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L150"><em>Source</em></a></div></h3>
+<h3 id="data_free_method"><span><a class="doc-id-link" href="#data_free_method">data_free_method<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L151"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">data_free_method :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	none, 
@@ -630,7 +706,15 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="draco_mesh_compression"><span><a class="doc-id-link" href="#draco_mesh_compression">draco_mesh_compression<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L429"><em>Source</em></a></div></h3>
+<h3 id="dispersion"><span><a class="doc-id-link" href="#dispersion">dispersion<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L379"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">dispersion :: <span class="keyword-type">struct</span> {
+	dispersion: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="draco_mesh_compression"><span><a class="doc-id-link" href="#draco_mesh_compression">draco_mesh_compression<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L432"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">draco_mesh_compression :: <span class="keyword-type">struct</span> {
 	buffer_view: ^<a class="code-typename" href="/vendor/cgltf/#buffer_view">buffer_view</a>,
@@ -639,7 +723,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="emissive_strength"><span><a class="doc-id-link" href="#emissive_strength">emissive_strength<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L371"><em>Source</em></a></div></h3>
+<h3 id="emissive_strength"><span><a class="doc-id-link" href="#emissive_strength">emissive_strength<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L360"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">emissive_strength :: <span class="keyword-type">struct</span> {
 	emissive_strength: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
@@ -647,7 +731,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="extension"><span><a class="doc-id-link" href="#extension">extension<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L163"><em>Source</em></a></div></h3>
+<h3 id="extension"><span><a class="doc-id-link" href="#extension">extension<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L164"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">extension :: <span class="keyword-type">struct</span> {
 	name: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -656,7 +740,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="extras_t"><span><a class="doc-id-link" href="#extras_t">extras_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L156"><em>Source</em></a></div></h3>
+<h3 id="extras_t"><span><a class="doc-id-link" href="#extras_t">extras_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L157"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">extras_t :: <span class="keyword-type">struct</span> {
 	start_offset: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
@@ -692,7 +776,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="image"><span><a class="doc-id-link" href="#image">image<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L263"><em>Source</em></a></div></h3>
+<h3 id="image"><span><a class="doc-id-link" href="#image">image<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L255"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">image :: <span class="keyword-type">struct</span> {
 	name:             <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -704,9 +788,13 @@ Procedure Groups (0)</summary>
 	extensions:       [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,extensions_count"`</span>,
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/cgltf/#image_index">image_index</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="interpolation_type"><span><a class="doc-id-link" href="#interpolation_type">interpolation_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L131"><em>Source</em></a></div></h3>
+<h3 id="interpolation_type"><span><a class="doc-id-link" href="#interpolation_type">interpolation_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L132"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">interpolation_type :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	linear, 
@@ -716,7 +804,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ior"><span><a class="doc-id-link" href="#ior">ior<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L346"><em>Source</em></a></div></h3>
+<h3 id="ior"><span><a class="doc-id-link" href="#ior">ior<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L335"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ior :: <span class="keyword-type">struct</span> {
 	ior: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
@@ -724,7 +812,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="iridescence"><span><a class="doc-id-link" href="#iridescence">iridescence<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L375"><em>Source</em></a></div></h3>
+<h3 id="iridescence"><span><a class="doc-id-link" href="#iridescence">iridescence<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L364"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">iridescence :: <span class="keyword-type">struct</span> {
 	iridescence_factor:            <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
@@ -737,7 +825,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="light"><span><a class="doc-id-link" href="#light">light<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L503"><em>Source</em></a></div></h3>
+<h3 id="light"><span><a class="doc-id-link" href="#light">light<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L505"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">light :: <span class="keyword-type">struct</span> {
 	name:                  <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -750,9 +838,13 @@ Procedure Groups (0)</summary>
 	extras:                <a class="code-typename" href="/vendor/cgltf/#extras_t">extras_t</a>,
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/cgltf/#light_index">light_index</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="light_type"><span><a class="doc-id-link" href="#light_type">light_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L143"><em>Source</em></a></div></h3>
+<h3 id="light_type"><span><a class="doc-id-link" href="#light_type">light_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L144"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">light_type :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	invalid, 
@@ -763,7 +855,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="material"><span><a class="doc-id-link" href="#material">material<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L384"><em>Source</em></a></div></h3>
+<h3 id="material"><span><a class="doc-id-link" href="#material">material<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L383"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">material :: <span class="keyword-type">struct</span> {
 	name:                        <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -777,6 +869,8 @@ Procedure Groups (0)</summary>
 	has_sheen:                   <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>,
 	has_emissive_strength:       <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>,
 	has_iridescence:             <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>,
+	has_anisotropy:              <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>,
+	has_dispersion:              <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>,
 	pbr_metallic_roughness:      <a class="code-typename" href="/vendor/cgltf/#pbr_metallic_roughness">pbr_metallic_roughness</a>,
 	pbr_specular_glossiness:     <a class="code-typename" href="/vendor/cgltf/#pbr_specular_glossiness">pbr_specular_glossiness</a>,
 	clearcoat:                   <a class="code-typename" href="/vendor/cgltf/#clearcoat">clearcoat</a>,
@@ -787,6 +881,8 @@ Procedure Groups (0)</summary>
 	volume:                      <a class="code-typename" href="/vendor/cgltf/#volume">volume</a>,
 	emissive_strength:           <a class="code-typename" href="/vendor/cgltf/#emissive_strength">emissive_strength</a>,
 	iridescence:                 <a class="code-typename" href="/vendor/cgltf/#iridescence">iridescence</a>,
+	anisotropy:                  <a class="code-typename" href="/vendor/cgltf/#anisotropy">anisotropy</a>,
+	dispersion:                  <a class="code-typename" href="/vendor/cgltf/#dispersion">dispersion</a>,
 	normal_texture:              <a class="code-typename" href="/vendor/cgltf/#texture_view">texture_view</a>,
 	occlusion_texture:           <a class="code-typename" href="/vendor/cgltf/#texture_view">texture_view</a>,
 	emissive_texture:            <a class="code-typename" href="/vendor/cgltf/#texture_view">texture_view</a>,
@@ -800,9 +896,13 @@ Procedure Groups (0)</summary>
 	extensions:                  [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,extensions_count"`</span>,
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/cgltf/#material_index">material_index</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="material_mapping"><span><a class="doc-id-link" href="#material_mapping">material_mapping<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L419"><em>Source</em></a></div></h3>
+<h3 id="material_mapping"><span><a class="doc-id-link" href="#material_mapping">material_mapping<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L422"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">material_mapping :: <span class="keyword-type">struct</span> {
 	variant:  <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
@@ -812,7 +912,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="material_variant"><span><a class="doc-id-link" href="#material_variant">material_variant<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L573"><em>Source</em></a></div></h3>
+<h3 id="material_variant"><span><a class="doc-id-link" href="#material_variant">material_variant<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L575"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">material_variant :: <span class="keyword-type">struct</span> {
 	name:   <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -831,7 +931,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="mesh"><span><a class="doc-id-link" href="#mesh">mesh<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L453"><em>Source</em></a></div></h3>
+<h3 id="mesh"><span><a class="doc-id-link" href="#mesh">mesh<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L455"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">mesh :: <span class="keyword-type">struct</span> {
 	name:             <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -843,18 +943,21 @@ Procedure Groups (0)</summary>
 	extensions:       [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,extensions_count"`</span>,
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/cgltf/#mesh_index">mesh_index</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="mesh_gpu_instancing"><span><a class="doc-id-link" href="#mesh_gpu_instancing">mesh_gpu_instancing<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L434"><em>Source</em></a></div></h3>
+<h3 id="mesh_gpu_instancing"><span><a class="doc-id-link" href="#mesh_gpu_instancing">mesh_gpu_instancing<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L437"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">mesh_gpu_instancing :: <span class="keyword-type">struct</span> {
-	buffer_view: ^<a class="code-typename" href="/vendor/cgltf/#buffer_view">buffer_view</a>,
-	attributes:  []<a class="code-typename" href="/vendor/cgltf/#attribute">attribute</a>,
+	attributes: []<a class="code-typename" href="/vendor/cgltf/#attribute">attribute</a>,
 }</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="meshopt_compression"><span><a class="doc-id-link" href="#meshopt_compression">meshopt_compression<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L193"><em>Source</em></a></div></h3>
+<h3 id="meshopt_compression"><span><a class="doc-id-link" href="#meshopt_compression">meshopt_compression<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L194"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">meshopt_compression :: <span class="keyword-type">struct</span> {
 	buffer: ^<a class="code-typename" href="/vendor/cgltf/#buffer">buffer</a>,
@@ -868,7 +971,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="meshopt_compression_filter"><span><a class="doc-id-link" href="#meshopt_compression_filter">meshopt_compression_filter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L186"><em>Source</em></a></div></h3>
+<h3 id="meshopt_compression_filter"><span><a class="doc-id-link" href="#meshopt_compression_filter">meshopt_compression_filter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L187"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">meshopt_compression_filter :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	none, 
@@ -879,7 +982,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="meshopt_compression_mode"><span><a class="doc-id-link" href="#meshopt_compression_mode">meshopt_compression_mode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L179"><em>Source</em></a></div></h3>
+<h3 id="meshopt_compression_mode"><span><a class="doc-id-link" href="#meshopt_compression_mode">meshopt_compression_mode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L180"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">meshopt_compression_mode :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	invalid, 
@@ -890,7 +993,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="morph_target"><span><a class="doc-id-link" href="#morph_target">morph_target<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L425"><em>Source</em></a></div></h3>
+<h3 id="morph_target"><span><a class="doc-id-link" href="#morph_target">morph_target<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L428"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">morph_target :: <span class="keyword-type">struct</span> {
 	attributes: []<a class="code-typename" href="/vendor/cgltf/#attribute">attribute</a>,
@@ -898,7 +1001,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="node"><span><a class="doc-id-link" href="#node">node<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L514"><em>Source</em></a></div></h3>
+<h3 id="node"><span><a class="doc-id-link" href="#node">node<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L516"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node :: <span class="keyword-type">struct</span> {
 	name:                    <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -926,6 +1029,7 @@ Procedure Groups (0)</summary>
 </div>
 <h5>Related Procedures With Parameters</h5>
 <ul>
+<li><a href="/vendor/cgltf/#node_index">node_index</a></li>
 <li><a href="/vendor/cgltf/#node_transform_local">node_transform_local</a></li>
 <li><a href="/vendor/cgltf/#node_transform_world">node_transform_world</a></li>
 </ul>
@@ -953,7 +1057,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="pbr_metallic_roughness"><span><a class="doc-id-link" href="#pbr_metallic_roughness">pbr_metallic_roughness<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L314"><em>Source</em></a></div></h3>
+<h3 id="pbr_metallic_roughness"><span><a class="doc-id-link" href="#pbr_metallic_roughness">pbr_metallic_roughness<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L303"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pbr_metallic_roughness :: <span class="keyword-type">struct</span> {
 	base_color_texture:         <a class="code-typename" href="/vendor/cgltf/#texture_view">texture_view</a>,
@@ -965,7 +1069,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="pbr_specular_glossiness"><span><a class="doc-id-link" href="#pbr_specular_glossiness">pbr_specular_glossiness<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L323"><em>Source</em></a></div></h3>
+<h3 id="pbr_specular_glossiness"><span><a class="doc-id-link" href="#pbr_specular_glossiness">pbr_specular_glossiness<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L312"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pbr_specular_glossiness :: <span class="keyword-type">struct</span> {
 	diffuse_texture:             <a class="code-typename" href="/vendor/cgltf/#texture_view">texture_view</a>,
@@ -977,7 +1081,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="primitive"><span><a class="doc-id-link" href="#primitive">primitive<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L439"><em>Source</em></a></div></h3>
+<h3 id="primitive"><span><a class="doc-id-link" href="#primitive">primitive<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L441"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">primitive :: <span class="keyword-type">struct</span> {
 	type:                       <a class="code-typename" href="/vendor/cgltf/#primitive_type">primitive_type</a>,
@@ -998,6 +1102,7 @@ Procedure Groups (0)</summary>
 <h3 id="primitive_type"><span><a class="doc-id-link" href="#primitive_type">primitive_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L107"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">primitive_type :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	invalid, 
 	points, 
 	lines, 
 	line_loop, 
@@ -1036,7 +1141,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="sampler"><span><a class="doc-id-link" href="#sampler">sampler<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L273"><em>Source</em></a></div></h3>
+<h3 id="sampler"><span><a class="doc-id-link" href="#sampler">sampler<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L265"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sampler :: <span class="keyword-type">struct</span> {
 	name:             <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -1049,9 +1154,13 @@ Procedure Groups (0)</summary>
 	extensions:       [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,extensions_count"`</span>,
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/cgltf/#sampler_index">sampler_index</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="scene"><span><a class="doc-id-link" href="#scene">scene<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L538"><em>Source</em></a></div></h3>
+<h3 id="scene"><span><a class="doc-id-link" href="#scene">scene<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L540"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scene :: <span class="keyword-type">struct</span> {
 	name:             <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -1061,9 +1170,13 @@ Procedure Groups (0)</summary>
 	extensions:       [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,extensions_count"`</span>,
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/cgltf/#scene_index">scene_index</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="sheen"><span><a class="doc-id-link" href="#sheen">sheen<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L364"><em>Source</em></a></div></h3>
+<h3 id="sheen"><span><a class="doc-id-link" href="#sheen">sheen<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L353"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sheen :: <span class="keyword-type">struct</span> {
 	sheen_color_texture:     <a class="code-typename" href="/vendor/cgltf/#texture_view">texture_view</a>,
@@ -1074,7 +1187,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="skin"><span><a class="doc-id-link" href="#skin">skin<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L463"><em>Source</em></a></div></h3>
+<h3 id="skin"><span><a class="doc-id-link" href="#skin">skin<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L465"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">skin :: <span class="keyword-type">struct</span> {
 	name:                  <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -1086,9 +1199,13 @@ Procedure Groups (0)</summary>
 	extensions:            [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,extensions_count"`</span>,
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/cgltf/#skin_index">skin_index</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="specular"><span><a class="doc-id-link" href="#specular">specular<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L350"><em>Source</em></a></div></h3>
+<h3 id="specular"><span><a class="doc-id-link" href="#specular">specular<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L339"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">specular :: <span class="keyword-type">struct</span> {
 	specular_texture:       <a class="code-typename" href="/vendor/cgltf/#texture_view">texture_view</a>,
@@ -1099,7 +1216,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="texture"><span><a class="doc-id-link" href="#texture">texture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L284"><em>Source</em></a></div></h3>
+<h3 id="texture"><span><a class="doc-id-link" href="#texture">texture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L276"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">texture :: <span class="keyword-type">struct</span> {
 	name:             <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -1112,9 +1229,13 @@ Procedure Groups (0)</summary>
 	extensions:       [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,extensions_count"`</span>,
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/cgltf/#texture_index">texture_index</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="texture_transform"><span><a class="doc-id-link" href="#texture_transform">texture_transform<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L295"><em>Source</em></a></div></h3>
+<h3 id="texture_transform"><span><a class="doc-id-link" href="#texture_transform">texture_transform<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L287"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">texture_transform :: <span class="keyword-type">struct</span> {
 	offset:       [2]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
@@ -1126,23 +1247,20 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="texture_view"><span><a class="doc-id-link" href="#texture_view">texture_view<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L303"><em>Source</em></a></div></h3>
+<h3 id="texture_view"><span><a class="doc-id-link" href="#texture_view">texture_view<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L295"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">texture_view :: <span class="keyword-type">struct</span> {
-	texture:          ^<a class="code-typename" href="/vendor/cgltf/#texture">texture</a>,
-	texcoord:         <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
-	scale:            <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	texture:       ^<a class="code-typename" href="/vendor/cgltf/#texture">texture</a>,
+	texcoord:      <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	scale:         <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	<span class="comment">// equivalent to strength for occlusion_texture </span>
-	has_transform:    <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>,
-	transform:        <a class="code-typename" href="/vendor/cgltf/#texture_transform">texture_transform</a>,
-	extras:           <a class="code-typename" href="/vendor/cgltf/#extras_t">extras_t</a>,
-	extensions_count: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
-	extensions:       [^]<a class="code-typename" href="/vendor/cgltf/#extension">extension</a> <span class="string">`fmt:"v,extensions_count"`</span>,
+	has_transform: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>,
+	transform:     <a class="code-typename" href="/vendor/cgltf/#texture_transform">texture_transform</a>,
 }</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="transmission"><span><a class="doc-id-link" href="#transmission">transmission<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L341"><em>Source</em></a></div></h3>
+<h3 id="transmission"><span><a class="doc-id-link" href="#transmission">transmission<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L330"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">transmission :: <span class="keyword-type">struct</span> {
 	transmission_texture: <a class="code-typename" href="/vendor/cgltf/#texture_view">texture_view</a>,
@@ -1166,11 +1284,12 @@ Procedure Groups (0)</summary>
 </div>
 <h5>Related Procedures With Parameters</h5>
 <ul>
+<li><a href="/vendor/cgltf/#calc_size">calc_size</a></li>
 <li><a href="/vendor/cgltf/#num_components">num_components</a></li>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="volume"><span><a class="doc-id-link" href="#volume">volume<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L357"><em>Source</em></a></div></h3>
+<h3 id="volume"><span><a class="doc-id-link" href="#volume">volume<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L346"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">volume :: <span class="keyword-type">struct</span> {
 	thickness_texture:    <a class="code-typename" href="/vendor/cgltf/#texture_view">texture_view</a>,
@@ -1186,31 +1305,97 @@ Procedure Groups (0)</summary>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="accessor_read_float"><span><a class="doc-id-link" href="#accessor_read_float">accessor_read_float<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L687"><em>Source</em></a></div></h3>
+<h3 id="accessor_index"><span><a class="doc-id-link" href="#accessor_index">accessor_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L720"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">accessor_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#accessor">accessor</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="accessor_read_float"><span><a class="doc-id-link" href="#accessor_read_float">accessor_read_float<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L692"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">accessor_read_float :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (accessor: ^<a class="code-typename" href="/vendor/cgltf/#accessor">accessor</a>, index: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, out: [^]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, element_size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="accessor_read_index"><span><a class="doc-id-link" href="#accessor_read_index">accessor_read_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L691"><em>Source</em></a></div></h3>
+<h3 id="accessor_read_index"><span><a class="doc-id-link" href="#accessor_read_index">accessor_read_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L696"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">accessor_read_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (accessor: ^<a class="code-typename" href="/vendor/cgltf/#accessor">accessor</a>, index: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="accessor_read_uint"><span><a class="doc-id-link" href="#accessor_read_uint">accessor_read_uint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L689"><em>Source</em></a></div></h3>
+<h3 id="accessor_read_uint"><span><a class="doc-id-link" href="#accessor_read_uint">accessor_read_uint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L694"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">accessor_read_uint :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (accessor: ^<a class="code-typename" href="/vendor/cgltf/#accessor">accessor</a>, index: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, out: [^]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, element_size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="accessor_unpack_floats"><span><a class="doc-id-link" href="#accessor_unpack_floats">accessor_unpack_floats<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L697"><em>Source</em></a></div></h3>
+<h3 id="accessor_unpack_floats"><span><a class="doc-id-link" href="#accessor_unpack_floats">accessor_unpack_floats<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L707"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">accessor_unpack_floats :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (accessor: ^<a class="code-typename" href="/vendor/cgltf/#accessor">accessor</a>, out: [^]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, float_count: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="copy_extras_json"><span><a class="doc-id-link" href="#copy_extras_json">copy_extras_json<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L701"><em>Source</em></a></div></h3>
+<h3 id="accessor_unpack_indices"><span><a class="doc-id-link" href="#accessor_unpack_indices">accessor_unpack_indices<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L709"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">accessor_unpack_indices :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (accessor: ^<a class="code-typename" href="/vendor/cgltf/#accessor">accessor</a>, out: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, out_component_size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, index_count: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="animation_channel_index"><span><a class="doc-id-link" href="#animation_channel_index">animation_channel_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L746"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">animation_channel_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (animation: ^<a class="code-typename" href="/vendor/cgltf/#animation">animation</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#animation_channel">animation_channel</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="animation_index"><span><a class="doc-id-link" href="#animation_index">animation_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L742"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">animation_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#animation">animation</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="animation_sampler_index"><span><a class="doc-id-link" href="#animation_sampler_index">animation_sampler_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L744"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">animation_sampler_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (animation: ^<a class="code-typename" href="/vendor/cgltf/#animation">animation</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#animation_sampler">animation_sampler</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="buffer_index"><span><a class="doc-id-link" href="#buffer_index">buffer_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L724"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">buffer_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#buffer">buffer</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="buffer_view_data"><span><a class="doc-id-link" href="#buffer_view_data">buffer_view_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L689"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">buffer_view_data :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (view: ^<a class="code-typename" href="/vendor/cgltf/#buffer_view">buffer_view</a>) -> [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="buffer_view_index"><span><a class="doc-id-link" href="#buffer_view_index">buffer_view_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L722"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">buffer_view_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#buffer_view">buffer_view</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="calc_size"><span><a class="doc-id-link" href="#calc_size">calc_size<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L704"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">calc_size :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (type: <a class="code-typename" href="/vendor/cgltf/#type">type</a>, component_type: <a class="code-typename" href="/vendor/cgltf/#component_type">component_type</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="camera_index"><span><a class="doc-id-link" href="#camera_index">camera_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L734"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">camera_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#camera">camera</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="component_size"><span><a class="doc-id-link" href="#component_size">component_size<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L702"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">component_size :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (component_type: <a class="code-typename" href="/vendor/cgltf/#component_type">component_type</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="copy_extras_json"><span><a class="doc-id-link" href="#copy_extras_json">copy_extras_json<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L713"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">copy_extras_json :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, extras: ^<a class="code-typename" href="/vendor/cgltf/#extras_t">extras_t</a>, dest: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, dest_size: ^<a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> <a class="code-typename" href="/vendor/cgltf/#result">result</a> ---</pre>
 </div>
@@ -1220,79 +1405,133 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="decode_string"><span><a class="doc-id-link" href="#decode_string">decode_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L674"><em>Source</em></a></div></h3>
+<h3 id="decode_string"><span><a class="doc-id-link" href="#decode_string">decode_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L676"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">decode_string :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (string: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="decode_uri"><span><a class="doc-id-link" href="#decode_uri">decode_uri<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L676"><em>Source</em></a></div></h3>
+<h3 id="decode_uri"><span><a class="doc-id-link" href="#decode_uri">decode_uri<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L678"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">decode_uri :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (uri: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="free"><span><a class="doc-id-link" href="#free">free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L681"><em>Source</em></a></div></h3>
+<h3 id="free"><span><a class="doc-id-link" href="#free">free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L683"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">free :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="load_buffer_base64"><span><a class="doc-id-link" href="#load_buffer_base64">load_buffer_base64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L656"><em>Source</em></a></div></h3>
+<h3 id="image_index"><span><a class="doc-id-link" href="#image_index">image_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L726"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">image_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#image">image</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="light_index"><span><a class="doc-id-link" href="#light_index">light_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L736"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">light_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#light">light</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="load_buffer_base64"><span><a class="doc-id-link" href="#load_buffer_base64">load_buffer_base64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L658"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">load_buffer_base64 :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (<span class="keyword-type">#by_ptr</span> options: <a class="code-typename" href="/vendor/cgltf/#options">options</a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, base64: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> (out_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, res: <a class="code-typename" href="/vendor/cgltf/#result">result</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="load_buffers"><span><a class="doc-id-link" href="#load_buffers">load_buffers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L668"><em>Source</em></a></div></h3>
+<h3 id="load_buffers"><span><a class="doc-id-link" href="#load_buffers">load_buffers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L670"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">load_buffers :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (<span class="keyword-type">#by_ptr</span> options: <a class="code-typename" href="/vendor/cgltf/#options">options</a>, data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, gltf_path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a class="code-typename" href="/vendor/cgltf/#result">result</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="node_transform_local"><span><a class="doc-id-link" href="#node_transform_local">node_transform_local<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L683"><em>Source</em></a></div></h3>
+<h3 id="material_index"><span><a class="doc-id-link" href="#material_index">material_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L718"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">material_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#material">material</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="mesh_index"><span><a class="doc-id-link" href="#mesh_index">mesh_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L716"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">mesh_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#mesh">mesh</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="node_index"><span><a class="doc-id-link" href="#node_index">node_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L738"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">node_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#node">node</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="node_transform_local"><span><a class="doc-id-link" href="#node_transform_local">node_transform_local<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L685"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_transform_local :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/cgltf/#node">node</a>, out_matrix: [^]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="node_transform_world"><span><a class="doc-id-link" href="#node_transform_world">node_transform_world<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L684"><em>Source</em></a></div></h3>
+<h3 id="node_transform_world"><span><a class="doc-id-link" href="#node_transform_world">node_transform_world<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L686"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_transform_world :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/cgltf/#node">node</a>, out_matrix: [^]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="num_components"><span><a class="doc-id-link" href="#num_components">num_components<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L694"><em>Source</em></a></div></h3>
+<h3 id="num_components"><span><a class="doc-id-link" href="#num_components">num_components<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L699"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">num_components :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (type: <a class="code-typename" href="/vendor/cgltf/#type">type</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="parse"><span><a class="doc-id-link" href="#parse">parse<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L631"><em>Source</em></a></div></h3>
+<h3 id="parse"><span><a class="doc-id-link" href="#parse">parse<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L633"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parse :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (<span class="keyword-type">#by_ptr</span> options: <a class="code-typename" href="/vendor/cgltf/#options">options</a>, data_ptr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> (out_data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, res: <a class="code-typename" href="/vendor/cgltf/#result">result</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="parse_file"><span><a class="doc-id-link" href="#parse_file">parse_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L644"><em>Source</em></a></div></h3>
+<h3 id="parse_file"><span><a class="doc-id-link" href="#parse_file">parse_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L646"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parse_file :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (<span class="keyword-type">#by_ptr</span> options: <a class="code-typename" href="/vendor/cgltf/#options">options</a>, path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> (out_data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, res: <a class="code-typename" href="/vendor/cgltf/#result">result</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="validate"><span><a class="doc-id-link" href="#validate">validate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L679"><em>Source</em></a></div></h3>
+<h3 id="sampler_index"><span><a class="doc-id-link" href="#sampler_index">sampler_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L730"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">sampler_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#sampler">sampler</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="scene_index"><span><a class="doc-id-link" href="#scene_index">scene_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L740"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">scene_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#scene">scene</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="skin_index"><span><a class="doc-id-link" href="#skin_index">skin_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L732"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">skin_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#skin">skin</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="texture_index"><span><a class="doc-id-link" href="#texture_index">texture_index<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L728"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">texture_index :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>, object: ^<a class="code-typename" href="/vendor/cgltf/#texture">texture</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="validate"><span><a class="doc-id-link" href="#validate">validate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L681"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">validate :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>) -> <a class="code-typename" href="/vendor/cgltf/#result">result</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="write"><span><a class="doc-id-link" href="#write">write<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L706"><em>Source</em></a></div></h3>
+<h3 id="write"><span><a class="doc-id-link" href="#write">write<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L751"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (<span class="keyword-type">#by_ptr</span> options: <a class="code-typename" href="/vendor/cgltf/#options">options</a>, buffer: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="write_file"><span><a class="doc-id-link" href="#write_file">write_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L704"><em>Source</em></a></div></h3>
+<h3 id="write_file"><span><a class="doc-id-link" href="#write_file">write_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin#L749"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write_file :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (<span class="keyword-type">#by_ptr</span> options: <a class="code-typename" href="/vendor/cgltf/#options">options</a>, path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, data: ^<a class="code-typename" href="/vendor/cgltf/#data">data</a>) -> <a class="code-typename" href="/vendor/cgltf/#result">result</a> ---</pre>
 </div>
@@ -1305,7 +1544,7 @@ Procedure Groups (0)</summary>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/cgltf/cgltf.odin">cgltf.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-01 (vendor "odin") Windows_amd64 @ 2025-01-04 21:10:02.559996700 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-01 (vendor "odin") Windows_amd64 @ 2025-01-05 21:10:37.562138800 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -1318,6 +1557,7 @@ Procedure Groups (0)</summary>
 <li><a href="#animation_channel">animation_channel</a></li>
 <li><a href="#animation_path_type">animation_path_type</a></li>
 <li><a href="#animation_sampler">animation_sampler</a></li>
+<li><a href="#anisotropy">anisotropy</a></li>
 <li><a href="#asset">asset</a></li>
 <li><a href="#attribute">attribute</a></li>
 <li><a href="#attribute_type">attribute_type</a></li>
@@ -1332,6 +1572,7 @@ Procedure Groups (0)</summary>
 <li><a href="#component_type">component_type</a></li>
 <li><a href="#data">data</a></li>
 <li><a href="#data_free_method">data_free_method</a></li>
+<li><a href="#dispersion">dispersion</a></li>
 <li><a href="#draco_mesh_compression">draco_mesh_compression</a></li>
 <li><a href="#emissive_strength">emissive_strength</a></li>
 <li><a href="#extension">extension</a></li>
@@ -1375,21 +1616,41 @@ Procedure Groups (0)</summary>
 </ul>
 </li>
 <li><a href="#pkg-Procedures">Procedures</a><ul>
+<li><a href="#accessor_index">accessor_index</a></li>
 <li><a href="#accessor_read_float">accessor_read_float</a></li>
 <li><a href="#accessor_read_index">accessor_read_index</a></li>
 <li><a href="#accessor_read_uint">accessor_read_uint</a></li>
 <li><a href="#accessor_unpack_floats">accessor_unpack_floats</a></li>
+<li><a href="#accessor_unpack_indices">accessor_unpack_indices</a></li>
+<li><a href="#animation_channel_index">animation_channel_index</a></li>
+<li><a href="#animation_index">animation_index</a></li>
+<li><a href="#animation_sampler_index">animation_sampler_index</a></li>
+<li><a href="#buffer_index">buffer_index</a></li>
+<li><a href="#buffer_view_data">buffer_view_data</a></li>
+<li><a href="#buffer_view_index">buffer_view_index</a></li>
+<li><a href="#calc_size">calc_size</a></li>
+<li><a href="#camera_index">camera_index</a></li>
+<li><a href="#component_size">component_size</a></li>
 <li><a href="#copy_extras_json">copy_extras_json</a></li>
 <li><a href="#decode_string">decode_string</a></li>
 <li><a href="#decode_uri">decode_uri</a></li>
 <li><a href="#free">free</a></li>
+<li><a href="#image_index">image_index</a></li>
+<li><a href="#light_index">light_index</a></li>
 <li><a href="#load_buffer_base64">load_buffer_base64</a></li>
 <li><a href="#load_buffers">load_buffers</a></li>
+<li><a href="#material_index">material_index</a></li>
+<li><a href="#mesh_index">mesh_index</a></li>
+<li><a href="#node_index">node_index</a></li>
 <li><a href="#node_transform_local">node_transform_local</a></li>
 <li><a href="#node_transform_world">node_transform_world</a></li>
 <li><a href="#num_components">num_components</a></li>
 <li><a href="#parse">parse</a></li>
 <li><a href="#parse_file">parse_file</a></li>
+<li><a href="#sampler_index">sampler_index</a></li>
+<li><a href="#scene_index">scene_index</a></li>
+<li><a href="#skin_index">skin_index</a></li>
+<li><a href="#texture_index">texture_index</a></li>
 <li><a href="#validate">validate</a></li>
 <li><a href="#write">write</a></li>
 <li><a href="#write_file">write_file</a></li>
