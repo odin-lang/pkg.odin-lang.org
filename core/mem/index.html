@@ -409,7 +409,7 @@ used to denote the count of objects.</p>
 <div>
 <details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
 <summary id="#doc-index-Types-header">
-Types (43)</summary>
+Types (44)</summary>
 <ul>
 <li><a href="#Allocator">Allocator</a></li>
 <li><a href="#Allocator_Error">Allocator_Error</a></li>
@@ -452,6 +452,7 @@ Types (43)</summary>
 <li><a href="#Stack">Stack</a></li>
 <li><a href="#Stack_Allocation_Header">Stack_Allocation_Header</a></li>
 <li><a href="#Tracking_Allocator">Tracking_Allocator</a></li>
+<li><a href="#Tracking_Allocator_Bad_Free_Callback">Tracking_Allocator_Bad_Free_Callback</a></li>
 <li><a href="#Tracking_Allocator_Bad_Free_Entry">Tracking_Allocator_Bad_Free_Entry</a></li>
 <li><a href="#Tracking_Allocator_Entry">Tracking_Allocator_Entry</a></li>
 </ul>
@@ -490,7 +491,7 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (186)</summary>
+Procedures (188)</summary>
 <ul>
 <li><a href="#align_backward">align_backward</a></li>
 <li><a href="#align_backward_int">align_backward_int</a></li>
@@ -669,6 +670,8 @@ Procedures (186)</summary>
 <li><a href="#stack_resize_bytes_non_zeroed">stack_resize_bytes_non_zeroed</a></li>
 <li><a href="#stack_resize_non_zeroed">stack_resize_non_zeroed</a></li>
 <li><a href="#tracking_allocator">tracking_allocator</a></li>
+<li><a href="#tracking_allocator_bad_free_callback_add_to_array">tracking_allocator_bad_free_callback_add_to_array</a></li>
+<li><a href="#tracking_allocator_bad_free_callback_panic">tracking_allocator_bad_free_callback_panic</a></li>
 <li><a href="#tracking_allocator_clear">tracking_allocator_clear</a></li>
 <li><a href="#tracking_allocator_destroy">tracking_allocator_destroy</a></li>
 <li><a href="#tracking_allocator_init">tracking_allocator_init</a></li>
@@ -1492,11 +1495,12 @@ byte buffers return <code>nil</code> and no error.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Tracking_Allocator"><span><a class="doc-id-link" href="#Tracking_Allocator">Tracking_Allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L40"><em>Source</em></a></div></h3>
+<h3 id="Tracking_Allocator"><span><a class="doc-id-link" href="#Tracking_Allocator">Tracking_Allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L45"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Tracking_Allocator :: <span class="keyword-type">struct</span> {
 	backing:                  runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>,
 	allocation_map:           <span class="keyword-type">map</span>[<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>]<a class="code-typename" href="/core/mem/#Tracking_Allocator_Entry">Tracking_Allocator_Entry</a>,
+	bad_free_callback:        <a class="code-typename" href="/core/mem/#Tracking_Allocator_Bad_Free_Callback">Tracking_Allocator_Bad_Free_Callback</a>,
 	bad_free_array:           [<span class="keyword">dynamic</span>]<a class="code-typename" href="/core/mem/#Tracking_Allocator_Bad_Free_Entry">Tracking_Allocator_Bad_Free_Entry</a>,
 	mutex:                    sync.<a class="code-typename" href="/core/sync/#Mutex">Mutex</a>,
 	clear_on_free_all:        <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
@@ -1515,11 +1519,23 @@ byte buffers return <code>nil</code> and no error.</p>
 <h5>Related Procedures With Parameters</h5>
 <ul>
 <li><a href="/core/mem/#tracking_allocator">tracking_allocator</a></li>
+<li><a href="/core/mem/#tracking_allocator_bad_free_callback_add_to_array">tracking_allocator_bad_free_callback_add_to_array</a></li>
+<li><a href="/core/mem/#tracking_allocator_bad_free_callback_panic">tracking_allocator_bad_free_callback_panic</a></li>
 <li><a href="/core/mem/#tracking_allocator_clear">tracking_allocator_clear</a></li>
 <li><a href="/core/mem/#tracking_allocator_destroy">tracking_allocator_destroy</a></li>
 <li><a href="/core/mem/#tracking_allocator_init">tracking_allocator_init</a></li>
 <li><a href="/core/mem/#tracking_allocator_reset">tracking_allocator_reset</a></li>
 </ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Tracking_Allocator_Bad_Free_Callback"><span><a class="doc-id-link" href="#Tracking_Allocator_Bad_Free_Callback">Tracking_Allocator_Bad_Free_Callback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L40"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Tracking_Allocator_Bad_Free_Callback :: <span class="keyword-type">proc</span>(t: ^<a class="code-typename" href="/core/mem/#Tracking_Allocator">Tracking_Allocator</a>, memory: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, location: runtime.<a class="code-typename" href="/base/runtime/#Source_Code_Location">Source_Code_Location</a>)</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Callback type for when tracking allocator runs into a bad free.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="Tracking_Allocator_Bad_Free_Entry"><span><a class="doc-id-link" href="#Tracking_Allocator_Bad_Free_Entry">Tracking_Allocator_Bad_Free_Entry<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L30"><em>Source</em></a></div></h3>
@@ -4456,7 +4472,7 @@ memory region located at an address specified by <code>old_memory</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="tracking_allocator"><span><a class="doc-id-link" href="#tracking_allocator">tracking_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L146"><em>Source</em></a></div></h3>
+<h3 id="tracking_allocator"><span><a class="doc-id-link" href="#tracking_allocator">tracking_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L179"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">tracking_allocator :: <span class="keyword-type">proc</span>(data: ^<a class="code-typename" href="/core/mem/#Tracking_Allocator">Tracking_Allocator</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a> {…}</pre>
 </div>
@@ -4466,8 +4482,10 @@ memory region located at an address specified by <code>old_memory</code>.</p>
 <p>The tracking allocator is an allocator wrapper that tracks memory allocations.
 This allocator stores all the allocations in a map. Whenever a pointer that's
 not inside of the map is freed, the <code>bad_free_array</code> entry is added.</p>
-<p>An example of how to use the <code>Tracking_Allocator</code> to track subsequent allocations
-in your program and report leaks and bad frees:</p>
+<p>Here follows an example of how to use the <code>Tracking_Allocator</code> to track
+subsequent allocations in your program and report leaks. By default, the
+tracking allocator will crash on bad frees. You can override that behavior by
+overriding <code>track.bad_free_callback</code>.</p>
 <details open class="code-example">
 <summary><b>Example:</b></summary>
 <pre><code class="hljs language-odin" data-lang="odin">package foo
@@ -4486,16 +4504,38 @@ main :: proc() {
 	for _, leak in track.allocation_map {
 		fmt.printf("%v leaked %m\n", leak.location, leak.size)
 	}
-	for bad_free in track.bad_free_array {
-		fmt.printf("%v allocation %p was freed badly\n", bad_free.location, bad_free.memory)
-	}
 }
 </code></pre>
 </details>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="tracking_allocator_clear"><span><a class="doc-id-link" href="#tracking_allocator_clear">tracking_allocator_clear<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L86"><em>Source</em></a></div></h3>
+<h3 id="tracking_allocator_bad_free_callback_add_to_array"><span><a class="doc-id-link" href="#tracking_allocator_bad_free_callback_add_to_array">tracking_allocator_bad_free_callback_add_to_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L139"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">tracking_allocator_bad_free_callback_add_to_array :: <span class="keyword-type">proc</span>(t: ^<a class="code-typename" href="/core/mem/#Tracking_Allocator">Tracking_Allocator</a>, memory: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, location: runtime.<a class="code-typename" href="/base/runtime/#Source_Code_Location">Source_Code_Location</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Alternative behavior for a bad free: Store in <code>bad_free_array</code>. If you use this,
+then you must make sure to check Tracking_Allocator.bad_free_array at some point.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="tracking_allocator_bad_free_callback_panic"><span><a class="doc-id-link" href="#tracking_allocator_bad_free_callback_panic">tracking_allocator_bad_free_callback_panic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L127"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">tracking_allocator_bad_free_callback_panic :: <span class="keyword-type">proc</span>(t: ^<a class="code-typename" href="/core/mem/#Tracking_Allocator">Tracking_Allocator</a>, memory: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, location: runtime.<a class="code-typename" href="/base/runtime/#Source_Code_Location">Source_Code_Location</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Default behavior for a bad free: Crash with error message that says where the
+bad free happened.</p>
+<p>Override Tracking_Allocator.bad_free_callback to have something else happen. For
+example, you can use tracking_allocator_bad_free_callback_add_to_array to return
+the tracking allocator to the old behavior, where the bad_free_array was used.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="tracking_allocator_clear"><span><a class="doc-id-link" href="#tracking_allocator_clear">tracking_allocator_clear<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L93"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">tracking_allocator_clear :: <span class="keyword-type">proc</span>(t: ^<a class="code-typename" href="/core/mem/#Tracking_Allocator">Tracking_Allocator</a>) {…}</pre>
 </div>
@@ -4508,7 +4548,7 @@ the totals intact.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="tracking_allocator_destroy"><span><a class="doc-id-link" href="#tracking_allocator_destroy">tracking_allocator_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L73"><em>Source</em></a></div></h3>
+<h3 id="tracking_allocator_destroy"><span><a class="doc-id-link" href="#tracking_allocator_destroy">tracking_allocator_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L80"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">tracking_allocator_destroy :: <span class="keyword-type">proc</span>(t: ^<a class="code-typename" href="/core/mem/#Tracking_Allocator">Tracking_Allocator</a>) {…}</pre>
 </div>
@@ -4518,7 +4558,7 @@ the totals intact.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="tracking_allocator_init"><span><a class="doc-id-link" href="#tracking_allocator_init">tracking_allocator_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L61"><em>Source</em></a></div></h3>
+<h3 id="tracking_allocator_init"><span><a class="doc-id-link" href="#tracking_allocator_init">tracking_allocator_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L67"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">tracking_allocator_init :: <span class="keyword-type">proc</span>(t: ^<a class="code-typename" href="/core/mem/#Tracking_Allocator">Tracking_Allocator</a>, backing_allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>, internals_allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
@@ -4531,7 +4571,7 @@ allocate the tracked data.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="tracking_allocator_proc"><span><a class="doc-id-link" href="#tracking_allocator_proc">tracking_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L153"><em>Source</em></a></div></h3>
+<h3 id="tracking_allocator_proc"><span><a class="doc-id-link" href="#tracking_allocator_proc">tracking_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L186"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">tracking_allocator_proc :: <span class="keyword-type">proc</span>(
 	allocator_data:  <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
@@ -4544,7 +4584,7 @@ allocate the tracked data.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="tracking_allocator_reset"><span><a class="doc-id-link" href="#tracking_allocator_reset">tracking_allocator_reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L99"><em>Source</em></a></div></h3>
+<h3 id="tracking_allocator_reset"><span><a class="doc-id-link" href="#tracking_allocator_reset">tracking_allocator_reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin#L106"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">tracking_allocator_reset :: <span class="keyword-type">proc</span>(t: ^<a class="code-typename" href="/core/mem/#Tracking_Allocator">Tracking_Allocator</a>) {…}</pre>
 </div>
@@ -4671,7 +4711,7 @@ to zero, and returns the slice <code>data</code>.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin">tracking_allocator.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-01 (vendor "odin") Windows_amd64 @ 2025-01-07 21:11:42.164670800 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-01 (vendor "odin") Windows_amd64 @ 2025-01-08 21:11:20.083258500 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -4718,6 +4758,7 @@ to zero, and returns the slice <code>data</code>.</p>
 <li><a href="#Stack">Stack</a></li>
 <li><a href="#Stack_Allocation_Header">Stack_Allocation_Header</a></li>
 <li><a href="#Tracking_Allocator">Tracking_Allocator</a></li>
+<li><a href="#Tracking_Allocator_Bad_Free_Callback">Tracking_Allocator_Bad_Free_Callback</a></li>
 <li><a href="#Tracking_Allocator_Bad_Free_Entry">Tracking_Allocator_Bad_Free_Entry</a></li>
 <li><a href="#Tracking_Allocator_Entry">Tracking_Allocator_Entry</a></li>
 </ul>
@@ -4918,6 +4959,8 @@ to zero, and returns the slice <code>data</code>.</p>
 <li><a href="#stack_resize_bytes_non_zeroed">stack_resize_bytes_non_zeroed</a></li>
 <li><a href="#stack_resize_non_zeroed">stack_resize_non_zeroed</a></li>
 <li><a href="#tracking_allocator">tracking_allocator</a></li>
+<li><a href="#tracking_allocator_bad_free_callback_add_to_array">tracking_allocator_bad_free_callback_add_to_array</a></li>
+<li><a href="#tracking_allocator_bad_free_callback_panic">tracking_allocator_bad_free_callback_panic</a></li>
 <li><a href="#tracking_allocator_clear">tracking_allocator_clear</a></li>
 <li><a href="#tracking_allocator_destroy">tracking_allocator_destroy</a></li>
 <li><a href="#tracking_allocator_init">tracking_allocator_init</a></li>
