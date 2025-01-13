@@ -361,7 +361,7 @@ Variables (1)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (31)</summary>
+Procedures (33)</summary>
 <ul>
 <li><a href="#assert">assert</a></li>
 <li><a href="#assertf">assertf</a></li>
@@ -376,6 +376,8 @@ Procedures (31)</summary>
 <li><a href="#do_level_header">do_level_header</a></li>
 <li><a href="#do_location_header">do_location_header</a></li>
 <li><a href="#do_time_header">do_time_header</a></li>
+<li><a href="#ensure">ensure</a></li>
+<li><a href="#ensuref">ensuref</a></li>
 <li><a href="#error">error</a></li>
 <li><a href="#errorf">errorf</a></li>
 <li><a href="#fatal">fatal</a></li>
@@ -578,7 +580,7 @@ Terminal_Color
 <div class="pkg-entity">
 <h3 id="assert"><span><a class="doc-id-link" href="#assert">assert<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log.odin#L118"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">assert :: <span class="keyword-type">proc</span>(condition: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = "", loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
+<pre class="doc-code">assert :: <span class="keyword-type">proc</span>(condition: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = #caller_expression(condition), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -654,6 +656,18 @@ Terminal_Color
 </div>
 </div>
 <div class="pkg-entity">
+<h3 id="ensure"><span><a class="doc-id-link" href="#ensure">ensure<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log.odin#L154"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ensure :: <span class="keyword-type">proc</span>(condition: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = #caller_expression(condition), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ensuref"><span><a class="doc-id-link" href="#ensuref">ensuref<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log.odin#L169"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ensuref :: <span class="keyword-type">proc</span>(condition: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, fmt_str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, <span class="keyword-type">..</span> args: ..<a href="/base/builtin#any"><span class="doc-builtin">any</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
 <h3 id="error"><span><a class="doc-id-link" href="#error">error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log.odin#L101"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">error :: <span class="keyword-type">proc</span>(<span class="keyword-type">..</span> args: ..<a href="/base/builtin#any"><span class="doc-builtin">any</span></a>, sep: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = " ", location := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
@@ -696,7 +710,7 @@ Terminal_Color
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="log"><span><a class="doc-id-link" href="#log">log<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log.odin#L156"><em>Source</em></a></div></h3>
+<h3 id="log"><span><a class="doc-id-link" href="#log">log<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log.odin#L187"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">log :: <span class="keyword-type">proc</span>(level: runtime.<a class="code-typename" href="/base/runtime/#Logger_Level">Logger_Level</a>, <span class="keyword-type">..</span> args: ..<a href="/base/builtin#any"><span class="doc-builtin">any</span></a>, sep: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = " ", location := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
@@ -727,7 +741,7 @@ Terminal_Color
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="logf"><span><a class="doc-id-link" href="#logf">logf<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log.odin#L169"><em>Source</em></a></div></h3>
+<h3 id="logf"><span><a class="doc-id-link" href="#logf">logf<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log.odin#L200"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">logf :: <span class="keyword-type">proc</span>(level: runtime.<a class="code-typename" href="/base/runtime/#Logger_Level">Logger_Level</a>, fmt_str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, <span class="keyword-type">..</span> args: ..<a href="/base/builtin#any"><span class="doc-builtin">any</span></a>, location := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
@@ -779,7 +793,7 @@ Terminal_Color
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/log/multi_logger.odin">multi_logger.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-01 (vendor "odin") Windows_amd64 @ 2025-01-12 21:10:55.661167100 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-01 (vendor "odin") Windows_amd64 @ 2025-01-13 21:11:11.309446700 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -822,6 +836,8 @@ Terminal_Color
 <li><a href="#do_level_header">do_level_header</a></li>
 <li><a href="#do_location_header">do_location_header</a></li>
 <li><a href="#do_time_header">do_time_header</a></li>
+<li><a href="#ensure">ensure</a></li>
+<li><a href="#ensuref">ensuref</a></li>
 <li><a href="#error">error</a></li>
 <li><a href="#errorf">errorf</a></li>
 <li><a href="#fatal">fatal</a></li>
