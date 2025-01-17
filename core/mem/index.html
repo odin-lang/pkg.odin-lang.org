@@ -491,7 +491,7 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (188)</summary>
+Procedures (194)</summary>
 <ul>
 <li><a href="#align_backward">align_backward</a></li>
 <li><a href="#align_backward_int">align_backward_int</a></li>
@@ -550,6 +550,8 @@ Procedures (188)</summary>
 <li><a href="#delete_dynamic_array">delete_dynamic_array</a></li>
 <li><a href="#delete_map">delete_map</a></li>
 <li><a href="#delete_slice">delete_slice</a></li>
+<li><a href="#delete_soa_dynamic_array">delete_soa_dynamic_array</a></li>
+<li><a href="#delete_soa_slice">delete_soa_slice</a></li>
 <li><a href="#delete_string">delete_string</a></li>
 <li><a href="#dynamic_arena_alloc_bytes">dynamic_arena_alloc_bytes</a></li>
 <li><a href="#dynamic_arena_alloc_bytes_non_zeroed">dynamic_arena_alloc_bytes_non_zeroed</a></li>
@@ -587,6 +589,10 @@ Procedures (188)</summary>
 <li><a href="#make_map">make_map</a></li>
 <li><a href="#make_multi_pointer">make_multi_pointer</a></li>
 <li><a href="#make_slice">make_slice</a></li>
+<li><a href="#make_soa_dynamic_array">make_soa_dynamic_array</a></li>
+<li><a href="#make_soa_dynamic_array_len">make_soa_dynamic_array_len</a></li>
+<li><a href="#make_soa_dynamic_array_len_cap">make_soa_dynamic_array_len_cap</a></li>
+<li><a href="#make_soa_slice">make_soa_slice</a></li>
 <li><a href="#mutex_allocator">mutex_allocator</a></li>
 <li><a href="#mutex_allocator_init">mutex_allocator_init</a></li>
 <li><a href="#mutex_allocator_proc">mutex_allocator_proc</a></li>
@@ -2482,7 +2488,7 @@ the behavior of this function may be unpredictable.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="default_resize_align"><span><a class="doc-id-link" href="#default_resize_align">default_resize_align<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L997"><em>Source</em></a></div></h3>
+<h3 id="default_resize_align"><span><a class="doc-id-link" href="#default_resize_align">default_resize_align<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L1088"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">default_resize_align :: <span class="keyword-type">proc</span>(
 	old_memory: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
@@ -2513,7 +2519,7 @@ freed.
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="default_resize_bytes_align"><span><a class="doc-id-link" href="#default_resize_bytes_align">default_resize_bytes_align<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L1066"><em>Source</em></a></div></h3>
+<h3 id="default_resize_bytes_align"><span><a class="doc-id-link" href="#default_resize_bytes_align">default_resize_bytes_align<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L1157"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">default_resize_bytes_align :: <span class="keyword-type">proc</span>(old_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, new_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -2537,7 +2543,7 @@ freed.
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="default_resize_bytes_align_non_zeroed"><span><a class="doc-id-link" href="#default_resize_bytes_align_non_zeroed">default_resize_bytes_align_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L1038"><em>Source</em></a></div></h3>
+<h3 id="default_resize_bytes_align_non_zeroed"><span><a class="doc-id-link" href="#default_resize_bytes_align_non_zeroed">default_resize_bytes_align_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L1129"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">default_resize_bytes_align_non_zeroed :: <span class="keyword-type">proc</span>(old_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, new_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -2600,6 +2606,26 @@ freed.
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Free a slice.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="delete_soa_dynamic_array"><span><a class="doc-id-link" href="#delete_soa_dynamic_array">delete_soa_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L802"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">delete_soa_dynamic_array :: <span class="keyword-type">proc</span>(array: $T/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$T, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Free an SoA dynamic array.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="delete_soa_slice"><span><a class="doc-id-link" href="#delete_soa_slice">delete_soa_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L791"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">delete_soa_slice :: <span class="keyword-type">proc</span>(array: $T/<span class="directive">#soa</span>[]$T, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Free an SoA slice.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3048,7 +3074,7 @@ a power-of-two value.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="make_aligned"><span><a class="doc-id-link" href="#make_aligned">make_aligned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L858"><em>Source</em></a></div></h3>
+<h3 id="make_aligned"><span><a class="doc-id-link" href="#make_aligned">make_aligned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L881"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">make_aligned :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[]T, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (slice: T, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -3073,7 +3099,7 @@ typeid <code>id</code> located at an address specified by <code>data</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="make_dynamic_array"><span><a class="doc-id-link" href="#make_dynamic_array">make_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L891"><em>Source</em></a></div></h3>
+<h3 id="make_dynamic_array"><span><a class="doc-id-link" href="#make_dynamic_array">make_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L914"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">make_dynamic_array :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[<span class="keyword">dynamic</span>]T, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (T, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -3085,7 +3111,7 @@ backing allocator, and initial length and capacity of <code>0</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="make_dynamic_array_len"><span><a class="doc-id-link" href="#make_dynamic_array_len">make_dynamic_array_len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L907"><em>Source</em></a></div></h3>
+<h3 id="make_dynamic_array_len"><span><a class="doc-id-link" href="#make_dynamic_array_len">make_dynamic_array_len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L929"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">make_dynamic_array_len :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[<span class="keyword">dynamic</span>]T, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (T, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -3093,12 +3119,11 @@ backing allocator, and initial length and capacity of <code>0</code>.</p>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Allocate a dynamic array with initial length.</p>
 <p>This procedure creates a dynamic array of type <code>T</code>, with <code>allocator</code> as its
-backing allocator, and initial capacity of <code>0</code>, and initial length specified by
-<code>len</code>.</p>
+backing allocator, and initial capacity and length specified by <code>len</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="make_dynamic_array_len_cap"><span><a class="doc-id-link" href="#make_dynamic_array_len_cap">make_dynamic_array_len_cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L924"><em>Source</em></a></div></h3>
+<h3 id="make_dynamic_array_len_cap"><span><a class="doc-id-link" href="#make_dynamic_array_len_cap">make_dynamic_array_len_cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L946"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">make_dynamic_array_len_cap :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[<span class="keyword">dynamic</span>]T, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">#any_int</span> cap: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -3121,7 +3146,7 @@ specified by <code>len</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="make_map"><span><a class="doc-id-link" href="#make_map">make_map<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L942"><em>Source</em></a></div></h3>
+<h3 id="make_map"><span><a class="doc-id-link" href="#make_map">make_map<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L964"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">make_map :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="keyword-type">map</span>[T]T, <span class="keyword-type">#any_int</span> cap: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = 1 &lt;&lt; runtime.MAP_MIN_LOG2_CAPACITY, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (m: T, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -3134,7 +3159,7 @@ allocator.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="make_multi_pointer"><span><a class="doc-id-link" href="#make_multi_pointer">make_multi_pointer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L958"><em>Source</em></a></div></h3>
+<h3 id="make_multi_pointer"><span><a class="doc-id-link" href="#make_multi_pointer">make_multi_pointer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L980"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">make_multi_pointer :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[^]T, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (mp: $/[^]T, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -3146,7 +3171,7 @@ from an allocator specified by <code>allocator</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="make_slice"><span><a class="doc-id-link" href="#make_slice">make_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L875"><em>Source</em></a></div></h3>
+<h3 id="make_slice"><span><a class="doc-id-link" href="#make_slice">make_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L898"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">make_slice :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[]T, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (T, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -3155,6 +3180,55 @@ from an allocator specified by <code>allocator</code>.</p>
 <p>Allocate a new slice.</p>
 <p>This procedure allocates a new slice of type <code>T</code> with length <code>len</code>, from an
 allocator specified by <code>allocator</code>, and returns the allocated slice.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="make_soa_dynamic_array"><span><a class="doc-id-link" href="#make_soa_dynamic_array">make_soa_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L1012"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">make_soa_dynamic_array :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]T, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Allocate an SoA dynamic array.</p>
+<p>This procedure creates an SoA dynamic array of type <code>T</code>, with <code>allocator</code> as
+its backing allocator, and initial length and capacity of <code>0</code>.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="make_soa_dynamic_array_len"><span><a class="doc-id-link" href="#make_soa_dynamic_array_len">make_soa_dynamic_array_len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L1027"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">make_soa_dynamic_array_len :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]T, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Allocate an SoA dynamic array with initial length.</p>
+<p>This procedure creates an SoA dynamic array of type <code>T</code>, with <code>allocator</code> as its
+backing allocator, and initial capacity and length specified by <code>len</code>.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="make_soa_dynamic_array_len_cap"><span><a class="doc-id-link" href="#make_soa_dynamic_array_len_cap">make_soa_dynamic_array_len_cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L1044"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">make_soa_dynamic_array_len_cap :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]T, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">#any_int</span> cap: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Allocate an SoA dynamic array with initial length and capacity.</p>
+<p>This procedure creates an SoA dynamic array of type <code>T</code>, with <code>allocator</code> as its
+backing allocator, and initial capacity specified by <code>cap</code>, and initial length
+specified by <code>len</code>.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="make_soa_slice"><span><a class="doc-id-link" href="#make_soa_slice">make_soa_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L996"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">make_soa_slice :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#soa</span>[]T, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Allocate an SoA slice.</p>
+<p>This procedure allocates an SoA slice of type <code>T</code> with length <code>len</code>, from an
+allocator specified by <code>allocator</code>, and returns the allocated SoA slice.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3195,7 +3269,7 @@ allocator that will be used to pass all allocation requests through.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="new"><span><a class="doc-id-link" href="#new">new<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L807"><em>Source</em></a></div></h3>
+<h3 id="new"><span><a class="doc-id-link" href="#new">new<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L830"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">new :: <span class="keyword-type">proc</span>($T: <a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (^<a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -3208,7 +3282,7 @@ successfully, or <code>nil</code> otherwise.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="new_aligned"><span><a class="doc-id-link" href="#new_aligned">new_aligned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L824"><em>Source</em></a></div></h3>
+<h3 id="new_aligned"><span><a class="doc-id-link" href="#new_aligned">new_aligned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L847"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">new_aligned :: <span class="keyword-type">proc</span>($T: <a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (t: ^<a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -3222,7 +3296,7 @@ otherwise.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="new_clone"><span><a class="doc-id-link" href="#new_clone">new_clone<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L842"><em>Source</em></a></div></h3>
+<h3 id="new_clone"><span><a class="doc-id-link" href="#new_clone">new_clone<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L865"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">new_clone :: <span class="keyword-type">proc</span>(data: $T, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (t: ^$T, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -4650,7 +4724,7 @@ to zero, and returns the slice <code>data</code>.</p>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="delete"><span><a class="doc-id-link" href="#delete">delete<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L791"><em>Source</em></a></div></h3>
+<h3 id="delete"><span><a class="doc-id-link" href="#delete">delete<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L812"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">delete :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/mem/#delete_string">delete_string</a>,
@@ -4658,6 +4732,8 @@ to zero, and returns the slice <code>data</code>.</p>
 	<a class="code-procedure" href="/core/mem/#delete_dynamic_array">delete_dynamic_array</a>,
 	<a class="code-procedure" href="/core/mem/#delete_slice">delete_slice</a>,
 	<a class="code-procedure" href="/core/mem/#delete_map">delete_map</a>,
+	<a class="code-procedure" href="/core/mem/#delete_soa_slice">delete_soa_slice</a>,
+	<a class="code-procedure" href="/core/mem/#delete_soa_dynamic_array">delete_soa_dynamic_array</a>,
 }
 </pre>
 </div>
@@ -4667,7 +4743,7 @@ to zero, and returns the slice <code>data</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="make"><span><a class="doc-id-link" href="#make">make<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L970"><em>Source</em></a></div></h3>
+<h3 id="make"><span><a class="doc-id-link" href="#make">make<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L1057"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">make :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/mem/#make_slice">make_slice</a>,
@@ -4676,6 +4752,10 @@ to zero, and returns the slice <code>data</code>.</p>
 	<a class="code-procedure" href="/core/mem/#make_dynamic_array_len_cap">make_dynamic_array_len_cap</a>,
 	<a class="code-procedure" href="/core/mem/#make_map">make_map</a>,
 	<a class="code-procedure" href="/core/mem/#make_multi_pointer">make_multi_pointer</a>,
+	<a class="code-procedure" href="/core/mem/#make_soa_slice">make_soa_slice</a>,
+	<a class="code-procedure" href="/core/mem/#make_soa_dynamic_array">make_soa_dynamic_array</a>,
+	<a class="code-procedure" href="/core/mem/#make_soa_dynamic_array_len">make_soa_dynamic_array_len</a>,
+	<a class="code-procedure" href="/core/mem/#make_soa_dynamic_array_len_cap">make_soa_dynamic_array_len_cap</a>,
 }
 </pre>
 </div>
@@ -4711,7 +4791,7 @@ to zero, and returns the slice <code>data</code>.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin">tracking_allocator.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-01 (vendor "odin") Windows_amd64 @ 2025-01-15 21:11:09.321364700 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-01 (vendor "odin") Windows_amd64 @ 2025-01-17 21:10:48.776148400 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -4839,6 +4919,8 @@ to zero, and returns the slice <code>data</code>.</p>
 <li><a href="#delete_dynamic_array">delete_dynamic_array</a></li>
 <li><a href="#delete_map">delete_map</a></li>
 <li><a href="#delete_slice">delete_slice</a></li>
+<li><a href="#delete_soa_dynamic_array">delete_soa_dynamic_array</a></li>
+<li><a href="#delete_soa_slice">delete_soa_slice</a></li>
 <li><a href="#delete_string">delete_string</a></li>
 <li><a href="#dynamic_arena_alloc_bytes">dynamic_arena_alloc_bytes</a></li>
 <li><a href="#dynamic_arena_alloc_bytes_non_zeroed">dynamic_arena_alloc_bytes_non_zeroed</a></li>
@@ -4876,6 +4958,10 @@ to zero, and returns the slice <code>data</code>.</p>
 <li><a href="#make_map">make_map</a></li>
 <li><a href="#make_multi_pointer">make_multi_pointer</a></li>
 <li><a href="#make_slice">make_slice</a></li>
+<li><a href="#make_soa_dynamic_array">make_soa_dynamic_array</a></li>
+<li><a href="#make_soa_dynamic_array_len">make_soa_dynamic_array_len</a></li>
+<li><a href="#make_soa_dynamic_array_len_cap">make_soa_dynamic_array_len_cap</a></li>
+<li><a href="#make_soa_slice">make_soa_slice</a></li>
 <li><a href="#mutex_allocator">mutex_allocator</a></li>
 <li><a href="#mutex_allocator_init">mutex_allocator_init</a></li>
 <li><a href="#mutex_allocator_proc">mutex_allocator_proc</a></li>
