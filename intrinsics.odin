@@ -464,8 +464,20 @@ intrinsics_table := []Builtin{
 	{name = "wasm_memory_grow", kind = "b", type = "proc(index, delta: uintptr) -> int", comment = "WASM targets only"},
 	{name = "wasm_memory_size", kind = "b", type = "proc(index: uintptr) -> int", comment = "WASM targets only"},
 
-	{name = "wasm_memory_atomic_wait32",   kind = "b", type ="proc(ptr: ^u32, expected: u32, timeout_ns: i64) -> u32", comment = WASM_ATOMIC_COMMENT},
-	{name = "wasm_memory_atomic_notify32", kind = "b", type ="proc(ptr: ^u32, waiters: u32) -> (waiters_woken_up: u32)", comment = WASM_ATOMIC_COMMENT},
+	{name = "wasm_memory_atomic_wait32",   kind = "b", type ="proc(ptr: ^u32, expected: u32, timeout_ns: i64) -> u32",
+		comment = "Blocks the calling thread for a given duration if the value pointed to by `ptr` is equal to the value of `expected`.\n"+
+		"`timeout_ns` is the maximum number of nanoseconds the calling thread will be blocked for.  If `timeout_ns` is negative, the calling thread will be blocked forever.\n"+
+		"Returns:\n"+
+		"- `0`: the thread blocked and then was woken up\n"+
+		"- `1`: the loaded value from `ptr` did not match `expected`, the thread did not block\n"+
+		"- `2`: the thread blocked, but the timeout expired\n"+
+		""
+	},
+	{name = "wasm_memory_atomic_notify32", kind = "b", type ="proc(ptr: ^u32, waiters: u32) -> (waiters_woken_up: u32)",
+		comment = "Wakes threads waiting on the address indicated by `ptr`, up to the given maximum (`waiters`). If `waiters` is zero, no threads are woken up. Threads previously blocked with `wasm_memory_atomic_wait32` will be woken up.\n"+
+		"Returns:\n"+
+		"The number of threads woken up.\n"
+	},
 
 	// x86 Targets (i386, amd64)
 	{name = "x86_cpuid",  kind = "b", type = "proc(ax, cx: u32) -> (eax, ebx, ecx, edx: u32)", comment = X86_COMMENT + "\nImplements the `cpuid` instruction."},
@@ -490,15 +502,6 @@ intrinsics_table := []Builtin{
 
 
 SIMD_LANES_COMMENT :: "Return an unsigned integer of the same size as the input type, NOT A BOOLEAN. element-wise: `false => 0x00...00`, `true => 0xff...ff`"
-
-
-WASM_ATOMIC_COMMENT :: "`timeout_ns` is maximum number of nanoseconds the calling thread will be blocked for\n"+
-"A negative value will be blocked forever\n"+
-"Return value:\n"+
-"0 - indicates that the thread blocked and then was woken up\n"+
-"1 - the loaded value from `ptr` did not match `expected`, the thread did not block\n"+
-"2 - the thread blocked, but the timeout\n"+
-""
 
 X86_COMMENT :: "x86 Targets Only (i386, amd64)"
 DARWIN_COMMENT :: "Darwin targets only"
