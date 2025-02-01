@@ -2143,12 +2143,12 @@ v: #simd[6]T = intrinsics.simd_shuffle(a, b, 0, 1, 0, 3, 0, 4) // repeated indic
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>timeout_ns</code> is maximum number of nanoseconds the calling thread will be blocked for
-A negative value will be blocked forever
-Return value:
-0 - indicates that the thread blocked and then was woken up
-1 - the loaded value from <code>ptr</code> did not match <code>expected</code>, the thread did not block
-2 - the thread blocked, but the timeout</p>
+<p>Blocks the calling thread for a given duration if the value pointed to by <code>ptr</code> is equal to the value of <code>expected</code>.
+<code>timeout_ns</code> is the maximum number of nanoseconds the calling thread will be blocked for.  If <code>timeout_ns</code> is negative, the calling thread will be blocked forever.
+Returns:
+<span class="doc-list"><code>0</code>: the thread blocked and then was woken up</span>
+<span class="doc-list"><code>1</code>: the loaded value from <code>ptr</code> did not match <code>expected</code>, the thread did not block</span>
+<span class="doc-list"><code>2</code>: the thread blocked, but the timeout expired</span></p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2158,12 +2158,9 @@ Return value:
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>timeout_ns</code> is maximum number of nanoseconds the calling thread will be blocked for
-A negative value will be blocked forever
-Return value:
-0 - indicates that the thread blocked and then was woken up
-1 - the loaded value from <code>ptr</code> did not match <code>expected</code>, the thread did not block
-2 - the thread blocked, but the timeout</p>
+<p>Wakes threads waiting on the address indicated by <code>ptr</code>, up to the given maximum (<code>waiters</code>). If <code>waiters</code> is zero, no threads are woken up. Threads previously blocked with <code>wasm_memory_atomic_wait32</code> will be woken up.
+Returns:
+The number of threads woken up.</p>
 </details>
 </div>
 <div class="pkg-entity">
