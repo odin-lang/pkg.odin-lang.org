@@ -1,0 +1,2265 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>package windows/GameInput - pkg.odin-lang.org</title>	<link rel="icon" href="/favicon.svg">
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/scss/custom.min.css">
+	<link rel=stylesheet href="//odin-lang.org/lib/highlight/styles/github-dark.min.css">
+	<script src="//odin-lang.org/lib/highlight/highlight.min.js"></script>
+
+	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
+	<script>hljs.highlightAll()</script>
+	<script>
+		function toggleDarkMode() {
+			if (document.body.classList.toggle("dark-mode")) {
+				window.localStorage.setItem("theme", "dark");
+			} else {
+				window.localStorage.setItem("theme", "light");
+			}
+		}
+	</script>
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
+
+	<link rel="stylesheet" type="text/css" href="/style.css">
+
+	</style>
+</head>
+<body>
+<script>
+	if (window.localStorage.getItem("theme") === "dark")
+		document.body.classList.add("dark-mode");
+	else
+		document.body.classList.remove("dark-mode");
+</script>
+<header class="sticky-top">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
+		<div class="container">
+			<a class="navbar-brand" href="https://odin-lang.org/">
+			<img src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#odin-navbar-content" aria-controls="odin-navbar-content" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+			<div class="collapse navbar-collapse" id="odin-navbar-content">
+			<ul class="navbar-nav ms-md-auto">
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/">Home</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/docs">Docs</a></li>
+				<li class="nav-item"><a class="nav-link active" href="/">Packages</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/news">News</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/showcase">Showcase</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/community">Community</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://github.com/odin-lang/Odin" target="_blank">GitHub</a></li>
+				<li class="nav-item">
+					<a
+						class="nav-link btn-dark-mode"
+						onclick="toggleDarkMode();"
+						title="Toggle Light/Dark Mode"
+					>
+						<span class="dark-mode-appearance">Appearance:</span>
+						<svg fill="white" id="dark-mode-icon" viewBox="0 0 384 512"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"/></svg>
+						<svg fill="white" id="light-mode-icon" viewBox="0 0 16 16">
+						  <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+						</svg>
+					</button>
+					</a>
+				</li>
+			</ul>
+		</div>
+		</div>
+	</nav>
+</header>
+<main>
+<div class="container full-width">
+<div class="row odin-main my-4" id="pkg">
+<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">
+<div class="py-3">
+<h4><a style="text-transform: capitalize; color: inherit;" href="/vendor">vendor Library</a></h4>
+<ul>
+<li class="nav-item"><a href="/vendor/box2d">box2d</a></li>
+<li class="nav-item"><a href="/vendor/cgltf">cgltf</a></li>
+<li class="nav-item"><a href="/vendor/commonmark">commonmark</a></li>
+<li class="nav-item">darwin<ul>
+<li><a href="/vendor/darwin/Metal">Metal</a></li>
+<li><a href="/vendor/darwin/MetalKit">MetalKit</a></li>
+<li><a href="/vendor/darwin/QuartzCore">QuartzCore</a></li>
+</ul>
+
+</li>
+<li class="nav-item">directx<ul>
+<li><a href="/vendor/directx/d3d11">d3d11</a></li>
+<li><a href="/vendor/directx/d3d12">d3d12</a></li>
+<li><a href="/vendor/directx/d3d_compiler">d3d_compiler</a></li>
+<li><a href="/vendor/directx/dxc">dxc</a></li>
+<li><a href="/vendor/directx/dxgi">dxgi</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/ENet">ENet</a></li>
+<li class="nav-item"><a href="/vendor/fontstash">fontstash</a></li>
+<li class="nav-item"><a href="/vendor/ggpo">ggpo</a></li>
+<li class="nav-item"><a href="/vendor/glfw">glfw</a><ul>
+<li><a href="/vendor/glfw/bindings">bindings</a></li>
+</ul>
+
+</li>
+<li class="nav-item">lua<ul>
+<li><a href="/vendor/lua/5.4">5.4</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/microui">microui</a></li>
+<li class="nav-item"><a href="/vendor/miniaudio">miniaudio</a></li>
+<li class="nav-item"><a href="/vendor/nanovg">nanovg</a><ul>
+<li><a href="/vendor/nanovg/gl">gl</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/OpenEXRCore">OpenEXRCore</a></li>
+<li class="nav-item"><a href="/vendor/OpenGL">OpenGL</a></li>
+<li class="nav-item"><a href="/vendor/portmidi">portmidi</a></li>
+<li class="nav-item"><a href="/vendor/raylib">raylib</a></li>
+<li class="nav-item"><a href="/vendor/sdl2">sdl2</a><ul>
+<li><a href="/vendor/sdl2/image">image</a></li>
+<li><a href="/vendor/sdl2/mixer">mixer</a></li>
+<li><a href="/vendor/sdl2/net">net</a></li>
+<li><a href="/vendor/sdl2/ttf">ttf</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/sdl3">sdl3</a></li>
+<li class="nav-item">stb<ul>
+<li><a href="/vendor/stb/easy_font">easy_font</a></li>
+<li><a href="/vendor/stb/image">image</a></li>
+<li><a href="/vendor/stb/rect_pack">rect_pack</a></li>
+<li><a href="/vendor/stb/truetype">truetype</a></li>
+<li><a href="/vendor/stb/vorbis">vorbis</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/vulkan">vulkan</a></li>
+<li class="nav-item"><a href="/vendor/wgpu">wgpu</a></li>
+<li class="nav-item">windows<ul>
+<li><a class="active" href="/vendor/windows/GameInput">GameInput</a></li>
+</ul>
+
+</li>
+<li class="nav-item">x11<ul>
+<li><a href="/vendor/x11/xlib">xlib</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/zlib">zlib</a></li>
+</ul>
+</div>
+</nav>
+<article class="col-lg-8 p-4 documentation odin-article">
+<nav class="pkg-breadcrumb" aria-label="breadcrumb">
+<ol class="breadcrumb">
+<li class="breadcrumb-item"><a href="/vendor">vendor</a></li>
+<li class="breadcrumb-item">windows</li>
+<li class="breadcrumb-item active" aria-current="page"><a href="/vendor/windows/GameInput">GameInput</a></li>
+</ol>
+</nav>
+<h1>package vendor:windows/GameInput<div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput"><em>Source</em></a></div></h1>
+
+		<div class="odin-search-wrapper">
+			<input type="search" id="odin-search" class="odin-search-package" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">
+			<div class="odin-search-shortcut">
+				<div class="odin-search-key key-macos">⌘K</div>
+				<div class="odin-search-key key-windows">Ctrl+K</div>
+				<span class="odin-search-or">or</span>
+				<div class="odin-search-key">/</div>
+			</div>
+		</div>
+	
+<div id="odin-search-info">
+<div id="odin-search-time"></div>
+
+		<div id="odin-search-options">
+			<input type="checkbox" id="odin-search-filter" name="odin-search-filter">
+			<label for="odin-search-filter">Filter Results</label>
+		</div>
+</div>
+<ul id="odin-search-results"></ul>
+<div id="pkg-top">
+<div id="pkg-index">
+<h2>Index</h2>
+<div>
+<details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
+<summary id="#doc-index-Types-header">
+Types (108)</summary>
+<ul>
+<li><a href="#APP_LOCAL_DEVICE_ID">APP_LOCAL_DEVICE_ID</a></li>
+<li><a href="#ArcadeStickButtons">ArcadeStickButtons</a></li>
+<li><a href="#ArcadeStickButtonsFlag">ArcadeStickButtonsFlag</a></li>
+<li><a href="#ArcadeStickInfo">ArcadeStickInfo</a></li>
+<li><a href="#ArcadeStickState">ArcadeStickState</a></li>
+<li><a href="#BatteryState">BatteryState</a></li>
+<li><a href="#BatteryStatus">BatteryStatus</a></li>
+<li><a href="#CallbackToken">CallbackToken</a></li>
+<li><a href="#ControllerAxisInfo">ControllerAxisInfo</a></li>
+<li><a href="#ControllerButtonInfo">ControllerButtonInfo</a></li>
+<li><a href="#ControllerSwitchInfo">ControllerSwitchInfo</a></li>
+<li><a href="#DeviceCallback">DeviceCallback</a></li>
+<li><a href="#DeviceCapabilities">DeviceCapabilities</a></li>
+<li><a href="#DeviceCapabilitiesFlag">DeviceCapabilitiesFlag</a></li>
+<li><a href="#DeviceFamily">DeviceFamily</a></li>
+<li><a href="#DeviceInfo">DeviceInfo</a></li>
+<li><a href="#DeviceStatus">DeviceStatus</a></li>
+<li><a href="#DeviceStatusFlag">DeviceStatusFlag</a></li>
+<li><a href="#EnumerationKind">EnumerationKind</a></li>
+<li><a href="#FeedbackAxes">FeedbackAxes</a></li>
+<li><a href="#FeedbackAxesFlag">FeedbackAxesFlag</a></li>
+<li><a href="#FeedbackEffectState">FeedbackEffectState</a></li>
+<li><a href="#FlightStickButtons">FlightStickButtons</a></li>
+<li><a href="#FlightStickButtonsFlag">FlightStickButtonsFlag</a></li>
+<li><a href="#FlightStickInfo">FlightStickInfo</a></li>
+<li><a href="#FlightStickState">FlightStickState</a></li>
+<li><a href="#FocusPolicy">FocusPolicy</a></li>
+<li><a href="#FocusPolicyFlag">FocusPolicyFlag</a></li>
+<li><a href="#ForceFeedbackConditionParams">ForceFeedbackConditionParams</a></li>
+<li><a href="#ForceFeedbackConstantParams">ForceFeedbackConstantParams</a></li>
+<li><a href="#ForceFeedbackEffectKind">ForceFeedbackEffectKind</a></li>
+<li><a href="#ForceFeedbackEnvelope">ForceFeedbackEnvelope</a></li>
+<li><a href="#ForceFeedbackMagnitude">ForceFeedbackMagnitude</a></li>
+<li><a href="#ForceFeedbackMotorInfo">ForceFeedbackMotorInfo</a></li>
+<li><a href="#ForceFeedbackParams">ForceFeedbackParams</a></li>
+<li><a href="#ForceFeedbackPeriodicParams">ForceFeedbackPeriodicParams</a></li>
+<li><a href="#ForceFeedbackRampParams">ForceFeedbackRampParams</a></li>
+<li><a href="#GamepadButtons">GamepadButtons</a></li>
+<li><a href="#GamepadButtonsFlag">GamepadButtonsFlag</a></li>
+<li><a href="#GamepadInfo">GamepadInfo</a></li>
+<li><a href="#GamepadState">GamepadState</a></li>
+<li><a href="#GuideButtonCallback">GuideButtonCallback</a></li>
+<li><a href="#HANDLE">HANDLE</a></li>
+<li><a href="#HRESULT">HRESULT</a></li>
+<li><a href="#HapticFeedbackMotorInfo">HapticFeedbackMotorInfo</a></li>
+<li><a href="#HapticFeedbackParams">HapticFeedbackParams</a></li>
+<li><a href="#HapticWaveformInfo">HapticWaveformInfo</a></li>
+<li><a href="#IGameInput">IGameInput</a></li>
+<li><a href="#IGameInputDevice">IGameInputDevice</a></li>
+<li><a href="#IGameInputDevice_Vtable">IGameInputDevice_Vtable</a></li>
+<li><a href="#IGameInputDispatcher">IGameInputDispatcher</a></li>
+<li><a href="#IGameInputDispatcher_Vtable">IGameInputDispatcher_Vtable</a></li>
+<li><a href="#IGameInputForceFeedbackEffect">IGameInputForceFeedbackEffect</a></li>
+<li><a href="#IGameInputForceFeedbackEffect_Vtable">IGameInputForceFeedbackEffect_Vtable</a></li>
+<li><a href="#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a></li>
+<li><a href="#IGameInputRawDeviceReport_Vtable">IGameInputRawDeviceReport_Vtable</a></li>
+<li><a href="#IGameInputReading">IGameInputReading</a></li>
+<li><a href="#IGameInputReading_VTable">IGameInputReading_VTable</a></li>
+<li><a href="#IGameInput_VTable">IGameInput_VTable</a></li>
+<li><a href="#IID">IID</a></li>
+<li><a href="#IUnknown">IUnknown</a></li>
+<li><a href="#IUnknown_VTable">IUnknown_VTable</a></li>
+<li><a href="#KeyState">KeyState</a></li>
+<li><a href="#KeyboardInfo">KeyboardInfo</a></li>
+<li><a href="#KeyboardKind">KeyboardKind</a></li>
+<li><a href="#KeyboardLayoutCallback">KeyboardLayoutCallback</a></li>
+<li><a href="#Kind">Kind</a></li>
+<li><a href="#KindFlag">KindFlag</a></li>
+<li><a href="#Label">Label</a></li>
+<li><a href="#Location">Location</a></li>
+<li><a href="#MotionAccuracy">MotionAccuracy</a></li>
+<li><a href="#MotionInfo">MotionInfo</a></li>
+<li><a href="#MotionState">MotionState</a></li>
+<li><a href="#MouseButtons">MouseButtons</a></li>
+<li><a href="#MouseButtonsFlag">MouseButtonsFlag</a></li>
+<li><a href="#MouseInfo">MouseInfo</a></li>
+<li><a href="#MouseState">MouseState</a></li>
+<li><a href="#RacingWheelButtons">RacingWheelButtons</a></li>
+<li><a href="#RacingWheelButtonsFlag">RacingWheelButtonsFlag</a></li>
+<li><a href="#RacingWheelInfo">RacingWheelInfo</a></li>
+<li><a href="#RacingWheelState">RacingWheelState</a></li>
+<li><a href="#RawDeviceItemCollectionInfo">RawDeviceItemCollectionInfo</a></li>
+<li><a href="#RawDeviceItemCollectionKind">RawDeviceItemCollectionKind</a></li>
+<li><a href="#RawDevicePhysicalUnitKind">RawDevicePhysicalUnitKind</a></li>
+<li><a href="#RawDeviceReportInfo">RawDeviceReportInfo</a></li>
+<li><a href="#RawDeviceReportItemFlag">RawDeviceReportItemFlag</a></li>
+<li><a href="#RawDeviceReportItemFlags">RawDeviceReportItemFlags</a></li>
+<li><a href="#RawDeviceReportItemInfo">RawDeviceReportItemInfo</a></li>
+<li><a href="#RawDeviceReportKind">RawDeviceReportKind</a></li>
+<li><a href="#ReadingCallback">ReadingCallback</a></li>
+<li><a href="#RumbleMotors">RumbleMotors</a></li>
+<li><a href="#RumbleMotorsFlag">RumbleMotorsFlag</a></li>
+<li><a href="#RumbleParams">RumbleParams</a></li>
+<li><a href="#String">String</a></li>
+<li><a href="#SwitchKind">SwitchKind</a></li>
+<li><a href="#SwitchPosition">SwitchPosition</a></li>
+<li><a href="#SystemButtonCallback">SystemButtonCallback</a></li>
+<li><a href="#SystemButtons">SystemButtons</a></li>
+<li><a href="#SystemButtonsFlag">SystemButtonsFlag</a></li>
+<li><a href="#TouchSensorInfo">TouchSensorInfo</a></li>
+<li><a href="#TouchShape">TouchShape</a></li>
+<li><a href="#TouchState">TouchState</a></li>
+<li><a href="#UiNavigationButtons">UiNavigationButtons</a></li>
+<li><a href="#UiNavigationButtonsFlag">UiNavigationButtonsFlag</a></li>
+<li><a href="#UiNavigationInfo">UiNavigationInfo</a></li>
+<li><a href="#UiNavigationState">UiNavigationState</a></li>
+<li><a href="#Usage">Usage</a></li>
+<li><a href="#Version">Version</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
+<summary id="#doc-index-Constants-header">
+Constants (15)</summary>
+<ul>
+<li><a href="#CURRENT_CALLBACK_TOKEN_VALUE">CURRENT_CALLBACK_TOKEN_VALUE</a></li>
+<li><a href="#DEVICE_DISCONNECTED">DEVICE_DISCONNECTED</a></li>
+<li><a href="#DEVICE_NOT_FOUND">DEVICE_NOT_FOUND</a></li>
+<li><a href="#IGameInputDevice_UUID_STRING">IGameInputDevice_UUID_STRING</a></li>
+<li><a href="#IGameInputDispatcher_UUID_STRING">IGameInputDispatcher_UUID_STRING</a></li>
+<li><a href="#IGameInputForceFeedbackEffect_UUID_STRING">IGameInputForceFeedbackEffect_UUID_STRING</a></li>
+<li><a href="#IGameInputRawDeviceReport_UUID_STRING">IGameInputRawDeviceReport_UUID_STRING</a></li>
+<li><a href="#IGameInputReading_UUID_STRING">IGameInputReading_UUID_STRING</a></li>
+<li><a href="#IGameInput_UUID_STRING">IGameInput_UUID_STRING</a></li>
+<li><a href="#INSUFFICIENT_FORCE_FEEDBACK_RESOURCES">INSUFFICIENT_FORCE_FEEDBACK_RESOURCES</a></li>
+<li><a href="#INVALID_CALLBACK_TOKEN_VALUE">INVALID_CALLBACK_TOKEN_VALUE</a></li>
+<li><a href="#Kind_Controller">Kind_Controller</a></li>
+<li><a href="#READING_NOT_FOUND">READING_NOT_FOUND</a></li>
+<li><a href="#REFERENCE_READING_TOO_OLD">REFERENCE_READING_TOO_OLD</a></li>
+<li><a href="#TIMESTAMP_OUT_OF_RANGE">TIMESTAMP_OUT_OF_RANGE</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Variables" aria-labelledby="#doc-index-Variables-header">
+<summary id="#doc-index-Variables-header">
+Variables (6)</summary>
+<ul>
+<li><a href="#IGameInputDevice_UUID">IGameInputDevice_UUID</a></li>
+<li><a href="#IGameInputDispatcher_UUID">IGameInputDispatcher_UUID</a></li>
+<li><a href="#IGameInputForceFeedbackEffect_UUID">IGameInputForceFeedbackEffect_UUID</a></li>
+<li><a href="#IGameInputRawDeviceReport_UUID">IGameInputRawDeviceReport_UUID</a></li>
+<li><a href="#IGameInputReading_UUID">IGameInputReading_UUID</a></li>
+<li><a href="#IGameInput_UUID">IGameInput_UUID</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
+<summary id="#doc-index-Procedures-header">
+Procedures (1)</summary>
+<ul>
+<li><a href="#Create">Create</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedure Groups" aria-labelledby="#doc-index-Procedure Groups-header">
+<summary id="#doc-index-Procedure Groups-header">
+Procedure Groups (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+</div>
+</div>
+<section class="documentation">
+<h2 id="pkg-Types" class="pkg-header">Types</h2>
+<div class="pkg-entity">
+<h3 id="APP_LOCAL_DEVICE_ID"><span><a class="doc-id-link" href="#APP_LOCAL_DEVICE_ID">APP_LOCAL_DEVICE_ID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L475"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">APP_LOCAL_DEVICE_ID :: <span class="keyword-type">distinct</span> [32]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ArcadeStickButtons"><span><a class="doc-id-link" href="#ArcadeStickButtons">ArcadeStickButtons<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L34"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ArcadeStickButtons :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/windows/GameInput/#ArcadeStickButtonsFlag">ArcadeStickButtonsFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ArcadeStickButtonsFlag"><span><a class="doc-id-link" href="#ArcadeStickButtonsFlag">ArcadeStickButtonsFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L18"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ArcadeStickButtonsFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Menu     = 0, 
+	View     = 1, 
+	Up       = 2, 
+	Down     = 3, 
+	Left     = 4, 
+	Right    = 5, 
+	Action1  = 6, 
+	Action2  = 7, 
+	Action3  = 8, 
+	Action4  = 9, 
+	Action5  = 10, 
+	Action6  = 11, 
+	Special1 = 12, 
+	Special2 = 13, 
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Enums</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="ArcadeStickInfo"><span><a class="doc-id-link" href="#ArcadeStickInfo">ArcadeStickInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L477"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ArcadeStickInfo :: <span class="keyword-type">struct</span> {
+	menuButtonLabel:     <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	viewButtonLabel:     <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	stickUpLabel:        <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	stickDownLabel:      <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	stickLeftLabel:      <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	stickRightLabel:     <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	actionButton1Label:  <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	actionButton2Label:  <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	actionButton3Label:  <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	actionButton4Label:  <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	actionButton5Label:  <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	actionButton6Label:  <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	specialButton1Label: <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	specialButton2Label: <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ArcadeStickState"><span><a class="doc-id-link" href="#ArcadeStickState">ArcadeStickState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L494"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ArcadeStickState :: <span class="keyword-type">struct</span> {
+	buttons: <a class="code-typename" href="/vendor/windows/GameInput/#ArcadeStickButtons">ArcadeStickButtons</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="BatteryState"><span><a class="doc-id-link" href="#BatteryState">BatteryState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L498"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BatteryState :: <span class="keyword-type">struct</span> {
+	chargeRate:         <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	maxChargeRate:      <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	remainingCapacity:  <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	fullChargeCapacity: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	status:             <a class="code-typename" href="/vendor/windows/GameInput/#BatteryStatus">BatteryStatus</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="BatteryStatus"><span><a class="doc-id-link" href="#BatteryStatus">BatteryStatus<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L36"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BatteryStatus :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Unknown     = -1, 
+	NotPresent  = 0, 
+	Discharging = 1, 
+	Idle        = 2, 
+	Charging    = 3, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="CallbackToken"><span><a class="doc-id-link" href="#CallbackToken">CallbackToken<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1114"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CallbackToken :: <span class="keyword-type">distinct</span> <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a></pre>
+</div>
+<h5>Related Constants</h5>
+<ul>
+<li><a href="/vendor/windows/GameInput/#CURRENT_CALLBACK_TOKEN_VALUE">CURRENT_CALLBACK_TOKEN_VALUE</a></li>
+<li><a href="/vendor/windows/GameInput/#INVALID_CALLBACK_TOKEN_VALUE">INVALID_CALLBACK_TOKEN_VALUE</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="ControllerAxisInfo"><span><a class="doc-id-link" href="#ControllerAxisInfo">ControllerAxisInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L506"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ControllerAxisInfo :: <span class="keyword-type">struct</span> {
+	mappedInputKinds:  <a class="code-typename" href="/vendor/windows/GameInput/#Kind">Kind</a>,
+	label:             <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	isContinuous:      <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isNonlinear:       <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isQuantized:       <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	hasRestValue:      <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	restValue:         <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	resolution:        <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+	legacyDInputIndex: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	legacyHidIndex:    <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	rawReportIndex:    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	inputReport:       ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceReportInfo">RawDeviceReportInfo</a>,
+	inputReportItem:   ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceReportItemInfo">RawDeviceReportItemInfo</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ControllerButtonInfo"><span><a class="doc-id-link" href="#ControllerButtonInfo">ControllerButtonInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L522"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ControllerButtonInfo :: <span class="keyword-type">struct</span> {
+	mappedInputKinds:  <a class="code-typename" href="/vendor/windows/GameInput/#Kind">Kind</a>,
+	label:             <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	legacyDInputIndex: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	legacyHidIndex:    <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	rawReportIndex:    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	inputReport:       ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceReportInfo">RawDeviceReportInfo</a>,
+	inputReportItem:   ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceReportItemInfo">RawDeviceReportItemInfo</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ControllerSwitchInfo"><span><a class="doc-id-link" href="#ControllerSwitchInfo">ControllerSwitchInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L532"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ControllerSwitchInfo :: <span class="keyword-type">struct</span> {
+	mappedInputKinds:  <a class="code-typename" href="/vendor/windows/GameInput/#Kind">Kind</a>,
+	label:             <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	positionLabels:    [9]<a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	kind:              <a class="code-typename" href="/vendor/windows/GameInput/#SwitchKind">SwitchKind</a>,
+	legacyDInputIndex: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	legacyHidIndex:    <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	rawReportIndex:    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	inputReport:       ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceReportInfo">RawDeviceReportInfo</a>,
+	inputReportItem:   ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceReportItemInfo">RawDeviceReportItemInfo</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DeviceCallback"><span><a class="doc-id-link" href="#DeviceCallback">DeviceCallback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1124"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DeviceCallback :: <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (callbackToken: <a class="code-typename" href="/vendor/windows/GameInput/#CallbackToken">CallbackToken</a>, ctx: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, device: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, timestamp: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>, currentState: <a class="code-typename" href="/vendor/windows/GameInput/#DeviceStatus">DeviceStatus</a>, previousState: <a class="code-typename" href="/vendor/windows/GameInput/#DeviceStatus">DeviceStatus</a>)</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DeviceCapabilities"><span><a class="doc-id-link" href="#DeviceCapabilities">DeviceCapabilities<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L51"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DeviceCapabilities :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/windows/GameInput/#DeviceCapabilitiesFlag">DeviceCapabilitiesFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DeviceCapabilitiesFlag"><span><a class="doc-id-link" href="#DeviceCapabilitiesFlag">DeviceCapabilitiesFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L44"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DeviceCapabilitiesFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Audio           = 0, 
+	PluginModule    = 1, 
+	PowerOff        = 2, 
+	Synchronization = 3, 
+	Wireless        = 4, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DeviceFamily"><span><a class="doc-id-link" href="#DeviceFamily">DeviceFamily<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L53"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DeviceFamily :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Virtual   = -1, 
+	Aggregate = 0, 
+	XboxOne   = 1, 
+	Xbox360   = 2, 
+	Hid       = 3, 
+	I8042     = 4, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DeviceInfo"><span><a class="doc-id-link" href="#DeviceInfo">DeviceInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L544"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DeviceInfo :: <span class="keyword-type">struct</span> {
+	infoSize:                 <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	vendorId:                 <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	productId:                <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	revisionNumber:           <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	interfaceNumber:          <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	collectionNumber:         <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	usage:                    <a class="code-typename" href="/vendor/windows/GameInput/#Usage">Usage</a>,
+	hardwareVersion:          <a class="code-typename" href="/vendor/windows/GameInput/#Version">Version</a>,
+	firmwareVersion:          <a class="code-typename" href="/vendor/windows/GameInput/#Version">Version</a>,
+	deviceId:                 <a class="code-typename" href="/vendor/windows/GameInput/#APP_LOCAL_DEVICE_ID">APP_LOCAL_DEVICE_ID</a>,
+	deviceRootId:             <a class="code-typename" href="/vendor/windows/GameInput/#APP_LOCAL_DEVICE_ID">APP_LOCAL_DEVICE_ID</a>,
+	deviceFamily:             <a class="code-typename" href="/vendor/windows/GameInput/#DeviceFamily">DeviceFamily</a>,
+	capabilities:             <a class="code-typename" href="/vendor/windows/GameInput/#DeviceCapabilities">DeviceCapabilities</a>,
+	supportedInput:           <a class="code-typename" href="/vendor/windows/GameInput/#Kind">Kind</a>,
+	supportedRumbleMotors:    <a class="code-typename" href="/vendor/windows/GameInput/#RumbleMotors">RumbleMotors</a>,
+	inputReportCount:         <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	outputReportCount:        <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	featureReportCount:       <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	controllerAxisCount:      <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	controllerButtonCount:    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	controllerSwitchCount:    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	touchPointCount:          <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	touchSensorCount:         <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	forceFeedbackMotorCount:  <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	hapticFeedbackMotorCount: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	deviceStringCount:        <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	deviceDescriptorSize:     <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	inputReportInfo:          ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceReportInfo">RawDeviceReportInfo</a>,
+	outputReportInfo:         ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceReportInfo">RawDeviceReportInfo</a>,
+	featureReportInfo:        ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceReportInfo">RawDeviceReportInfo</a>,
+	controllerAxisInfo:       ^<a class="code-typename" href="/vendor/windows/GameInput/#ControllerAxisInfo">ControllerAxisInfo</a>,
+	controllerButtonInfo:     ^<a class="code-typename" href="/vendor/windows/GameInput/#ControllerButtonInfo">ControllerButtonInfo</a>,
+	controllerSwitchInfo:     ^<a class="code-typename" href="/vendor/windows/GameInput/#ControllerSwitchInfo">ControllerSwitchInfo</a>,
+	keyboardInfo:             ^<a class="code-typename" href="/vendor/windows/GameInput/#KeyboardInfo">KeyboardInfo</a>,
+	mouseInfo:                ^<a class="code-typename" href="/vendor/windows/GameInput/#MouseInfo">MouseInfo</a>,
+	touchSensorInfo:          ^<a class="code-typename" href="/vendor/windows/GameInput/#TouchSensorInfo">TouchSensorInfo</a>,
+	motionInfo:               ^<a class="code-typename" href="/vendor/windows/GameInput/#MotionInfo">MotionInfo</a>,
+	arcadeStickInfo:          ^<a class="code-typename" href="/vendor/windows/GameInput/#ArcadeStickInfo">ArcadeStickInfo</a>,
+	flightStickInfo:          ^<a class="code-typename" href="/vendor/windows/GameInput/#FlightStickInfo">FlightStickInfo</a>,
+	gamepadInfo:              ^<a class="code-typename" href="/vendor/windows/GameInput/#GamepadInfo">GamepadInfo</a>,
+	racingWheelInfo:          ^<a class="code-typename" href="/vendor/windows/GameInput/#RacingWheelInfo">RacingWheelInfo</a>,
+	uiNavigationInfo:         ^<a class="code-typename" href="/vendor/windows/GameInput/#UiNavigationInfo">UiNavigationInfo</a>,
+	forceFeedbackMotorInfo:   ^<a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackMotorInfo">ForceFeedbackMotorInfo</a>,
+	hapticFeedbackMotorInfo:  ^<a class="code-typename" href="/vendor/windows/GameInput/#HapticFeedbackMotorInfo">HapticFeedbackMotorInfo</a>,
+	displayName:              ^<a class="code-typename" href="/vendor/windows/GameInput/#String">String</a>,
+	deviceStrings:            ^<a class="code-typename" href="/vendor/windows/GameInput/#String">String</a>,
+	deviceDescriptorData:     <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DeviceStatus"><span><a class="doc-id-link" href="#DeviceStatus">DeviceStatus<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L73"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DeviceStatus :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/windows/GameInput/#DeviceStatusFlag">DeviceStatusFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DeviceStatusFlag"><span><a class="doc-id-link" href="#DeviceStatusFlag">DeviceStatusFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L62"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DeviceStatusFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Connected     = 0, 
+	InputEnabled  = 1, 
+	OutputEnabled = 2, 
+	RawIoEnabled  = 3, 
+	AudioCapture  = 4, 
+	AudioRender   = 5, 
+	Synchronized  = 6, 
+	Wireless      = 7, 
+	UserIdle      = 20, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="EnumerationKind"><span><a class="doc-id-link" href="#EnumerationKind">EnumerationKind<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L75"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">EnumerationKind :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	NoEnumeration       = 0, 
+	AsyncEnumeration    = 1, 
+	BlockingEnumeration = 2, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FeedbackAxes"><span><a class="doc-id-link" href="#FeedbackAxes">FeedbackAxes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L90"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FeedbackAxes :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/windows/GameInput/#FeedbackAxesFlag">FeedbackAxesFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FeedbackAxesFlag"><span><a class="doc-id-link" href="#FeedbackAxesFlag">FeedbackAxesFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L81"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FeedbackAxesFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	LinearX  = 0, 
+	LinearY  = 1, 
+	LinearZ  = 2, 
+	AngularX = 3, 
+	AngularY = 4, 
+	AngularZ = 5, 
+	Normal   = 6, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FeedbackEffectState"><span><a class="doc-id-link" href="#FeedbackEffectState">FeedbackEffectState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L92"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FeedbackEffectState :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Stopped = 0, 
+	Running = 1, 
+	Paused  = 2, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FlightStickButtons"><span><a class="doc-id-link" href="#FlightStickButtons">FlightStickButtons<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L105"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FlightStickButtons :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/windows/GameInput/#FlightStickButtonsFlag">FlightStickButtonsFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FlightStickButtonsFlag"><span><a class="doc-id-link" href="#FlightStickButtonsFlag">FlightStickButtonsFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L98"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FlightStickButtonsFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	None          = 0, 
+	Menu          = 1, 
+	View          = 2, 
+	FirePrimary   = 3, 
+	FireSecondary = 4, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FlightStickInfo"><span><a class="doc-id-link" href="#FlightStickInfo">FlightStickInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L594"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FlightStickInfo :: <span class="keyword-type">struct</span> {
+	menuButtonLabel:          <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	viewButtonLabel:          <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	firePrimaryButtonLabel:   <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	fireSecondaryButtonLabel: <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	hatSwitchKind:            <a class="code-typename" href="/vendor/windows/GameInput/#SwitchKind">SwitchKind</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FlightStickState"><span><a class="doc-id-link" href="#FlightStickState">FlightStickState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L602"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FlightStickState :: <span class="keyword-type">struct</span> {
+	buttons:   <a class="code-typename" href="/vendor/windows/GameInput/#FlightStickButtons">FlightStickButtons</a>,
+	hatSwitch: <a class="code-typename" href="/vendor/windows/GameInput/#SwitchPosition">SwitchPosition</a>,
+	roll:      <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	pitch:     <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	yaw:       <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	throttle:  <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FocusPolicy"><span><a class="doc-id-link" href="#FocusPolicy">FocusPolicy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L115"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FocusPolicy :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/windows/GameInput/#FocusPolicyFlag">FocusPolicyFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FocusPolicyFlag"><span><a class="doc-id-link" href="#FocusPolicyFlag">FocusPolicyFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L107"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FocusPolicyFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	DisableBackgroundInput         = 0, 
+	ExclusiveForegroundInput       = 1, 
+	DisableBackgroundGuideButton   = 2, 
+	ExclusiveForegroundGuideButton = 3, 
+	DisableBackgroundShareButton   = 4, 
+	ExclusiveForegroundShareButton = 5, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ForceFeedbackConditionParams"><span><a class="doc-id-link" href="#ForceFeedbackConditionParams">ForceFeedbackConditionParams<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L611"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ForceFeedbackConditionParams :: <span class="keyword-type">struct</span> {
+	magnitude:            <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackMagnitude">ForceFeedbackMagnitude</a>,
+	positiveCoefficient:  <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	negativeCoefficient:  <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	maxPositiveMagnitude: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	maxNegativeMagnitude: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	deadZone:             <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	bias:                 <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ForceFeedbackConstantParams"><span><a class="doc-id-link" href="#ForceFeedbackConstantParams">ForceFeedbackConstantParams<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L621"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ForceFeedbackConstantParams :: <span class="keyword-type">struct</span> {
+	envelope:  <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackEnvelope">ForceFeedbackEnvelope</a>,
+	magnitude: <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackMagnitude">ForceFeedbackMagnitude</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ForceFeedbackEffectKind"><span><a class="doc-id-link" href="#ForceFeedbackEffectKind">ForceFeedbackEffectKind<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L117"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ForceFeedbackEffectKind :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Constant         = 0, 
+	Ramp             = 1, 
+	SineWave         = 2, 
+	SquareWave       = 3, 
+	TriangleWave     = 4, 
+	SawtoothUpWave   = 5, 
+	SawtoothDownWave = 6, 
+	Spring           = 7, 
+	Friction         = 8, 
+	Damper           = 9, 
+	Inertia          = 10, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ForceFeedbackEnvelope"><span><a class="doc-id-link" href="#ForceFeedbackEnvelope">ForceFeedbackEnvelope<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L626"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ForceFeedbackEnvelope :: <span class="keyword-type">struct</span> {
+	attackDuration:  <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+	sustainDuration: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+	releaseDuration: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+	attackGain:      <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	sustainGain:     <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	releaseGain:     <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	playCount:       <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	repeatDelay:     <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ForceFeedbackMagnitude"><span><a class="doc-id-link" href="#ForceFeedbackMagnitude">ForceFeedbackMagnitude<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L637"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ForceFeedbackMagnitude :: <span class="keyword-type">struct</span> {
+	linearX:  <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	linearY:  <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	linearZ:  <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	angularX: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	angularY: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	angularZ: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	normal:   <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ForceFeedbackMotorInfo"><span><a class="doc-id-link" href="#ForceFeedbackMotorInfo">ForceFeedbackMotorInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L647"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ForceFeedbackMotorInfo :: <span class="keyword-type">struct</span> {
+	supportedAxes:                     <a class="code-typename" href="/vendor/windows/GameInput/#FeedbackAxes">FeedbackAxes</a>,
+	location:                          <a class="code-typename" href="/vendor/windows/GameInput/#Location">Location</a>,
+	locationId:                        <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	maxSimultaneousEffects:            <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	isConstantEffectSupported:         <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isRampEffectSupported:             <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isSineWaveEffectSupported:         <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isSquareWaveEffectSupported:       <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isTriangleWaveEffectSupported:     <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isSawtoothUpWaveEffectSupported:   <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isSawtoothDownWaveEffectSupported: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isSpringEffectSupported:           <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isFrictionEffectSupported:         <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isDamperEffectSupported:           <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isInertiaEffectSupported:          <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ForceFeedbackParams"><span><a class="doc-id-link" href="#ForceFeedbackParams">ForceFeedbackParams<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L665"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ForceFeedbackParams :: <span class="keyword-type">struct</span> {
+	kind: <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackEffectKind">ForceFeedbackEffectKind</a>,
+	<span class="keyword-type">using</span> _: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
+		constant:         <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackConstantParams">ForceFeedbackConstantParams</a>,
+		ramp:             <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackRampParams">ForceFeedbackRampParams</a>,
+		sineWave:         <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackPeriodicParams">ForceFeedbackPeriodicParams</a>,
+		squareWave:       <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackPeriodicParams">ForceFeedbackPeriodicParams</a>,
+		triangleWave:     <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackPeriodicParams">ForceFeedbackPeriodicParams</a>,
+		sawtoothUpWave:   <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackPeriodicParams">ForceFeedbackPeriodicParams</a>,
+		sawtoothDownWave: <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackPeriodicParams">ForceFeedbackPeriodicParams</a>,
+		spring:           <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackConditionParams">ForceFeedbackConditionParams</a>,
+		friction:         <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackConditionParams">ForceFeedbackConditionParams</a>,
+		damper:           <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackConditionParams">ForceFeedbackConditionParams</a>,
+		inertia:          <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackConditionParams">ForceFeedbackConditionParams</a>,
+	},
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ForceFeedbackPeriodicParams"><span><a class="doc-id-link" href="#ForceFeedbackPeriodicParams">ForceFeedbackPeriodicParams<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L682"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ForceFeedbackPeriodicParams :: <span class="keyword-type">struct</span> {
+	envelope:  <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackEnvelope">ForceFeedbackEnvelope</a>,
+	magnitude: <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackMagnitude">ForceFeedbackMagnitude</a>,
+	frequency: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	phase:     <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	bias:      <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ForceFeedbackRampParams"><span><a class="doc-id-link" href="#ForceFeedbackRampParams">ForceFeedbackRampParams<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L690"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ForceFeedbackRampParams :: <span class="keyword-type">struct</span> {
+	envelope:       <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackEnvelope">ForceFeedbackEnvelope</a>,
+	startMagnitude: <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackMagnitude">ForceFeedbackMagnitude</a>,
+	endMagnitude:   <a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackMagnitude">ForceFeedbackMagnitude</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GamepadButtons"><span><a class="doc-id-link" href="#GamepadButtons">GamepadButtons<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L147"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GamepadButtons :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/windows/GameInput/#GamepadButtonsFlag">GamepadButtonsFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GamepadButtonsFlag"><span><a class="doc-id-link" href="#GamepadButtonsFlag">GamepadButtonsFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L131"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GamepadButtonsFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Menu            = 0, 
+	View            = 1, 
+	A               = 2, 
+	B               = 3, 
+	X               = 4, 
+	Y               = 5, 
+	DPadUp          = 6, 
+	DPadDown        = 7, 
+	DPadLeft        = 8, 
+	DPadRight       = 9, 
+	LeftShoulder    = 10, 
+	RightShoulder   = 11, 
+	LeftThumbstick  = 12, 
+	RightThumbstick = 13, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GamepadInfo"><span><a class="doc-id-link" href="#GamepadInfo">GamepadInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L696"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GamepadInfo :: <span class="keyword-type">struct</span> {
+	menuButtonLabel:            <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	viewButtonLabel:            <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	aButtonLabel:               <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	bButtonLabel:               <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	xButtonLabel:               <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	yButtonLabel:               <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	dpadUpLabel:                <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	dpadDownLabel:              <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	dpadLeftLabel:              <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	dpadRightLabel:             <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	leftShoulderButtonLabel:    <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	rightShoulderButtonLabel:   <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	leftThumbstickButtonLabel:  <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	rightThumbstickButtonLabel: <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GamepadState"><span><a class="doc-id-link" href="#GamepadState">GamepadState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L713"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GamepadState :: <span class="keyword-type">struct</span> {
+	buttons:          <a class="code-typename" href="/vendor/windows/GameInput/#GamepadButtons">GamepadButtons</a>,
+	leftTrigger:      <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	rightTrigger:     <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	leftThumbstickX:  <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	leftThumbstickY:  <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	rightThumbstickX: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	rightThumbstickY: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GuideButtonCallback"><span><a class="doc-id-link" href="#GuideButtonCallback">GuideButtonCallback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1125"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GuideButtonCallback :: <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (callbackToken: <a class="code-typename" href="/vendor/windows/GameInput/#CallbackToken">CallbackToken</a>, ctx: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, device: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, timestamp: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>, isPressed: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>)</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HANDLE"><span><a class="doc-id-link" href="#HANDLE">HANDLE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1105"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HANDLE :: sys_windows.<a class="code-typename" href="/core/sys/windows/#HANDLE">HANDLE</a></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HRESULT"><span><a class="doc-id-link" href="#HRESULT">HRESULT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1104"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HRESULT :: sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a></pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Functions</p>
+</details>
+<h5>Related Constants</h5>
+<ul>
+<li><a href="/vendor/windows/GameInput/#DEVICE_DISCONNECTED">DEVICE_DISCONNECTED</a></li>
+<li><a href="/vendor/windows/GameInput/#DEVICE_NOT_FOUND">DEVICE_NOT_FOUND</a></li>
+<li><a href="/vendor/windows/GameInput/#INSUFFICIENT_FORCE_FEEDBACK_RESOURCES">INSUFFICIENT_FORCE_FEEDBACK_RESOURCES</a></li>
+<li><a href="/vendor/windows/GameInput/#READING_NOT_FOUND">READING_NOT_FOUND</a></li>
+<li><a href="/vendor/windows/GameInput/#REFERENCE_READING_TOO_OLD">REFERENCE_READING_TOO_OLD</a></li>
+<li><a href="/vendor/windows/GameInput/#TIMESTAMP_OUT_OF_RANGE">TIMESTAMP_OUT_OF_RANGE</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="HapticFeedbackMotorInfo"><span><a class="doc-id-link" href="#HapticFeedbackMotorInfo">HapticFeedbackMotorInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L723"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HapticFeedbackMotorInfo :: <span class="keyword-type">struct</span> {
+	mappedRumbleMotor: <a class="code-typename" href="/vendor/windows/GameInput/#RumbleMotors">RumbleMotors</a>,
+	location:          <a class="code-typename" href="/vendor/windows/GameInput/#Location">Location</a>,
+	locationId:        <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	waveformCount:     <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	waveformInfo:      [^]<a class="code-typename" href="/vendor/windows/GameInput/#HapticWaveformInfo">HapticWaveformInfo</a> <span class="string">`fmt:"v,waveformCount"`</span>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HapticFeedbackParams"><span><a class="doc-id-link" href="#HapticFeedbackParams">HapticFeedbackParams<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L731"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HapticFeedbackParams :: <span class="keyword-type">struct</span> {
+	waveformIndex: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	duration:      <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+	intensity:     <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	playCount:     <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	repeatDelay:   <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HapticWaveformInfo"><span><a class="doc-id-link" href="#HapticWaveformInfo">HapticWaveformInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L739"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HapticWaveformInfo :: <span class="keyword-type">struct</span> {
+	usage:                  <a class="code-typename" href="/vendor/windows/GameInput/#Usage">Usage</a>,
+	isDurationSupported:    <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isIntensitySupported:   <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isRepeatSupported:      <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isRepeatDelaySupported: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	defaultDuration:        <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInput"><span><a class="doc-id-link" href="#IGameInput">IGameInput<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L966"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInput :: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
+	iunknown:          sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown">IUnknown</a>,
+	<span class="keyword-type">using</span> igameinput_vtable: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput_VTable">IGameInput_VTable</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputDevice"><span><a class="doc-id-link" href="#IGameInputDevice">IGameInputDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1027"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputDevice :: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
+	iunknown:                sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown">IUnknown</a>,
+	<span class="keyword-type">using</span> igameinputdevice_vtable: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice_Vtable">IGameInputDevice_Vtable</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputDevice_Vtable"><span><a class="doc-id-link" href="#IGameInputDevice_Vtable">IGameInputDevice_Vtable<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1031"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputDevice_Vtable :: <span class="keyword-type">struct</span> {
+	<span class="keyword-type">using</span> iunknown_vtable:           sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown_VTable">IUnknown_VTable</a>,
+	GetDeviceInfo:                   <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>) -> ^<a class="code-typename" href="/vendor/windows/GameInput/#DeviceInfo">DeviceInfo</a>,
+	GetDeviceStatus:                 <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>) -> <a class="code-typename" href="/vendor/windows/GameInput/#DeviceStatus">DeviceStatus</a>,
+	GetBatteryState:                 <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, state: ^<a class="code-typename" href="/vendor/windows/GameInput/#BatteryState">BatteryState</a>),
+	CreateForceFeedbackEffect:       <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, motorIndex: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, params: ^<a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackParams">ForceFeedbackParams</a>, effect: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputForceFeedbackEffect">IGameInputForceFeedbackEffect</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	IsForceFeedbackMotorPoweredOn:   <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, motorIndex: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	SetForceFeedbackMotorGain:       <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, motorIndex: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, masterGain: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>),
+	SetHapticMotorState:             <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, motorIndex: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, params: ^<a class="code-typename" href="/vendor/windows/GameInput/#HapticFeedbackParams">HapticFeedbackParams</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	SetRumbleState:                  <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, params: ^<a class="code-typename" href="/vendor/windows/GameInput/#RumbleParams">RumbleParams</a>),
+	SetInputSynchronizationState:    <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, enabled: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>),
+	SendInputSynchronizationHint:    <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>),
+	PowerOff:                        <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>),
+	CreateRawDeviceReport:           <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, reportId: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, reportKind: <a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceReportKind">RawDeviceReportKind</a>, report: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	GetRawDeviceFeature:             <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, reportId: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, report: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	SetRawDeviceFeature:             <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, report: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	SendRawDeviceOutput:             <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, report: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	SendRawDeviceOutputWithResponse: <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, requestReport: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>, responseReport: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	ExecuteRawDeviceIoControl:       <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, controlCode: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, inputBufferSize: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, inputBuffer: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, outputBufferSize: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, outputBuffer: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, outputSize: ^<a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	AcquireExclusiveRawDeviceAccess: <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, timeoutInMicroseconds: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	ReleaseExclusiveRawDeviceAccess: <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>),
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputDispatcher"><span><a class="doc-id-link" href="#IGameInputDispatcher">IGameInputDispatcher<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1056"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputDispatcher :: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
+	iunknown:                    sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown">IUnknown</a>,
+	<span class="keyword-type">using</span> igameinputdispatcher_vtable: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDispatcher_Vtable">IGameInputDispatcher_Vtable</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputDispatcher_Vtable"><span><a class="doc-id-link" href="#IGameInputDispatcher_Vtable">IGameInputDispatcher_Vtable<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1060"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputDispatcher_Vtable :: <span class="keyword-type">struct</span> {
+	<span class="keyword-type">using</span> iunknown_vtable: sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown_VTable">IUnknown_VTable</a>,
+	Dispatch:        <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDispatcher">IGameInputDispatcher</a>, quotaInMicroseconds: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	OpenWaitHandle:  <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDispatcher">IGameInputDispatcher</a>, waitHandle: ^sys_windows.<a class="code-typename" href="/core/sys/windows/#HANDLE">HANDLE</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputForceFeedbackEffect"><span><a class="doc-id-link" href="#IGameInputForceFeedbackEffect">IGameInputForceFeedbackEffect<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1068"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputForceFeedbackEffect :: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
+	iunknown:                             sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown">IUnknown</a>,
+	<span class="keyword-type">using</span> igameinputforcefeedbackeffect_vtable: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputForceFeedbackEffect_Vtable">IGameInputForceFeedbackEffect_Vtable</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputForceFeedbackEffect_Vtable"><span><a class="doc-id-link" href="#IGameInputForceFeedbackEffect_Vtable">IGameInputForceFeedbackEffect_Vtable<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1072"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputForceFeedbackEffect_Vtable :: <span class="keyword-type">struct</span> {
+	<span class="keyword-type">using</span> iunknown_vtable: sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown_VTable">IUnknown_VTable</a>,
+	GetDevice:       <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputForceFeedbackEffect">IGameInputForceFeedbackEffect</a>, device: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>),
+	GetMotorIndex:   <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputForceFeedbackEffect">IGameInputForceFeedbackEffect</a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	GetGain:         <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputForceFeedbackEffect">IGameInputForceFeedbackEffect</a>) -> <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	SetGain:         <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputForceFeedbackEffect">IGameInputForceFeedbackEffect</a>, gain: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>),
+	GetParams:       <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputForceFeedbackEffect">IGameInputForceFeedbackEffect</a>, params: ^<a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackParams">ForceFeedbackParams</a>),
+	SetParams:       <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputForceFeedbackEffect">IGameInputForceFeedbackEffect</a>, params: ^<a class="code-typename" href="/vendor/windows/GameInput/#ForceFeedbackParams">ForceFeedbackParams</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	GetState:        <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputForceFeedbackEffect">IGameInputForceFeedbackEffect</a>) -> <a class="code-typename" href="/vendor/windows/GameInput/#FeedbackEffectState">FeedbackEffectState</a>,
+	SetState:        <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputForceFeedbackEffect">IGameInputForceFeedbackEffect</a>, state: <a class="code-typename" href="/vendor/windows/GameInput/#FeedbackEffectState">FeedbackEffectState</a>),
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputRawDeviceReport"><span><a class="doc-id-link" href="#IGameInputRawDeviceReport">IGameInputRawDeviceReport<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1086"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputRawDeviceReport :: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
+	iunknown:                         sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown">IUnknown</a>,
+	<span class="keyword-type">using</span> igameinputrawdevicereport_vtable: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport_Vtable">IGameInputRawDeviceReport_Vtable</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputRawDeviceReport_Vtable"><span><a class="doc-id-link" href="#IGameInputRawDeviceReport_Vtable">IGameInputRawDeviceReport_Vtable<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1090"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputRawDeviceReport_Vtable :: <span class="keyword-type">struct</span> {
+	<span class="keyword-type">using</span> iunknown_vtable: sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown_VTable">IUnknown_VTable</a>,
+	GetDevice:       <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>, device: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>),
+	GetReportInfo:   <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>) -> ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceReportInfo">RawDeviceReportInfo</a>,
+	GetRawDataSize:  <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
+	GetRawData:      <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>, bufferSize: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, buffer: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
+	SetRawData:      <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>, bufferSize: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, buffer: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	GetItemValue:    <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>, itemIndex: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, value: ^<a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	SetItemValue:    <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>, itemIndex: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, value: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	ResetItemValue:  <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>, itemIndex: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	ResetAllItems:   <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputReading"><span><a class="doc-id-link" href="#IGameInputReading">IGameInputReading<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L995"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputReading :: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
+	iunknown:                 sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown">IUnknown</a>,
+	<span class="keyword-type">using</span> igameinputreading_vtable: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading_VTable">IGameInputReading_VTable</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputReading_VTable"><span><a class="doc-id-link" href="#IGameInputReading_VTable">IGameInputReading_VTable<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L999"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputReading_VTable :: <span class="keyword-type">struct</span> {
+	<span class="keyword-type">using</span> iunknown_vtable:    sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown_VTable">IUnknown_VTable</a>,
+	GetInputKind:             <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>) -> <a class="code-typename" href="/vendor/windows/GameInput/#Kind">Kind</a>,
+	GetSequenceNumber:        <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>) -> <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+	GetTimestamp:             <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>) -> <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+	GetDevice:                <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, device: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>),
+	GetRawReport:             <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, report: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	GetControllerAxisCount:   <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	GetControllerAxisState:   <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, stateArrayCount: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, stateArray: [^]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	GetControllerButtonCount: <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	GetControllerButtonState: <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, stateArrayCount: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, stateArray: [^]<a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	GetControllerSwitchCount: <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	GetControllerSwitchState: <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, stateArrayCount: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, stateArray: [^]<a class="code-typename" href="/vendor/windows/GameInput/#SwitchPosition">SwitchPosition</a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	GetKeyCount:              <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	GetKeyState:              <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, stateArrayCount: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, stateArray: [^]<a class="code-typename" href="/vendor/windows/GameInput/#KeyState">KeyState</a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	GetMouseState:            <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, state: ^<a class="code-typename" href="/vendor/windows/GameInput/#MouseState">MouseState</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	GetTouchCount:            <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	GetTouchState:            <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, stateArrayCount: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, stateArray: [^]<a class="code-typename" href="/vendor/windows/GameInput/#TouchState">TouchState</a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	GetMotionState:           <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, state: ^<a class="code-typename" href="/vendor/windows/GameInput/#MotionState">MotionState</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	GetArcadeStickState:      <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, state: ^<a class="code-typename" href="/vendor/windows/GameInput/#ArcadeStickState">ArcadeStickState</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	GetFlightStickState:      <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, state: ^<a class="code-typename" href="/vendor/windows/GameInput/#FlightStickState">FlightStickState</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	GetGamepadState:          <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, state: ^<a class="code-typename" href="/vendor/windows/GameInput/#GamepadState">GamepadState</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	GetRacingWheelState:      <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, state: ^<a class="code-typename" href="/vendor/windows/GameInput/#RacingWheelState">RacingWheelState</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	GetUiNavigationState:     <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, state: ^<a class="code-typename" href="/vendor/windows/GameInput/#UiNavigationState">UiNavigationState</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInput_VTable"><span><a class="doc-id-link" href="#IGameInput_VTable">IGameInput_VTable<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L970"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInput_VTable :: <span class="keyword-type">struct</span> {
+	<span class="keyword-type">using</span> iunknown_vtable:          sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown_VTable">IUnknown_VTable</a>,
+	GetCurrentTimestamp:            <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>) -> <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+	GetCurrentReading:              <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, inputKind: <a class="code-typename" href="/vendor/windows/GameInput/#Kind">Kind</a>, device: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, reading: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	GetNextReading:                 <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, referenceReading: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, inputKind: <a class="code-typename" href="/vendor/windows/GameInput/#Kind">Kind</a>, device: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, reading: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	GetPreviousReading:             <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, referenceReading: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, inputKind: <a class="code-typename" href="/vendor/windows/GameInput/#Kind">Kind</a>, device: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, reading: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	GetTemporalReading:             <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, timestamp: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>, device: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, reading: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	RegisterReadingCallback:        <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, device: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, inputKind: <a class="code-typename" href="/vendor/windows/GameInput/#Kind">Kind</a>, analogThreshold: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, ctx: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, callbackFunc: <a class="code-typename" href="/vendor/windows/GameInput/#ReadingCallback">ReadingCallback</a>, callbackToken: ^<a class="code-typename" href="/vendor/windows/GameInput/#CallbackToken">CallbackToken</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	RegisterDeviceCallback:         <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, device: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, inputKind: <a class="code-typename" href="/vendor/windows/GameInput/#Kind">Kind</a>, statusFilter: <a class="code-typename" href="/vendor/windows/GameInput/#DeviceStatus">DeviceStatus</a>, enumerationKind: <a class="code-typename" href="/vendor/windows/GameInput/#EnumerationKind">EnumerationKind</a>, ctx: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, callbackFunc: <a class="code-typename" href="/vendor/windows/GameInput/#DeviceCallback">DeviceCallback</a>, callbackToken: ^<a class="code-typename" href="/vendor/windows/GameInput/#CallbackToken">CallbackToken</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	RegisterSystemButtonCallback:   <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, device: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, buttonFilter: <a class="code-typename" href="/vendor/windows/GameInput/#SystemButtons">SystemButtons</a>, ctx: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, callbackFunc: <a class="code-typename" href="/vendor/windows/GameInput/#SystemButtonCallback">SystemButtonCallback</a>, callbackToken: ^<a class="code-typename" href="/vendor/windows/GameInput/#CallbackToken">CallbackToken</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	RegisterKeyboardLayoutCallback: <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, device: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, ctx: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, callbackFunc: <a class="code-typename" href="/vendor/windows/GameInput/#KeyboardLayoutCallback">KeyboardLayoutCallback</a>, callbackToken: ^<a class="code-typename" href="/vendor/windows/GameInput/#CallbackToken">CallbackToken</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	StopCallback:                   <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, callbackToken: <a class="code-typename" href="/vendor/windows/GameInput/#CallbackToken">CallbackToken</a>),
+	UnregisterCallback:             <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, callbackToken: <a class="code-typename" href="/vendor/windows/GameInput/#CallbackToken">CallbackToken</a>, timeoutInMicroseconds: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	CreateDispatcher:               <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, dispatcher: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDispatcher">IGameInputDispatcher</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	CreateAggregateDevice:          <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, kind: <a class="code-typename" href="/vendor/windows/GameInput/#Kind">Kind</a>, device: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	FindDeviceFromId:               <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, value: ^<a class="code-typename" href="/vendor/windows/GameInput/#APP_LOCAL_DEVICE_ID">APP_LOCAL_DEVICE_ID</a>, device: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	FindDeviceFromObject:           <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, value: ^sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown">IUnknown</a>, device: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	FindDeviceFromPlatformHandle:   <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, value: sys_windows.<a class="code-typename" href="/core/sys/windows/#HANDLE">HANDLE</a>, device: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	FindDeviceFromPlatformString:   <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, value: [^]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, device: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	EnableOemDeviceSupport:         <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, vendorId: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, productId: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, interfaceNumber: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, collectionNumber: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	SetFocusPolicy:                 <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>, policy: <a class="code-typename" href="/vendor/windows/GameInput/#FocusPolicy">FocusPolicy</a>),
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IID"><span><a class="doc-id-link" href="#IID">IID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L962"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IID :: sys_windows.<a class="code-typename" href="/core/sys/windows/#GUID">GUID</a></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IUnknown"><span><a class="doc-id-link" href="#IUnknown">IUnknown<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L960"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IUnknown :: sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown">IUnknown</a></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IUnknown_VTable"><span><a class="doc-id-link" href="#IUnknown_VTable">IUnknown_VTable<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L961"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IUnknown_VTable :: sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown_VTable">IUnknown_VTable</a></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="KeyState"><span><a class="doc-id-link" href="#KeyState">KeyState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L759"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">KeyState :: <span class="keyword-type">struct</span> {
+	scanCode:   <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	codePoint:  <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	virtualKey: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	isDeadKey:  <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="KeyboardInfo"><span><a class="doc-id-link" href="#KeyboardInfo">KeyboardInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L748"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">KeyboardInfo :: <span class="keyword-type">struct</span> {
+	kind:                <a class="code-typename" href="/vendor/windows/GameInput/#KeyboardKind">KeyboardKind</a>,
+	layout:              <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	keyCount:            <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	functionKeyCount:    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	maxSimultaneousKeys: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	platformType:        <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	platformSubtype:     <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	nativeLanguage:      ^<a class="code-typename" href="/vendor/windows/GameInput/#String">String</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="KeyboardKind"><span><a class="doc-id-link" href="#KeyboardKind">KeyboardKind<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L149"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">KeyboardKind :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	UnknownKeyboard = -1, 
+	AnsiKeyboard    = 0, 
+	IsoKeyboard     = 1, 
+	KsKeyboard      = 2, 
+	AbntKeyboard    = 3, 
+	JisKeyboard     = 4, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="KeyboardLayoutCallback"><span><a class="doc-id-link" href="#KeyboardLayoutCallback">KeyboardLayoutCallback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1128"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">KeyboardLayoutCallback :: <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (callbackToken: <a class="code-typename" href="/vendor/windows/GameInput/#CallbackToken">CallbackToken</a>, ctx: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, device: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, timestamp: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>, currentState: <a class="code-typename" href="/vendor/windows/GameInput/#DeviceStatus">DeviceStatus</a>, previousState: <a class="code-typename" href="/vendor/windows/GameInput/#DeviceStatus">DeviceStatus</a>)</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Kind"><span><a class="doc-id-link" href="#Kind">Kind<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L173"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Kind :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/windows/GameInput/#KindFlag">KindFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+<h5>Related Constants</h5>
+<ul>
+<li><a href="/vendor/windows/GameInput/#Kind_Controller">Kind_Controller</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="KindFlag"><span><a class="doc-id-link" href="#KindFlag">KindFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L158"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">KindFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	RawDeviceReport  = 0, 
+	ControllerAxis   = 1, 
+	ControllerButton = 2, 
+	ControllerSwitch = 3, 
+	Keyboard         = 4, 
+	Mouse            = 5, 
+	Touch            = 8, 
+	Motion           = 12, 
+	ArcadeStick      = 16, 
+	FlightStick      = 17, 
+	Gamepad          = 18, 
+	RacingWheel      = 19, 
+	UiNavigation     = 20, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Label"><span><a class="doc-id-link" href="#Label">Label<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L176"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Label :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Unknown                  = -1, 
+	None                     = 0, 
+	XboxGuide                = 1, 
+	XboxBack                 = 2, 
+	XboxStart                = 3, 
+	XboxMenu                 = 4, 
+	XboxView                 = 5, 
+	XboxA                    = 7, 
+	XboxB                    = 8, 
+	XboxX                    = 9, 
+	XboxY                    = 10, 
+	XboxDPadUp               = 11, 
+	XboxDPadDown             = 12, 
+	XboxDPadLeft             = 13, 
+	XboxDPadRight            = 14, 
+	XboxLeftShoulder         = 15, 
+	XboxLeftTrigger          = 16, 
+	XboxLeftStickButton      = 17, 
+	XboxRightShoulder        = 18, 
+	XboxRightTrigger         = 19, 
+	XboxRightStickButton     = 20, 
+	XboxPaddle1              = 21, 
+	XboxPaddle2              = 22, 
+	XboxPaddle3              = 23, 
+	XboxPaddle4              = 24, 
+	LetterA                  = 25, 
+	LetterB                  = 26, 
+	LetterC                  = 27, 
+	LetterD                  = 28, 
+	LetterE                  = 29, 
+	LetterF                  = 30, 
+	LetterG                  = 31, 
+	LetterH                  = 32, 
+	LetterI                  = 33, 
+	LetterJ                  = 34, 
+	LetterK                  = 35, 
+	LetterL                  = 36, 
+	LetterM                  = 37, 
+	LetterN                  = 38, 
+	LetterO                  = 39, 
+	LetterP                  = 40, 
+	LetterQ                  = 41, 
+	LetterR                  = 42, 
+	LetterS                  = 43, 
+	LetterT                  = 44, 
+	LetterU                  = 45, 
+	LetterV                  = 46, 
+	LetterW                  = 47, 
+	LetterX                  = 48, 
+	LetterY                  = 49, 
+	LetterZ                  = 50, 
+	Number0                  = 51, 
+	Number1                  = 52, 
+	Number2                  = 53, 
+	Number3                  = 54, 
+	Number4                  = 55, 
+	Number5                  = 56, 
+	Number6                  = 57, 
+	Number7                  = 58, 
+	Number8                  = 59, 
+	Number9                  = 60, 
+	ArrowUp                  = 61, 
+	ArrowUpRight             = 62, 
+	ArrowRight               = 63, 
+	ArrowDownRight           = 64, 
+	ArrowDown                = 65, 
+	ArrowDownLLeft           = 66, 
+	ArrowLeft                = 67, 
+	ArrowUpLeft              = 68, 
+	ArrowUpDown              = 69, 
+	ArrowLeftRight           = 70, 
+	ArrowUpDownLeftRight     = 71, 
+	ArrowClockwise           = 72, 
+	ArrowCounterClockwise    = 73, 
+	ArrowReturn              = 74, 
+	IconBranding             = 75, 
+	IconHome                 = 76, 
+	IconMenu                 = 77, 
+	IconCross                = 78, 
+	IconCircle               = 79, 
+	IconSquare               = 80, 
+	IconTriangle             = 81, 
+	IconStar                 = 82, 
+	IconDPadUp               = 83, 
+	IconDPadDown             = 84, 
+	IconDPadLeft             = 85, 
+	IconDPadRight            = 86, 
+	IconDialClockwise        = 87, 
+	IconDialCounterClockwise = 88, 
+	IconSliderLeftRight      = 89, 
+	IconSliderUpDown         = 90, 
+	IconWheelUpDown          = 91, 
+	IconPlus                 = 92, 
+	IconMinus                = 93, 
+	IconSuspension           = 94, 
+	Home                     = 95, 
+	Guide                    = 96, 
+	Mode                     = 97, 
+	Select                   = 98, 
+	Menu                     = 99, 
+	View                     = 100, 
+	Back                     = 101, 
+	Start                    = 102, 
+	Options                  = 103, 
+	Share                    = 104, 
+	Up                       = 105, 
+	Down                     = 106, 
+	Left                     = 107, 
+	Right                    = 108, 
+	LB                       = 109, 
+	LT                       = 110, 
+	LSB                      = 111, 
+	L1                       = 112, 
+	L2                       = 113, 
+	L3                       = 114, 
+	RB                       = 115, 
+	RT                       = 116, 
+	RSB                      = 117, 
+	R1                       = 118, 
+	R2                       = 119, 
+	R3                       = 120, 
+	P1                       = 121, 
+	P2                       = 122, 
+	P3                       = 123, 
+	P4                       = 124, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Location"><span><a class="doc-id-link" href="#Location">Location<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L304"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Location :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Unknown  = -1, 
+	Chassis  = 0, 
+	Display  = 1, 
+	Axis     = 2, 
+	Button   = 3, 
+	Switch   = 4, 
+	Key      = 5, 
+	TouchPad = 6, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MotionAccuracy"><span><a class="doc-id-link" href="#MotionAccuracy">MotionAccuracy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L315"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MotionAccuracy :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	AccuracyUnknown = -1, 
+	Unavailable     = 0, 
+	Unreliable      = 1, 
+	Approximate     = 2, 
+	Accurate        = 3, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MotionInfo"><span><a class="doc-id-link" href="#MotionInfo">MotionInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L766"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MotionInfo :: <span class="keyword-type">struct</span> {
+	maxAcceleration:          <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	maxAngularVelocity:       <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	maxMagneticFieldStrength: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MotionState"><span><a class="doc-id-link" href="#MotionState">MotionState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L772"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MotionState :: <span class="keyword-type">struct</span> {
+	accelerationX:         <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	accelerationY:         <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	accelerationZ:         <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	angularVelocityX:      <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	angularVelocityY:      <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	angularVelocityZ:      <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	magneticFieldX:        <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	magneticFieldY:        <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	magneticFieldZ:        <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	orientationW:          <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	orientationX:          <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	orientationY:          <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	orientationZ:          <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	accelerometerAccuracy: <a class="code-typename" href="/vendor/windows/GameInput/#MotionAccuracy">MotionAccuracy</a>,
+	gyroscopeAccuracy:     <a class="code-typename" href="/vendor/windows/GameInput/#MotionAccuracy">MotionAccuracy</a>,
+	magnetometerAccuracy:  <a class="code-typename" href="/vendor/windows/GameInput/#MotionAccuracy">MotionAccuracy</a>,
+	orientationAccuracy:   <a class="code-typename" href="/vendor/windows/GameInput/#MotionAccuracy">MotionAccuracy</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MouseButtons"><span><a class="doc-id-link" href="#MouseButtons">MouseButtons<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L332"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MouseButtons :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/windows/GameInput/#MouseButtonsFlag">MouseButtonsFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MouseButtonsFlag"><span><a class="doc-id-link" href="#MouseButtonsFlag">MouseButtonsFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L323"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MouseButtonsFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	LeftButton     = 0, 
+	RightButton    = 1, 
+	MiddleButton   = 2, 
+	Button4        = 3, 
+	Button5        = 4, 
+	WheelTiltLeft  = 5, 
+	WheelTiltRight = 6, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MouseInfo"><span><a class="doc-id-link" href="#MouseInfo">MouseInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L792"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MouseInfo :: <span class="keyword-type">struct</span> {
+	supportedButtons: <a class="code-typename" href="/vendor/windows/GameInput/#MouseButtons">MouseButtons</a>,
+	sampleRate:       <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	sensorDpi:        <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	hasWheelX:        <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	hasWheelY:        <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MouseState"><span><a class="doc-id-link" href="#MouseState">MouseState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L800"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MouseState :: <span class="keyword-type">struct</span> {
+	buttons:   <a class="code-typename" href="/vendor/windows/GameInput/#MouseButtons">MouseButtons</a>,
+	positionX: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+	positionY: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+	wheelX:    <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+	wheelY:    <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RacingWheelButtons"><span><a class="doc-id-link" href="#RacingWheelButtons">RacingWheelButtons<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L344"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RacingWheelButtons :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/windows/GameInput/#RacingWheelButtonsFlag">RacingWheelButtonsFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RacingWheelButtonsFlag"><span><a class="doc-id-link" href="#RacingWheelButtonsFlag">RacingWheelButtonsFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L334"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RacingWheelButtonsFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Menu         = 0, 
+	View         = 1, 
+	PreviousGear = 2, 
+	NextGear     = 3, 
+	DpadUp       = 4, 
+	DpadDown     = 5, 
+	DpadLeft     = 6, 
+	DpadRight    = 7, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RacingWheelInfo"><span><a class="doc-id-link" href="#RacingWheelInfo">RacingWheelInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L808"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RacingWheelInfo :: <span class="keyword-type">struct</span> {
+	menuButtonLabel:         <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	viewButtonLabel:         <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	previousGearButtonLabel: <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	nextGearButtonLabel:     <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	dpadUpLabel:             <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	dpadDownLabel:           <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	dpadLeftLabel:           <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	dpadRightLabel:          <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	hasClutch:               <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	hasHandbrake:            <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	hasPatternShifter:       <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	minPatternShifterGear:   <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	maxPatternShifterGear:   <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	maxWheelAngle:           <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RacingWheelState"><span><a class="doc-id-link" href="#RacingWheelState">RacingWheelState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L825"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RacingWheelState :: <span class="keyword-type">struct</span> {
+	buttons:            <a class="code-typename" href="/vendor/windows/GameInput/#RacingWheelButtons">RacingWheelButtons</a>,
+	patternShifterGear: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	wheel:              <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	throttle:           <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	brake:              <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	clutch:             <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	handbrake:          <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RawDeviceItemCollectionInfo"><span><a class="doc-id-link" href="#RawDeviceItemCollectionInfo">RawDeviceItemCollectionInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L835"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RawDeviceItemCollectionInfo :: <span class="keyword-type">struct</span> {
+	kind:            <a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceItemCollectionKind">RawDeviceItemCollectionKind</a>,
+	childCount:      <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	siblingCount:    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	usageCount:      <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	usages:          [^]<a class="code-typename" href="/vendor/windows/GameInput/#Usage">Usage</a> <span class="string">`fmt:v,usageCount`</span>,
+	parent:          ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceItemCollectionInfo">RawDeviceItemCollectionInfo</a>,
+	firstSibling:    ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceItemCollectionInfo">RawDeviceItemCollectionInfo</a>,
+	previousSibling: ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceItemCollectionInfo">RawDeviceItemCollectionInfo</a>,
+	nextSibling:     ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceItemCollectionInfo">RawDeviceItemCollectionInfo</a>,
+	lastSibling:     ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceItemCollectionInfo">RawDeviceItemCollectionInfo</a>,
+	firstChild:      ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceItemCollectionInfo">RawDeviceItemCollectionInfo</a>,
+	lastChild:       ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceItemCollectionInfo">RawDeviceItemCollectionInfo</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RawDeviceItemCollectionKind"><span><a class="doc-id-link" href="#RawDeviceItemCollectionKind">RawDeviceItemCollectionKind<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L346"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RawDeviceItemCollectionKind :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	UnknownItemCollection       = -1, 
+	PhysicalItemCollection      = 0, 
+	ApplicationItemCollection   = 1, 
+	LogicalItemCollection       = 2, 
+	ReportItemCollection        = 3, 
+	NamedArrayItemCollection    = 4, 
+	UsageSwitchItemCollection   = 5, 
+	UsageModifierItemCollection = 6, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RawDevicePhysicalUnitKind"><span><a class="doc-id-link" href="#RawDevicePhysicalUnitKind">RawDevicePhysicalUnitKind<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L357"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RawDevicePhysicalUnitKind :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Unknown             = -1, 
+	None                = 0, 
+	Time                = 1, 
+	Frequency           = 2, 
+	Length              = 3, 
+	Velocity            = 4, 
+	Acceleration        = 5, 
+	Mass                = 6, 
+	Momentum            = 7, 
+	Force               = 8, 
+	Pressure            = 9, 
+	Angle               = 10, 
+	AngularVelocity     = 11, 
+	AngularAcceleration = 12, 
+	AngularMass         = 13, 
+	AngularMomentum     = 14, 
+	AngularTorque       = 15, 
+	ElectricCurrent     = 16, 
+	ElectricCharge      = 17, 
+	ElectricPotential   = 18, 
+	Energy              = 19, 
+	Power               = 20, 
+	Temperature         = 21, 
+	LuminousIntensity   = 22, 
+	LuminousFlux        = 23, 
+	Illuminance         = 24, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RawDeviceReportInfo"><span><a class="doc-id-link" href="#RawDeviceReportInfo">RawDeviceReportInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L850"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RawDeviceReportInfo :: <span class="keyword-type">struct</span> {
+	kind:      <a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceReportKind">RawDeviceReportKind</a>,
+	id:        <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	size:      <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	itemCount: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	items:     [^]<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceReportItemInfo">RawDeviceReportItemInfo</a> <span class="string">`fmt:"v,itemCount"`</span>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RawDeviceReportItemFlag"><span><a class="doc-id-link" href="#RawDeviceReportItemFlag">RawDeviceReportItemFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L386"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RawDeviceReportItemFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	ConstantItem   = 0, 
+	ArrayItem      = 1, 
+	RelativeItem   = 2, 
+	WraparoundItem = 3, 
+	NonlinearItem  = 4, 
+	StableItem     = 5, 
+	NullableItem   = 6, 
+	VolatileItem   = 7, 
+	BufferedItem   = 8, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RawDeviceReportItemFlags"><span><a class="doc-id-link" href="#RawDeviceReportItemFlags">RawDeviceReportItemFlags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L397"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RawDeviceReportItemFlags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceReportItemFlag">RawDeviceReportItemFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RawDeviceReportItemInfo"><span><a class="doc-id-link" href="#RawDeviceReportItemInfo">RawDeviceReportItemInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L858"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RawDeviceReportItemInfo :: <span class="keyword-type">struct</span> {
+	bitOffset:                <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	bitSize:                  <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	logicalMin:               <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+	logicalMax:               <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+	physicalMin:              <a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a>,
+	physicalMax:              <a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a>,
+	physicalUnits:            <a class="code-typename" href="/vendor/windows/GameInput/#RawDevicePhysicalUnitKind">RawDevicePhysicalUnitKind</a>,
+	rawPhysicalUnits:         <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	rawPhysicalUnitsExponent: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	flags:                    <a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceReportItemFlags">RawDeviceReportItemFlags</a>,
+	usageCount:               <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	usages:                   [^]<a class="code-typename" href="/vendor/windows/GameInput/#Usage">Usage</a> <span class="string">`fmt:"v,usageCount"`</span>,
+	collection:               ^<a class="code-typename" href="/vendor/windows/GameInput/#RawDeviceItemCollectionInfo">RawDeviceItemCollectionInfo</a>,
+	itemString:               ^<a class="code-typename" href="/vendor/windows/GameInput/#String">String</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RawDeviceReportKind"><span><a class="doc-id-link" href="#RawDeviceReportKind">RawDeviceReportKind<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L399"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RawDeviceReportKind :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	InputReport   = 0, 
+	OutputReport  = 1, 
+	FeatureReport = 2, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ReadingCallback"><span><a class="doc-id-link" href="#ReadingCallback">ReadingCallback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1127"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ReadingCallback :: <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (callbackToken: <a class="code-typename" href="/vendor/windows/GameInput/#CallbackToken">CallbackToken</a>, ctx: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, reading: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputReading">IGameInputReading</a>, hasOverrunOccured: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>)</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RumbleMotors"><span><a class="doc-id-link" href="#RumbleMotors">RumbleMotors<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L411"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RumbleMotors :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/windows/GameInput/#RumbleMotorsFlag">RumbleMotorsFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RumbleMotorsFlag"><span><a class="doc-id-link" href="#RumbleMotorsFlag">RumbleMotorsFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L405"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RumbleMotorsFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	LowFrequency  = 0, 
+	HighFrequency = 1, 
+	LeftTrigger   = 2, 
+	RightTrigger  = 3, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RumbleParams"><span><a class="doc-id-link" href="#RumbleParams">RumbleParams<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L875"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RumbleParams :: <span class="keyword-type">struct</span> {
+	lowFrequency:  <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	highFrequency: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	leftTrigger:   <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	rightTrigger:  <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="String"><span><a class="doc-id-link" href="#String">String<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L882"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">String :: <span class="keyword-type">struct</span> {
+	sizeInBytes:    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	codePointCount: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	data:           [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SwitchKind"><span><a class="doc-id-link" href="#SwitchKind">SwitchKind<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L413"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SwitchKind :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	UnknownSwitchKind = -1, 
+	TwoWaySwitch      = 0, 
+	FourWaySwitch     = 1, 
+	EightWaySwitch    = 2, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SwitchPosition"><span><a class="doc-id-link" href="#SwitchPosition">SwitchPosition<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L420"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SwitchPosition :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Center    = 0, 
+	Up        = 1, 
+	UpRight   = 2, 
+	Right     = 3, 
+	DownRight = 4, 
+	Down      = 5, 
+	DownLeft  = 6, 
+	Left      = 7, 
+	UpLeft    = 8, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SystemButtonCallback"><span><a class="doc-id-link" href="#SystemButtonCallback">SystemButtonCallback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1126"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SystemButtonCallback :: <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (callbackToken: <a class="code-typename" href="/vendor/windows/GameInput/#CallbackToken">CallbackToken</a>, ctx: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, device: ^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInputDevice">IGameInputDevice</a>, timestamp: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>, currentState: <a class="code-typename" href="/vendor/windows/GameInput/#DeviceStatus">DeviceStatus</a>, previousState: <a class="code-typename" href="/vendor/windows/GameInput/#DeviceStatus">DeviceStatus</a>)</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SystemButtons"><span><a class="doc-id-link" href="#SystemButtons">SystemButtons<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L436"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SystemButtons :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/windows/GameInput/#SystemButtonsFlag">SystemButtonsFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SystemButtonsFlag"><span><a class="doc-id-link" href="#SystemButtonsFlag">SystemButtonsFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L432"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SystemButtonsFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Guide = 0, 
+	Share = 1, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="TouchSensorInfo"><span><a class="doc-id-link" href="#TouchSensorInfo">TouchSensorInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L888"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TouchSensorInfo :: <span class="keyword-type">struct</span> {
+	mappedInputKinds: <a class="code-typename" href="/vendor/windows/GameInput/#Kind">Kind</a>,
+	label:            <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	location:         <a class="code-typename" href="/vendor/windows/GameInput/#Location">Location</a>,
+	locationId:       <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	resolutionX:      <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+	resolutionY:      <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+	shape:            <a class="code-typename" href="/vendor/windows/GameInput/#TouchShape">TouchShape</a>,
+	aspectRatio:      <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	orientation:      <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	physicalWidth:    <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	physicalHeight:   <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	maxPressure:      <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	maxProximity:     <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	maxTouchPoints:   <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="TouchShape"><span><a class="doc-id-link" href="#TouchShape">TouchShape<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L438"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TouchShape :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Unknown            = -1, 
+	Point              = 0, 
+	Shape1DLinear      = 1, 
+	Shape1DRadial      = 2, 
+	Shape1DIrregular   = 3, 
+	Shape2DRectangular = 4, 
+	Shape2DElliptical  = 5, 
+	Shape2DIrregular   = 6, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="TouchState"><span><a class="doc-id-link" href="#TouchState">TouchState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L905"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TouchState :: <span class="keyword-type">struct</span> {
+	touchId:           <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+	sensorIndex:       <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	positionX:         <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	positionY:         <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	pressure:          <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	proximity:         <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	contactRectTop:    <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	contactRectLeft:   <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	contactRectRight:  <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	contactRectBottom: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="UiNavigationButtons"><span><a class="doc-id-link" href="#UiNavigationButtons">UiNavigationButtons<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L471"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">UiNavigationButtons :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/windows/GameInput/#UiNavigationButtonsFlag">UiNavigationButtonsFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="UiNavigationButtonsFlag"><span><a class="doc-id-link" href="#UiNavigationButtonsFlag">UiNavigationButtonsFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L449"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">UiNavigationButtonsFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	Menu        = 0, 
+	View        = 1, 
+	Accept      = 2, 
+	Cancel      = 3, 
+	Up          = 4, 
+	Down        = 5, 
+	Left        = 6, 
+	Right       = 7, 
+	Context1    = 8, 
+	Context2    = 9, 
+	Context3    = 10, 
+	Context4    = 11, 
+	PageUp      = 12, 
+	PageDown    = 13, 
+	PageLeft    = 14, 
+	PageRight   = 15, 
+	ScrollUp    = 16, 
+	ScrollDown  = 17, 
+	ScrollLeft  = 18, 
+	ScrollRight = 19, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="UiNavigationInfo"><span><a class="doc-id-link" href="#UiNavigationInfo">UiNavigationInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L918"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">UiNavigationInfo :: <span class="keyword-type">struct</span> {
+	menuButtonLabel:        <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	viewButtonLabel:        <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	acceptButtonLabel:      <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	cancelButtonLabel:      <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	upButtonLabel:          <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	downButtonLabel:        <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	leftButtonLabel:        <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	rightButtonLabel:       <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	contextButton1Label:    <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	contextButton2Label:    <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	contextButton3Label:    <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	contextButton4Label:    <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	pageUpButtonLabel:      <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	pageDownButtonLabel:    <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	pageLeftButtonLabel:    <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	pageRightButtonLabel:   <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	scrollUpButtonLabel:    <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	scrollDownButtonLabel:  <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	scrollLeftButtonLabel:  <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	scrollRightButtonLabel: <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+	guideButtonLabel:       <a class="code-typename" href="/vendor/windows/GameInput/#Label">Label</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="UiNavigationState"><span><a class="doc-id-link" href="#UiNavigationState">UiNavigationState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L942"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">UiNavigationState :: <span class="keyword-type">struct</span> {
+	buttons: <a class="code-typename" href="/vendor/windows/GameInput/#UiNavigationButtons">UiNavigationButtons</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Usage"><span><a class="doc-id-link" href="#Usage">Usage<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L946"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Usage :: <span class="keyword-type">struct</span> {
+	page: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	id:   <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Version"><span><a class="doc-id-link" href="#Version">Version<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L951"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Version :: <span class="keyword-type">struct</span> {
+	major:    <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	minor:    <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	build:    <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	revision: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+}</pre>
+</div>
+</div>
+<h2 id="pkg-Constants" class="pkg-header">Constants</h2>
+<div class="pkg-entity">
+<h3 id="CURRENT_CALLBACK_TOKEN_VALUE"><span><a class="doc-id-link" href="#CURRENT_CALLBACK_TOKEN_VALUE">CURRENT_CALLBACK_TOKEN_VALUE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1116"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CURRENT_CALLBACK_TOKEN_VALUE :: CallbackToken(0xFFFFFFFFFFFFFFFF)</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DEVICE_DISCONNECTED"><span><a class="doc-id-link" href="#DEVICE_DISCONNECTED">DEVICE_DISCONNECTED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1107"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DEVICE_DISCONNECTED :: HRESULT(-0x7C75FFFF)</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DEVICE_NOT_FOUND"><span><a class="doc-id-link" href="#DEVICE_NOT_FOUND">DEVICE_NOT_FOUND<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1108"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DEVICE_NOT_FOUND :: HRESULT(-0x7C75FFFE)</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputDevice_UUID_STRING"><span><a class="doc-id-link" href="#IGameInputDevice_UUID_STRING">IGameInputDevice_UUID_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1025"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputDevice_UUID_STRING :: <span class="string">"31DD86FB-4C1B-408A-868F-439B3CD47125"</span></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputDispatcher_UUID_STRING"><span><a class="doc-id-link" href="#IGameInputDispatcher_UUID_STRING">IGameInputDispatcher_UUID_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1054"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputDispatcher_UUID_STRING :: <span class="string">"415EED2E-98CB-42C2-8F28-B94601074E31"</span></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputForceFeedbackEffect_UUID_STRING"><span><a class="doc-id-link" href="#IGameInputForceFeedbackEffect_UUID_STRING">IGameInputForceFeedbackEffect_UUID_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1066"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputForceFeedbackEffect_UUID_STRING :: <span class="string">"51BDA05E-F742-45D9-B085-9444AE48381D"</span></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputRawDeviceReport_UUID_STRING"><span><a class="doc-id-link" href="#IGameInputRawDeviceReport_UUID_STRING">IGameInputRawDeviceReport_UUID_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1084"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputRawDeviceReport_UUID_STRING :: <span class="string">"61F08CF1-1FFC-40CA-A2B8-E1AB8BC5B6DC"</span></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputReading_UUID_STRING"><span><a class="doc-id-link" href="#IGameInputReading_UUID_STRING">IGameInputReading_UUID_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L993"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputReading_UUID_STRING :: <span class="string">"2156947A-E1FA-4DE0-A30B-D812931DBD8D"</span></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInput_UUID_STRING"><span><a class="doc-id-link" href="#IGameInput_UUID_STRING">IGameInput_UUID_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L964"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInput_UUID_STRING :: <span class="string">"11BE2A7E-4254-445A-9C09-FFC40F006918"</span></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="INSUFFICIENT_FORCE_FEEDBACK_RESOURCES"><span><a class="doc-id-link" href="#INSUFFICIENT_FORCE_FEEDBACK_RESOURCES">INSUFFICIENT_FORCE_FEEDBACK_RESOURCES<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1112"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">INSUFFICIENT_FORCE_FEEDBACK_RESOURCES :: HRESULT(-0x7C75FFFA)</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="INVALID_CALLBACK_TOKEN_VALUE"><span><a class="doc-id-link" href="#INVALID_CALLBACK_TOKEN_VALUE">INVALID_CALLBACK_TOKEN_VALUE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1117"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">INVALID_CALLBACK_TOKEN_VALUE :: CallbackToken(0x0000000000000000)</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Kind_Controller"><span><a class="doc-id-link" href="#Kind_Controller">Kind_Controller<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L174"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Kind_Controller: <a class="code-typename" href="/vendor/windows/GameInput/#Kind">Kind</a> : {.ControllerAxis, .ControllerButton, .ControllerSwitch}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="READING_NOT_FOUND"><span><a class="doc-id-link" href="#READING_NOT_FOUND">READING_NOT_FOUND<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1109"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">READING_NOT_FOUND :: HRESULT(-0x7C75FFFD)</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="REFERENCE_READING_TOO_OLD"><span><a class="doc-id-link" href="#REFERENCE_READING_TOO_OLD">REFERENCE_READING_TOO_OLD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1110"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">REFERENCE_READING_TOO_OLD :: HRESULT(-0x7C75FFFC)</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="TIMESTAMP_OUT_OF_RANGE"><span><a class="doc-id-link" href="#TIMESTAMP_OUT_OF_RANGE">TIMESTAMP_OUT_OF_RANGE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1111"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TIMESTAMP_OUT_OF_RANGE :: HRESULT(-0x7C75FFFB)</pre>
+</div>
+</div>
+<h2 id="pkg-Variables" class="pkg-header">Variables</h2>
+<div class="pkg-entity">
+<h3 id="IGameInputDevice_UUID"><span><a class="doc-id-link" href="#IGameInputDevice_UUID">IGameInputDevice_UUID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1026"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputDevice_UUID: ^sys_windows.<a class="code-typename" href="/core/sys/windows/#GUID">GUID</a> = …</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputDispatcher_UUID"><span><a class="doc-id-link" href="#IGameInputDispatcher_UUID">IGameInputDispatcher_UUID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1055"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputDispatcher_UUID: ^sys_windows.<a class="code-typename" href="/core/sys/windows/#GUID">GUID</a> = …</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputForceFeedbackEffect_UUID"><span><a class="doc-id-link" href="#IGameInputForceFeedbackEffect_UUID">IGameInputForceFeedbackEffect_UUID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1067"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputForceFeedbackEffect_UUID: ^sys_windows.<a class="code-typename" href="/core/sys/windows/#GUID">GUID</a> = …</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputRawDeviceReport_UUID"><span><a class="doc-id-link" href="#IGameInputRawDeviceReport_UUID">IGameInputRawDeviceReport_UUID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1085"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputRawDeviceReport_UUID: ^sys_windows.<a class="code-typename" href="/core/sys/windows/#GUID">GUID</a> = …</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInputReading_UUID"><span><a class="doc-id-link" href="#IGameInputReading_UUID">IGameInputReading_UUID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L994"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInputReading_UUID: ^sys_windows.<a class="code-typename" href="/core/sys/windows/#GUID">GUID</a> = …</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="IGameInput_UUID"><span><a class="doc-id-link" href="#IGameInput_UUID">IGameInput_UUID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L965"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">IGameInput_UUID: ^sys_windows.<a class="code-typename" href="/core/sys/windows/#GUID">GUID</a> = …</pre>
+</div>
+</div>
+<h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
+<div class="pkg-entity">
+<h3 id="Create"><span><a class="doc-id-link" href="#Create">Create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin#L1121"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Create :: <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (gameInput: ^^<a class="code-typename" href="/vendor/windows/GameInput/#IGameInput">IGameInput</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a> ---</pre>
+</div>
+</div>
+<h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+</section>
+<h2 id="pkg-source-files">Source Files</h2>
+<ul>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/windows/GameInput/windows_game_input.odin">windows_game_input.odin</a></li>
+</ul>
+<h2 id="pkg-generation-information">Generation Information</h2>
+<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-08 19:36:51.968662400 +0000 UTC</code></p>
+</article>
+<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
+<nav id="TableOfContents">
+<ul>
+<li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#APP_LOCAL_DEVICE_ID">APP_LOCAL_DEVICE_ID</a></li>
+<li><a href="#ArcadeStickButtons">ArcadeStickButtons</a></li>
+<li><a href="#ArcadeStickButtonsFlag">ArcadeStickButtonsFlag</a></li>
+<li><a href="#ArcadeStickInfo">ArcadeStickInfo</a></li>
+<li><a href="#ArcadeStickState">ArcadeStickState</a></li>
+<li><a href="#BatteryState">BatteryState</a></li>
+<li><a href="#BatteryStatus">BatteryStatus</a></li>
+<li><a href="#CallbackToken">CallbackToken</a></li>
+<li><a href="#ControllerAxisInfo">ControllerAxisInfo</a></li>
+<li><a href="#ControllerButtonInfo">ControllerButtonInfo</a></li>
+<li><a href="#ControllerSwitchInfo">ControllerSwitchInfo</a></li>
+<li><a href="#DeviceCallback">DeviceCallback</a></li>
+<li><a href="#DeviceCapabilities">DeviceCapabilities</a></li>
+<li><a href="#DeviceCapabilitiesFlag">DeviceCapabilitiesFlag</a></li>
+<li><a href="#DeviceFamily">DeviceFamily</a></li>
+<li><a href="#DeviceInfo">DeviceInfo</a></li>
+<li><a href="#DeviceStatus">DeviceStatus</a></li>
+<li><a href="#DeviceStatusFlag">DeviceStatusFlag</a></li>
+<li><a href="#EnumerationKind">EnumerationKind</a></li>
+<li><a href="#FeedbackAxes">FeedbackAxes</a></li>
+<li><a href="#FeedbackAxesFlag">FeedbackAxesFlag</a></li>
+<li><a href="#FeedbackEffectState">FeedbackEffectState</a></li>
+<li><a href="#FlightStickButtons">FlightStickButtons</a></li>
+<li><a href="#FlightStickButtonsFlag">FlightStickButtonsFlag</a></li>
+<li><a href="#FlightStickInfo">FlightStickInfo</a></li>
+<li><a href="#FlightStickState">FlightStickState</a></li>
+<li><a href="#FocusPolicy">FocusPolicy</a></li>
+<li><a href="#FocusPolicyFlag">FocusPolicyFlag</a></li>
+<li><a href="#ForceFeedbackConditionParams">ForceFeedbackConditionParams</a></li>
+<li><a href="#ForceFeedbackConstantParams">ForceFeedbackConstantParams</a></li>
+<li><a href="#ForceFeedbackEffectKind">ForceFeedbackEffectKind</a></li>
+<li><a href="#ForceFeedbackEnvelope">ForceFeedbackEnvelope</a></li>
+<li><a href="#ForceFeedbackMagnitude">ForceFeedbackMagnitude</a></li>
+<li><a href="#ForceFeedbackMotorInfo">ForceFeedbackMotorInfo</a></li>
+<li><a href="#ForceFeedbackParams">ForceFeedbackParams</a></li>
+<li><a href="#ForceFeedbackPeriodicParams">ForceFeedbackPeriodicParams</a></li>
+<li><a href="#ForceFeedbackRampParams">ForceFeedbackRampParams</a></li>
+<li><a href="#GamepadButtons">GamepadButtons</a></li>
+<li><a href="#GamepadButtonsFlag">GamepadButtonsFlag</a></li>
+<li><a href="#GamepadInfo">GamepadInfo</a></li>
+<li><a href="#GamepadState">GamepadState</a></li>
+<li><a href="#GuideButtonCallback">GuideButtonCallback</a></li>
+<li><a href="#HANDLE">HANDLE</a></li>
+<li><a href="#HRESULT">HRESULT</a></li>
+<li><a href="#HapticFeedbackMotorInfo">HapticFeedbackMotorInfo</a></li>
+<li><a href="#HapticFeedbackParams">HapticFeedbackParams</a></li>
+<li><a href="#HapticWaveformInfo">HapticWaveformInfo</a></li>
+<li><a href="#IGameInput">IGameInput</a></li>
+<li><a href="#IGameInputDevice">IGameInputDevice</a></li>
+<li><a href="#IGameInputDevice_Vtable">IGameInputDevice_Vtable</a></li>
+<li><a href="#IGameInputDispatcher">IGameInputDispatcher</a></li>
+<li><a href="#IGameInputDispatcher_Vtable">IGameInputDispatcher_Vtable</a></li>
+<li><a href="#IGameInputForceFeedbackEffect">IGameInputForceFeedbackEffect</a></li>
+<li><a href="#IGameInputForceFeedbackEffect_Vtable">IGameInputForceFeedbackEffect_Vtable</a></li>
+<li><a href="#IGameInputRawDeviceReport">IGameInputRawDeviceReport</a></li>
+<li><a href="#IGameInputRawDeviceReport_Vtable">IGameInputRawDeviceReport_Vtable</a></li>
+<li><a href="#IGameInputReading">IGameInputReading</a></li>
+<li><a href="#IGameInputReading_VTable">IGameInputReading_VTable</a></li>
+<li><a href="#IGameInput_VTable">IGameInput_VTable</a></li>
+<li><a href="#IID">IID</a></li>
+<li><a href="#IUnknown">IUnknown</a></li>
+<li><a href="#IUnknown_VTable">IUnknown_VTable</a></li>
+<li><a href="#KeyState">KeyState</a></li>
+<li><a href="#KeyboardInfo">KeyboardInfo</a></li>
+<li><a href="#KeyboardKind">KeyboardKind</a></li>
+<li><a href="#KeyboardLayoutCallback">KeyboardLayoutCallback</a></li>
+<li><a href="#Kind">Kind</a></li>
+<li><a href="#KindFlag">KindFlag</a></li>
+<li><a href="#Label">Label</a></li>
+<li><a href="#Location">Location</a></li>
+<li><a href="#MotionAccuracy">MotionAccuracy</a></li>
+<li><a href="#MotionInfo">MotionInfo</a></li>
+<li><a href="#MotionState">MotionState</a></li>
+<li><a href="#MouseButtons">MouseButtons</a></li>
+<li><a href="#MouseButtonsFlag">MouseButtonsFlag</a></li>
+<li><a href="#MouseInfo">MouseInfo</a></li>
+<li><a href="#MouseState">MouseState</a></li>
+<li><a href="#RacingWheelButtons">RacingWheelButtons</a></li>
+<li><a href="#RacingWheelButtonsFlag">RacingWheelButtonsFlag</a></li>
+<li><a href="#RacingWheelInfo">RacingWheelInfo</a></li>
+<li><a href="#RacingWheelState">RacingWheelState</a></li>
+<li><a href="#RawDeviceItemCollectionInfo">RawDeviceItemCollectionInfo</a></li>
+<li><a href="#RawDeviceItemCollectionKind">RawDeviceItemCollectionKind</a></li>
+<li><a href="#RawDevicePhysicalUnitKind">RawDevicePhysicalUnitKind</a></li>
+<li><a href="#RawDeviceReportInfo">RawDeviceReportInfo</a></li>
+<li><a href="#RawDeviceReportItemFlag">RawDeviceReportItemFlag</a></li>
+<li><a href="#RawDeviceReportItemFlags">RawDeviceReportItemFlags</a></li>
+<li><a href="#RawDeviceReportItemInfo">RawDeviceReportItemInfo</a></li>
+<li><a href="#RawDeviceReportKind">RawDeviceReportKind</a></li>
+<li><a href="#ReadingCallback">ReadingCallback</a></li>
+<li><a href="#RumbleMotors">RumbleMotors</a></li>
+<li><a href="#RumbleMotorsFlag">RumbleMotorsFlag</a></li>
+<li><a href="#RumbleParams">RumbleParams</a></li>
+<li><a href="#String">String</a></li>
+<li><a href="#SwitchKind">SwitchKind</a></li>
+<li><a href="#SwitchPosition">SwitchPosition</a></li>
+<li><a href="#SystemButtonCallback">SystemButtonCallback</a></li>
+<li><a href="#SystemButtons">SystemButtons</a></li>
+<li><a href="#SystemButtonsFlag">SystemButtonsFlag</a></li>
+<li><a href="#TouchSensorInfo">TouchSensorInfo</a></li>
+<li><a href="#TouchShape">TouchShape</a></li>
+<li><a href="#TouchState">TouchState</a></li>
+<li><a href="#UiNavigationButtons">UiNavigationButtons</a></li>
+<li><a href="#UiNavigationButtonsFlag">UiNavigationButtonsFlag</a></li>
+<li><a href="#UiNavigationInfo">UiNavigationInfo</a></li>
+<li><a href="#UiNavigationState">UiNavigationState</a></li>
+<li><a href="#Usage">Usage</a></li>
+<li><a href="#Version">Version</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Constants">Constants</a><ul>
+<li><a href="#CURRENT_CALLBACK_TOKEN_VALUE">CURRENT_CALLBACK_TOKEN_VALUE</a></li>
+<li><a href="#DEVICE_DISCONNECTED">DEVICE_DISCONNECTED</a></li>
+<li><a href="#DEVICE_NOT_FOUND">DEVICE_NOT_FOUND</a></li>
+<li><a href="#IGameInputDevice_UUID_STRING">IGameInputDevice_UUID_STRING</a></li>
+<li><a href="#IGameInputDispatcher_UUID_STRING">IGameInputDispatcher_UUID_STRING</a></li>
+<li><a href="#IGameInputForceFeedbackEffect_UUID_STRING">IGameInputForceFeedbackEffect_UUID_STRING</a></li>
+<li><a href="#IGameInputRawDeviceReport_UUID_STRING">IGameInputRawDeviceReport_UUID_STRING</a></li>
+<li><a href="#IGameInputReading_UUID_STRING">IGameInputReading_UUID_STRING</a></li>
+<li><a href="#IGameInput_UUID_STRING">IGameInput_UUID_STRING</a></li>
+<li><a href="#INSUFFICIENT_FORCE_FEEDBACK_RESOURCES">INSUFFICIENT_FORCE_FEEDBACK_RESOURCES</a></li>
+<li><a href="#INVALID_CALLBACK_TOKEN_VALUE">INVALID_CALLBACK_TOKEN_VALUE</a></li>
+<li><a href="#Kind_Controller">Kind_Controller</a></li>
+<li><a href="#READING_NOT_FOUND">READING_NOT_FOUND</a></li>
+<li><a href="#REFERENCE_READING_TOO_OLD">REFERENCE_READING_TOO_OLD</a></li>
+<li><a href="#TIMESTAMP_OUT_OF_RANGE">TIMESTAMP_OUT_OF_RANGE</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Variables">Variables</a><ul>
+<li><a href="#IGameInputDevice_UUID">IGameInputDevice_UUID</a></li>
+<li><a href="#IGameInputDispatcher_UUID">IGameInputDispatcher_UUID</a></li>
+<li><a href="#IGameInputForceFeedbackEffect_UUID">IGameInputForceFeedbackEffect_UUID</a></li>
+<li><a href="#IGameInputRawDeviceReport_UUID">IGameInputRawDeviceReport_UUID</a></li>
+<li><a href="#IGameInputReading_UUID">IGameInputReading_UUID</a></li>
+<li><a href="#IGameInput_UUID">IGameInput_UUID</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Procedures">Procedures</a><ul>
+<li><a href="#Create">Create</a></li>
+</ul>
+</li>
+<li><a href="#pkg-source-files">Source Files</a></ul>
+</nav>
+</div></div>
+<script type="text/javascript">var odin_pkg_name = "windows_game_input";</script>
+</div>
+
+</div>
+</main>
+
+<footer class="odin-footer">
+	<div class="container pb-5 pt-5">
+		<div class="row g-4">
+		<div class="col">
+		<a class="navbar-brand" href="https://odin-lang.org">
+		<img class="mb-3" src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+		<p>
+		The Data-Oriented Language for Sane Software Development.
+		</p>
+		</div>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Resources</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://odin-lang.org/docs" class="link-light">Docs</a></li>
+			<li><a href="https://pkg.odin-lang.org/" class="link-light">Packages</a></li>
+			<li><a href="https://odin-lang.org/news" class="link-light">News</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Community</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin" target="_blank" class="link-light">GitHub</a></li>
+			<li><a href="https://discord.com/invite/sVBPHEv" target="_blank" class="link-light">Discord</a></li>
+			<li><a href="https://www.twitch.tv/ginger_bill" target="_blank" class="link-light">Twitch</a></li>
+			<li><a href="https://www.youtube.com/channel/UCUSck1dOH7VKmG4lRW7tZXg" target="_blank" class="link-light">YouTube</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Contribute</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin/issues" target="_blank" class="link-light">Issues</a></li>
+			<li><a href="https://www.patreon.com/gingerbill" target="_blank" class="link-light">Donate</a></li>
+			</ul>
+			</nav>
+		</div>
+		<div class="mt-4 text-muted">© 2016–2023 Ginger Bill</div>
+	</div>
+</footer>
+
+<script src="https://odin-lang.org/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://odin-lang.org/js/script.js"></script>
+<script src="/pkg-data.js"></script>
+<script src="/search.js"></script>
+</body>
+</html>
