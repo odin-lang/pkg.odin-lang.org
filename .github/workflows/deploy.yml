@@ -34,6 +34,7 @@ jobs:
           odin run examples/demo
       - name: Generation doc format for examples/all
         shell: cmd
+        # SDL3 Needs to be separate because it can't be added into examples/all without conflicting with sdl2 symbols.
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
           cd Odin
@@ -44,6 +45,7 @@ jobs:
           odin doc core/sys/linux                    -all-packages -doc-format -show-debug-messages -target:linux_amd64
           odin doc core/sys/unix                     -all-packages -doc-format -show-debug-messages -target:linux_amd64
           odin doc core/sys/haiku                    -all-packages -doc-format -show-debug-messages -target:haiku_amd64
+          odin doc vendor/sdl3                       -all-packages -doc-format -show-debug-messages
       - name: Generate Tool
         shell: cmd
         run: |
@@ -57,7 +59,7 @@ jobs:
           copy resources\CNAME       website\static\CNAME
           copy resources\favicon.svg website\static\favicon.svg
           pushd website\static
-          ..\odin-html-docs.exe ..\all.odin-doc --merge ..\darwin.odin-doc ..\all_posix.odin-doc ..\freebsd.odin-doc ..\linux.odin-doc ..\unix.odin-doc ..\haiku.odin-doc
+          ..\odin-html-docs.exe ..\all.odin-doc --merge ..\darwin.odin-doc ..\all_posix.odin-doc ..\freebsd.odin-doc ..\linux.odin-doc ..\unix.odin-doc ..\haiku.odin-doc ..\sdl3.odin-doc
           popd
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
