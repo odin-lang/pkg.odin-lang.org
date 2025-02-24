@@ -733,7 +733,7 @@ Procedure Groups (1)</summary>
 	src:         <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
 	err:         <a class="code-typename" href="/core/encoding/xml/#Error_Handler">Error_Handler</a>,
 	<span class="comment">// Tokenizing state</span>
-	ch:          <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>,
+	ch:          untyped rune,
 	offset:      <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
 	read_offset: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
 	line_offset: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
@@ -773,25 +773,25 @@ Procedure Groups (1)</summary>
 <div class="pkg-entity">
 <h3 id="CDATA_END"><span><a class="doc-id-link" href="#CDATA_END">CDATA_END<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/xml/tokenizer.odin#L63"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">CDATA_END :: <span class="string">"]]&gt;"</span></pre>
+<pre class="doc-code">CDATA_END: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> : <span class="string">"]]&gt;"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="CDATA_START"><span><a class="doc-id-link" href="#CDATA_START">CDATA_START<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/xml/tokenizer.odin#L62"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">CDATA_START :: <span class="string">"&lt;![CDATA["</span></pre>
+<pre class="doc-code">CDATA_START: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> : <span class="string">"&lt;![CDATA["</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="COMMENT_END"><span><a class="doc-id-link" href="#COMMENT_END">COMMENT_END<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/xml/tokenizer.odin#L66"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">COMMENT_END :: <span class="string">"--&gt;"</span></pre>
+<pre class="doc-code">COMMENT_END: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> : <span class="string">"--&gt;"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="COMMENT_START"><span><a class="doc-id-link" href="#COMMENT_START">COMMENT_START<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/xml/tokenizer.odin#L65"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">COMMENT_START :: <span class="string">"&lt;!--"</span></pre>
+<pre class="doc-code">COMMENT_START: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> : <span class="string">"&lt;!--"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -868,13 +868,13 @@ Procedure Groups (1)</summary>
 <div class="pkg-entity">
 <h3 id="is_letter"><span><a class="doc-id-link" href="#is_letter">is_letter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/xml/tokenizer.odin#L186"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">is_letter :: <span class="keyword-type">proc</span>(r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+<pre class="doc-code">is_letter :: <span class="keyword-type">proc</span>(r: untyped rune) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="is_valid_identifier_rune"><span><a class="doc-id-link" href="#is_valid_identifier_rune">is_valid_identifier_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/xml/tokenizer.odin#L198"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">is_valid_identifier_rune :: <span class="keyword-type">proc</span>(r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+<pre class="doc-code">is_valid_identifier_rune :: <span class="keyword-type">proc</span>(r: untyped rune) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -993,7 +993,7 @@ that's a <code>&gt;</code>.</p>
 <div class="pkg-entity">
 <h3 id="scan_string"><span><a class="doc-id-link" href="#scan_string">scan_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/xml/tokenizer.odin#L300"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">scan_string :: <span class="keyword-type">proc</span>(t: ^<a class="code-typename" href="/core/encoding/xml/#Tokenizer">Tokenizer</a>, offset: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, close: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a> = '&lt;', consume_close: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = false, multiline: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> (value: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, err: <a class="code-typename" href="/core/encoding/xml/#Error">Error</a>) {…}</pre>
+<pre class="doc-code">scan_string :: <span class="keyword-type">proc</span>(t: ^<a class="code-typename" href="/core/encoding/xml/#Tokenizer">Tokenizer</a>, offset: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, close: untyped rune = '&lt;', consume_close: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = false, multiline: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> (value: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, err: <a class="code-typename" href="/core/encoding/xml/#Error">Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1045,7 +1045,7 @@ that's a <code>&gt;</code>.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/xml/xml_reader.odin">xml_reader.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-23 21:10:31.411868800 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-24 21:11:26.458888700 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

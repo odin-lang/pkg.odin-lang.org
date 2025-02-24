@@ -391,7 +391,7 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (69)</summary>
+Procedures (71)</summary>
 <ul>
 <li><a href="#abs">abs</a></li>
 <li><a href="#add">add</a></li>
@@ -409,6 +409,8 @@ Procedures (69)</summary>
 <li><a href="#count_zeros">count_zeros</a></li>
 <li><a href="#div">div</a></li>
 <li><a href="#extract">extract</a></li>
+<li><a href="#extract_lsbs">extract_lsbs</a></li>
+<li><a href="#extract_msbs">extract_msbs</a></li>
 <li><a href="#floor">floor</a></li>
 <li><a href="#fma">fma</a></li>
 <li><a href="#from_array">from_array</a></li>
@@ -762,7 +764,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="IS_EMULATED"><span><a class="doc-id-link" href="#IS_EMULATED">IS_EMULATED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L8"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">IS_EMULATED :: true when (ODIN_ARCH == .amd64 || ODIN_ARCH == .i386) && !intrinsics.has_target_feature("sse2") else true when (ODIN_ARCH == .arm64 || ODIN_ARCH == .arm32) && !intrinsics.has_target_feature("neon") else true when (ODIN_ARCH == .wasm64p32 || ODIN_ARCH == .wasm32) && !intrinsics.has_target_feature("simd128") else true when (ODIN_ARCH == .riscv64) && !intrinsics.has_target_feature("v") else false</pre>
+<pre class="doc-code">IS_EMULATED: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : true when (ODIN_ARCH == .amd64 || ODIN_ARCH == .i386) && !intrinsics.has_target_feature("sse2") else true when (ODIN_ARCH == .arm64 || ODIN_ARCH == .arm32) && !intrinsics.has_target_feature("neon") else true when (ODIN_ARCH == .wasm64p32 || ODIN_ARCH == .wasm32) && !intrinsics.has_target_feature("simd128") else true when (ODIN_ARCH == .riscv64) && !intrinsics.has_target_feature("v") else false</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -798,9 +800,9 @@ for at least 128-bit SIMD.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="bit_not"><span><a class="doc-id-link" href="#bit_not">bit_not<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L189"><em>Source</em></a></div></h3>
+<h3 id="bit_not"><span><a class="doc-id-link" href="#bit_not">bit_not<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L192"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">bit_not :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $/<span class="directive">#simd</span>[0]$T) -> $/<span class="directive">#simd</span>[0]$T {…}</pre>
+<pre class="doc-code">bit_not :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $T) -> $T {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -828,9 +830,9 @@ for at least 128-bit SIMD.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="copysign"><span><a class="doc-id-link" href="#copysign">copysign<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L193"><em>Source</em></a></div></h3>
+<h3 id="copysign"><span><a class="doc-id-link" href="#copysign">copysign<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L196"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">copysign :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v, sign: $/<span class="directive">#simd</span>[0]$T) -> $/<span class="directive">#simd</span>[0]$T {…}</pre>
+<pre class="doc-code">copysign :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v, sign: $T) -> $T {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -878,6 +880,18 @@ for at least 128-bit SIMD.</p>
 </details>
 </div>
 <div class="pkg-entity">
+<h3 id="extract_lsbs"><span><a class="doc-id-link" href="#extract_lsbs">extract_lsbs<span class="a-hidden">&nbsp;¶</span></a></span></h3>
+<div>
+<pre class="doc-code">extract_lsbs :: <a href="/base/intrinsics#simd_extract_lsbs">intrinsics</a>.simd_extract_lsbs</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="extract_msbs"><span><a class="doc-id-link" href="#extract_msbs">extract_msbs<span class="a-hidden">&nbsp;¶</span></a></span></h3>
+<div>
+<pre class="doc-code">extract_msbs :: <a href="/base/intrinsics#simd_extract_msbs">intrinsics</a>.simd_extract_msbs</pre>
+</div>
+</div>
+<div class="pkg-entity">
 <h3 id="floor"><span><a class="doc-id-link" href="#floor">floor<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">floor :: <a href="/base/intrinsics#simd_floor">intrinsics</a>.simd_floor</pre>
@@ -890,15 +904,15 @@ for at least 128-bit SIMD.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="from_array"><span><a class="doc-id-link" href="#from_array">from_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L176"><em>Source</em></a></div></h3>
+<h3 id="from_array"><span><a class="doc-id-link" href="#from_array">from_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L179"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">from_array :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $T/[0]$T) -> <span class="directive">#simd</span>[0]$T {…}</pre>
+<pre class="doc-code">from_array :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $A/container_small_array.<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) -> <span class="directive">#simd</span>[0]$E {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="from_slice"><span><a class="doc-id-link" href="#from_slice">from_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L180"><em>Source</em></a></div></h3>
+<h3 id="from_slice"><span><a class="doc-id-link" href="#from_slice">from_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L183"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">from_slice :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#simd</span>[0]T, slice: []T) -> $/<span class="directive">#simd</span>[0]T {…}</pre>
+<pre class="doc-code">from_slice :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[0][0]$E, slice: []$E) -> $/[0][0]$E {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1034,9 +1048,9 @@ element-wise:
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="recip"><span><a class="doc-id-link" href="#recip">recip<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L205"><em>Source</em></a></div></h3>
+<h3 id="recip"><span><a class="doc-id-link" href="#recip">recip<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L208"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">recip :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $/<span class="directive">#simd</span>[0]$T) -> $/<span class="directive">#simd</span>[0]$T {…}</pre>
+<pre class="doc-code">recip :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $T) -> $T {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1186,9 +1200,9 @@ x &lt;&lt; (y & mask)</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="signum"><span><a class="doc-id-link" href="#signum">signum<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L200"><em>Source</em></a></div></h3>
+<h3 id="signum"><span><a class="doc-id-link" href="#signum">signum<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L203"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">signum :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $/<span class="directive">#simd</span>[0]$T) -> $/<span class="directive">#simd</span>[0]$T {…}</pre>
+<pre class="doc-code">signum :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $T) -> $T {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1214,15 +1228,15 @@ x &lt;&lt; (y & mask)</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="to_array"><span><a class="doc-id-link" href="#to_array">to_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L173"><em>Source</em></a></div></h3>
+<h3 id="to_array"><span><a class="doc-id-link" href="#to_array">to_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L176"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">to_array :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: <span class="directive">#simd</span>[0]$T) -> [0]$T {…}</pre>
+<pre class="doc-code">to_array :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: <span class="directive">#simd</span>[0]$E) -> [0]$E {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="to_array_ptr"><span><a class="doc-id-link" href="#to_array_ptr">to_array_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L170"><em>Source</em></a></div></h3>
+<h3 id="to_array_ptr"><span><a class="doc-id-link" href="#to_array_ptr">to_array_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L173"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">to_array_ptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: ^<span class="directive">#simd</span>[0]$T) -> ^[0]$T {…}</pre>
+<pre class="doc-code">to_array_ptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: ^<span class="directive">#simd</span>[0]$E) -> ^[0]$E {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1245,7 +1259,7 @@ x &lt;&lt; (y & mask)</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin">simd.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-23 21:10:31.658363500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-24 21:11:26.710361600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -1319,6 +1333,8 @@ x &lt;&lt; (y & mask)</p>
 <li><a href="#count_zeros">count_zeros</a></li>
 <li><a href="#div">div</a></li>
 <li><a href="#extract">extract</a></li>
+<li><a href="#extract_lsbs">extract_lsbs</a></li>
+<li><a href="#extract_msbs">extract_msbs</a></li>
 <li><a href="#floor">floor</a></li>
 <li><a href="#fma">fma</a></li>
 <li><a href="#from_array">from_array</a></li>

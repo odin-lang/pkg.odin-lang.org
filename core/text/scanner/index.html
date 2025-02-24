@@ -465,7 +465,7 @@ A position is valid if line &gt; 0</p>
 	src_end:       <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
 	tok_pos:       <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
 	tok_end:       <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
-	ch:            <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>,
+	ch:            untyped rune,
 	line:          <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
 	column:        <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
 	prev_line_len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
@@ -486,7 +486,7 @@ A position is valid if line &gt; 0</p>
 	<span class="comment">// The valid characters must not conflict with the set of white space characters</span>
 	<span class="comment">// If is_ident_rune is not set, regular Odin-like identifiers are accepted</span>
 	<span class="comment">// This field may be changed by the user at any time during scanning</span>
-	is_ident_rune: <span class="keyword-type">proc</span>(ch: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>, i: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	is_ident_rune: <span class="keyword-type">proc</span>(ch: untyped rune, i: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
 	<span class="comment">// Start position of most recently scanned token (set by scan(s))</span>
 	<span class="comment">// Call init or next invalidates the position</span>
 	pos:           <a class="code-typename" href="/core/text/scanner/#Position">Position</a>,
@@ -512,7 +512,7 @@ A position is valid if line &gt; 0</p>
 <div class="pkg-entity">
 <h3 id="Whitespace"><span><a class="doc-id-link" href="#Whitespace">Whitespace<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L73"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">Whitespace :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>; <a href="/base/builtin#u128"><span class="doc-builtin">u128</span></a>]</pre>
+<pre class="doc-code">Whitespace :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[untyped rune; <a href="/base/builtin#u128"><span class="doc-builtin">u128</span></a>]</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -540,37 +540,37 @@ A position is valid if line &gt; 0</p>
 <div class="pkg-entity">
 <h3 id="Char"><span><a class="doc-id-link" href="#Char">Char<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L51"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">Char :: -5</pre>
+<pre class="doc-code">Char: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : -5</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="Comment"><span><a class="doc-id-link" href="#Comment">Comment<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L54"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">Comment :: -8</pre>
+<pre class="doc-code">Comment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : -8</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="EOF"><span><a class="doc-id-link" href="#EOF">EOF<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L47"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">EOF :: -1</pre>
+<pre class="doc-code">EOF: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : -1</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="Float"><span><a class="doc-id-link" href="#Float">Float<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L50"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">Float :: -4</pre>
+<pre class="doc-code">Float: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : -4</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="Ident"><span><a class="doc-id-link" href="#Ident">Ident<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L48"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">Ident :: -2</pre>
+<pre class="doc-code">Ident: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : -2</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="Int"><span><a class="doc-id-link" href="#Int">Int<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L49"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">Int :: -3</pre>
+<pre class="doc-code">Int: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : -3</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -592,13 +592,13 @@ A position is valid if line &gt; 0</p>
 <div class="pkg-entity">
 <h3 id="Raw_String"><span><a class="doc-id-link" href="#Raw_String">Raw_String<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L53"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">Raw_String :: -7</pre>
+<pre class="doc-code">Raw_String: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : -7</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="String"><span><a class="doc-id-link" href="#String">String<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L52"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">String :: -6</pre>
+<pre class="doc-code">String: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : -6</pre>
 </div>
 </div>
 <h2 id="pkg-Variables" class="pkg-header">Variables</h2>
@@ -630,7 +630,7 @@ error_count is set to 0, flags is set to Odin_Like_Tokens, whitespace is set to 
 <div class="pkg-entity">
 <h3 id="next"><span><a class="doc-id-link" href="#next">next<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L183"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">next :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/text/scanner/#Scanner">Scanner</a>) -> <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a> {…}</pre>
+<pre class="doc-code">next :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/text/scanner/#Scanner">Scanner</a>) -> untyped rune {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -641,7 +641,7 @@ next does not update the Scanner's pos field. Use 'position(s)' to get the curre
 <div class="pkg-entity">
 <h3 id="peek"><span><a class="doc-id-link" href="#peek">peek<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L197"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">peek :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/text/scanner/#Scanner">Scanner</a>, n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = 0) -> (ch: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) {…}</pre>
+<pre class="doc-code">peek :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/text/scanner/#Scanner">Scanner</a>, n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = 0) -> (ch: untyped rune) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -653,7 +653,7 @@ if n &gt; 0, it call next n times and return the nth Unicode character and then 
 <div class="pkg-entity">
 <h3 id="peek_token"><span><a class="doc-id-link" href="#peek_token">peek_token<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L219"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">peek_token :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/text/scanner/#Scanner">Scanner</a>, n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = 0) -> (tok: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) {…}</pre>
+<pre class="doc-code">peek_token :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/text/scanner/#Scanner">Scanner</a>, n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = 0) -> (tok: untyped rune) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -692,7 +692,7 @@ Use the Scanner's position field for the most recently scanned token position</p
 <div class="pkg-entity">
 <h3 id="scan"><span><a class="doc-id-link" href="#scan">scan<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L523"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">scan :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/text/scanner/#Scanner">Scanner</a>) -> (tok: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) {…}</pre>
+<pre class="doc-code">scan :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/text/scanner/#Scanner">Scanner</a>) -> (tok: untyped rune) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -705,7 +705,7 @@ It reports Scanner errors by calling s.error, if not nil; otherwise it will prin
 <div class="pkg-entity">
 <h3 id="token_string"><span><a class="doc-id-link" href="#token_string">token_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L650"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">token_string :: <span class="keyword-type">proc</span>(tok: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
+<pre class="doc-code">token_string :: <span class="keyword-type">proc</span>(tok: untyped rune, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -731,7 +731,7 @@ By default, it uses the context.temp_allocator to produce the string</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin">scanner.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-23 21:10:32.859153900 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-24 21:11:27.964119200 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

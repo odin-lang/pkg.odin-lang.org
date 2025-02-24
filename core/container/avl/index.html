@@ -479,23 +479,6 @@ elements in the tree.</p>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Tree is an AVL tree.</p>
 </details>
-<h5>Related Procedures With Parameters</h5>
-<ul>
-<li><a href="/core/container/avl/#destroy">destroy</a></li>
-<li><a href="/core/container/avl/#find">find</a></li>
-<li><a href="/core/container/avl/#find_or_insert">find_or_insert</a></li>
-<li><a href="/core/container/avl/#first">first</a></li>
-<li><a href="/core/container/avl/#init_cmp">init_cmp</a></li>
-<li><a href="/core/container/avl/#init_ordered">init_ordered</a></li>
-<li><a href="/core/container/avl/#iterator">iterator</a></li>
-<li><a href="/core/container/avl/#iterator_from_pos">iterator_from_pos</a></li>
-<li><a href="/core/container/avl/#last">last</a></li>
-<li><a href="/core/container/avl/#len">len</a></li>
-<li><a href="/core/container/avl/#remove_node">remove_node</a></li>
-<li><a href="/core/container/avl/#remove_value">remove_value</a></li>
-<li><a href="/core/container/avl/#init">init</a>&nbsp;<em>(procedure groups)</em></li>
-<li><a href="/core/container/avl/#remove">remove</a>&nbsp;<em>(procedure groups)</em></li>
-</ul>
 </div>
 <h2 id="pkg-Constants" class="pkg-header">Constants</h2>
 <p class="pkg-empty-section">This section is empty.</p>
@@ -505,7 +488,7 @@ elements in the tree.</p>
 <div class="pkg-entity">
 <h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/avl/avl.odin#L95"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">destroy :: <span class="keyword-type">proc</span>(t: ^$T/<a class="code-typename" href="/core/container/avl/#Tree">Tree</a>($Value), call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) {…}</pre>
+<pre class="doc-code">destroy :: <span class="keyword-type">proc</span>(t: ^$T, call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -515,7 +498,7 @@ elements in the tree.</p>
 <div class="pkg-entity">
 <h3 id="find"><span><a class="doc-id-link" href="#find">find<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/avl/avl.odin#L121"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">find :: <span class="keyword-type">proc</span>(t: ^$T/<a class="code-typename" href="/core/container/avl/#Tree">Tree</a>($Value), value: $T) -> ^<a class="code-typename" href="/core/container/avl/#Node">Node</a>($Value) {…}</pre>
+<pre class="doc-code">find :: <span class="keyword-type">proc</span>(t: ^$T, value: $Value) -> ^<a class="code-typename" href="/core/container/avl/#Node">Node</a>($Value) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -526,7 +509,7 @@ node or nil iff the value is not present.</p>
 <div class="pkg-entity">
 <h3 id="find_or_insert"><span><a class="doc-id-link" href="#find_or_insert">find_or_insert<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/avl/avl.odin#L141"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">find_or_insert :: <span class="keyword-type">proc</span>(t: ^$T/<a class="code-typename" href="/core/container/avl/#Tree">Tree</a>($Value), value: $T) -> (n: ^<a class="code-typename" href="/core/container/avl/#Node">Node</a>($Value), inserted: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">find_or_insert :: <span class="keyword-type">proc</span>(t: ^$T, value: $Value) -> (n: ^<a class="code-typename" href="/core/container/avl/#Node">Node</a>($Value), inserted: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -539,7 +522,7 @@ present, the existing node is returned un-altered.</p>
 <div class="pkg-entity">
 <h3 id="first"><span><a class="doc-id-link" href="#first">first<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/avl/avl.odin#L109"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">first :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T/<a class="code-typename" href="/core/container/avl/#Tree">Tree</a>($Value)) -> ^<a class="code-typename" href="/core/container/avl/#Node">Node</a>($Value) {…}</pre>
+<pre class="doc-code">first :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T) -> ^<a class="code-typename" href="/core/container/avl/#Node">Node</a>($Value) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -550,7 +533,7 @@ the tree is empty.</p>
 <div class="pkg-entity">
 <h3 id="init_cmp"><span><a class="doc-id-link" href="#init_cmp">init_cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/avl/avl.odin#L74"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">init_cmp :: <span class="keyword-type">proc</span>(t: ^$T/<a class="code-typename" href="/core/container/avl/#Tree">Tree</a>($Value), cmp_fn: <span class="keyword-type">proc</span>(a, b: $T) -> slice.<a class="code-typename" href="/core/slice/#Ordering">Ordering</a>, node_allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
+<pre class="doc-code">init_cmp :: <span class="keyword-type">proc</span>(t: ^$T, cmp_fn: <span class="keyword-type">proc</span>(a, b: $Value) -> slice.<a class="code-typename" href="/core/slice/#Ordering">Ordering</a>, node_allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -560,7 +543,7 @@ the tree is empty.</p>
 <div class="pkg-entity">
 <h3 id="init_ordered"><span><a class="doc-id-link" href="#init_ordered">init_ordered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/avl/avl.odin#L87"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">init_ordered :: <span class="keyword-type">proc</span>(t: ^$T/<a class="code-typename" href="/core/container/avl/#Tree">Tree</a>($Value), node_allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
+<pre class="doc-code">init_ordered :: <span class="keyword-type">proc</span>(t: ^$T, node_allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -571,7 +554,7 @@ a comparison function that results in an ascending order sort.</p>
 <div class="pkg-entity">
 <h3 id="iterator"><span><a class="doc-id-link" href="#iterator">iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/avl/avl.odin#L257"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">iterator :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T/<a class="code-typename" href="/core/container/avl/#Tree">Tree</a>($Value), direction: <a class="code-typename" href="/core/container/avl/#Direction">Direction</a>) -> <a class="code-typename" href="/core/container/avl/#Iterator">Iterator</a>($Value) {…}</pre>
+<pre class="doc-code">iterator :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T, direction: <a class="code-typename" href="/core/container/avl/#Direction">Direction</a>) -> <a class="code-typename" href="/core/container/avl/#Iterator">Iterator</a>($Value) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -581,7 +564,7 @@ a comparison function that results in an ascending order sort.</p>
 <div class="pkg-entity">
 <h3 id="iterator_from_pos"><span><a class="doc-id-link" href="#iterator_from_pos">iterator_from_pos<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/avl/avl.odin#L269"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">iterator_from_pos :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T/<a class="code-typename" href="/core/container/avl/#Tree">Tree</a>($Value), pos: ^<a class="code-typename" href="/core/container/avl/#Node">Node</a>($Value), direction: <a class="code-typename" href="/core/container/avl/#Direction">Direction</a>) -> <a class="code-typename" href="/core/container/avl/#Iterator">Iterator</a>($Value) {…}</pre>
+<pre class="doc-code">iterator_from_pos :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T, pos: ^<a class="code-typename" href="/core/container/avl/#Node">Node</a>($Value), direction: <a class="code-typename" href="/core/container/avl/#Direction">Direction</a>) -> <a class="code-typename" href="/core/container/avl/#Iterator">Iterator</a>($Value) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -629,7 +612,7 @@ same as the Tree remove.</p>
 <div class="pkg-entity">
 <h3 id="last"><span><a class="doc-id-link" href="#last">last<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/avl/avl.odin#L115"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">last :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T/<a class="code-typename" href="/core/container/avl/#Tree">Tree</a>($Value)) -> ^<a class="code-typename" href="/core/container/avl/#Node">Node</a>($Value) {…}</pre>
+<pre class="doc-code">last :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T) -> ^<a class="code-typename" href="/core/container/avl/#Node">Node</a>($Value) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -640,7 +623,7 @@ the tree is empty.</p>
 <div class="pkg-entity">
 <h3 id="len"><span><a class="doc-id-link" href="#len">len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/avl/avl.odin#L103"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">len :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T/<a class="code-typename" href="/core/container/avl/#Tree">Tree</a>($Value)) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
+<pre class="doc-code">len :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -650,7 +633,7 @@ the tree is empty.</p>
 <div class="pkg-entity">
 <h3 id="remove_node"><span><a class="doc-id-link" href="#remove_node">remove_node<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/avl/avl.odin#L197"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">remove_node :: <span class="keyword-type">proc</span>(t: ^$T/<a class="code-typename" href="/core/container/avl/#Tree">Tree</a>($Value), node: ^<a class="code-typename" href="/core/container/avl/#Node">Node</a>($Value), call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+<pre class="doc-code">remove_node :: <span class="keyword-type">proc</span>(t: ^$T, node: ^<a class="code-typename" href="/core/container/avl/#Node">Node</a>($Value), call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -662,7 +645,7 @@ the node itself will be freed via the tree's node allocator.</p>
 <div class="pkg-entity">
 <h3 id="remove_value"><span><a class="doc-id-link" href="#remove_value">remove_value<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/avl/avl.odin#L186"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">remove_value :: <span class="keyword-type">proc</span>(t: ^$T/<a class="code-typename" href="/core/container/avl/#Tree">Tree</a>($Value), value: $T, call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+<pre class="doc-code">remove_value :: <span class="keyword-type">proc</span>(t: ^$T, value: $Value, call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -708,7 +691,7 @@ the node itself will be freed via the tree's node allocator.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/container/avl/avl.odin">avl.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-23 21:10:31.357331800 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-24 21:11:26.405499100 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

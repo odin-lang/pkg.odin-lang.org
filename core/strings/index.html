@@ -1085,7 +1085,7 @@ It replaces the existing <code>buf</code></p>
 <div class="pkg-entity">
 <h3 id="clone_safe"><span><a class="doc-id-link" href="#clone_safe">clone_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L45"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">clone_safe :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">clone_safe :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1236,7 +1236,7 @@ false
 <div class="pkg-entity">
 <h3 id="contains_rune"><span><a class="doc-id-link" href="#contains_rune">contains_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L277"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">contains_rune :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> (result: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+<pre class="doc-code">contains_rune :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, r: untyped rune) -> (result: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1476,7 +1476,7 @@ expand_tabs_example :: proc() {
 <div class="pkg-entity">
 <h3 id="fields_proc"><span><a class="doc-id-link" href="#fields_proc">fields_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L3195"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">fields_proc :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, f: <span class="keyword-type">proc</span>(<a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (res: []<a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">fields_proc :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, f: <span class="keyword-type">proc</span>(untyped rune) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (res: []<a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1668,7 +1668,7 @@ index_byte_example :: proc() {
 <div class="pkg-entity">
 <h3 id="index_proc"><span><a class="doc-id-link" href="#index_proc">index_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L2286"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">index_proc :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(<a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, truth: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> (res: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+<pre class="doc-code">index_proc :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(untyped rune) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, truth: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> (res: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1706,7 +1706,7 @@ index_proc_example :: proc() {
 <div class="pkg-entity">
 <h3 id="index_proc_with_state"><span><a class="doc-id-link" href="#index_proc_with_state">index_proc_with_state<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L2295"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">index_proc_with_state :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, state: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, truth: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> (res: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+<pre class="doc-code">index_proc_with_state :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, untyped rune) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, state: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, truth: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> (res: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1716,7 +1716,7 @@ index_proc_example :: proc() {
 <div class="pkg-entity">
 <h3 id="index_rune"><span><a class="doc-id-link" href="#index_rune">index_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L1530"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">index_rune :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> (res: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+<pre class="doc-code">index_rune :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, r: untyped rune) -> (res: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1815,7 +1815,7 @@ index_rune_example :: proc() {
 <div class="pkg-entity">
 <h3 id="is_ascii_space"><span><a class="doc-id-link" href="#is_ascii_space">is_ascii_space<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L2203"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">is_ascii_space :: <span class="keyword-type">proc</span>(r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> (res: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+<pre class="doc-code">is_ascii_space :: <span class="keyword-type">proc</span>(r: untyped rune) -> (res: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1827,7 +1827,7 @@ index_rune_example :: proc() {
 <div class="pkg-entity">
 <h3 id="is_delimiter"><span><a class="doc-id-link" href="#is_delimiter">is_delimiter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/conversion.odin#L156"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">is_delimiter :: <span class="keyword-type">proc</span>(r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> (res: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+<pre class="doc-code">is_delimiter :: <span class="keyword-type">proc</span>(r: untyped rune) -> (res: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1839,7 +1839,7 @@ index_rune_example :: proc() {
 <div class="pkg-entity">
 <h3 id="is_in_cutset"><span><a class="doc-id-link" href="#is_in_cutset">is_in_cutset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L2438"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">is_in_cutset :: <span class="keyword-type">proc</span>(state: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> (res: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+<pre class="doc-code">is_in_cutset :: <span class="keyword-type">proc</span>(state: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, r: untyped rune) -> (res: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1849,7 +1849,7 @@ index_rune_example :: proc() {
 <div class="pkg-entity">
 <h3 id="is_null"><span><a class="doc-id-link" href="#is_null">is_null<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L2246"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">is_null :: <span class="keyword-type">proc</span>(r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> (res: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+<pre class="doc-code">is_null :: <span class="keyword-type">proc</span>(r: untyped rune) -> (res: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1861,7 +1861,7 @@ index_rune_example :: proc() {
 <div class="pkg-entity">
 <h3 id="is_separator"><span><a class="doc-id-link" href="#is_separator">is_separator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/conversion.odin#L168"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">is_separator :: <span class="keyword-type">proc</span>(r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> (res: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+<pre class="doc-code">is_separator :: <span class="keyword-type">proc</span>(r: untyped rune) -> (res: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1873,7 +1873,7 @@ index_rune_example :: proc() {
 <div class="pkg-entity">
 <h3 id="is_space"><span><a class="doc-id-link" href="#is_space">is_space<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L2219"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">is_space :: <span class="keyword-type">proc</span>(r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> (res: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+<pre class="doc-code">is_space :: <span class="keyword-type">proc</span>(r: untyped rune) -> (res: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -2034,7 +2034,7 @@ last_index_byte_example :: proc() {
 <div class="pkg-entity">
 <h3 id="last_index_proc"><span><a class="doc-id-link" href="#last_index_proc">last_index_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L2304"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">last_index_proc :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(<a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, truth: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> (res: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+<pre class="doc-code">last_index_proc :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(untyped rune) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, truth: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> (res: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -2044,7 +2044,7 @@ last_index_byte_example :: proc() {
 <div class="pkg-entity">
 <h3 id="last_index_proc_with_state"><span><a class="doc-id-link" href="#last_index_proc_with_state">last_index_proc_with_state<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L2316"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">last_index_proc_with_state :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, state: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, truth: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> (res: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+<pre class="doc-code">last_index_proc_with_state :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, untyped rune) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, state: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, truth: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> (res: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -2140,7 +2140,7 @@ true
 <div class="pkg-entity">
 <h3 id="pop_rune"><span><a class="doc-id-link" href="#pop_rune">pop_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/builder.odin#L533"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">pop_rune :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/strings/#Builder">Builder</a>) -> (r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>, width: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+<pre class="doc-code">pop_rune :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/strings/#Builder">Builder</a>) -> (r: untyped rune, width: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -2263,7 +2263,7 @@ prefix_length_example :: proc() {
 <div class="pkg-entity">
 <h3 id="reader_read_rune"><span><a class="doc-id-link" href="#reader_read_rune">reader_read_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/reader.odin#L191"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">reader_read_rune :: <span class="keyword-type">proc</span>(r: ^<a class="code-typename" href="/core/strings/#Reader">Reader</a>) -> (rr: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: io.<a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
+<pre class="doc-code">reader_read_rune :: <span class="keyword-type">proc</span>(r: ^<a class="code-typename" href="/core/strings/#Reader">Reader</a>) -> (rr: untyped rune, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: io.<a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3158,7 +3158,7 @@ false
 <div class="pkg-entity">
 <h3 id="string_case_iterator"><span><a class="doc-id-link" href="#string_case_iterator">string_case_iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/conversion.odin#L225"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">string_case_iterator :: <span class="keyword-type">proc</span>(w: io.<a class="code-typename" href="/core/io/#Stream">Stream</a>, s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, callback: <span class="keyword-type">proc</span>(w: io.<a class="code-typename" href="/core/io/#Stream">Stream</a>, prev, curr, next: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>)) {…}</pre>
+<pre class="doc-code">string_case_iterator :: <span class="keyword-type">proc</span>(w: io.<a class="code-typename" href="/core/io/#Stream">Stream</a>, s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, callback: <span class="keyword-type">proc</span>(w: io.<a class="code-typename" href="/core/io/#Stream">Stream</a>, prev, curr, next: untyped rune)) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3329,7 +3329,7 @@ to_ada_case_example :: proc() {
 <div class="pkg-entity">
 <h3 id="to_delimiter_case"><span><a class="doc-id-link" href="#to_delimiter_case">to_delimiter_case<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/conversion.odin#L353"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">to_delimiter_case :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, delimiter: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>, all_upper_case: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">to_delimiter_case :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, delimiter: untyped rune, all_upper_case: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3723,7 +3723,7 @@ to_upper_snake_case_example :: proc() {
 <div class="pkg-entity">
 <h3 id="trim_left_proc"><span><a class="doc-id-link" href="#trim_left_proc">trim_left_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L2354"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">trim_left_proc :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(<a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
+<pre class="doc-code">trim_left_proc :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(untyped rune) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3752,7 +3752,7 @@ trim_left_proc_example :: proc() {
 <div class="pkg-entity">
 <h3 id="trim_left_proc_with_state"><span><a class="doc-id-link" href="#trim_left_proc_with_state">trim_left_proc_with_state<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L2372"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">trim_left_proc_with_state :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, state: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
+<pre class="doc-code">trim_left_proc_with_state :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, untyped rune) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, state: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3844,7 +3844,7 @@ testing
 <div class="pkg-entity">
 <h3 id="trim_right_proc"><span><a class="doc-id-link" href="#trim_right_proc">trim_right_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L2406"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">trim_right_proc :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(<a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
+<pre class="doc-code">trim_right_proc :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(untyped rune) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3873,7 +3873,7 @@ trim_right_proc_example :: proc() {
 <div class="pkg-entity">
 <h3 id="trim_right_proc_with_state"><span><a class="doc-id-link" href="#trim_right_proc_with_state">trim_right_proc_with_state<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L2427"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">trim_right_proc_with_state :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, state: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
+<pre class="doc-code">trim_right_proc_with_state :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, p: <span class="keyword-type">proc</span>(<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, untyped rune) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, state: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3953,7 +3953,7 @@ todo.doc
 <div class="pkg-entity">
 <h3 id="truncate_to_rune"><span><a class="doc-id-link" href="#truncate_to_rune">truncate_to_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin#L159"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">truncate_to_rune :: <span class="keyword-type">proc</span>(str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
+<pre class="doc-code">truncate_to_rune :: <span class="keyword-type">proc</span>(str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, r: untyped rune) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -4036,7 +4036,7 @@ write_bytes_example :: proc() {
 <div class="pkg-entity">
 <h3 id="write_encoded_rune"><span><a class="doc-id-link" href="#write_encoded_rune">write_encoded_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/builder.odin#L609"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">write_encoded_rune :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/strings/#Builder">Builder</a>, r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>, write_quote: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+<pre class="doc-code">write_encoded_rune :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/strings/#Builder">Builder</a>, r: untyped rune, write_quote: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -4068,7 +4068,7 @@ write_encoded_rune_example :: proc() {
 <div class="pkg-entity">
 <h3 id="write_escaped_rune"><span><a class="doc-id-link" href="#write_escaped_rune">write_escaped_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/builder.odin#L633"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">write_escaped_rune :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/strings/#Builder">Builder</a>, r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>, quote: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, html_safe: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = false) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+<pre class="doc-code">write_escaped_rune :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/strings/#Builder">Builder</a>, r: untyped rune, quote: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, html_safe: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = false) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -4207,7 +4207,7 @@ write_f32_example :: proc() {
 <div class="pkg-entity">
 <h3 id="write_quoted_rune"><span><a class="doc-id-link" href="#write_quoted_rune">write_quoted_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/builder.odin#L466"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">write_quoted_rune :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/strings/#Builder">Builder</a>, r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+<pre class="doc-code">write_quoted_rune :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/strings/#Builder">Builder</a>, r: untyped rune) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -4269,7 +4269,7 @@ write_quoted_string_example :: proc() {
 <div class="pkg-entity">
 <h3 id="write_rune"><span><a class="doc-id-link" href="#write_rune">write_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/builder.odin#L433"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">write_rune :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/strings/#Builder">Builder</a>, r: <a href="/base/builtin#rune"><span class="doc-builtin">rune</span></a>) -> (res: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: io.<a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
+<pre class="doc-code">write_rune :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/strings/#Builder">Builder</a>, r: untyped rune) -> (res: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: io.<a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -4436,7 +4436,7 @@ builder_make_example :: proc() {
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/strings/strings.odin">strings.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-23 21:10:31.676376200 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-24 21:11:26.728238600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

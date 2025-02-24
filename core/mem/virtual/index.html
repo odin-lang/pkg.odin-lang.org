@@ -611,19 +611,19 @@ All uses of an <code>Arena_Temp</code> must be handled by ending them with <code
 <div class="pkg-entity">
 <h3 id="DEFAULT_ARENA_GROWING_COMMIT_SIZE"><span><a class="doc-id-link" href="#DEFAULT_ARENA_GROWING_COMMIT_SIZE">DEFAULT_ARENA_GROWING_COMMIT_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena.odin#L36"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">DEFAULT_ARENA_GROWING_COMMIT_SIZE :: 8 * mem.Megabyte</pre>
+<pre class="doc-code">DEFAULT_ARENA_GROWING_COMMIT_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 8 * mem.Megabyte</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="DEFAULT_ARENA_GROWING_MINIMUM_BLOCK_SIZE"><span><a class="doc-id-link" href="#DEFAULT_ARENA_GROWING_MINIMUM_BLOCK_SIZE">DEFAULT_ARENA_GROWING_MINIMUM_BLOCK_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena.odin#L37"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">DEFAULT_ARENA_GROWING_MINIMUM_BLOCK_SIZE :: DEFAULT_ARENA_STATIC_COMMIT_SIZE</pre>
+<pre class="doc-code">DEFAULT_ARENA_GROWING_MINIMUM_BLOCK_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : DEFAULT_ARENA_STATIC_COMMIT_SIZE</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="DEFAULT_ARENA_STATIC_COMMIT_SIZE"><span><a class="doc-id-link" href="#DEFAULT_ARENA_STATIC_COMMIT_SIZE">DEFAULT_ARENA_STATIC_COMMIT_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena.odin#L35"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">DEFAULT_ARENA_STATIC_COMMIT_SIZE :: mem.Megabyte</pre>
+<pre class="doc-code">DEFAULT_ARENA_STATIC_COMMIT_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : mem.Megabyte</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -633,7 +633,7 @@ All uses of an <code>Arena_Temp</code> must be handled by ending them with <code
 <div class="pkg-entity">
 <h3 id="DEFAULT_ARENA_STATIC_RESERVE_SIZE"><span><a class="doc-id-link" href="#DEFAULT_ARENA_STATIC_RESERVE_SIZE">DEFAULT_ARENA_STATIC_RESERVE_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena.odin#L40"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">DEFAULT_ARENA_STATIC_RESERVE_SIZE :: mem.Gigabyte when size_of(uintptr) == 8 else 128 * mem.Megabyte</pre>
+<pre class="doc-code">DEFAULT_ARENA_STATIC_RESERVE_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : mem.Gigabyte when size_of(uintptr) == 8 else 128 * mem.Megabyte</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -866,7 +866,7 @@ A static arena contains a single <code>Memory_Block</code> allocated with virtua
 <div class="pkg-entity">
 <h3 id="make_aligned"><span><a class="doc-id-link" href="#make_aligned">make_aligned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena_util.odin#L37"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_aligned :: <span class="keyword-type">proc</span>(arena: ^<a class="code-typename" href="/core/mem/virtual/#Arena">Arena</a>, $T: <span class="keyword-type">typeid</span>/[]T, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (T, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">make_aligned :: <span class="keyword-type">proc</span>(arena: ^<a class="code-typename" href="/core/mem/virtual/#Arena">Arena</a>, $T: <span class="keyword-type">typeid</span>/[0][0]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ($/[0][0]$E, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -878,7 +878,7 @@ Unlike <code>new</code>, <code>make</code>'s return value is the same as the typ
 <div class="pkg-entity">
 <h3 id="make_multi_pointer"><span><a class="doc-id-link" href="#make_multi_pointer">make_multi_pointer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena_util.odin#L55"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_multi_pointer :: <span class="keyword-type">proc</span>(arena: ^<a class="code-typename" href="/core/mem/virtual/#Arena">Arena</a>, $T: <span class="keyword-type">typeid</span>/[^]T, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ($/[^]T, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">make_multi_pointer :: <span class="keyword-type">proc</span>(arena: ^<a class="code-typename" href="/core/mem/virtual/#Arena">Arena</a>, $T: <span class="keyword-type">typeid</span>/[0][0]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ($/[0][0]$E, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -891,7 +891,7 @@ Unlike <code>new</code>, <code>make</code>'s return value is the same as the typ
 <div class="pkg-entity">
 <h3 id="make_slice"><span><a class="doc-id-link" href="#make_slice">make_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena_util.odin#L28"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_slice :: <span class="keyword-type">proc</span>(arena: ^<a class="code-typename" href="/core/mem/virtual/#Arena">Arena</a>, $T: <span class="keyword-type">typeid</span>/[]T, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (T, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">make_slice :: <span class="keyword-type">proc</span>(arena: ^<a class="code-typename" href="/core/mem/virtual/#Arena">Arena</a>, $T: <span class="keyword-type">typeid</span>/[0][0]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ($/[0][0]$E, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1031,7 +1031,7 @@ that type using the specified allocator.</p>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-23 21:10:31.622747700 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-24 21:11:26.674307100 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

@@ -495,24 +495,6 @@ elements in the tree.</p>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Tree is a red-black tree</p>
 </details>
-<h5>Related Procedures With Parameters</h5>
-<ul>
-<li><a href="/core/container/rbtree/#destroy">destroy</a></li>
-<li><a href="/core/container/rbtree/#find">find</a></li>
-<li><a href="/core/container/rbtree/#find_or_insert">find_or_insert</a></li>
-<li><a href="/core/container/rbtree/#find_value">find_value</a></li>
-<li><a href="/core/container/rbtree/#first">first</a></li>
-<li><a href="/core/container/rbtree/#init_cmp">init_cmp</a></li>
-<li><a href="/core/container/rbtree/#init_ordered">init_ordered</a></li>
-<li><a href="/core/container/rbtree/#iterator">iterator</a></li>
-<li><a href="/core/container/rbtree/#iterator_from_pos">iterator_from_pos</a></li>
-<li><a href="/core/container/rbtree/#last">last</a></li>
-<li><a href="/core/container/rbtree/#len">len</a></li>
-<li><a href="/core/container/rbtree/#remove_key">remove_key</a></li>
-<li><a href="/core/container/rbtree/#remove_node">remove_node</a></li>
-<li><a href="/core/container/rbtree/#init">init</a>&nbsp;<em>(procedure groups)</em></li>
-<li><a href="/core/container/rbtree/#remove">remove</a>&nbsp;<em>(procedure groups)</em></li>
-</ul>
 </div>
 <h2 id="pkg-Constants" class="pkg-header">Constants</h2>
 <p class="pkg-empty-section">This section is empty.</p>
@@ -522,7 +504,7 @@ elements in the tree.</p>
 <div class="pkg-entity">
 <h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L87"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">destroy :: <span class="keyword-type">proc</span>(t: ^$T/<a class="code-typename" href="/core/container/rbtree/#Tree">Tree</a>($Key, $Value), call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) {…}</pre>
+<pre class="doc-code">destroy :: <span class="keyword-type">proc</span>(t: ^$T, call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -532,7 +514,7 @@ elements in the tree.</p>
 <div class="pkg-entity">
 <h3 id="find"><span><a class="doc-id-link" href="#find">find<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L111"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">find :: <span class="keyword-type">proc</span>(t: ^$T/<a class="code-typename" href="/core/container/rbtree/#Tree">Tree</a>($Key, $Value), key: $T) -> (node: ^<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value)) {…}</pre>
+<pre class="doc-code">find :: <span class="keyword-type">proc</span>(t: ^$T, key: $Key) -> (node: ^<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value)) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -542,7 +524,7 @@ elements in the tree.</p>
 <div class="pkg-entity">
 <h3 id="find_or_insert"><span><a class="doc-id-link" href="#find_or_insert">find_or_insert<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L134"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">find_or_insert :: <span class="keyword-type">proc</span>(t: ^$T/<a class="code-typename" href="/core/container/rbtree/#Tree">Tree</a>($Key, $Value), key: $T, value: $T) -> (n: ^<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value), inserted: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">find_or_insert :: <span class="keyword-type">proc</span>(t: ^$T, key: $Key, value: $Value) -> (n: ^<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value), inserted: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -554,7 +536,7 @@ node allocator error if relevant.  If the value is already present, the existing
 <div class="pkg-entity">
 <h3 id="find_value"><span><a class="doc-id-link" href="#find_value">find_value<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L124"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">find_value :: <span class="keyword-type">proc</span>(t: ^$T/<a class="code-typename" href="/core/container/rbtree/#Tree">Tree</a>($Key, $Value), key: $T) -> (value: $T, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">find_value :: <span class="keyword-type">proc</span>(t: ^$T, key: $Key) -> (value: $Value, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -564,7 +546,7 @@ node allocator error if relevant.  If the value is already present, the existing
 <div class="pkg-entity">
 <h3 id="first"><span><a class="doc-id-link" href="#first">first<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L100"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">first :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T/<a class="code-typename" href="/core/container/rbtree/#Tree">Tree</a>($Key, $Value)) -> ^<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value) {…}</pre>
+<pre class="doc-code">first :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T) -> ^<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -575,7 +557,7 @@ the tree is empty.</p>
 <div class="pkg-entity">
 <h3 id="init_cmp"><span><a class="doc-id-link" href="#init_cmp">init_cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L73"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">init_cmp :: <span class="keyword-type">proc</span>(t: ^$T/<a class="code-typename" href="/core/container/rbtree/#Tree">Tree</a>($Key, $Value), cmp_fn: <span class="keyword-type">proc</span>(a, b: $T) -> slice.<a class="code-typename" href="/core/slice/#Ordering">Ordering</a>, node_allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
+<pre class="doc-code">init_cmp :: <span class="keyword-type">proc</span>(t: ^$T, cmp_fn: <span class="keyword-type">proc</span>(a, b: $Key) -> slice.<a class="code-typename" href="/core/slice/#Ordering">Ordering</a>, node_allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -585,7 +567,7 @@ the tree is empty.</p>
 <div class="pkg-entity">
 <h3 id="init_ordered"><span><a class="doc-id-link" href="#init_ordered">init_ordered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L82"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">init_ordered :: <span class="keyword-type">proc</span>(t: ^$T/<a class="code-typename" href="/core/container/rbtree/#Tree">Tree</a>($Key, $Value), node_allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
+<pre class="doc-code">init_ordered :: <span class="keyword-type">proc</span>(t: ^$T, node_allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -596,7 +578,7 @@ a comparison function that results in an ascending order sort.</p>
 <div class="pkg-entity">
 <h3 id="iterator"><span><a class="doc-id-link" href="#iterator">iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L210"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">iterator :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T/<a class="code-typename" href="/core/container/rbtree/#Tree">Tree</a>($Key, $Value), direction: <a class="code-typename" href="/core/container/rbtree/#Direction">Direction</a>) -> <a class="code-typename" href="/core/container/rbtree/#Iterator">Iterator</a>($Key, $Value) {…}</pre>
+<pre class="doc-code">iterator :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T, direction: <a class="code-typename" href="/core/container/rbtree/#Direction">Direction</a>) -> <a class="code-typename" href="/core/container/rbtree/#Iterator">Iterator</a>($Key, $Value) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -606,7 +588,7 @@ a comparison function that results in an ascending order sort.</p>
 <div class="pkg-entity">
 <h3 id="iterator_from_pos"><span><a class="doc-id-link" href="#iterator_from_pos">iterator_from_pos<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L222"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">iterator_from_pos :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T/<a class="code-typename" href="/core/container/rbtree/#Tree">Tree</a>($Key, $Value), pos: ^<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value), direction: <a class="code-typename" href="/core/container/rbtree/#Direction">Direction</a>) -> <a class="code-typename" href="/core/container/rbtree/#Iterator">Iterator</a>($Key, $Value) {…}</pre>
+<pre class="doc-code">iterator_from_pos :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T, pos: ^<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value), direction: <a class="code-typename" href="/core/container/rbtree/#Direction">Direction</a>) -> <a class="code-typename" href="/core/container/rbtree/#Iterator">Iterator</a>($Key, $Value) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -617,7 +599,7 @@ spanning the range [pos, last] (inclusive).</p>
 <div class="pkg-entity">
 <h3 id="iterator_get"><span><a class="doc-id-link" href="#iterator_get">iterator_get<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L239"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">iterator_get :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (it: ^$I/<a class="code-typename" href="/core/container/rbtree/#Iterator">Iterator</a>($Key, $Value)) -> ^<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value) {…}</pre>
+<pre class="doc-code">iterator_get :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (it: ^$I/container_avl.<a class="code-typename" href="/core/container/avl/#Iterator">Iterator</a>($Value)) -> ^<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -629,7 +611,7 @@ of the tree has been reached.</p>
 <div class="pkg-entity">
 <h3 id="iterator_next"><span><a class="doc-id-link" href="#iterator_next">iterator_next<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L264"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">iterator_next :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (it: ^$I/<a class="code-typename" href="/core/container/rbtree/#Iterator">Iterator</a>($Key, $Value)) -> (^<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value), <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+<pre class="doc-code">iterator_next :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (it: ^$I/container_avl.<a class="code-typename" href="/core/container/avl/#Iterator">Iterator</a>($Value)) -> (^<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value), <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -642,7 +624,7 @@ of advancing the iterator.</p>
 <div class="pkg-entity">
 <h3 id="iterator_remove"><span><a class="doc-id-link" href="#iterator_remove">iterator_remove<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L246"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">iterator_remove :: <span class="keyword-type">proc</span>(it: ^$I/<a class="code-typename" href="/core/container/rbtree/#Iterator">Iterator</a>($Key, $Value), call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+<pre class="doc-code">iterator_remove :: <span class="keyword-type">proc</span>(it: ^$I/container_avl.<a class="code-typename" href="/core/container/avl/#Iterator">Iterator</a>($Value), call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -654,7 +636,7 @@ same as the Tree remove.</p>
 <div class="pkg-entity">
 <h3 id="last"><span><a class="doc-id-link" href="#last">last<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L106"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">last :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T/<a class="code-typename" href="/core/container/rbtree/#Tree">Tree</a>($Key, $Value)) -> ^<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value) {…}</pre>
+<pre class="doc-code">last :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T) -> ^<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -665,7 +647,7 @@ the tree is empty.</p>
 <div class="pkg-entity">
 <h3 id="len"><span><a class="doc-id-link" href="#len">len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L94"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">len :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T/<a class="code-typename" href="/core/container/rbtree/#Tree">Tree</a>($Key, $Value)) -> (node_count: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+<pre class="doc-code">len :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: ^$T) -> (node_count: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -677,7 +659,7 @@ the tree is empty.</p>
 <div class="pkg-entity">
 <h3 id="remove_key"><span><a class="doc-id-link" href="#remove_key">remove_key<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L167"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">remove_key :: <span class="keyword-type">proc</span>(t: ^$T/<a class="code-typename" href="/core/container/rbtree/#Tree">Tree</a>($Key, $Value), key: $T, call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+<pre class="doc-code">remove_key :: <span class="keyword-type">proc</span>(t: ^$T, key: $Key, call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -689,7 +671,7 @@ the node itself will be freed via the tree's node allocator.</p>
 <div class="pkg-entity">
 <h3 id="remove_node"><span><a class="doc-id-link" href="#remove_node">remove_node<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin#L178"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">remove_node :: <span class="keyword-type">proc</span>(t: ^$T/<a class="code-typename" href="/core/container/rbtree/#Tree">Tree</a>($Key, $Value), node: ^$N/<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value), call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> (found: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+<pre class="doc-code">remove_node :: <span class="keyword-type">proc</span>(t: ^$T, node: ^$N/<a class="code-typename" href="/core/container/rbtree/#Node">Node</a>($Key, $Value), call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> (found: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -735,7 +717,7 @@ the node itself will be freed via the tree's node allocator.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/container/rbtree/rbtree.odin">rbtree.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-23 21:10:31.363717900 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-24 21:11:26.411743700 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
