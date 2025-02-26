@@ -4369,9 +4369,7 @@ Procedure Groups (0)</summary>
 <li><a href="/vendor/sdl3/#GetRenderLogicalPresentationRect">GetRenderLogicalPresentationRect</a></li>
 <li><a href="/vendor/sdl3/#HasRectIntersectionFloat">HasRectIntersectionFloat</a></li>
 <li><a href="/vendor/sdl3/#RectToFRect">RectToFRect</a></li>
-<li><a href="/vendor/sdl3/#RenderFillRect">RenderFillRect</a></li>
 <li><a href="/vendor/sdl3/#RenderFillRects">RenderFillRects</a></li>
-<li><a href="/vendor/sdl3/#RenderRect">RenderRect</a></li>
 <li><a href="/vendor/sdl3/#RenderRects">RenderRects</a></li>
 </ul>
 </div>
@@ -8485,14 +8483,6 @@ Procedure Groups (0)</summary>
 </div>
 <h5>Related Procedures With Parameters</h5>
 <ul>
-<li><a href="/vendor/sdl3/#BlitSurface">BlitSurface</a></li>
-<li><a href="/vendor/sdl3/#BlitSurface9Grid">BlitSurface9Grid</a></li>
-<li><a href="/vendor/sdl3/#BlitSurfaceScaled">BlitSurfaceScaled</a></li>
-<li><a href="/vendor/sdl3/#BlitSurfaceTiled">BlitSurfaceTiled</a></li>
-<li><a href="/vendor/sdl3/#BlitSurfaceTiledWithScale">BlitSurfaceTiledWithScale</a></li>
-<li><a href="/vendor/sdl3/#BlitSurfaceUnchecked">BlitSurfaceUnchecked</a></li>
-<li><a href="/vendor/sdl3/#BlitSurfaceUncheckedScaled">BlitSurfaceUncheckedScaled</a></li>
-<li><a href="/vendor/sdl3/#FillSurfaceRect">FillSurfaceRect</a></li>
 <li><a href="/vendor/sdl3/#FillSurfaceRects">FillSurfaceRects</a></li>
 <li><a href="/vendor/sdl3/#GetDisplayBounds">GetDisplayBounds</a></li>
 <li><a href="/vendor/sdl3/#GetDisplayForRect">GetDisplayForRect</a></li>
@@ -8513,10 +8503,6 @@ Procedure Groups (0)</summary>
 <li><a href="/vendor/sdl3/#RectEqual">RectEqual</a></li>
 <li><a href="/vendor/sdl3/#RectToFRect">RectToFRect</a></li>
 <li><a href="/vendor/sdl3/#SetGPUScissor">SetGPUScissor</a></li>
-<li><a href="/vendor/sdl3/#SetRenderClipRect">SetRenderClipRect</a></li>
-<li><a href="/vendor/sdl3/#SetRenderViewport">SetRenderViewport</a></li>
-<li><a href="/vendor/sdl3/#SetSurfaceClipRect">SetSurfaceClipRect</a></li>
-<li><a href="/vendor/sdl3/#SetTextInputArea">SetTextInputArea</a></li>
 <li><a href="/vendor/sdl3/#SetWindowMouseRect">SetWindowMouseRect</a></li>
 <li><a href="/vendor/sdl3/#UpdateWindowSurfaceRects">UpdateWindowSurfaceRects</a></li>
 </ul>
@@ -17630,7 +17616,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="BlitSurface"><span><a class="doc-id-link" href="#BlitSurface">BlitSurface<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_surface.odin#L95"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">BlitSurface :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, <span class="keyword-type">#by_ptr</span> srcrect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>, dst: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, <span class="keyword-type">#by_ptr</span> dstrect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
+<pre class="doc-code">BlitSurface :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, srcrect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect), dst: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, dstrect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect)) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -17638,25 +17624,25 @@ Procedure Groups (0)</summary>
 <div>
 <pre class="doc-code">BlitSurface9Grid :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
 	src:                                                ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, 
-	<span class="keyword-type">#by_ptr</span> srcrect:                                    <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>, 
+	srcrect:                                            runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect), 
 	left_width, right_width, top_height, bottom_height: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
 	scale:                                              <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, 
 	scaleMode:                                          <a class="code-typename" href="/vendor/sdl3/#ScaleMode">ScaleMode</a>, 
 	dst:                                                ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, 
-	<span class="keyword-type">#by_ptr</span> dstrect:                                    <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>, 
+	dstrect:                                            runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect), 
 ) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="BlitSurfaceScaled"><span><a class="doc-id-link" href="#BlitSurfaceScaled">BlitSurfaceScaled<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_surface.odin#L97"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">BlitSurfaceScaled :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, <span class="keyword-type">#by_ptr</span> srcrect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>, dst: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, <span class="keyword-type">#by_ptr</span> dstrect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>, scaleMode: <a class="code-typename" href="/vendor/sdl3/#ScaleMode">ScaleMode</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
+<pre class="doc-code">BlitSurfaceScaled :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, srcrect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect), dst: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, dstrect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect), scaleMode: <a class="code-typename" href="/vendor/sdl3/#ScaleMode">ScaleMode</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="BlitSurfaceTiled"><span><a class="doc-id-link" href="#BlitSurfaceTiled">BlitSurfaceTiled<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_surface.odin#L99"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">BlitSurfaceTiled :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, <span class="keyword-type">#by_ptr</span> srcrect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>, dst: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, <span class="keyword-type">#by_ptr</span> dstrect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
+<pre class="doc-code">BlitSurfaceTiled :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, srcrect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect), dst: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, dstrect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect)) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -17664,24 +17650,24 @@ Procedure Groups (0)</summary>
 <div>
 <pre class="doc-code">BlitSurfaceTiledWithScale :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
 	src:       ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, 
-	<span class="keyword-type">#by_ptr</span> srcrect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>, 
+	srcrect:   runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect), 
 	scale:     <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, 
 	scaleMode: <a class="code-typename" href="/vendor/sdl3/#ScaleMode">ScaleMode</a>, 
 	dst:       ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, 
-	<span class="keyword-type">#by_ptr</span> dstrect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>, 
+	dstrect:   runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect), 
 ) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="BlitSurfaceUnchecked"><span><a class="doc-id-link" href="#BlitSurfaceUnchecked">BlitSurfaceUnchecked<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_surface.odin#L96"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">BlitSurfaceUnchecked :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, <span class="keyword-type">#by_ptr</span> srcrect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>, dst: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, <span class="keyword-type">#by_ptr</span> dstrect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
+<pre class="doc-code">BlitSurfaceUnchecked :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, srcrect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect), dst: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, dstrect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect)) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="BlitSurfaceUncheckedScaled"><span><a class="doc-id-link" href="#BlitSurfaceUncheckedScaled">BlitSurfaceUncheckedScaled<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_surface.odin#L98"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">BlitSurfaceUncheckedScaled :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, <span class="keyword-type">#by_ptr</span> srcrect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>, dst: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, <span class="keyword-type">#by_ptr</span> dstrect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>, scaleMode: <a class="code-typename" href="/vendor/sdl3/#ScaleMode">ScaleMode</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
+<pre class="doc-code">BlitSurfaceUncheckedScaled :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, srcrect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect), dst: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, dstrect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect), scaleMode: <a class="code-typename" href="/vendor/sdl3/#ScaleMode">ScaleMode</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -18610,7 +18596,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="FillSurfaceRect"><span><a class="doc-id-link" href="#FillSurfaceRect">FillSurfaceRect<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_surface.odin#L93"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">FillSurfaceRect :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (dst: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, <span class="keyword-type">#by_ptr</span> rect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>, color: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
+<pre class="doc-code">FillSurfaceRect :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (dst: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, rect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect), color: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -22414,7 +22400,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="RenderFillRect"><span><a class="doc-id-link" href="#RenderFillRect">RenderFillRect<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_render.odin#L208"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">RenderFillRect :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (renderer: ^<a class="code-typename" href="/vendor/sdl3/#Renderer">Renderer</a>, <span class="keyword-type">#by_ptr</span> rect: <a class="code-typename" href="/vendor/sdl3/#FRect">FRect</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
+<pre class="doc-code">RenderFillRect :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (renderer: ^<a class="code-typename" href="/vendor/sdl3/#Renderer">Renderer</a>, rect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^FRect)) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -22494,7 +22480,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="RenderRect"><span><a class="doc-id-link" href="#RenderRect">RenderRect<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_render.odin#L206"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">RenderRect :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (renderer: ^<a class="code-typename" href="/vendor/sdl3/#Renderer">Renderer</a>, <span class="keyword-type">#by_ptr</span> rect: <a class="code-typename" href="/vendor/sdl3/#FRect">FRect</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
+<pre class="doc-code">RenderRect :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (renderer: ^<a class="code-typename" href="/vendor/sdl3/#Renderer">Renderer</a>, rect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^FRect)) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -23163,7 +23149,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="SetRenderClipRect"><span><a class="doc-id-link" href="#SetRenderClipRect">SetRenderClipRect<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_render.odin#L189"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">SetRenderClipRect :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (renderer: ^<a class="code-typename" href="/vendor/sdl3/#Renderer">Renderer</a>, <span class="keyword-type">#by_ptr</span> rect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
+<pre class="doc-code">SetRenderClipRect :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (renderer: ^<a class="code-typename" href="/vendor/sdl3/#Renderer">Renderer</a>, rect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect)) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -23217,7 +23203,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="SetRenderViewport"><span><a class="doc-id-link" href="#SetRenderViewport">SetRenderViewport<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_render.odin#L186"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">SetRenderViewport :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (renderer: ^<a class="code-typename" href="/vendor/sdl3/#Renderer">Renderer</a>, <span class="keyword-type">#by_ptr</span> rect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
+<pre class="doc-code">SetRenderViewport :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (renderer: ^<a class="code-typename" href="/vendor/sdl3/#Renderer">Renderer</a>, rect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect)) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -23247,7 +23233,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="SetSurfaceClipRect"><span><a class="doc-id-link" href="#SetSurfaceClipRect">SetSurfaceClipRect<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_surface.odin#L81"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">SetSurfaceClipRect :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (surface: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, <span class="keyword-type">#by_ptr</span> rect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
+<pre class="doc-code">SetSurfaceClipRect :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (surface: ^<a class="code-typename" href="/vendor/sdl3/#Surface">Surface</a>, rect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect)) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -23289,7 +23275,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="SetTextInputArea"><span><a class="doc-id-link" href="#SetTextInputArea">SetTextInputArea<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_keyboard.odin#L55"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">SetTextInputArea :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (window: ^<a class="code-typename" href="/vendor/sdl3/#Window">Window</a>, <span class="keyword-type">#by_ptr</span> rect: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>, cursor: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
+<pre class="doc-code">SetTextInputArea :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (window: ^<a class="code-typename" href="/vendor/sdl3/#Window">Window</a>, rect: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^Rect), cursor: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -25580,7 +25566,7 @@ Procedure Groups (0)</summary>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_vulkan.odin">sdl3_vulkan.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-25 21:12:00.275281100 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-02 (vendor "odin") Windows_amd64 @ 2025-02-26 21:12:29.821499500 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
