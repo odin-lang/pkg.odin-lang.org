@@ -317,6 +317,22 @@
 </div>
 <ul id="odin-search-results"></ul>
 <div id="pkg-top">
+<h2>Overview</h2>
+<div id="pkg-overview">
+<p>The SIMD support package.</p>
+<p>SIMD (Single Instruction Multiple Data), is a CPU hardware feature that
+introduce special registers and instructions which operate on multiple units
+of data at the same time, which enables faster data processing for
+applications with heavy computational workloads.</p>
+<p>In Odin SIMD is exposed via a special kinds of arrays, called the *SIMD
+vectors*. The types of SIMD vectors is written as <code>#simd [N]T</code>, where N is a
+power of two, and T could be any basic type (integers, floats, etc.). The
+documentation of this package will call <i>SIMD vectors</i> just <i>vectors</i>.</p>
+<p>SIMD vectors consist of elements, called <i>scalar values</i>, or
+<i>scalars</i>, each occupying a <i>lane</i> of the SIMD vector. In the type declaration,
+<code>N</code> specifies the amount of lanes, or values, that a vector stores.</p>
+<p>This package implements procedures for working with vectors.</p>
+</div>
 <div id="pkg-index">
 <h2>Index</h2>
 <div>
@@ -479,297 +495,468 @@ Procedure Groups (0)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="b16x16"><span><a class="doc-id-link" href="#b16x16">b16x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L46"><em>Source</em></a></div></h3>
+<h3 id="b16x16"><span><a class="doc-id-link" href="#b16x16">b16x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L177"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b16x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#b16"><span class="doc-builtin">b16</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 16 <code>b16</code> lanes (256 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="b16x32"><span><a class="doc-id-link" href="#b16x32">b16x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L64"><em>Source</em></a></div></h3>
+<h3 id="b16x32"><span><a class="doc-id-link" href="#b16x32">b16x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L252"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b16x32 :: <span class="directive">#simd</span>[32]<a href="/base/builtin#b16"><span class="doc-builtin">b16</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 32 <code>b16</code> lanes (512 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="b16x8"><span><a class="doc-id-link" href="#b16x8">b16x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L28"><em>Source</em></a></div></h3>
+<h3 id="b16x8"><span><a class="doc-id-link" href="#b16x8">b16x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L102"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b16x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#b16"><span class="doc-builtin">b16</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 8 <code>b16</code> lanes (128 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="b32x16"><span><a class="doc-id-link" href="#b32x16">b32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L65"><em>Source</em></a></div></h3>
+<h3 id="b32x16"><span><a class="doc-id-link" href="#b32x16">b32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L257"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b32x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 16 <code>b32</code> lanes (512 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="b32x4"><span><a class="doc-id-link" href="#b32x4">b32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L29"><em>Source</em></a></div></h3>
+<h3 id="b32x4"><span><a class="doc-id-link" href="#b32x4">b32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L107"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b32x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 4 <code>b32</code> lanes (128 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="b32x8"><span><a class="doc-id-link" href="#b32x8">b32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L47"><em>Source</em></a></div></h3>
+<h3 id="b32x8"><span><a class="doc-id-link" href="#b32x8">b32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L182"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b32x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 8 <code>b32</code> lanes (256 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="b64x2"><span><a class="doc-id-link" href="#b64x2">b64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L30"><em>Source</em></a></div></h3>
+<h3 id="b64x2"><span><a class="doc-id-link" href="#b64x2">b64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L112"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b64x2 :: <span class="directive">#simd</span>[2]<a href="/base/builtin#b64"><span class="doc-builtin">b64</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 2 <code>b64</code> lanes (128 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="b64x4"><span><a class="doc-id-link" href="#b64x4">b64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L48"><em>Source</em></a></div></h3>
+<h3 id="b64x4"><span><a class="doc-id-link" href="#b64x4">b64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L187"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b64x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#b64"><span class="doc-builtin">b64</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 4 <code>b64</code> lanes (256 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="b64x8"><span><a class="doc-id-link" href="#b64x8">b64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L66"><em>Source</em></a></div></h3>
+<h3 id="b64x8"><span><a class="doc-id-link" href="#b64x8">b64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L262"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b64x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#b64"><span class="doc-builtin">b64</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 8 <code>b64</code> lanes (512 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="b8x16"><span><a class="doc-id-link" href="#b8x16">b8x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L27"><em>Source</em></a></div></h3>
+<h3 id="b8x16"><span><a class="doc-id-link" href="#b8x16">b8x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L97"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b8x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#b8"><span class="doc-builtin">b8</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 16 <code>b8</code> lanes (128 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="b8x32"><span><a class="doc-id-link" href="#b8x32">b8x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L45"><em>Source</em></a></div></h3>
+<h3 id="b8x32"><span><a class="doc-id-link" href="#b8x32">b8x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L172"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b8x32 :: <span class="directive">#simd</span>[32]<a href="/base/builtin#b8"><span class="doc-builtin">b8</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 32 <code>b8</code> lanes (256 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="b8x64"><span><a class="doc-id-link" href="#b8x64">b8x64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L63"><em>Source</em></a></div></h3>
+<h3 id="b8x64"><span><a class="doc-id-link" href="#b8x64">b8x64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L247"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b8x64 :: <span class="directive">#simd</span>[64]<a href="/base/builtin#b8"><span class="doc-builtin">b8</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 64 <code>b8</code> lanes (512 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="boolx16"><span><a class="doc-id-link" href="#boolx16">boolx16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L26"><em>Source</em></a></div></h3>
+<h3 id="boolx16"><span><a class="doc-id-link" href="#boolx16">boolx16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L92"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">boolx16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 16 <code>bool</code> lanes (128 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="boolx32"><span><a class="doc-id-link" href="#boolx32">boolx32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L44"><em>Source</em></a></div></h3>
+<h3 id="boolx32"><span><a class="doc-id-link" href="#boolx32">boolx32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L167"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">boolx32 :: <span class="directive">#simd</span>[32]<a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 32 <code>bool</code> lanes (256 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="boolx64"><span><a class="doc-id-link" href="#boolx64">boolx64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L62"><em>Source</em></a></div></h3>
+<h3 id="boolx64"><span><a class="doc-id-link" href="#boolx64">boolx64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L242"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">boolx64 :: <span class="directive">#simd</span>[64]<a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 64 <code>bool</code> lanes (512 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="f32x16"><span><a class="doc-id-link" href="#f32x16">f32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L59"><em>Source</em></a></div></h3>
+<h3 id="f32x16"><span><a class="doc-id-link" href="#f32x16">f32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L232"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">f32x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 16 <code>f32</code> lanes (512 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="f32x4"><span><a class="doc-id-link" href="#f32x4">f32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L23"><em>Source</em></a></div></h3>
+<h3 id="f32x4"><span><a class="doc-id-link" href="#f32x4">f32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L82"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">f32x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 4 <code>f32</code> lanes (128 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="f32x8"><span><a class="doc-id-link" href="#f32x8">f32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L41"><em>Source</em></a></div></h3>
+<h3 id="f32x8"><span><a class="doc-id-link" href="#f32x8">f32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L157"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">f32x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 8 <code>f32</code> lanes (256 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="f64x2"><span><a class="doc-id-link" href="#f64x2">f64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L24"><em>Source</em></a></div></h3>
+<h3 id="f64x2"><span><a class="doc-id-link" href="#f64x2">f64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L87"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">f64x2 :: <span class="directive">#simd</span>[2]<a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 2 <code>f64</code> lanes (128 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="f64x4"><span><a class="doc-id-link" href="#f64x4">f64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L42"><em>Source</em></a></div></h3>
+<h3 id="f64x4"><span><a class="doc-id-link" href="#f64x4">f64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L162"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">f64x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 4 <code>f64</code> lanes (256 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="f64x8"><span><a class="doc-id-link" href="#f64x8">f64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L60"><em>Source</em></a></div></h3>
+<h3 id="f64x8"><span><a class="doc-id-link" href="#f64x8">f64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L237"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">f64x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 8 <code>f64</code> lanes (512 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="i16x16"><span><a class="doc-id-link" href="#i16x16">i16x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L36"><em>Source</em></a></div></h3>
+<h3 id="i16x16"><span><a class="doc-id-link" href="#i16x16">i16x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L132"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i16x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 16 <code>i16</code> lanes (256 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="i16x32"><span><a class="doc-id-link" href="#i16x32">i16x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L54"><em>Source</em></a></div></h3>
+<h3 id="i16x32"><span><a class="doc-id-link" href="#i16x32">i16x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L207"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i16x32 :: <span class="directive">#simd</span>[32]<a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 32 <code>i16</code> lanes (512 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="i16x8"><span><a class="doc-id-link" href="#i16x8">i16x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L18"><em>Source</em></a></div></h3>
+<h3 id="i16x8"><span><a class="doc-id-link" href="#i16x8">i16x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L57"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i16x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 8 <code>i16</code> lanes (128 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="i32x16"><span><a class="doc-id-link" href="#i32x16">i32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L56"><em>Source</em></a></div></h3>
+<h3 id="i32x16"><span><a class="doc-id-link" href="#i32x16">i32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L217"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i32x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 16 <code>i32</code> lanes (512 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="i32x4"><span><a class="doc-id-link" href="#i32x4">i32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L20"><em>Source</em></a></div></h3>
+<h3 id="i32x4"><span><a class="doc-id-link" href="#i32x4">i32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L67"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i32x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 4 <code>i32</code> lanes (128 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="i32x8"><span><a class="doc-id-link" href="#i32x8">i32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L38"><em>Source</em></a></div></h3>
+<h3 id="i32x8"><span><a class="doc-id-link" href="#i32x8">i32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L142"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i32x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 8 <code>i32</code> lanes (256 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="i64x2"><span><a class="doc-id-link" href="#i64x2">i64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L22"><em>Source</em></a></div></h3>
+<h3 id="i64x2"><span><a class="doc-id-link" href="#i64x2">i64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L77"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i64x2 :: <span class="directive">#simd</span>[2]<a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 2 <code>i64</code> lanes (128 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="i64x4"><span><a class="doc-id-link" href="#i64x4">i64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L40"><em>Source</em></a></div></h3>
+<h3 id="i64x4"><span><a class="doc-id-link" href="#i64x4">i64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L152"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i64x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 4 <code>i64</code> lanes (256 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="i64x8"><span><a class="doc-id-link" href="#i64x8">i64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L58"><em>Source</em></a></div></h3>
+<h3 id="i64x8"><span><a class="doc-id-link" href="#i64x8">i64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L227"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i64x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 8 <code>i64</code> lanes (512 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="i8x16"><span><a class="doc-id-link" href="#i8x16">i8x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L16"><em>Source</em></a></div></h3>
+<h3 id="i8x16"><span><a class="doc-id-link" href="#i8x16">i8x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L47"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i8x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 16 <code>i8</code> lanes (128 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="i8x32"><span><a class="doc-id-link" href="#i8x32">i8x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L34"><em>Source</em></a></div></h3>
+<h3 id="i8x32"><span><a class="doc-id-link" href="#i8x32">i8x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L122"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i8x32 :: <span class="directive">#simd</span>[32]<a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 32 <code>i8</code> lanes (256 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="i8x64"><span><a class="doc-id-link" href="#i8x64">i8x64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L52"><em>Source</em></a></div></h3>
+<h3 id="i8x64"><span><a class="doc-id-link" href="#i8x64">i8x64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L197"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i8x64 :: <span class="directive">#simd</span>[64]<a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 64 <code>i8</code> lanes (512 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="u16x16"><span><a class="doc-id-link" href="#u16x16">u16x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L35"><em>Source</em></a></div></h3>
+<h3 id="u16x16"><span><a class="doc-id-link" href="#u16x16">u16x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L127"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u16x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 16 <code>u16</code> lanes (256 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="u16x32"><span><a class="doc-id-link" href="#u16x32">u16x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L53"><em>Source</em></a></div></h3>
+<h3 id="u16x32"><span><a class="doc-id-link" href="#u16x32">u16x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L202"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u16x32 :: <span class="directive">#simd</span>[32]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 32 <code>u16</code> lanes (512 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="u16x8"><span><a class="doc-id-link" href="#u16x8">u16x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L17"><em>Source</em></a></div></h3>
+<h3 id="u16x8"><span><a class="doc-id-link" href="#u16x8">u16x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L52"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u16x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 8 <code>u16</code> lanes (128 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="u32x16"><span><a class="doc-id-link" href="#u32x16">u32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L55"><em>Source</em></a></div></h3>
+<h3 id="u32x16"><span><a class="doc-id-link" href="#u32x16">u32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L212"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u32x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 16 <code>u32</code> lanes (512 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="u32x4"><span><a class="doc-id-link" href="#u32x4">u32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L19"><em>Source</em></a></div></h3>
+<h3 id="u32x4"><span><a class="doc-id-link" href="#u32x4">u32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L62"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u32x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 4 <code>u32</code> lanes (128 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="u32x8"><span><a class="doc-id-link" href="#u32x8">u32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L37"><em>Source</em></a></div></h3>
+<h3 id="u32x8"><span><a class="doc-id-link" href="#u32x8">u32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L137"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u32x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 8 <code>u32</code> lanes (256 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="u64x2"><span><a class="doc-id-link" href="#u64x2">u64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L21"><em>Source</em></a></div></h3>
+<h3 id="u64x2"><span><a class="doc-id-link" href="#u64x2">u64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L72"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u64x2 :: <span class="directive">#simd</span>[2]<a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 2 <code>u64</code> lanes (128 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="u64x4"><span><a class="doc-id-link" href="#u64x4">u64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L39"><em>Source</em></a></div></h3>
+<h3 id="u64x4"><span><a class="doc-id-link" href="#u64x4">u64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L147"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u64x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 4 <code>u64</code> lanes (256 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="u64x8"><span><a class="doc-id-link" href="#u64x8">u64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L57"><em>Source</em></a></div></h3>
+<h3 id="u64x8"><span><a class="doc-id-link" href="#u64x8">u64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L222"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u64x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Vector of 8 <code>u64</code> lanes (512 bits).</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="u8x16"><span><a class="doc-id-link" href="#u8x16">u8x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L15"><em>Source</em></a></div></h3>
+<h3 id="u8x16"><span><a class="doc-id-link" href="#u8x16">u8x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L42"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u8x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a></pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>128-bit vector aliases</p>
+<p>Vector of 16 <code>u8</code> lanes (128 bits).</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="u8x32"><span><a class="doc-id-link" href="#u8x32">u8x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L33"><em>Source</em></a></div></h3>
+<h3 id="u8x32"><span><a class="doc-id-link" href="#u8x32">u8x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L117"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u8x32 :: <span class="directive">#simd</span>[32]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a></pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>256-bit vector aliases</p>
+<p>Vector of 32 <code>u8</code> lanes (256 bits).</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="u8x64"><span><a class="doc-id-link" href="#u8x64">u8x64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L51"><em>Source</em></a></div></h3>
+<h3 id="u8x64"><span><a class="doc-id-link" href="#u8x64">u8x64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L192"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u8x64 :: <span class="directive">#simd</span>[64]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a></pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>512-bit vector aliases</p>
+<p>Vector of 64 <code>u8</code> lanes (512 bits).</p>
 </details>
 </div>
 <h2 id="pkg-Constants" class="pkg-header">Constants</h2>
 <div class="pkg-entity">
-<h3 id="IS_EMULATED"><span><a class="doc-id-link" href="#IS_EMULATED">IS_EMULATED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L8"><em>Source</em></a></div></h3>
+<h3 id="IS_EMULATED"><span><a class="doc-id-link" href="#IS_EMULATED">IS_EMULATED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L33"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">IS_EMULATED: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : true when (ODIN_ARCH == .amd64 || ODIN_ARCH == .i386) && !intrinsics.has_target_feature("sse2") else true when (ODIN_ARCH == .arm64 || ODIN_ARCH == .arm32) && !intrinsics.has_target_feature("neon") else true when (ODIN_ARCH == .wasm64p32 || ODIN_ARCH == .wasm32) && !intrinsics.has_target_feature("simd128") else true when (ODIN_ARCH == .riscv64) && !intrinsics.has_target_feature("v") else false</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>IS_EMULATED is true iff the compile-time target lacks hardware support
-for at least 128-bit SIMD.</p>
+<p>Check if SIMD is software-emulated on a target platform.</p>
+<p>This value is <code>false</code>, when the compile-time target has the hardware support for
+at 128-bit (or wider) SIMD. If the compile-time target lacks the hardware support
+for 128-bit SIMD, this value is <code>true</code>, and all SIMD operations will likely be
+emulated.</p>
 </details>
 </div>
 <h2 id="pkg-Variables" class="pkg-header">Variables</h2>
@@ -780,84 +967,352 @@ for at least 128-bit SIMD.</p>
 <div>
 <pre class="doc-code">abs :: <a href="/base/intrinsics#simd_abs">intrinsics</a>.simd_abs</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Absolute value of a SIMD vector.</p>
+<p>This procedure returns a vector where each lane has the absolute value of the
+corresponding lane in the vector <code>a</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a float vector to negate</span></p>
+<p><b>Returns:</b><br><span class="doc-list">The absolute value of a vector.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	switch {
+		case a[i] &lt; 0:  res[i] = -a[i]
+		case a[i] &gt; 0:  res[i] = a[i]
+		case a[i] == 0: res[i] = 0
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +------+------+------+------+
+a: |   0  |  -1  |   2  |  -3  |
+   +------+------+------+------+
+res:
+   +------+------+------+------+
+   |   0  |   1  |   2  |   3  |
+   +------+------+------+------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="add"><span><a class="doc-id-link" href="#add">add<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">add :: <a href="/base/intrinsics#simd_add">intrinsics</a>.simd_add</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Add SIMD vectors.</p>
+<p>This procedure returns a vector, where each lane holds the sum of the
+corresponding <code>a</code> and <code>b</code> vectors' lanes.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a float vector.</span>
+<span class="doc-list"><code>b</code>: An integer or a float vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector that is the sum of two input vectors.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	res[i] = a[i] + b[i]
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +-----+-----+-----+-----+
+a: |  0  |  1  |  2  |  3  |
+   +-----+-----+-----+-----+
+   +-----+-----+-----+-----+
+b: |  0  |  1  |  2  | -1  |
+   +-----+-----+-----+-----+
+res:
+   +-----+-----+-----+-----+
+   |  0  |  2  |  4  |  2  |
+   +-----+-----+-----+-----+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="bit_and"><span><a class="doc-id-link" href="#bit_and">bit_and<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">bit_and :: <a href="/base/intrinsics#simd_bit_and">intrinsics</a>.simd_bit_and</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Bitwise AND of vectors.</p>
+<p>This procedure returns a vector, such that each lane has the result of a bitwise
+AND operation between the corresponding lanes of the vectors <code>a</code> and <code>b</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a boolean vector.</span>
+<span class="doc-list"><code>b</code>: An integer or a boolean vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector that is the result of the bitwise AND operation between two vectors.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	res[i] = a[i] & b[i]
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +------+------+------+------+
+a: | 0x11 | 0x33 | 0x55 | 0xaa |
+   +------+------+------+------+
+   +------+------+------+------+
+b: | 0xff | 0xf0 | 0x0f | 0x00 |
+   +------+------+------+------+
+res:
+   +------+------+------+------+
+   | 0x11 | 0x30 | 0x05 | 0x00 |
+   +------+------+------+------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="bit_and_not"><span><a class="doc-id-link" href="#bit_and_not">bit_and_not<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">bit_and_not :: <a href="/base/intrinsics#simd_bit_and_not">intrinsics</a>.simd_bit_and_not</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Bitwise AND NOT of vectors.</p>
+<p>This procedure returns a vector, such that each lane has the result of a bitwise
+AND NOT operation between the corresponding lanes of the vectors <code>a</code> and <code>b</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a boolean vector.</span>
+<span class="doc-list"><code>b</code>: An integer or a boolean vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector that is the result of the bitwise AND NOT operation between two vectors.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	res[i] = a[i] &~ b[i]
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +------+------+------+------+
+a: | 0x11 | 0x33 | 0x55 | 0xaa |
+   +------+------+------+------+
+   +------+------+------+------+
+b: | 0xff | 0xf0 | 0x0f | 0x00 |
+   +------+------+------+------+
+res:
+   +------+------+------+------+
+   | 0x00 | 0x03 | 0x50 | 0xaa |
+   +------+------+------+------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="bit_not"><span><a class="doc-id-link" href="#bit_not">bit_not<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L192"><em>Source</em></a></div></h3>
+<h3 id="bit_not"><span><a class="doc-id-link" href="#bit_not">bit_not<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2396"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">bit_not :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $T) -> $T {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Perform binary not operation on a SIMD vector.</p>
+<p>This procedure returns a vector where each lane is the result of the binary
+NOT operation of the corresponding lane in the vector <code>a</code>.</p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	res[i] = ~a[i]
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +------+------+------+------+
+a: | 0x00 | 0x50 | 0x80 | 0xff |
+   +------+------+------+------+
+res:
+   +------+------+------+------+
+   | 0xff | 0xaf | 0x7f | 0x00 |
+   +------+------+------+------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="bit_or"><span><a class="doc-id-link" href="#bit_or">bit_or<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">bit_or :: <a href="/base/intrinsics#simd_bit_or">intrinsics</a>.simd_bit_or</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Bitwise OR of vectors.</p>
+<p>This procedure returns a vector, such that each lane has the result of a bitwise
+OR operation between the corresponding lanes of the vectors <code>a</code> and <code>b</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a boolean vector.</span>
+<span class="doc-list"><code>b</code>: An integer or a boolean vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector that is the result of the bitwise OR operation between two vectors.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	res[i] = a[i] | b[i]
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +------+------+------+------+
+a: | 0x11 | 0x33 | 0x55 | 0xaa |
+   +------+------+------+------+
+   +------+------+------+------+
+b: | 0xff | 0xf0 | 0x0f | 0x00 |
+   +------+------+------+------+
+res:
+   +------+------+------+------+
+   | 0xff | 0xf3 | 0x5f | 0xaa |
+   +------+------+------+------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="bit_xor"><span><a class="doc-id-link" href="#bit_xor">bit_xor<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">bit_xor :: <a href="/base/intrinsics#simd_bit_xor">intrinsics</a>.simd_bit_xor</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Bitwise XOR of vectors.</p>
+<p>This procedure returns a vector, such that each lane has the result of a bitwise
+XOR operation between the corresponding lanes of the vectors <code>a</code> and <code>b</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a boolean vector.</span>
+<span class="doc-list"><code>b</code>: An integer or a boolean vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector that is the result of the bitwise XOR operation between two vectors.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	res[i] = a[i] ~ b[i]
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +------+------+------+------+
+a: | 0x11 | 0x33 | 0x55 | 0xaa |
+   +------+------+------+------+
+   +------+------+------+------+
+b: | 0xff | 0xf0 | 0x0f | 0x00 |
+   +------+------+------+------+
+res:
+   +------+------+------+------+
+   | 0xee | 0xc3 | 0x5a | 0xaa |
+   +------+------+------+------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="ceil"><span><a class="doc-id-link" href="#ceil">ceil<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">ceil :: <a href="/base/intrinsics#simd_ceil">intrinsics</a>.simd_ceil</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Ceil each lane in a SIMD vector.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="clamp"><span><a class="doc-id-link" href="#clamp">clamp<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">clamp :: <a href="/base/intrinsics#simd_clamp">intrinsics</a>.simd_clamp</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Clamp lanes of vector.</p>
+<p>This procedure returns a vector, where each lane is the result of the
+clamping of the lane from the vector <code>v</code> between the values in the corresponding
+lanes of vectors <code>min</code> and <code>max</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>v</code>: An integer or a float vector with values to be clamped.</span>
+<span class="doc-list"><code>min</code>: An integer or a float vector with minimum bounds.</span>
+<span class="doc-list"><code>max</code>: An integer or a float vectoe with maximum bounds.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector containing clamped values in each lane.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	val := v[i]
+	switch {
+		case val &lt; min: val = min
+		case val &gt; max: val = max
+	}
+	res[i] = val
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">     +-------+-------+-------+-------+
+v:   |  -1   |  0.3  |  1.2  |   1   |
+     +-------+-------+-------+-------+
+     +-------+-------+-------+-------+
+min: |   0   |   0   |   0   |   0   |
+     +-------+-------+-------+-------+
+     +-------+-------+-------+-------+
+max: |   1   |   1   |   1   |   1   |
+     +-------+-------+-------+-------+
+res:
+     +-------+-------+-------+-------+
+     |   0   |  0.3  |   1   |   1   |
+     +-------+-------+-------+-------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="copysign"><span><a class="doc-id-link" href="#copysign">copysign<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L196"><em>Source</em></a></div></h3>
+<h3 id="copysign"><span><a class="doc-id-link" href="#copysign">copysign<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2403"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">copysign :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v, sign: $T) -> $T {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Copy the signs from lanes of one SIMD vector into another SIMD vector.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="count_leading_zeros"><span><a class="doc-id-link" href="#count_leading_zeros">count_leading_zeros<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">count_leading_zeros :: <a href="/base/intrinsics#count_leading_zeros">intrinsics</a>.count_leading_zeros</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Count the number of leading unset bits in each lane of a SIMD vector.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="count_ones"><span><a class="doc-id-link" href="#count_ones">count_ones<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">count_ones :: <a href="/base/intrinsics#count_ones">intrinsics</a>.count_ones</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Count the number of set bits in each lane of a SIMD vector.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="count_trailing_zeros"><span><a class="doc-id-link" href="#count_trailing_zeros">count_trailing_zeros<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">count_trailing_zeros :: <a href="/base/intrinsics#count_trailing_zeros">intrinsics</a>.count_trailing_zeros</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Count the number of trailing unset bits in each lane of a SIMD vector.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="count_zeros"><span><a class="doc-id-link" href="#count_zeros">count_zeros<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">count_zeros :: <a href="/base/intrinsics#count_zeros">intrinsics</a>.count_zeros</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Count the number of unset bits in each lane of a SIMD vector.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="div"><span><a class="doc-id-link" href="#div">div<span class="a-hidden">&nbsp;¶</span></a></span></h3>
@@ -866,7 +1321,35 @@ for at least 128-bit SIMD.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>floats only</p>
+<p>Divide SIMD vectors.</p>
+<p>This procedure returns a vector, where each lane holds the quotient (result
+of division) between the corresponding lanes of the vectors <code>a</code> and <code>b</code>. Each
+lane of the vector <code>a</code> is divided by the corresponding lane of the vector <code>b</code>.</p>
+<p>This operation performs a standard floating-point division for each lane.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: A float vector.</span>
+<span class="doc-list"><code>b</code>: A float vector to divide by.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector that is the quotient of two vectors, <code>a</code> / <code>b</code>.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	res[i] = a[i] / b[i]
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +-----+-----+-----+-----+
+a: |  2  |  2  |  2  |  2  |
+   +-----+-----+-----+-----+
+   +-----+-----+-----+-----+
+b: |  0  | -1  |  2  | -3  |
+   +-----+-----+-----+-----+
+res:
+   +-----+-----+-----+------+
+   | +∞  | -2  |  1  | -2/3 |
+   +-----+-----+-----+------+
+</code></pre>
+</details>
 </details>
 </div>
 <div class="pkg-entity">
@@ -876,7 +1359,15 @@ for at least 128-bit SIMD.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>extract :: proc(a: #simd[N]T, idx: uint) -&gt; T</p>
+<p>Extract scalar from a vector's lane.</p>
+<p>This procedure returns the scalar from the lane at the specified index of the
+vector.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: The vector to extract from.</span>
+<span class="doc-list"><code>idx</code>: The lane index.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">The value of the lane at the specified index.</span></p>
+<p><b>Operation</b>:</p>
+<pre>return a[idx]
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -884,42 +1375,161 @@ for at least 128-bit SIMD.</p>
 <div>
 <pre class="doc-code">extract_lsbs :: <a href="/base/intrinsics#simd_extract_lsbs">intrinsics</a>.simd_extract_lsbs</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Extract the set of least-significant bits of a SIMD vector.</p>
+<p>This procedure checks the the least-significant bit (LSB) for each lane of vector
+and returns the numbers of lanes with the least-significant bit set. This procedure
+can be used in conjuction with <code>lanes_eq</code> (and other similar procedures) to
+count the number of matched lanes by computing the cardinality of the resulting
+set.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An input vector.</span></p>
+<p>Result:
+<span class="doc-list">A bitset of integers, corresponding to the indexes of the lanes, whose LSBs</span>
+  are set.</p>
+<p><b>Operation</b>:</p>
+<pre>res = bit_set {}
+for i in 0 ..&lt; len(a) {
+	if a[i] & 1 != 0 {
+		res |= i
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// Since lanes 0, 2, 4, 6 contain odd integers, the least significant bits
+// for these lanes are set.
+v := #simd [8]i32 { -1, -2, +3, +4, -5, +6, +7, -8 }
+fmt.println(simd.extract_lsbs(v))
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">bit_set[0..=7]{0, 2, 4, 6}
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="extract_msbs"><span><a class="doc-id-link" href="#extract_msbs">extract_msbs<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">extract_msbs :: <a href="/base/intrinsics#simd_extract_msbs">intrinsics</a>.simd_extract_msbs</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Extract the set of most-significant bits of a SIMD vector.</p>
+<p>This procedure checks the the most-significant bit (MSB) for each lane of vector
+and returns the numbers of lanes with the most-significant bit set. This procedure
+can be used in conjuction with <code>lanes_eq</code> (and other similar procedures) to
+count the number of matched lanes by computing the cardinality of the resulting
+set.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An input vector.</span></p>
+<p>Result:
+<span class="doc-list">A bitset of integers, corresponding to the indexes of the lanes, whose MSBs</span>
+  are set.</p>
+<p><b>Operation</b>:</p>
+<pre>bits_per_lane = 8*size_of(a[0])
+res = bit_set {}
+for i in 0 ..&lt; len(a) {
+	if a[i] & 1&lt;&lt;(bits_per_lane-1) != 0 {
+		res |= i
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// Since lanes 0, 1, 4, 7 contain negative numbers, the most significant
+// bits for them will be set.
+v := #simd [8]i32 { -1, -2, +3, +4, -5, +6, +7, -8 }
+fmt.println(simd.extract_msbs(v))
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">bit_set[0..=7]{0, 1, 4, 7}
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="floor"><span><a class="doc-id-link" href="#floor">floor<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">floor :: <a href="/base/intrinsics#simd_floor">intrinsics</a>.simd_floor</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Floor each lane in a SIMD vector.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="fma"><span><a class="doc-id-link" href="#fma">fma<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">fma :: <a href="/base/intrinsics#fused_mul_add">intrinsics</a>.fused_mul_add</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Perform a FMA (Fused multiply-add) operation on each lane of SIMD vectors.</p>
+<p>A fused multiply-add is a ternary operation that for three operands, <code>a</code>, <code>b</code>
+and <code>c</code>  performs the operation <code>a*b+c</code>. This operation is a hardware feature
+that allows to minimize floating-point error and allow for faster computation.</p>
+<p>This procedure performs a FMA operation on each lane of the SIMD vectors.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: The multiplier.</span>
+<span class="doc-list"><code>b</code>: The multiplicand.</span>
+<span class="doc-list"><code>c</code>: The addend.</span></p>
+<p><b>Returns:</b><br><span class="doc-list"><code>a*b+c</code></span></p>
+<p><b>Operation</b></p>
+<pre>res := 0
+for i in 0 ..&lt; len(a) {
+	res[i] = fma(a[i], b[i], c[i])
+}
+return res
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="from_array"><span><a class="doc-id-link" href="#from_array">from_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L179"><em>Source</em></a></div></h3>
+<h3 id="from_array"><span><a class="doc-id-link" href="#from_array">from_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2357"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">from_array :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $A/container_small_array.<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) -> <span class="directive">#simd</span>[0]$E {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Convert array to SIMD vector.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="from_slice"><span><a class="doc-id-link" href="#from_slice">from_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L183"><em>Source</em></a></div></h3>
+<h3 id="from_slice"><span><a class="doc-id-link" href="#from_slice">from_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2364"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">from_slice :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[0][0]$E, slice: []$E) -> $/[0][0]$E {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Convert slice to SIMD vector.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="fused_mul_add"><span><a class="doc-id-link" href="#fused_mul_add">fused_mul_add<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">fused_mul_add :: <a href="/base/intrinsics#fused_mul_add">intrinsics</a>.fused_mul_add</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Perform a FMA (Fused multiply-add) operation on each lane of SIMD vectors.</p>
+<p>A fused multiply-add is a ternary operation that for three operands, <code>a</code>, <code>b</code>
+and <code>c</code>  performs the operation <code>a*b+c</code>. This operation is a hardware feature
+that allows to minimize floating-point error and allow for faster computation.</p>
+<p>This procedure performs a FMA operation on each lane of the SIMD vectors.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: The multiplier</span>
+<span class="doc-list"><code>b</code>: The multiplicand</span>
+<span class="doc-list"><code>c</code>: The addend</span></p>
+<p><b>Returns:</b><br><span class="doc-list"><code>a*b+c</code></span></p>
+<p><b>Operation</b></p>
+<pre>res := 0
+for i in 0 ..&lt; len(a) {
+	res[i] = fma(a[i], b[i], c[i])
+}
+return res
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="gather"><span><a class="doc-id-link" href="#gather">gather<span class="a-hidden">&nbsp;¶</span></a></span></h3>
@@ -928,7 +1538,91 @@ for at least 128-bit SIMD.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Gather and Scatter intrinsics</p>
+<p>Perform a gather load into a vector.</p>
+<p>A <i>gather</i> operation is memory load operation, that loads values from an vector
+of addresses into a single value vector. This can be used to achieve the
+following results:</p>
+<p><span class="doc-list">Accessing every N'th element of an array (strided access)</span>
+<span class="doc-list">Access of elements according to some computed offsets (indexed access).</span>
+<span class="doc-list">Access of elements in a different order (shuffling access).</span></p>
+<p>When used alongside other SIMD procedures in order to compute the offsets
+for the <code>ptr</code> and <code>mask</code> parameters.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>ptr</code>: A vector of memory locations. Each pointer points to a single value,</span></p>
+<pre>of a SIMD vector's lane type that will be loaded into the vector. Pointer
+in this vector can be `nil` or any other invalid value, if the corresponding
+value in the `mask` parameter is zero.
+</pre>
+<p><span class="doc-list"><code>val</code>: A vector of values that will be used at corresponding positions</span></p>
+<pre>of the result vector, if the corresponding memory location has been
+masked out.
+</pre>
+<p><span class="doc-list"><code>mask</code>: A vector of booleans or unsigned integers that determines which memory</span></p>
+<pre>locations to read from. If the value at an index has the value true
+(lowest bit set), the value at that index will be loaded into the result
+vector from the corresponding memory location in the `ptr` vector. Otherwise
+the value will be loaded from the `val` vector.
+
+</pre>
+<p><b>Returns:</b><br><span class="doc-list">A vector with all values from unmasked indices</span>
+loaded from the pointer vector <code>ptr</code>, and all values from masked indices loaded
+from the value vector <code>val</code>.</p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	if mask[i]&1 == 1 {
+		res[i] = ptr[i]^
+	} else {
+		res[i] = val[i]
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// Example below loads 2 lanes of values from 2 lanes of float vectors, `v1` and
+// `v2`. From each of these vectors we're loading the second value, into the first
+// and the third position of the result vector.
+
+// Therefore the `ptrs` argument is initialized such that the first and the third
+// value are the addresses of the values that we want to load into the result
+// vector, and we'll fill in `nil` for the rest of them. To prevent CPU from
+// dereferencing those `nil` addresses we provide the mask that only allows us
+// to load valid positions of the `ptrs` array, and the array of defaults which
+// will have `127` in each position as the default value.
+
+v1 := [4] f32 {1, 2, 3, 4};
+v2 := [4] f32 {9, 10,11,12};
+ptrs := #simd [4]rawptr { &v1[1], nil, &v2[1], nil }
+mask := #simd [4]bool { true, false, true, false }
+defaults := #simd [4]f32 { 0x7f, 0x7f, 0x7f, 0x7f }
+res := simd.gather(ptrs, defaults, mask)
+fmt.println(res)
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">&lt;2, 127, 10, 127&gt;
+</pre>
+<p>The first and the third positions came from the <code>ptrs</code> array, and the other
+2 lanes of from the default vector. The graphic below shows how the values of
+the result are decided based on the mask:</p>
+<pre>      +-------------------------------+ 
+mask: |   1   |   0   |   1   |   0   | 
+      +-------------------------------+ 
+        |         |       |       `----------------------------.
+        |         |       |                                    |
+        |          `----  |  ------------------------.         |
+        v                 v                          v         v
+      +-------------------------------+       +-------------------+
+ptrs: |  &m0  |  nil  |  &m2  |  nil  | vals: | d0 | d1 | d2 | d3 |
+      +-------------------------------+       +-------------------+
+          |               |                          |         |
+          |          .--- | -------------------------'         |
+          |         |     |          ,-------------------------'
+          v         v     v         v
+        +-------------------------------+
+result: |   m0  |   d1  |   m2  |  d3   |
+        +-------------------------------+
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -938,11 +1632,40 @@ for at least 128-bit SIMD.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Return an unsigned integer of the same size as the input type
-NOT A BOOLEAN
-element-wise:
-    false =&gt; 0x00...00
-    true  =&gt; 0xff...ff</p>
+<p>Check if lanes of vectors are equal.</p>
+<p>This procedure checks each pair of lanes from vectors <code>a</code> and <code>b</code> for whether
+they are equal, and if they are, the corresponding lane of the result vector
+will have a value with all bits set (<code>0xff..ff</code>). Otherwise the lane of the
+result vector will have the value <code>0</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer, a float or a boolean vector.</span>
+<span class="doc-list"><code>b</code>: An integer, a float or a boolean vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector of unsigned integers of the same size as the input vector's lanes,</span>
+containing the comparison results for each lane.</p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	if a[i] == b[i] {
+		res[i] = max(T)
+	} else {
+		res[i] = 0
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +-------+-------+-------+-------+
+a: |   0   |   1   |   2   |   3   |
+   +-------+-------+-------+-------+
+   +-------+-------+-------+-------+
+b: |   0   |   2   |   2   |   2   |
+   +-------+-------+-------+-------+
+res:
+   +-------+-------+-------+-------+
+   | 0xff  | 0x00  | 0xff  | 0x00  |
+   +-------+-------+-------+-------+
+</code></pre>
+</details>
 </details>
 </div>
 <div class="pkg-entity">
@@ -950,162 +1673,906 @@ element-wise:
 <div>
 <pre class="doc-code">lanes_ge :: <a href="/base/intrinsics#simd_lanes_ge">intrinsics</a>.simd_lanes_ge</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Check if lanes of a vector are greater than or equal than another.
+SIMD vector.</p>
+<p>This procedure checks each pair of lanes from vectors <code>a</code> and <code>b</code> for whether the
+lane of <code>a</code> is greater than or equal to the lane of <code>b</code>, and if so, the
+corresponding lane of the result vector will have a value with all bits set
+(<code>0xff..ff</code>). Otherwise the lane of the result vector will have the value <code>0</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a float vector.</span>
+<span class="doc-list"><code>b</code>: An integer or a float vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector of unsigned integers of the same size as the input vector's lanes,</span>
+containing the comparison results for each lane.</p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	if a[i] &gt;= b[i] {
+		res[i] = unsigned(-1)
+	} else {
+		res[i] = 0
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +-------+-------+-------+-------+
+a: |   0   |   1   |   2   |   3   |
+   +-------+-------+-------+-------+
+   +-------+-------+-------+-------+
+b: |   0   |   2   |   2   |   2   |
+   +-------+-------+-------+-------+
+res:
+   +-------+-------+-------+-------+
+   | 0xff  | 0x00  | 0xff  | 0xff  |
+   +-------+-------+-------+-------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="lanes_gt"><span><a class="doc-id-link" href="#lanes_gt">lanes_gt<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">lanes_gt :: <a href="/base/intrinsics#simd_lanes_gt">intrinsics</a>.simd_lanes_gt</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Check if lanes of a vector are greater than another.
+vector.</p>
+<p>This procedure checks each pair of lanes from vectors <code>a</code> and <code>b</code> for whether the
+lane of <code>a</code> is greater than to the lane of <code>b</code>, and if so, the corresponding
+lane of the result vector will have a value with all bits set (<code>0xff..ff</code>).
+Otherwise the lane of the result vector will have the value <code>0</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a float vector.</span>
+<span class="doc-list"><code>b</code>: An integer or a float vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector of unsigned integers of the same size as the input vector's lanes,</span>
+containing the comparison results for each lane.</p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	if a[i] &gt; b[i] {
+		res[i] = unsigned(-1)
+	} else {
+		res[i] = 0
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +-------+-------+-------+-------+
+a: |   0   |   1   |   2   |   3   |
+   +-------+-------+-------+-------+
+   +-------+-------+-------+-------+
+b: |   0   |   2   |   2   |   2   |
+   +-------+-------+-------+-------+
+res:
+   +-------+-------+-------+-------+
+   | 0x00  | 0x00  | 0x00  | 0xff  |
+   +-------+-------+-------+-------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="lanes_le"><span><a class="doc-id-link" href="#lanes_le">lanes_le<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">lanes_le :: <a href="/base/intrinsics#simd_lanes_le">intrinsics</a>.simd_lanes_le</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Check if lanes of a vector are less than or equal than another.
+SIMD vector.</p>
+<p>This procedure checks each pair of lanes from vectors <code>a</code> and <code>b</code> for whether the
+lane of <code>a</code> is less than or equal to the lane of <code>b</code>, and if so, the
+corresponding lane of the result vector will have a value with all bits set
+(<code>0xff..ff</code>). Otherwise the lane of the result vector will have the value <code>0</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a float vector.</span>
+<span class="doc-list"><code>b</code>: An integer or a float vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector of unsigned integers of the same size as the input vector's lanes,</span>
+containing the comparison results for each lane.</p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	if a[i] &lt;= b[i] {
+		res[i] = unsigned(-1)
+	} else {
+		res[i] = 0
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +-------+-------+-------+-------+
+a: |   0   |   1   |   2   |   3   |
+   +-------+-------+-------+-------+
+   +-------+-------+-------+-------+
+b: |   0   |   2   |   2   |   2   |
+   +-------+-------+-------+-------+
+res:
+   +-------+-------+-------+-------+
+   | 0xff  | 0xff  | 0xff  | 0x00  |
+   +-------+-------+-------+-------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="lanes_lt"><span><a class="doc-id-link" href="#lanes_lt">lanes_lt<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">lanes_lt :: <a href="/base/intrinsics#simd_lanes_lt">intrinsics</a>.simd_lanes_lt</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Check if lanes of a vector are less than another.</p>
+<p>This procedure checks each pair of lanes from vectors <code>a</code> and <code>b</code> for whether
+the lane of <code>a</code> is less than the lane of <code>b</code>, and if so, the corresponding lane
+of the result vector will have a value with all bits set (<code>0xff..ff</code>). Otherwise
+the lane of the result vector will have the value <code>0</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a float vector.</span>
+<span class="doc-list"><code>b</code>: An integer or a float vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector of unsigned integers of the same size as the input vector's lanes,</span>
+containing the comparison results for each lane.</p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	if a[i] &lt; b[i] {
+		res[i] = unsigned(-1)
+	} else {
+		res[i] = 0
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +-------+-------+-------+-------+
+a: |   0   |   1   |   2   |   3   |
+   +-------+-------+-------+-------+
+   +-------+-------+-------+-------+
+b: |   0   |   2   |   2   |   2   |
+   +-------+-------+-------+-------+
+res:
+   +-------+-------+-------+-------+
+r: | 0x00  | 0xff  | 0x00  | 0x00  |
+   +-------+-------+-------+-------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="lanes_ne"><span><a class="doc-id-link" href="#lanes_ne">lanes_ne<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">lanes_ne :: <a href="/base/intrinsics#simd_lanes_ne">intrinsics</a>.simd_lanes_ne</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Check if lanes of vectors are not equal.</p>
+<p>This procedure checks each pair of lanes from vectors <code>a</code> and <code>b</code> for whether
+they are not equal, and if they are, the corresponding lane of the result
+vector will have a value with all bits set (<code>0xff..ff</code>). Otherwise the lane of
+the result vector will have the value <code>0</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer, a float or a boolean vector.</span>
+<span class="doc-list"><code>b</code>: An integer, a float or a boolean vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector of unsigned integers of the same size as the input vector's lanes,</span>
+containing the comparison results for each lane.</p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	if a[i] != b[i] {
+		res[i] = unsigned(-1)
+	} else {
+		res[i] = 0
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +-------+-------+-------+-------+
+a: |   0   |   1   |   2   |   3   |
+   +-------+-------+-------+-------+
+   +-------+-------+-------+-------+
+b: |   0   |   2   |   2   |   2   |
+   +-------+-------+-------+-------+
+res:
+   +-------+-------+-------+-------+
+   | 0x00  | 0xff  | 0x00  | 0xff  |
+   +-------+-------+-------+-------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="lanes_reverse"><span><a class="doc-id-link" href="#lanes_reverse">lanes_reverse<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">lanes_reverse :: <a href="/base/intrinsics#simd_lanes_reverse">intrinsics</a>.simd_lanes_reverse</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reverse the lanes of a SIMD vector.</p>
+<p>This procedure reverses the lanes of a vector, putting last lane in the
+first spot, etc. This procedure is equivalent to the following call (for
+4-element vectors):</p>
+<pre>swizzle(a, 3, 2, 1, 0)
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="lanes_rotate_left"><span><a class="doc-id-link" href="#lanes_rotate_left">lanes_rotate_left<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">lanes_rotate_left :: <a href="/base/intrinsics#simd_lanes_rotate_left">intrinsics</a>.simd_lanes_rotate_left</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Rotate the lanes of a SIMD vector left.</p>
+<p>This procedure rotates the lanes of a vector, putting the first lane of the
+last spot, second lane in the first spot, third lane in the second spot, etc.
+For 4-element vectors, this procedure is equvalent to the following:</p>
+<pre>swizzle(a, 1, 2, 3, 0)
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="lanes_rotate_right"><span><a class="doc-id-link" href="#lanes_rotate_right">lanes_rotate_right<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">lanes_rotate_right :: <a href="/base/intrinsics#simd_lanes_rotate_right">intrinsics</a>.simd_lanes_rotate_right</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Rotate the lanes of a SIMD vector right.</p>
+<p>This procedure rotates the lanes of a SIMD vector, putting the first lane of the
+second spot, second lane in the third spot, etc. For 4-element vectors, this
+procedure is equvalent to the following:</p>
+<pre>swizzle(a, 3, 0, 1, 2)
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="masked_compress_store"><span><a class="doc-id-link" href="#masked_compress_store">masked_compress_store<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">masked_compress_store :: <a href="/base/intrinsics#simd_masked_compress_store">intrinsics</a>.simd_masked_compress_store</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Store masked values to consecutive memory locations.</p>
+<p>This procedure stores values from masked lanes of a vector <code>val</code> consecutively
+into memory. This operation is the opposite of <code>masked_expand_load</code>. The number
+of items stored into memory is the number of set bits in the mask. If the value
+in a lane of a mask is <code>true</code>, that lane is stored into memory. Otherwise
+nothing is stored.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>ptr</code>: The pointer to the memory of a store.</span>
+<span class="doc-list"><code>val</code>: The vector to store into memory.</span>
+<span class="doc-list"><code>mask</code>: The mask that selects which values to store into memory.</span></p>
+<p><b>Operation</b>:</p>
+<pre>mem_idx := 0
+for i in 0 ..&lt; len(mask) {
+	if mask[i]&1 == 1 {
+		ptr[mem_idx] = val[i]
+		mem_idx += 1
+	}
+}
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// The code below fills the vector `v` with two values from a 4-element SIMD
+// vector, the first and the third value. The items in the mask are set to `true`
+// in those lanes.
+
+v := [2] f64 { };
+mask := #simd [4]bool { true, false, true, false }
+vals := #simd [4]f64 { 1, 2, 3, 4 }
+simd.masked_compress_store(&v, vals, mask)
+fmt.println(v)
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[1, 3]
+</pre>
+<p>Graphical representation of the operation:</p>
+<pre>      +-------------------+
+mask: | 1  | 0  | 1  | 0  |
+      +-------------------+
+        |         |
+        v         v
+      +-------------------+
+vals: | v0 | v1 | v2 | v3 |
+      +-------------------+
+        |      ,--'
+ptr     v     v
+ +---&gt;+-----------------
+      | v0  | v2  | ...
+      +-----------------
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="masked_expand_load"><span><a class="doc-id-link" href="#masked_expand_load">masked_expand_load<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">masked_expand_load :: <a href="/base/intrinsics#simd_masked_expand_load">intrinsics</a>.simd_masked_expand_load</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Load consecutive scalar values and expand into a vector.</p>
+<p>This procedure loads a number of consecutive scalar values from an address,
+specified by the <code>ptr</code> parameter, and stores them in a result vector, according
+to the mask. The number of values read from memory is the number of set bits
+in the mask. The lanes for which the mask has the value <code>true</code> get the next
+consecutive value from memory, otherwise if the mask is <code>false</code> for the
+lane, its value is filled from the corresponding lane of the <code>val</code> parameter.</p>
+<p>This procedure acts like <code>masked_store</code>, except the values from memory are
+read consecutively, and not according to the lanes. The memory values are read
+and assigned to the result vector's masked lanes in order of increasing
+addresses.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>ptr</code>: The pointer to the memory to read from.</span>
+<span class="doc-list"><code>vals</code>: The default values for masked-off entries.</span>
+<span class="doc-list"><code>mask</code>: The mask that determines which lanes get consecutive memory values.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">The result vector, holding masked memory values unmasked default values.</span></p>
+<p><b>Operation</b>:</p>
+<pre>mem_idx := 0
+for i in 0 ..&lt; len(mask) {
+	if mask[i]&1 == 1 {
+		res[i] = ptr[mem_idx]
+		mem_idx += 1
+	} else {
+		res[i] = val[i]
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// The example below loads two values from memory of the vector `v`. Two values in
+// the mask are set to `true`, meaning only two memory items will be loaded into
+// the result vector. The mask is set to `true` in the first and the third
+// position, which specifies that the first memory item will be read into the
+// first lane of the result vector, and the second memory item will be read into
+// the third lane of the result vector. All the other lanes of the result vector
+// will be initialized to the default value `127`.
+
+v := [2] f64 {1, 2};
+mask := #simd [4]bool { true, false, true, false }
+vals := #simd [4]f64 { 0x7f, 0x7f, 0x7f, 0x7f }
+res := simd.masked_expand_load(&v, vals, mask)
+fmt.println(res)
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">&lt;1, 127, 2, 127&gt;
+</pre>
+<p>Graphical representation of the operation:</p>
+<pre>ptr ---&gt;+-----------+-----
+        | m0  | m1  | ...
+        +-----------+-----
+          |      `--.
+          v         v
+        +-------------------+         +-------------------+
+mask:   | 1  | 0  | 1  | 0  |   vals: | v0 | v1 | v2 | v3 |
+        +-------------------+         +-------------------+
+          |         |                         |         |
+          |     .-- | -----------------------'          |
+          |    |    |     ,----------------------------'
+          v    v    v    v
+        +-------------------+
+result: | m0 | v1 | m1 | v3 |
+        +-------------------+
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="masked_load"><span><a class="doc-id-link" href="#masked_load">masked_load<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">masked_load :: <a href="/base/intrinsics#simd_masked_load">intrinsics</a>.simd_masked_load</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Perform a masked load into the vector.</p>
+<p>This procedure performs a masked load from memory, into the vector. The <code>ptr</code>
+argument specifies the base address from which the values of the vector
+will be loaded. The mask selects the source for the result vector's lanes. If
+the mask for the corresponding lane has the value <code>true</code> (lowest bit set), the
+result lane is loaded from memory. Otherwise the result lane is loaded from the
+corresponding lane of the <code>val</code> vector.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>ptr</code>: The address of the vector values to load. Masked-off values are not</span></p>
+<pre>accessed.
+</pre>
+<p><span class="doc-list"><code>val</code>: The vector of values that will be loaded into the masked slots of the</span></p>
+<pre>result vector.
+</pre>
+<p><span class="doc-list"><code>mask</code>: The mask that selects where to load the values from.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">The loaded vector. The lanes for which the mask was set are loaded from</span>
+memory, and the other lanes are loaded from the <code>val</code> vector.</p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	if mask[i]&1 == 1 {
+		res[i] = ptr[i]
+	} else {
+		res[i] = vals[i]
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// The following code loads two values from the `src` vector, the first and the
+// third value (selected by the mask). The masked-off values are given the value
+// of 127 (`0x7f`).
+
+src := [4] f32 {1, 2, 3, 4};
+mask := #simd [4]bool { true, false, true, false }
+vals := #simd [4]f32 { 0x7f, 0x7f, 0x7f, 0x7f }
+res := simd.masked_load(&src, vals, mask)
+fmt.println(res)
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">&lt;1, 127, 3, 127&gt;
+</pre>
+<p>The graphic below demonstrates the flow of lanes.</p>
+<pre>      +-------------------------------+ 
+mask: |   1   |   0   |   1   |   0   | 
+      +-------------------------------+ 
+        |         |       |       `----------------------------.
+        |         |       |                                    |
+        |          `----  |  ------------------------.         |
+ptr     v                 v                          v         v
++----&gt;+-------------------------------+       +-------------------+
+      |   v1  |   v2  |   v3  |   v4  | vals: | d0 | d1 | d2 | d3 |
+      +-------------------------------+       +-------------------+
+          |               |                          |         |
+          |          .--- | -------------------------'         |
+          |         |     |          ,-------------------------'
+          v         v     v         v
+        +-------------------------------+
+result: |  v1   |   d1  |  v3   |  d3   |
+        +-------------------------------+
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="masked_store"><span><a class="doc-id-link" href="#masked_store">masked_store<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">masked_store :: <a href="/base/intrinsics#simd_masked_store">intrinsics</a>.simd_masked_store</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Perform a masked store to memory.</p>
+<p>This procedure performs a masked store from a vector <code>val</code>, into memory at
+address <code>ptr</code>, with the <code>mask</code> deciding which lanes are going to be stored,
+and which aren't. If the mask at a corresponding lane has the value <code>true</code>
+(lowest bit set), the lane is stored into memory. Otherwise the lane is not
+stored into memory.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>ptr</code>: The base address of the store.</span>
+<span class="doc-list"><code>val</code>: The vector to store.</span>
+<span class="doc-list"><code>mask</code>: The mask, selecting which lanes of the vector to store into memory.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(val) {
+	if mask[i]&1 == 1 {
+		ptr[i] = val
+	}
+}
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// Example below stores the value 127 into the first and the third slot of the
+// vector `v`.
+
+v := [4] f32 {1, 2, 3, 4};
+mask := #simd [4]bool { true, false, true, false }
+vals := #simd [4]f32 { 0x7f, 0x7f, 0x7f, 0x7f }
+simd.masked_store(&v, vals, mask)
+fmt.println(v)
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[127, 2, 127, 4]
+</pre>
+<p>The graphic below shows the flow of lanes:</p>
+<pre>      +-------------------+
+mask: | 1  | 0  | 1  | 0  |
+      +-------------------+
+        |    |    |    |
+        v    X    v    X
+      +-------------------+
+vals: | v0 | v1 | v2 | v3 |
+      +-------------------+
+         |         \
+ptr      v          v
+ +---&gt;+-----------------------+
+      | v0  | ... | v2  | ... |
+      +-----------------------+
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="max"><span><a class="doc-id-link" href="#max">max<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">max :: <a href="/base/intrinsics#simd_max">intrinsics</a>.simd_max</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Maximum of each lane of vectors.</p>
+<p>This procedure returns a vector, such that each lane has the maximum value
+between the corresponding lanes in vectors <code>a</code> and <code>b</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a float vector.</span>
+<span class="doc-list"><code>b</code>: An integer or a float vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector containing with maximum values from corresponding lanes of <code>a</code> and <code>b</code>.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	if a[i] &gt; b[i] {
+		res[i] = a[i]
+	} else {
+		res[i] = b[i]
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +-----+-----+-----+-----+
+a: |  0  |  1  |  2  |  3  |
+   +-----+-----+-----+-----+
+   +-----+-----+-----+-----+
+b: |  0  |  2  |  1  | -1  |
+   +-----+-----+-----+-----+
+res:
+   +-----+-----+-----+-----+
+   |  0  |  2  |  2  |  3  |
+   +-----+-----+-----+-----+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="min"><span><a class="doc-id-link" href="#min">min<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">min :: <a href="/base/intrinsics#simd_min">intrinsics</a>.simd_min</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Minimum of each lane of vectors.</p>
+<p>This procedure returns a vector, such that each lane has the minimum value
+between the corresponding lanes in vectors <code>a</code> and <code>b</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a float vector.</span>
+<span class="doc-list"><code>b</code>: An integer or a float vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector containing with minimum values from corresponding lanes of <code>a</code> and <code>b</code>.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	if a[i] &lt; b[i] {
+		res[i] = a[i]
+	} else {
+		res[i] = b[i]
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +-----+-----+-----+-----+
+a: |  0  |  1  |  2  |  3  |
+   +-----+-----+-----+-----+
+   +-----+-----+-----+-----+
+b: |  0  |  2  |  1  | -1  |
+   +-----+-----+-----+-----+
+res:
+   +-----+-----+-----+-----+
+   |  0  |  1  |  1  | -1  |
+   +-----+-----+-----+-----+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="mul"><span><a class="doc-id-link" href="#mul">mul<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">mul :: <a href="/base/intrinsics#simd_mul">intrinsics</a>.simd_mul</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Multiply (component-wise) SIMD vectors.</p>
+<p>This procedure returns a vector, where each lane holds the product of the
+corresponding lanes of the vectors <code>a</code> and <code>b</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a float vector.</span>
+<span class="doc-list"><code>b</code>: An integer or a float vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector that is the product of two vectors.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	res[i] = a[i] * b[i]
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +-----+-----+-----+-----+
+a: |  2  |  2  |  2  |  2  |
+   +-----+-----+-----+-----+
+   +-----+-----+-----+-----+
+b: |  0  | -1  |  2  | -3  |
+   +-----+-----+-----+-----+
+res:
+   +-----+-----+-----+-----+
+   |  0  | -2  |  4  | -6  |
+   +-----+-----+-----+-----+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="nearest"><span><a class="doc-id-link" href="#nearest">nearest<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">nearest :: <a href="/base/intrinsics#simd_nearest">intrinsics</a>.simd_nearest</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Compute the nearest integer of each lane in a SIMD vector.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="neg"><span><a class="doc-id-link" href="#neg">neg<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">neg :: <a href="/base/intrinsics#simd_neg">intrinsics</a>.simd_neg</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Negation of a SIMD vector.</p>
+<p>This procedure returns a vector where each lane is the negation of the
+corresponding lane in the vector <code>a</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a float vector to negate.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">The negated version of the vector <code>a</code>.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	res[i] = -a[i]
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +------+------+------+------+
+a: |   0  |   1  |   2  |   3  |
+   +------+------+------+------+
+res:
+   +------+------+------+------+
+   |   0  |  -1  |  -2  |  -3  |
+   +------+------+------+------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="recip"><span><a class="doc-id-link" href="#recip">recip<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L208"><em>Source</em></a></div></h3>
+<h3 id="recip"><span><a class="doc-id-link" href="#recip">recip<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2452"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">recip :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $T) -> $T {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Calculate reciprocals of SIMD lanes.</p>
+<p>This procedure returns a vector where each lane is the reciprocal of the
+corresponding lane in the vector <code>a</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a float vector to negate.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">Negated vector.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	res[i] = 1.0 / a[i]
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +------+------+------+------+
+a: |   2  |   1  |   3  |   5  |
+   +------+------+------+------+
+res:
+   +------+------+------+------+
+   |  0.5 |   1  | 0.33 |  0.2 |
+   +------+------+------+------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="reduce_add_ordered"><span><a class="doc-id-link" href="#reduce_add_ordered">reduce_add_ordered<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">reduce_add_ordered :: <a href="/base/intrinsics#simd_reduce_add_ordered">intrinsics</a>.simd_reduce_add_ordered</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reduce a vector to a scalar by adding up all the lanes.</p>
+<p>This procedure returns a scalar that is the ordered sum of all lanes. The
+ordered sum may be important for accounting for precision errors in
+floating-point computation, as floating-point addition is not associative,
+that is <code>(a+b)+c</code> may not be equal to <code>a+(b+c)</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: The vector to reduce.</span></p>
+<p>Result:
+<span class="doc-list">Sum of all lanes, as a scalar.</span></p>
+<p><b>Operation</b>:</p>
+<pre>res := 0
+for i in 0 ..&lt; len(a) {
+	res += a[i]
+}
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="reduce_all"><span><a class="doc-id-link" href="#reduce_all">reduce_all<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">reduce_all :: <a href="/base/intrinsics#simd_reduce_all">intrinsics</a>.simd_reduce_all</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reduce SIMD vector to a scalar by performing bitwise AND of all of the lanes.</p>
+<p>This procedure returns a scalar that is the result of the bitwise AND operation
+between all of the lanes in a vector.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: The vector to reduce.</span></p>
+<p>Result:
+<span class="doc-list">Bitwise AND of all lanes, as a scalar.</span></p>
+<p><b>Operation</b>:</p>
+<pre>res := 0
+for i in 0 ..&lt; len(a) {
+	res &= a[i]
+}
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="reduce_and"><span><a class="doc-id-link" href="#reduce_and">reduce_and<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">reduce_and :: <a href="/base/intrinsics#simd_reduce_and">intrinsics</a>.simd_reduce_and</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reduce a vector to a scalar by performing bitwise AND of all of the lanes.</p>
+<p>This procedure returns a scalar that is the result of the bitwise AND operation
+between all of the lanes in a vector.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: The vector to reduce.</span></p>
+<p>Result:
+<span class="doc-list">Bitwise AND of all lanes, as a scalar.</span></p>
+<p><b>Operation</b>:</p>
+<pre>res := 0
+for i in 0 ..&lt; len(a) {
+	res &= a[i]
+}
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="reduce_any"><span><a class="doc-id-link" href="#reduce_any">reduce_any<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">reduce_any :: <a href="/base/intrinsics#simd_reduce_any">intrinsics</a>.simd_reduce_any</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reduce SIMD vector to a scalar by performing bitwise OR of all of the lanes.</p>
+<p>This procedure returns a scalar that is the result of the bitwise OR operation
+between all of the lanes in a vector.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: The vector to reduce.</span></p>
+<p>Result:
+<span class="doc-list">Bitwise OR of all lanes, as a scalar.</span></p>
+<p><b>Operation</b>:</p>
+<pre>res := 0
+for i in 0 ..&lt; len(a) {
+	res |= a[i]
+}
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="reduce_max"><span><a class="doc-id-link" href="#reduce_max">reduce_max<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">reduce_max :: <a href="/base/intrinsics#simd_reduce_max">intrinsics</a>.simd_reduce_max</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reduce a vector to a scalar by finding the maximum value between all of the lanes.</p>
+<p>This procedure returns a scalar that is the maximum value of all the lanes
+in a vector.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: The vector to reduce.</span></p>
+<p>Result:
+<span class="doc-list">Maximum value of all lanes, as a scalar.</span></p>
+<p><b>Operation</b>:</p>
+<pre>res := 0
+for i in 0 ..&lt; len(a) {
+	res = max(res, a[i])
+}
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="reduce_min"><span><a class="doc-id-link" href="#reduce_min">reduce_min<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">reduce_min :: <a href="/base/intrinsics#simd_reduce_min">intrinsics</a>.simd_reduce_min</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reduce a vector to a scalar by finding the minimum value between all of the lanes.</p>
+<p>This procedure returns a scalar that is the minimum value of all the lanes
+in a vector.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: The vector to reduce.</span></p>
+<p>Result:
+<span class="doc-list">Minimum value of all lanes, as a scalar.</span></p>
+<p><b>Operation</b>:</p>
+<pre>res := 0
+for i in 0 ..&lt; len(a) {
+	res = min(res, a[i])
+}
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="reduce_mul_ordered"><span><a class="doc-id-link" href="#reduce_mul_ordered">reduce_mul_ordered<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">reduce_mul_ordered :: <a href="/base/intrinsics#simd_reduce_mul_ordered">intrinsics</a>.simd_reduce_mul_ordered</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reduce a vector to a scalar by multiplying all the lanes.</p>
+<p>This procedure returns a scalar that is the ordered product of all lanes.
+The ordered product may be important for accounting for precision errors in
+floating-point computation, as floating-point multiplication is not associative,
+that is <code>(a*b)*c</code> may not be equal to <code>a*(b*c)</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: The vector to reduce.</span></p>
+<p>Result:
+<span class="doc-list">Product of all lanes, as a scalar.</span></p>
+<p><b>Operation</b>:</p>
+<pre>res := 1
+for i in 0 ..&lt; len(a) {
+	res *= a[i]
+}
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="reduce_or"><span><a class="doc-id-link" href="#reduce_or">reduce_or<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">reduce_or :: <a href="/base/intrinsics#simd_reduce_or">intrinsics</a>.simd_reduce_or</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reduce a vector to a scalar by performing bitwise OR of all of the lanes.</p>
+<p>This procedure returns a scalar that is the result of the bitwise OR operation
+between all of the lanes in a vector.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: The vector to reduce.</span></p>
+<p>Result:
+<span class="doc-list">Bitwise OR of all lanes, as a scalar.</span></p>
+<p><b>Operation</b>:</p>
+<pre>res := 0
+for i in 0 ..&lt; len(a) {
+	res |= a[i]
+}
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="reduce_xor"><span><a class="doc-id-link" href="#reduce_xor">reduce_xor<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">reduce_xor :: <a href="/base/intrinsics#simd_reduce_xor">intrinsics</a>.simd_reduce_xor</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reduce SIMD vector to a scalar by performing bitwise XOR of all of the lanes.</p>
+<p>This procedure returns a scalar that is the result of the bitwise XOR operation
+between all of the lanes in a vector.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: The vector to reduce.</span></p>
+<p>Result:
+<span class="doc-list">Bitwise XOR of all lanes, as a scalar.</span></p>
+<p><b>Operation</b>:</p>
+<pre>res := 0
+for i in 0 ..&lt; len(a) {
+	res ~= a[i]
+}
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="replace"><span><a class="doc-id-link" href="#replace">replace<span class="a-hidden">&nbsp;¶</span></a></span></h3>
@@ -1114,7 +2581,16 @@ element-wise:
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>replace :: proc(a: #simd[N]T, idx: uint, elem: T) -&gt; #simd[N]T</p>
+<p>Replace the value in a vector's lane.</p>
+<p>This procedure places a scalar value at the lane corresponding to the given index of
+the vector.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: The vector to replace a lane in.</span>
+<span class="doc-list"><code>idx</code>: The lane index.</span>
+<span class="doc-list"><code>elem</code>: The scalar to place.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">Vector with the specified lane replaced.</span></p>
+<p><b>Operation</b>:</p>
+<pre>a[idx] = elem
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1122,6 +2598,10 @@ element-wise:
 <div>
 <pre class="doc-code">reverse_bits :: <a href="/base/intrinsics#reverse_bits">intrinsics</a>.reverse_bits</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reverse the bit pattern of a SIMD vector.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="saturating_add"><span><a class="doc-id-link" href="#saturating_add">saturating_add<span class="a-hidden">&nbsp;¶</span></a></span></h3>
@@ -1130,7 +2610,46 @@ element-wise:
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Saturation Arithmetic</p>
+<p>Saturated addition of SIMD vectors.</p>
+<p>The <i>saturated sum</i> is a just like a normal sum, except the treatment of the
+result upon overflow or underflow is different. In saturated operations, the
+result is not wrapped to the bit-width of the lane, and instead is kept clamped
+between the minimum and the maximum values of the lane type.</p>
+<p>This procedure returns a vector where each lane is the saturated sum of the
+corresponding lanes of vectors <code>a</code> and <code>b</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer vector.</span>
+<span class="doc-list"><code>b</code>: An integer vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">The saturated sum of the two vectors.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	switch {
+	case b[i] &gt;= max(type_of(a[i])) - a[i]: // (overflow of a[i])
+		res[i] = max(type_of(a[i]))
+	case b[i] &lt;= min(type_of(a[i])) - a[i]: // (underflow of a[i])
+		res[i] = min(type_of(a[i]))
+	} else {
+		res[i] = a[i] + b[i]
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// An example for a 4-lane vector `a` of 8-bit signed integers.
+
+   +-----+-----+-----+-----+
+a: |  0  | 255 |  2  |  3  |
+   +-----+-----+-----+-----+
+   +-----+-----+-----+-----+
+b: |  1  |  3  |  2  | -1  |
+   +-----+-----+-----+-----+
+res:
+   +-----+-----+-----+-----+
+   |  1  | 255 |  4  |  2  |
+   +-----+-----+-----+-----+
+</code></pre>
+</details>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1138,12 +2657,117 @@ element-wise:
 <div>
 <pre class="doc-code">saturating_sub :: <a href="/base/intrinsics#simd_saturating_sub">intrinsics</a>.simd_saturating_sub</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Saturated subtraction of 2 lanes of vectors.</p>
+<p>The <i>saturated difference</i> is a just like a normal difference, except the treatment of the
+result upon overflow or underflow is different. In saturated operations, the
+result is not wrapped to the bit-width of the lane, and instead is kept clamped
+between the minimum and the maximum values of the lane type.</p>
+<p>This procedure returns a vector where each lane is the saturated difference of
+the corresponding lanes of vectors <code>a</code> and <code>b</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer vector to subtract from.</span>
+<span class="doc-list"><code>b</code>: An integer vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">The saturated difference of the two vectors.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	switch {
+	case b[i] &gt;= max(type_of(a[i])) + a[i]: // (overflow of a[i])
+		res[i] = max(type_of(a[i]))
+	case b[i] &lt;= min(type_of(a[i])) + a[i]: // (underflow of a[i])
+		res[i] = min(type_of(a[i]))
+	} else {
+		res[i] = a[i] - b[i]
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// An example for a 4-lane vector `a` of 8-bit signed integers.
+
+   +-----+-----+-----+-----+
+a: |  0  | 255 |  2  |  3  |
+   +-----+-----+-----+-----+
+   +-----+-----+-----+-----+
+b: |  3  |  3  |  2  | -1  |
+   +-----+-----+-----+-----+
+res:
+   +-----+-----+-----+-----+
+   |  0  | 252 |  0  |  4  |
+   +-----+-----+-----+-----+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="scatter"><span><a class="doc-id-link" href="#scatter">scatter<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">scatter :: <a href="/base/intrinsics#simd_scatter">intrinsics</a>.simd_scatter</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Perform a scatter store from a vector.</p>
+<p>A <i>scatter</i> operation is a memory store operation that stores values from a
+vector into multiple memory locations. This operation is effectively the
+opposite of the <i>gather</i> operation.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>ptr</code>: A vector of memory locations. Each masked location will be written</span></p>
+<pre>to with a value from the `val` vector. Pointers in this vector can be `nil`
+or any other invalid value if the corresponding value in the `mask`
+parameter is zero.
+</pre>
+<p><span class="doc-list"><code>val</code>: A vector of values to write to the memory locations.</span>
+<span class="doc-list"><code>mask</code>: A vector of booleans or unsigned integers that decides which lanes</span></p>
+<pre>get written to memory. If the value of the mask is `true` (the lowest bit
+set), the corresponding lane is written into memory. Otherwise it's not
+written into memory.
+
+</pre>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(ptr) {
+	if mask[i]&1 == 1 {
+		ptr[i]^ = val[i]
+	}
+}
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// Example below writes value `127` to the second element of two different
+// vectors. The addresses of store destinations are written to the first and the
+// third argument of the `ptr` vector, and the `mask` is set accordingly.
+
+v1 := [4] f32 {1, 2, 3, 4};
+v2 := [4] f32 {5, 6, 7, 8};
+ptrs := #simd [4]rawptr { &v1[1], nil, &v2[1], nil }
+mask := #simd [4]bool { true, false, true, false }
+vals := #simd [4]f32 { 0x7f, 0x7f, 0x7f, 0x7f }
+simd.scatter(ptrs, vals, mask)
+fmt.println(v1)
+fmt.println(v2)
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[1, 127, 3, 4]
+[5, 127, 7, 8]
+</pre>
+<p>The graphic below shows how the data gets written into memory.</p>
+<pre>      +-------------------+
+mask: | 1  | 0  | 1  | 0  |
+      +-------------------+
+        |    |    |    |
+        v    X    v    X
+      +-------------------+
+vals: | d0 | d1 | d2 | d3 |
+      +-------------------+
+         |         \
+         v          v
+      +-----------------------+
+ptrs: | &m0 | nil | &m2 | nil |
+      +-----------------------+
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="select"><span><a class="doc-id-link" href="#select">select<span class="a-hidden">&nbsp;¶</span></a></span></h3>
@@ -1152,7 +2776,62 @@ element-wise:
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>select :: proc(cond: #simd[N]boolean_or_integer, true, false: #simd[N]T) -&gt; #simd[N]T</p>
+<p>Select values from one of the two vectors.</p>
+<p>This procedure returns a vector, which has, on each lane a value from one of the
+corresponding lanes in one of the two input vectors based on the <code>cond</code>
+parameter. On each lane, if the value of the <code>cond</code> parameter is <code>true</code> (or
+non-zero), the result lane will have a value from the <code>true</code> input vector,
+otherwise the result lane will have a value from the <code>false</code> input vector.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>cond</code>: The condition vector.</span>
+<span class="doc-list"><code>true</code>: The first input vector.</span>
+<span class="doc-list"><code>false</code>: The second input vector.</span></p>
+<p>Result:
+<span class="doc-list">The result of selecting values from the two input vectors.</span></p>
+<p><b>Operation</b>:</p>
+<pre>res = {}
+for i in 0 ..&lt; len(cond) {
+	if cond[i] {
+		res[i] = true[i]
+	} else {
+		res[i] = false[i]
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// The following example selects values from the two input vectors, `a` and `b`
+// into a single vector.
+a := #simd [4] f64 { 1,2,3,4 }
+b := #simd [4] f64 { 5,6,7,8 }
+cond := #simd[4] int { 1, 0, 1, 0 }
+fmt.println(simd.select(cond,a,b))
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[ 1, 6, 3, 8 ]
+</pre>
+<p>Graphically, the operation looks as follows. The <code>t</code> and <code>f</code> represent the
+<code>true</code> and <code>false</code> vectors respectively:</p>
+<pre>      0     1     2     3            0     1     2     3
+      +-----+-----+-----+-----+      +-----+-----+-----+-----+
+t:    |  1  |  2  |  3  |  4  |  f:  |  5  |  6  |  7  |  8  |
+      +-----+-----+-----+-----+      +-----+-----+-----+-----+
+         ^           ^                        ^           ^
+         |           |                        |           |
+         |           |                        |           |
+         |      .--- | ----------------------'            |
+         |     |     |     .-----------------------------'
+      +-----+-----+-----+-----+
+cond: |  1  |  0  |  1  |  0  |
+      +-----+-----+-----+-----+
+         ^     ^     ^     ^
+         |     |     |     |
+      +-----+-----+-----+-----+
+res:  |  1  |  5  |  3  |  6  |
+      +-----+-----+-----+-----+
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1162,8 +2841,44 @@ element-wise:
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Keeps Odin's Behaviour
-(x &lt;&lt; y) if y &lt;= mask else 0</p>
+<p>Shift left lanes of a vector.</p>
+<p>This procedure returns a vector, such that each lane holds the result of a
+shift-left (aka shift-up) operation of the corresponding lane from vector <code>a</code> by the shift
+amount from the corresponding lane of the vector <code>b</code>.</p>
+<p>If the shift amount is greater than the bit-width of a lane, the result is <code>0</code>
+in the corresponding positions of the result.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer vector of values to shift.</span>
+<span class="doc-list"><code>b</code>: An unsigned integer vector of the shift amounts.</span></p>
+<p>Result:
+<span class="doc-list">A vector, where each lane is the lane from <code>a</code> shifted left by the amount</span>
+specified in the corresponding lane of the vector <code>b</code>.</p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	if b[i] &lt; 8*size_of(a[i]) {
+		res[i] = a[i] &lt;&lt; b[i]
+	} else {
+		res[i] = 0
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// An example for a 4-lane 8-bit signed integer vector `a`.
+
+   +-------+-------+-------+-------+
+a: |  0x11 |  0x55 |  0x03 |  0xff |
+   +-------+-------+-------+-------+
+   +-------+-------+-------+-------+
+b: |   2   |   1   |   33  |   1   |
+   +-------+-------+-------+-------+
+res:
+   +-------+-------+-------+--------+
+   |  0x44 |  0xaa |   0   |  0xfe  |
+   +-------+-------+-------+--------+
+</code></pre>
+</details>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1173,8 +2888,40 @@ element-wise:
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Similar to C's Behaviour
-x &lt;&lt; (y & mask)</p>
+<p>Shift left lanes of a vector (masked).</p>
+<p>This procedure returns a vector, such that each lane holds the result of a
+shift-left (aka shift-up) operation, of lane from the vector <code>a</code> by the shift
+amount from the corresponding lane of the vector <code>b</code>.</p>
+<p>The shift amount is wrapped (masked) to the bit-width of the lane.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer vector of values to shift.</span>
+<span class="doc-list"><code>b</code>: An unsigned integer vector of the shift amounts.</span></p>
+<p>Result:
+<span class="doc-list">A vector, where each lane is the lane from <code>a</code> shifted left by the amount</span>
+specified in the corresponding lane of the vector <code>b</code>.</p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	mask := 8*size_of(a[i]) - 1
+	res[i] = a[i] &lt;&lt; (b[i] & mask)
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// An example for a 4-lane vector `a` of 8-bit signed integers.
+
+   +-------+-------+-------+-------+
+a: |  0x11 |  0x55 |  0x03 |  0xff |
+   +-------+-------+-------+-------+
+   +-------+-------+-------+-------+
+b: |   2   |   1   |   33  |   1   |
+   +-------+-------+-------+-------+
+res:
+   +-------+-------+-------+--------+
+   |  0x44 |  0xaa |  0x06 |  0xfe  |
+   +-------+-------+-------+--------+
+</code></pre>
+</details>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1182,12 +2929,96 @@ x &lt;&lt; (y & mask)</p>
 <div>
 <pre class="doc-code">shr :: <a href="/base/intrinsics#simd_shr">intrinsics</a>.simd_shr</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Shift right lanes of a vector.</p>
+<p>This procedure returns a vector, such that each lane holds the result of a
+shift-right (aka shift-down) operation, of lane from the vector <code>a</code> by the shift
+amount from the corresponding lane of the vector <code>b</code>.</p>
+<p>If the shift amount is greater than the bit-width of a lane, the result is <code>0</code>
+in the corresponding positions of the result.</p>
+<p>If the first vector is a vector of signed integers, the arithmetic shift
+operation is performed. Otherwise, if the first vector is a vector of unsigned
+integers, a logical shift is performed.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer vector of values to shift.</span>
+<span class="doc-list"><code>b</code>: An unsigned integer vector of the shift amounts.</span></p>
+<p>Result:
+<span class="doc-list">A vector, where each lane is the lane from <code>a</code> shifted right by the amount</span>
+specified in the corresponding lane of the vector <code>b</code>.</p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	if b[i] &lt; 8*size_of(a[i]) {
+		res[i] = a[i] &gt;&gt; b[i]
+	} else {
+		res[i] = 0
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// An example for a 4-lane 8-bit signed integer vector `a`.
+
+   +-------+-------+-------+-------+
+a: |  0x11 |  0x55 |  0x03 |  0xff |
+   +-------+-------+-------+-------+
+   +-------+-------+-------+-------+
+b: |   2   |   1   |   33  |   1   |
+   +-------+-------+-------+-------+
+res:
+   +-------+-------+-------+--------+
+   |  0x04 |  0x2a |   0   |  0xff  |
+   +-------+-------+-------+--------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="shr_masked"><span><a class="doc-id-link" href="#shr_masked">shr_masked<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">shr_masked :: <a href="/base/intrinsics#simd_shr_masked">intrinsics</a>.simd_shr_masked</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Shift right lanes of a vector (masked).</p>
+<p>This procedure returns a vector, such that each lane holds the result of a
+shift-right (aka shift-down) operation, of lane from the vector <code>a</code> by the shift
+amount from the corresponding lane of the vector <code>b</code>.</p>
+<p>The shift amount is wrapped (masked) to the bit-width of the lane.</p>
+<p>If the first vector is a vector of signed integers, the arithmetic shift
+operation is performed. Otherwise, if the first vector is a vector of unsigned
+integers, a logical shift is performed.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer vector of values to shift.</span>
+<span class="doc-list"><code>b</code>: An unsigned integer vector of the shift amounts.</span></p>
+<p>Result:
+<span class="doc-list">A vector, where each lane is the lane from <code>a</code> shifted right by the amount</span>
+specified in the corresponding lane of the vector <code>b</code>.</p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	mask := 8*size_of(a[i]) - 1
+	res[i] = a[i] &gt;&gt; (b[i] & mask)
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// An example for a 4-lane vector `a` of 8-bit signed integers.
+
+   +-------+-------+-------+-------+
+a: |  0x11 |  0x55 |  0x03 |  0xff |
+   +-------+-------+-------+-------+
+   +-------+-------+-------+-------+
+b: |   2   |   1   |   33  |   1   |
+   +-------+-------+-------+-------+
+res:
+   +-------+-------+-------+--------+
+   |  0x04 |  0x2a |  0x01 |  0xff  |
+   +-------+-------+-------+--------+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="shuffle"><span><a class="doc-id-link" href="#shuffle">shuffle<span class="a-hidden">&nbsp;¶</span></a></span></h3>
@@ -1196,26 +3027,128 @@ x &lt;&lt; (y & mask)</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>shuffle :: proc(a, b: #simd[N]T, indices: #simd[max 2*N]u32) -&gt; #simd[len(indices)]T</p>
+<p>Reorder the lanes of two SIMD vectors.</p>
+<p>This procedure returns a vector, containing the scalars from the lanes of two
+vectors, according to the provided indices vector. Each index in the indices
+vector specifies, the lane of the scalar from one of the two input vectors,
+which will be written at the corresponding position of the result vector. If
+the index is within bounds 0 ..&lt; len(A), it corresponds to the indices of the
+first input vector. Otherwise the index corresponds to the indices of the second
+input vector.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: The first input vector.</span>
+<span class="doc-list"><code>b</code>: The second input vector.</span>
+<span class="doc-list"><code>indices</code>: The indices.</span></p>
+<p>Result:
+<span class="doc-list">Input vectors, shuffled according to the indices.</span></p>
+<p><b>Operation</b>:</p>
+<pre>res = {}
+for i in 0 ..&lt; len(indices) {
+	idx = indices[i];
+	if idx &lt; len(a) {
+		res[i] = a[idx]
+	} else {
+		res[i] = b[idx]
+	}
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// The example below shows how the indices are used to determine lanes of the
+// input vector that are shuffled into the result vector.
+
+a := #simd [4]f32 { 1, 2, 3, 4 }
+b := #simd [4]f32 { 5, 6, 7, 8 }
+res := simd.shuffle(a, b, 0, 4, 2, 5)
+fmt.println("res")
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[ 1, 5, 3, 6 ]
+</pre>
+<p>The graphical representation of the operation is as follows. The <code>idx</code> vector in
+the picture represents the <code>indices</code> parameter:</p>
+<pre>      0     1     2     3            4     5     6     7
+      +-----+-----+-----+-----+      +-----+-----+-----+-----+
+a:    |  1  |  2  |  3  |  4  |  b:  |  5  |  6  |  7  |  8  |
+      +-----+-----+-----+-----+      +-----+-----+-----+-----+
+         ^           ^                  ^     ^
+         |           |                  |     |
+         |           |                  |     |
+         |      .--- | ----------------'      |
+         |     |     |     .-----------------'
+      +-----+-----+-----+-----+
+idx:  |  0  |  4  |  2  |  5  |
+      +-----+-----+-----+-----+
+         ^     ^     ^     ^
+         |     |     |     |
+      +-----+-----+-----+-----+
+res:  |  1  |  5  |  3  |  6  |
+      +-----+-----+-----+-----+
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="signum"><span><a class="doc-id-link" href="#signum">signum<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L203"><em>Source</em></a></div></h3>
+<h3 id="signum"><span><a class="doc-id-link" href="#signum">signum<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2418"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">signum :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $T) -> $T {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Return signs of SIMD lanes.</p>
+<p>This procedure returns a vector, each lane of which contains either +1.0 or
+-1.0 depending on the sign of the value in the corresponding lane of the
+input vector. If the lane of the input vector has NaN, then the result vector
+will contain this NaN value as-is.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="sqrt"><span><a class="doc-id-link" href="#sqrt">sqrt<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">sqrt :: <a href="/base/intrinsics#sqrt">intrinsics</a>.sqrt</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Compute the square root of each lane in a SIMD vector.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="sub"><span><a class="doc-id-link" href="#sub">sub<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">sub :: <a href="/base/intrinsics#simd_sub">intrinsics</a>.simd_sub</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Subtract SIMD vectors.</p>
+<p>This procedure returns a vector, where each lane holds the difference between
+the corresponding lanes of the vectors <code>a</code> and <code>b</code>. The lanes from the vector
+<code>b</code> are subtracted from the corresponding lanes of the vector <code>a</code>.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>a</code>: An integer or a float vector to subtract from.</span>
+<span class="doc-list"><code>b</code>: An integer or a float vector.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector that is the difference of two vectors, <code>a</code> - <code>b</code>.</span></p>
+<p><b>Operation</b>:</p>
+<pre>for i in 0 ..&lt; len(res) {
+	res[i] = a[i] - b[i]
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">   +-----+-----+-----+-----+
+a: |  2  |  2  |  2  |  2  |
+   +-----+-----+-----+-----+
+   +-----+-----+-----+-----+
+b: |  0  |  1  |  2  |  3  |
+   +-----+-----+-----+-----+
+res:
+   +-----+-----+-----+-----+
+   |  2  |  1  |  0  | -1  |
+   +-----+-----+-----+-----+
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="swizzle"><span><a class="doc-id-link" href="#swizzle">swizzle<span class="a-hidden">&nbsp;¶</span></a></span></h3>
@@ -1224,32 +3157,99 @@ x &lt;&lt; (y & mask)</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>swizzle :: proc(a: #simd[N]T, indices: ..int) -&gt; #simd[len(indices)]T</p>
+<p>Reorder the lanes of a SIMD vector.</p>
+<p>This procedure reorders the lanes of a vector, according to the provided
+indices. The number of indices correspond to the number of lanes in the
+result vector and must be the same as the number of lanes of the input vector.
+Each index specifies, the lane of the scalar from the input vector, which
+will be written at the corresponding position of the result vector.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>x</code>: The input vector.</span>
+<span class="doc-list"><code>indices</code>: The indices of lanes to write to the result vector.</span></p>
+<p>Result:
+<span class="doc-list">Swizzled input vector.</span></p>
+<p><b>Operation</b>:</p>
+<pre>res = {}
+for i in 0 ..&lt; len(indices) {
+	res[i] = x[indices[i]]
+}
+return res
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">// The example below shows how the indices are used to determine which lanes of the
+// input vector get written into the result vector.
+
+x := #simd [4]f32 { 1.5, 2.5, 3.5, 4.5 }
+res := simd.swizzle(x, 0, 3, 1, 1)
+fmt.println("res")
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[ 1.5, 3.5, 2.5, 2.5 ]
+</pre>
+<p>The graphical representation of the operation is as follows. The <code>idx</code> vector in
+the picture represents the <code>indices</code> parameter:</p>
+<pre>      0     1     2     3
+      +-----+-----+-----+-----+
+x:    | 1.5 | 2.5 | 3.5 | 4.5 |
+      +-----+-----+-----+-----+
+         ^     ^           ^
+         |     |           |
+         |      '----.     |
+         |     .---- | ---'
+         |     |     |
+         |     |     +------.
+      +-----+-----+-----+-----+
+idx:  |  0  |  3  |  1  |  1  |
+      +-----+-----+-----+-----+
+         ^     ^     ^     ^
+         |     |     |     |
+      +-----+-----+-----+-----+
+res:  | 1.5 | 3.5 | 2.5 | 2.5 |
+      +-----+-----+-----+-----+
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="to_array"><span><a class="doc-id-link" href="#to_array">to_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L176"><em>Source</em></a></div></h3>
+<h3 id="to_array"><span><a class="doc-id-link" href="#to_array">to_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2350"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">to_array :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: <span class="directive">#simd</span>[0]$E) -> [0]$E {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Convert SIMD vector to an array.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="to_array_ptr"><span><a class="doc-id-link" href="#to_array_ptr">to_array_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L173"><em>Source</em></a></div></h3>
+<h3 id="to_array_ptr"><span><a class="doc-id-link" href="#to_array_ptr">to_array_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2343"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">to_array_ptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: ^<span class="directive">#simd</span>[0]$E) -> ^[0]$E {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Convert pointer to SIMD vector to an array pointer.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="to_bits"><span><a class="doc-id-link" href="#to_bits">to_bits<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">to_bits :: <a href="/base/intrinsics#simd_to_bits">intrinsics</a>.simd_to_bits</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Transmute a SIMD vector into an integer vector.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="trunc"><span><a class="doc-id-link" href="#trunc">trunc<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">trunc :: <a href="/base/intrinsics#simd_trunc">intrinsics</a>.simd_trunc</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Truncate each lane in a SIMD vector.</p>
+</details>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <p class="pkg-empty-section">This section is empty.</p>
@@ -1259,12 +3259,12 @@ x &lt;&lt; (y & mask)</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin">simd.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-01 21:10:17.023975400 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-02 21:11:21.388843500 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
 <ul>
-<li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#pkg-overview">Overview</a><li><a href="#pkg-Types">Types</a><ul>
 <li><a href="#b16x16">b16x16</a></li>
 <li><a href="#b16x32">b16x32</a></li>
 <li><a href="#b16x8">b16x8</a></li>
