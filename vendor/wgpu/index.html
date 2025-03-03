@@ -179,6 +179,51 @@
 </div>
 <ul id="odin-search-results"></ul>
 <div id="pkg-top">
+<h2>Overview</h2>
+<div id="pkg-overview">
+<p>A cross-platform (and WASM) GPU API.</p>
+<p>WASM support is achieved by providing wrappers around the browser native WebGPU API
+that are called instead of the [wgpu-native](https://github.com/gfx-rs/wgpu-native) library,
+the wgpu-native library provides support for all other targets.</p>
+<p><b>Examples</b></p>
+<p>You can find a number of examples on <a href="https://github.com/odin-lang/examples/tree/master/wgpu">Odin's official examples repository</a>.</p>
+<p><b>Getting the wgpu-native libraries</b></p>
+<p>For native support (not the browser), some libraries are required. Fortunately this is
+extremely easy, just download them from the <a href="https://github.com/gfx-rs/wgpu-native/releases/tag/v24.0.0.2">releases on GitHub</a>.
+the bindings are for v24.0.0.2 at the moment.</p>
+<p>These are expected in the <code>lib</code> folder under the same name as they are released (just unzipped).
+By default it will look for a static release version (<code>wgpu-OS-ARCH-release.a|lib</code>),
+you can set <code>-define:WGPU_DEBUG=true</code> for it to look for a debug version,
+and use <code>-define:WGPU_SHARED=true</code> to look for the shared libraries.</p>
+<p><b>WASM</b></p>
+<p>For WASM, the module has to be built with a function table to enable callbacks.
+You can do so using <code>-extra-linker-flags:"--export-table"</code>.</p>
+<p>Being able to allocate is also required (for some auxiliary APIs but also for mapping/unmapping buffers).</p>
+<p>You can set the context that is used for allocations by setting the global variable <code>wpgu.g_context</code>.
+It will default to the <code>runtime.default_context</code>.</p>
+<p>Have a look at the <a href="https://github.com/odin-lang/examples/blob/master/wgpu/glfw-triangle/build_web.sh">example build file</a> and <a href="https://github.com/odin-lang/examples/blob/master/wgpu/glfw-triangle/web/index.html">html file</a>
+to see how it looks when set up, doing the <code>--import-memory</code> and the likes
+is not strictly necessary but allows your app more memory than the minimal default.</p>
+<p>The bindings work on both <code>-target:js_wasm32</code> and <code>-target:js_wasm64p32</code>.</p>
+<p><b>SDL Glue</b></p>
+<p>There is an inner package <code>sdl2glue</code> (and <code>sdl3glue</code>) that can be used to glue together WGPU and SDL.
+It exports one procedure <code>GetSurface(wgpu.Instance, ^SDL.Window) -&gt; wgpu.Surface</code>.
+The procedure will call the needed target specific procedures and return a surface configured
+for the given window.</p>
+<p><b>GLFW Glue</b></p>
+<p>There is an inner package <code>glfwglue</code> that can be used to glue together WGPU and GLFW.
+It exports one procedure <code>GetSurface(wgpu.Instance, glfw.WindowHandle) -&gt; wgpu.Surface</code>.
+The procedure will call the needed target specific procedures and return a surface configured
+for the given window.</p>
+<p>Do note that wgpu does not require GLFW, you can use native windows or another windowing library too.
+For that you can take inspiration from <code>glfwglue</code> on glueing them together.</p>
+<p><b>GLFW and Wayland</b></p>
+<p>GLFW supports Wayland from version 3.4 onwards and only if it is compiled with <code>-DGLFW_EXPOSE_NATIVE_WAYLAND</code>.</p>
+<p>Odin links against your system's glfw library (probably installed through a package manager).
+If that version is lower than 3.4 or hasn't been compiled with the previously mentioned define,
+you will have to compile glfw from source yourself and adjust the <code>foreign import</code> declarations in <code>vendor:glfw/bindings</code> to
+point to it.</p>
+</div>
 <div id="pkg-index">
 <h2>Index</h2>
 <div>
@@ -444,7 +489,7 @@ Procedures (240)</summary>
 <li><a href="#AdapterRelease">AdapterRelease</a></li>
 <li><a href="#AdapterRequestDevice">AdapterRequestDevice</a></li>
 <li><a href="#BindGroupAddRef">BindGroupAddRef</a></li>
-<li><a href="#BindGroupLayoutReference">BindGroupLayoutReference</a></li>
+<li><a href="#BindGroupLayoutAddRef">BindGroupLayoutAddRef</a></li>
 <li><a href="#BindGroupLayoutRelease">BindGroupLayoutRelease</a></li>
 <li><a href="#BindGroupLayoutSetLabel">BindGroupLayoutSetLabel</a></li>
 <li><a href="#BindGroupRelease">BindGroupRelease</a></li>
@@ -852,7 +897,7 @@ Procedure Groups (2)</summary>
 </div>
 <h5>Related Procedures With Parameters</h5>
 <ul>
-<li><a href="/vendor/wgpu/#BindGroupLayoutReference">BindGroupLayoutReference</a></li>
+<li><a href="/vendor/wgpu/#BindGroupLayoutAddRef">BindGroupLayoutAddRef</a></li>
 <li><a href="/vendor/wgpu/#BindGroupLayoutRelease">BindGroupLayoutRelease</a></li>
 <li><a href="/vendor/wgpu/#BindGroupLayoutSetLabel">BindGroupLayoutSetLabel</a></li>
 </ul>
@@ -1056,7 +1101,7 @@ Procedure Groups (2)</summary>
 <h3 id="BufferMapCallbackInfo"><span><a class="doc-id-link" href="#BufferMapCallbackInfo">BufferMapCallbackInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L782"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BufferMapCallbackInfo :: <span class="keyword-type">struct</span> {
-	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStructOut">ChainedStructOut</a>,
+	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStruct">ChainedStruct</a>,
 	mode:        <a class="code-typename" href="/vendor/wgpu/#CallbackMode">CallbackMode</a>,
 	callback:    <a class="code-typename" href="/vendor/wgpu/#BufferMapCallback">BufferMapCallback</a>,
 	userdata1:   <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
@@ -1295,7 +1340,7 @@ Procedure Groups (2)</summary>
 <h3 id="CompilationInfoCallbackInfo"><span><a class="doc-id-link" href="#CompilationInfoCallbackInfo">CompilationInfoCallbackInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L790"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CompilationInfoCallbackInfo :: <span class="keyword-type">struct</span> {
-	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStructOut">ChainedStructOut</a>,
+	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStruct">ChainedStruct</a>,
 	mode:        <a class="code-typename" href="/vendor/wgpu/#CallbackMode">CallbackMode</a>,
 	callback:    <a class="code-typename" href="/vendor/wgpu/#CompilationInfoCallback">CompilationInfoCallback</a>,
 	userdata1:   <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
@@ -1461,7 +1506,7 @@ Procedure Groups (2)</summary>
 <h3 id="CreateComputePipelineAsyncCallbackInfo"><span><a class="doc-id-link" href="#CreateComputePipelineAsyncCallbackInfo">CreateComputePipelineAsyncCallbackInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L798"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CreateComputePipelineAsyncCallbackInfo :: <span class="keyword-type">struct</span> {
-	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStructOut">ChainedStructOut</a>,
+	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStruct">ChainedStruct</a>,
 	mode:        <a class="code-typename" href="/vendor/wgpu/#CallbackMode">CallbackMode</a>,
 	callback:    <a class="code-typename" href="/vendor/wgpu/#CreateComputePipelineAsyncCallback">CreateComputePipelineAsyncCallback</a>,
 	userdata1:   <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
@@ -1495,7 +1540,7 @@ Procedure Groups (2)</summary>
 <h3 id="CreateRenderPipelineAsyncCallbackInfo"><span><a class="doc-id-link" href="#CreateRenderPipelineAsyncCallbackInfo">CreateRenderPipelineAsyncCallbackInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L806"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CreateRenderPipelineAsyncCallbackInfo :: <span class="keyword-type">struct</span> {
-	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStructOut">ChainedStructOut</a>,
+	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStruct">ChainedStruct</a>,
 	mode:        <a class="code-typename" href="/vendor/wgpu/#CallbackMode">CallbackMode</a>,
 	callback:    <a class="code-typename" href="/vendor/wgpu/#CreateRenderPipelineAsyncCallback">CreateRenderPipelineAsyncCallback</a>,
 	userdata1:   <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
@@ -1610,14 +1655,14 @@ Procedure Groups (2)</summary>
 <div class="pkg-entity">
 <h3 id="DeviceLostCallback"><span><a class="doc-id-link" href="#DeviceLostCallback">DeviceLostCallback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L765"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">DeviceLostCallback :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: <a class="code-typename" href="/vendor/wgpu/#Device">Device</a>, reason: <a class="code-typename" href="/vendor/wgpu/#DeviceLostReason">DeviceLostReason</a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, userdata1: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, userdata2: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>)</pre>
+<pre class="doc-code">DeviceLostCallback :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/wgpu/#Device">Device</a>, reason: <a class="code-typename" href="/vendor/wgpu/#DeviceLostReason">DeviceLostReason</a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, userdata1: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, userdata2: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>)</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="DeviceLostCallbackInfo"><span><a class="doc-id-link" href="#DeviceLostCallbackInfo">DeviceLostCallbackInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L814"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DeviceLostCallbackInfo :: <span class="keyword-type">struct</span> {
-	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStructOut">ChainedStructOut</a>,
+	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStruct">ChainedStruct</a>,
 	mode:        <a class="code-typename" href="/vendor/wgpu/#CallbackMode">CallbackMode</a>,
 	callback:    <a class="code-typename" href="/vendor/wgpu/#DeviceLostCallback">DeviceLostCallback</a>,
 	userdata1:   <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
@@ -1744,7 +1789,7 @@ Procedure Groups (2)</summary>
 	<span class="comment">// PolygonModePoint,</span>
 	<span class="comment">// ConservativeRasterization,</span>
 	<span class="comment">// ClearTexture,</span>
-	SprivShaderPassThrough                                = 196631, 
+	SpirvShaderPassthrough                                = 196631, 
 	<span class="comment">// MultiView,</span>
 	VertexAttribute64bit                                  = 196633, 
 	TextureFormatNv12, 
@@ -2183,7 +2228,7 @@ Procedure Groups (2)</summary>
 <h3 id="NativeLimits"><span><a class="doc-id-link" href="#NativeLimits">NativeLimits<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu_native_types.odin#L74"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">NativeLimits :: <span class="keyword-type">struct</span> {
-	chain:                 <a class="code-typename" href="/vendor/wgpu/#ChainedStructOut">ChainedStructOut</a>,
+	<span class="keyword-type">using</span> chain:           <a class="code-typename" href="/vendor/wgpu/#ChainedStructOut">ChainedStructOut</a>,
 	maxPushConstantSize:   <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
 	maxNonSamplerBindings: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
 }</pre>
@@ -2272,7 +2317,7 @@ Procedure Groups (2)</summary>
 <h3 id="PopErrorScopeCallbackInfo"><span><a class="doc-id-link" href="#PopErrorScopeCallbackInfo">PopErrorScopeCallbackInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L822"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PopErrorScopeCallbackInfo :: <span class="keyword-type">struct</span> {
-	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStructOut">ChainedStructOut</a>,
+	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStruct">ChainedStruct</a>,
 	mode:        <a class="code-typename" href="/vendor/wgpu/#CallbackMode">CallbackMode</a>,
 	callback:    <a class="code-typename" href="/vendor/wgpu/#PopErrorScopeCallback">PopErrorScopeCallback</a>,
 	userdata1:   <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
@@ -2482,7 +2527,7 @@ Procedure Groups (2)</summary>
 <h3 id="QueueWorkDoneCallbackInfo"><span><a class="doc-id-link" href="#QueueWorkDoneCallbackInfo">QueueWorkDoneCallbackInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L830"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">QueueWorkDoneCallbackInfo :: <span class="keyword-type">struct</span> {
-	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStructOut">ChainedStructOut</a>,
+	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStruct">ChainedStruct</a>,
 	mode:        <a class="code-typename" href="/vendor/wgpu/#CallbackMode">CallbackMode</a>,
 	callback:    <a class="code-typename" href="/vendor/wgpu/#QueueWorkDoneCallback">QueueWorkDoneCallback</a>,
 	userdata1:   <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
@@ -2756,7 +2801,7 @@ Procedure Groups (2)</summary>
 <h3 id="RequestAdapterCallbackInfo"><span><a class="doc-id-link" href="#RequestAdapterCallbackInfo">RequestAdapterCallbackInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L838"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">RequestAdapterCallbackInfo :: <span class="keyword-type">struct</span> {
-	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStructOut">ChainedStructOut</a>,
+	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStruct">ChainedStruct</a>,
 	mode:        <a class="code-typename" href="/vendor/wgpu/#CallbackMode">CallbackMode</a>,
 	callback:    <a class="code-typename" href="/vendor/wgpu/#RequestAdapterCallback">RequestAdapterCallback</a>,
 	userdata1:   <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
@@ -2807,7 +2852,7 @@ Procedure Groups (2)</summary>
 <h3 id="RequestDeviceCallbackInfo"><span><a class="doc-id-link" href="#RequestDeviceCallbackInfo">RequestDeviceCallbackInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L846"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">RequestDeviceCallbackInfo :: <span class="keyword-type">struct</span> {
-	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStructOut">ChainedStructOut</a>,
+	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStruct">ChainedStruct</a>,
 	mode:        <a class="code-typename" href="/vendor/wgpu/#CallbackMode">CallbackMode</a>,
 	callback:    <a class="code-typename" href="/vendor/wgpu/#RequestDeviceCallback">RequestDeviceCallback</a>,
 	userdata1:   <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
@@ -3044,6 +3089,7 @@ Procedure Groups (2)</summary>
 <li><a href="/vendor/wgpu/#RawGetInstanceCapabilities">RawGetInstanceCapabilities</a></li>
 <li><a href="/vendor/wgpu/#RawInstanceGetWGSLLanguageFeatures">RawInstanceGetWGSLLanguageFeatures</a></li>
 <li><a href="/vendor/wgpu/#RawSurfaceGetCapabilities">RawSurfaceGetCapabilities</a></li>
+<li><a href="/vendor/wgpu/#SurfaceGetCapabilities">SurfaceGetCapabilities</a></li>
 <li><a href="/vendor/wgpu/#SurfacePresent">SurfacePresent</a></li>
 </ul>
 </div>
@@ -3239,7 +3285,7 @@ Procedure Groups (2)</summary>
 <div>
 <pre class="doc-code">SurfaceConfigurationExtras :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> chain:                <a class="code-typename" href="/vendor/wgpu/#ChainedStruct">ChainedStruct</a>,
-	desiredMaximumFrameLatency: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	desiredMaximumFrameLatency: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
 }</pre>
 </div>
 </div>
@@ -3342,7 +3388,7 @@ Procedure Groups (2)</summary>
 <h3 id="SurfaceTexture"><span><a class="doc-id-link" href="#SurfaceTexture">SurfaceTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L1206"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SurfaceTexture :: <span class="keyword-type">struct</span> {
-	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStruct">ChainedStruct</a>,
+	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStructOut">ChainedStructOut</a>,
 	texture:     <a class="code-typename" href="/vendor/wgpu/#Texture">Texture</a>,
 	status:      <a class="code-typename" href="/vendor/wgpu/#SurfaceGetCurrentTextureStatus">SurfaceGetCurrentTextureStatus</a>,
 }</pre>
@@ -3688,14 +3734,14 @@ Procedure Groups (2)</summary>
 <div class="pkg-entity">
 <h3 id="UncapturedErrorCallback"><span><a class="doc-id-link" href="#UncapturedErrorCallback">UncapturedErrorCallback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L770"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">UncapturedErrorCallback :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: <a class="code-typename" href="/vendor/wgpu/#Device">Device</a>, type: <a class="code-typename" href="/vendor/wgpu/#ErrorType">ErrorType</a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, userdata1: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, userdata2: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>)</pre>
+<pre class="doc-code">UncapturedErrorCallback :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/wgpu/#Device">Device</a>, type: <a class="code-typename" href="/vendor/wgpu/#ErrorType">ErrorType</a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, userdata1: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, userdata2: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>)</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="UncapturedErrorCallbackInfo"><span><a class="doc-id-link" href="#UncapturedErrorCallbackInfo">UncapturedErrorCallbackInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L854"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">UncapturedErrorCallbackInfo :: <span class="keyword-type">struct</span> {
-	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStructOut">ChainedStructOut</a>,
+	nextInChain: ^<a class="code-typename" href="/vendor/wgpu/#ChainedStruct">ChainedStruct</a>,
 	callback:    <a class="code-typename" href="/vendor/wgpu/#UncapturedErrorCallback">UncapturedErrorCallback</a>,
 	userdata1:   <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
 	userdata2:   <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
@@ -4004,9 +4050,9 @@ Procedure Groups (2)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BindGroupLayoutReference"><span><a class="doc-id-link" href="#BindGroupLayoutReference">BindGroupLayoutReference<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L1456"><em>Source</em></a></div></h3>
+<h3 id="BindGroupLayoutAddRef"><span><a class="doc-id-link" href="#BindGroupLayoutAddRef">BindGroupLayoutAddRef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L1456"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">BindGroupLayoutReference :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (bindGroupLayout: <a class="code-typename" href="/vendor/wgpu/#BindGroupLayout">BindGroupLayout</a>) ---</pre>
+<pre class="doc-code">BindGroupLayoutAddRef :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (bindGroupLayout: <a class="code-typename" href="/vendor/wgpu/#BindGroupLayout">BindGroupLayout</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -4114,7 +4160,7 @@ Procedure Groups (2)</summary>
 <div class="pkg-entity">
 <h3 id="BufferMapAsync"><span><a class="doc-id-link" href="#BufferMapAsync">BufferMapAsync<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L1468"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">BufferMapAsync :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (buffer: <a class="code-typename" href="/vendor/wgpu/#Buffer">Buffer</a>, mode: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/wgpu/#MapMode">MapMode</a>; <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>], offset: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, callback: <a class="code-typename" href="/vendor/wgpu/#BufferMapCallbackInfo">BufferMapCallbackInfo</a>) -> <a class="code-typename" href="/vendor/wgpu/#Future">Future</a> ---</pre>
+<pre class="doc-code">BufferMapAsync :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (buffer: <a class="code-typename" href="/vendor/wgpu/#Buffer">Buffer</a>, mode: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/wgpu/#MapMode">MapMode</a>; <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>], offset: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, callbackInfo: <a class="code-typename" href="/vendor/wgpu/#BufferMapCallbackInfo">BufferMapCallbackInfo</a>) -> <a class="code-typename" href="/vendor/wgpu/#Future">Future</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -5413,7 +5459,7 @@ Procedure Groups (2)</summary>
 <div class="pkg-entity">
 <h3 id="SurfaceGetCapabilities"><span><a class="doc-id-link" href="#SurfaceGetCapabilities">SurfaceGetCapabilities<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin#L1856"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">SurfaceGetCapabilities :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (surface: <a class="code-typename" href="/vendor/wgpu/#Surface">Surface</a>, adapter: <a class="code-typename" href="/vendor/wgpu/#Adapter">Adapter</a>) -> (capabilities: <a class="code-typename" href="/vendor/wgpu/#SurfaceCapabilities">SurfaceCapabilities</a>) {…}</pre>
+<pre class="doc-code">SurfaceGetCapabilities :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (surface: <a class="code-typename" href="/vendor/wgpu/#Surface">Surface</a>, adapter: <a class="code-typename" href="/vendor/wgpu/#Adapter">Adapter</a>) -> (capabilities: <a class="code-typename" href="/vendor/wgpu/#SurfaceCapabilities">SurfaceCapabilities</a>, status: <a class="code-typename" href="/vendor/wgpu/#Status">Status</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -5574,17 +5620,18 @@ Procedure Groups (2)</summary>
 </section>
 <h2 id="pkg-source-files">Source Files</h2>
 <ul>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/doc.odin">doc.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu.odin">wgpu.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu_native.odin">wgpu_native.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/wgpu/wgpu_native_types.odin">wgpu_native_types.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-02 21:11:24.133763900 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-03 21:11:24.296168000 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
 <ul>
-<li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#pkg-overview">Overview</a><li><a href="#pkg-Types">Types</a><ul>
 <li><a href="#Adapter">Adapter</a></li>
 <li><a href="#AdapterInfo">AdapterInfo</a></li>
 <li><a href="#AdapterType">AdapterType</a></li>
@@ -5826,7 +5873,7 @@ Procedure Groups (2)</summary>
 <li><a href="#AdapterRelease">AdapterRelease</a></li>
 <li><a href="#AdapterRequestDevice">AdapterRequestDevice</a></li>
 <li><a href="#BindGroupAddRef">BindGroupAddRef</a></li>
-<li><a href="#BindGroupLayoutReference">BindGroupLayoutReference</a></li>
+<li><a href="#BindGroupLayoutAddRef">BindGroupLayoutAddRef</a></li>
 <li><a href="#BindGroupLayoutRelease">BindGroupLayoutRelease</a></li>
 <li><a href="#BindGroupLayoutSetLabel">BindGroupLayoutSetLabel</a></li>
 <li><a href="#BindGroupRelease">BindGroupRelease</a></li>
