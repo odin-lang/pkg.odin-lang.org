@@ -412,6 +412,13 @@ intrinsics_table := []Builtin{
 	{name = "simd_reduce_any",         kind = "b", type = "proc(a: #simd[N]T) -> T where type_is_boolean(T)" },
 	{name = "simd_reduce_all",         kind = "b", type = "proc(a: #simd[N]T) -> T where type_is_boolean(T)" },
 
+	{name = "simd_extract_msbs",       kind = "b", type = "proc(a: #simd[N]T) -> bit_set[0..<N] where type_is_integer(T) || type_is_boolean(T)",
+		comment = "Extracts the most significant bit of each element of the given vector into a `bit_set`.",
+	},
+	{name = "simd_extract_lsbs",       kind = "b", type = "proc(a: #simd[N]T) -> bit_set[0..<N] where type_is_integer(T) || type_is_boolean(T)",
+		comment = "Extracts the least significant bit of each element of the given vector into a `bit_set`.",
+	},
+
 	{name = "simd_gather",             kind = "b", type = "proc(ptr: #simd[N]rawptr, val: #simd[N]T, mask: #simd[N]U) -> #simd[N]T where type_is_integer(U) || type_is_boolean(U)"},
 	{name = "simd_scatter",            kind = "b", type = "proc(ptr: rawptr, val: #simd[N]T, mask: #simd[N]U) where type_is_integer(U) || type_is_boolean(U)"},
 
