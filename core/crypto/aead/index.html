@@ -102,11 +102,13 @@
 </li>
 <li class="nav-item"><a href="/core/crypto">crypto</a><ul>
 <li><a class="active" href="/core/crypto/aead">aead</a></li>
+<li><a href="/core/crypto/aegis">aegis</a></li>
 <li><a href="/core/crypto/aes">aes</a></li>
 <li><a href="/core/crypto/blake2b">blake2b</a></li>
 <li><a href="/core/crypto/blake2s">blake2s</a></li>
 <li><a href="/core/crypto/chacha20">chacha20</a></li>
 <li><a href="/core/crypto/chacha20poly1305">chacha20poly1305</a></li>
+<li><a href="/core/crypto/deoxysii">deoxysii</a></li>
 <li><a href="/core/crypto/ed25519">ed25519</a></li>
 <li><a href="/core/crypto/hash">hash</a></li>
 <li><a href="/core/crypto/hkdf">hkdf</a></li>
@@ -124,6 +126,7 @@
 <li><a href="/core/crypto/sm3">sm3</a></li>
 <li><a href="/core/crypto/tuplehash">tuplehash</a></li>
 <li><a href="/core/crypto/x25519">x25519</a></li>
+<li><a href="/core/crypto/x448">x448</a></li>
 </ul>
 
 </li>
@@ -441,7 +444,7 @@ Procedure Groups (2)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Algorithm"><span><a class="doc-id-link" href="#Algorithm">Algorithm<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L21"><em>Source</em></a></div></h3>
+<h3 id="Algorithm"><span><a class="doc-id-link" href="#Algorithm">Algorithm<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L23"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Algorithm :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
 	Invalid, 
@@ -450,6 +453,11 @@ Procedure Groups (2)</summary>
 	AES_GCM_256, 
 	CHACHA20POLY1305, 
 	XCHACHA20POLY1305, 
+	AEGIS_128L, 
+	AEGIS_128L_256,    <span class="comment">// AEGIS-128L (256-bit tag)</span>
+	AEGIS_256, 
+	AEGIS_256_256,     <span class="comment">// AEGIS-256 (256-bit tag)</span>
+	DEOXYS_II_256, 
 }</pre>
 </div>
 <details class="odin-doc-toggle" open>
@@ -470,13 +478,15 @@ Procedure Groups (2)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Context"><span><a class="doc-id-link" href="#Context">Context<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L73"><em>Source</em></a></div></h3>
+<h3 id="Context"><span><a class="doc-id-link" href="#Context">Context<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L100"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Context :: <span class="keyword-type">struct</span> {
 	_algo: <a class="code-typename" href="/core/crypto/aead/#Algorithm">Algorithm</a>,
 	_impl: <span class="keyword-type">union</span> {
 		aes.<a class="code-typename" href="/core/crypto/aes/#Context_GCM">Context_GCM</a>, 
 		chacha20poly1305.<a class="code-typename" href="/core/crypto/chacha20poly1305/#Context">Context</a>, 
+		aegis.<a class="code-typename" href="/core/crypto/aegis/#Context">Context</a>, 
+		deoxysii.<a class="code-typename" href="/core/crypto/deoxysii/#Context">Context</a>, 
 	},
 }</pre>
 </div>
@@ -498,7 +508,7 @@ Procedure Groups (2)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Implementation"><span><a class="doc-id-link" href="#Implementation">Implementation<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L11"><em>Source</em></a></div></h3>
+<h3 id="Implementation"><span><a class="doc-id-link" href="#Implementation">Implementation<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L13"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Implementation :: <span class="keyword-type">union</span> {
 	aes.<a class="code-typename" href="/core/crypto/aes/#Implementation">Implementation</a>, 
@@ -522,9 +532,9 @@ implementation available.</p>
 </div>
 <h2 id="pkg-Constants" class="pkg-header">Constants</h2>
 <div class="pkg-entity">
-<h3 id="MAX_TAG_SIZE"><span><a class="doc-id-link" href="#MAX_TAG_SIZE">MAX_TAG_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L18"><em>Source</em></a></div></h3>
+<h3 id="MAX_TAG_SIZE"><span><a class="doc-id-link" href="#MAX_TAG_SIZE">MAX_TAG_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L20"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">MAX_TAG_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 16</pre>
+<pre class="doc-code">MAX_TAG_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 32</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -534,17 +544,17 @@ Algorithms supported via this package.</p>
 </div>
 <h2 id="pkg-Variables" class="pkg-header">Variables</h2>
 <div class="pkg-entity">
-<h3 id="ALGORITHM_NAMES"><span><a class="doc-id-link" href="#ALGORITHM_NAMES">ALGORITHM_NAMES<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L31"><em>Source</em></a></div></h3>
+<h3 id="ALGORITHM_NAMES"><span><a class="doc-id-link" href="#ALGORITHM_NAMES">ALGORITHM_NAMES<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L38"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ALGORITHM_NAMES: [<a class="code-typename" href="/core/crypto/aead/#Algorithm">Algorithm</a>]<a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = …</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>ALGORITM_NAMES is the Agorithm to algorithm name string.</p>
+<p>ALGORITM_NAMES is the Algorithm to algorithm name string.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="IV_SIZES"><span><a class="doc-id-link" href="#IV_SIZES">IV_SIZES<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L63"><em>Source</em></a></div></h3>
+<h3 id="IV_SIZES"><span><a class="doc-id-link" href="#IV_SIZES">IV_SIZES<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L85"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">IV_SIZES: [<a class="code-typename" href="/core/crypto/aead/#Algorithm">Algorithm</a>]<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = …</pre>
 </div>
@@ -555,7 +565,7 @@ Algorithms supported via this package.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="KEY_SIZES"><span><a class="doc-id-link" href="#KEY_SIZES">KEY_SIZES<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L51"><em>Source</em></a></div></h3>
+<h3 id="KEY_SIZES"><span><a class="doc-id-link" href="#KEY_SIZES">KEY_SIZES<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L68"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">KEY_SIZES: [<a class="code-typename" href="/core/crypto/aead/#Algorithm">Algorithm</a>]<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = …</pre>
 </div>
@@ -565,7 +575,7 @@ Algorithms supported via this package.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="TAG_SIZES"><span><a class="doc-id-link" href="#TAG_SIZES">TAG_SIZES<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L41"><em>Source</em></a></div></h3>
+<h3 id="TAG_SIZES"><span><a class="doc-id-link" href="#TAG_SIZES">TAG_SIZES<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L53"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">TAG_SIZES: [<a class="code-typename" href="/core/crypto/aead/#Algorithm">Algorithm</a>]<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = …</pre>
 </div>
@@ -576,7 +586,7 @@ Algorithms supported via this package.</p>
 </div>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="algorithm"><span><a class="doc-id-link" href="#algorithm">algorithm<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L175"><em>Source</em></a></div></h3>
+<h3 id="algorithm"><span><a class="doc-id-link" href="#algorithm">algorithm<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L229"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">algorithm :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/core/crypto/aead/#Context">Context</a>) -> <a class="code-typename" href="/core/crypto/aead/#Algorithm">Algorithm</a> {…}</pre>
 </div>
@@ -586,7 +596,7 @@ Algorithms supported via this package.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="init"><span><a class="doc-id-link" href="#init">init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L92"><em>Source</em></a></div></h3>
+<h3 id="init"><span><a class="doc-id-link" href="#init">init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L126"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">init :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/core/crypto/aead/#Context">Context</a>, algorithm: <a class="code-typename" href="/core/crypto/aead/#Algorithm">Algorithm</a>, key: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, impl: <a class="code-typename" href="/core/crypto/aead/#Implementation">Implementation</a> = nil) {…}</pre>
 </div>
@@ -596,7 +606,7 @@ Algorithms supported via this package.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="iv_size"><span><a class="doc-id-link" href="#iv_size">iv_size<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L180"><em>Source</em></a></div></h3>
+<h3 id="iv_size"><span><a class="doc-id-link" href="#iv_size">iv_size<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L234"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">iv_size :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/core/crypto/aead/#Context">Context</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
@@ -606,7 +616,7 @@ Algorithms supported via this package.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="open_ctx"><span><a class="doc-id-link" href="#open_ctx">open_ctx<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L147"><em>Source</em></a></div></h3>
+<h3 id="open_ctx"><span><a class="doc-id-link" href="#open_ctx">open_ctx<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L191"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">open_ctx :: <span class="keyword-type">proc</span>(
 	ctx:                      ^<a class="code-typename" href="/core/crypto/aead/#Context">Context</a>, 
@@ -638,11 +648,11 @@ fails, the destination buffer will be zeroed.</p>
 with the provided algorithm, key, iv, and tag, and stores the output in dst,
 returning true iff the authentication was successful.  If authentication
 fails, the destination buffer will be zeroed.</p>
-<p>dst and plaintext MUST alias exactly or not at all.</p>
+<p>dst and ciphertext MUST alias exactly or not at all.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="reset"><span><a class="doc-id-link" href="#reset">reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L160"><em>Source</em></a></div></h3>
+<h3 id="reset"><span><a class="doc-id-link" href="#reset">reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L210"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">reset :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/core/crypto/aead/#Context">Context</a>) {…}</pre>
 </div>
@@ -653,7 +663,7 @@ be used again.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="seal_ctx"><span><a class="doc-id-link" href="#seal_ctx">seal_ctx<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L129"><em>Source</em></a></div></h3>
+<h3 id="seal_ctx"><span><a class="doc-id-link" href="#seal_ctx">seal_ctx<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L167"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">seal_ctx :: <span class="keyword-type">proc</span>(
 	ctx:               ^<a class="code-typename" href="/core/crypto/aead/#Context">Context</a>, 
@@ -685,7 +695,7 @@ with the provided algorithm, key, and iv, stores the output in dst and tag.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="tag_size"><span><a class="doc-id-link" href="#tag_size">tag_size<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L185"><em>Source</em></a></div></h3>
+<h3 id="tag_size"><span><a class="doc-id-link" href="#tag_size">tag_size<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin#L239"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">tag_size :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/core/crypto/aead/#Context">Context</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
@@ -723,7 +733,7 @@ with the provided algorithm, key, and iv, stores the output in dst and tag.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/aead/low_level.odin">low_level.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-22 21:10:38.534970900 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-23 21:10:42.398973600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

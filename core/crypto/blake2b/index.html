@@ -102,11 +102,13 @@
 </li>
 <li class="nav-item"><a href="/core/crypto">crypto</a><ul>
 <li><a href="/core/crypto/aead">aead</a></li>
+<li><a href="/core/crypto/aegis">aegis</a></li>
 <li><a href="/core/crypto/aes">aes</a></li>
 <li><a class="active" href="/core/crypto/blake2b">blake2b</a></li>
 <li><a href="/core/crypto/blake2s">blake2s</a></li>
 <li><a href="/core/crypto/chacha20">chacha20</a></li>
 <li><a href="/core/crypto/chacha20poly1305">chacha20poly1305</a></li>
+<li><a href="/core/crypto/deoxysii">deoxysii</a></li>
 <li><a href="/core/crypto/ed25519">ed25519</a></li>
 <li><a href="/core/crypto/hash">hash</a></li>
 <li><a href="/core/crypto/hkdf">hkdf</a></li>
@@ -124,6 +126,7 @@
 <li><a href="/core/crypto/sm3">sm3</a></li>
 <li><a href="/core/crypto/tuplehash">tuplehash</a></li>
 <li><a href="/core/crypto/x25519">x25519</a></li>
+<li><a href="/core/crypto/x448">x448</a></li>
 </ul>
 
 </li>
@@ -401,7 +404,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="DIGEST_SIZE"><span><a class="doc-id-link" href="#DIGEST_SIZE">DIGEST_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/blake2b/blake2b.odin#L21"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">DIGEST_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 64</pre>
+<pre class="doc-code">DIGEST_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : _blake2.BLAKE2B_SIZE</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -412,7 +415,7 @@ Procedure Groups (0)</summary>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="clone"><span><a class="doc-id-link" href="#clone">clone<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/blake2b/blake2b.odin#L51"><em>Source</em></a></div></h3>
+<h3 id="clone"><span><a class="doc-id-link" href="#clone">clone<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/blake2b/blake2b.odin#L53"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">clone :: <span class="keyword-type">proc</span>(ctx, other: ^_blake2.<a class="code-typename" href="//#Blake2b_Context">Blake2b_Context</a>) {…}</pre>
 </div>
@@ -422,7 +425,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="final"><span><a class="doc-id-link" href="#final">final<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/blake2b/blake2b.odin#L46"><em>Source</em></a></div></h3>
+<h3 id="final"><span><a class="doc-id-link" href="#final">final<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/blake2b/blake2b.odin#L48"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">final :: <span class="keyword-type">proc</span>(ctx: ^_blake2.<a class="code-typename" href="//#Blake2b_Context">Blake2b_Context</a>, hash: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, finalize_clone: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = false) {…}</pre>
 </div>
@@ -437,7 +440,7 @@ which is useful for for calculating rolling digests.</p>
 <div class="pkg-entity">
 <h3 id="init"><span><a class="doc-id-link" href="#init">init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/blake2b/blake2b.odin#L30"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">init :: <span class="keyword-type">proc</span>(ctx: ^_blake2.<a class="code-typename" href="//#Blake2b_Context">Blake2b_Context</a>) {…}</pre>
+<pre class="doc-code">init :: <span class="keyword-type">proc</span>(ctx: ^_blake2.<a class="code-typename" href="//#Blake2b_Context">Blake2b_Context</a>, digest_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DIGEST_SIZE) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -445,7 +448,7 @@ which is useful for for calculating rolling digests.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="reset"><span><a class="doc-id-link" href="#reset">reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/blake2b/blake2b.odin#L57"><em>Source</em></a></div></h3>
+<h3 id="reset"><span><a class="doc-id-link" href="#reset">reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/blake2b/blake2b.odin#L59"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">reset :: <span class="keyword-type">proc</span>(ctx: ^_blake2.<a class="code-typename" href="//#Blake2b_Context">Blake2b_Context</a>) {…}</pre>
 </div>
@@ -456,7 +459,7 @@ be used again.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="update"><span><a class="doc-id-link" href="#update">update<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/blake2b/blake2b.odin#L37"><em>Source</em></a></div></h3>
+<h3 id="update"><span><a class="doc-id-link" href="#update">update<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/blake2b/blake2b.odin#L39"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">update :: <span class="keyword-type">proc</span>(ctx: ^_blake2.<a class="code-typename" href="//#Blake2b_Context">Blake2b_Context</a>, data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) {…}</pre>
 </div>
@@ -473,7 +476,7 @@ be used again.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/blake2b/blake2b.odin">blake2b.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-22 21:10:38.536798400 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-23 21:10:42.401755400 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

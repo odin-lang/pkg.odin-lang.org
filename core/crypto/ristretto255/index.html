@@ -102,11 +102,13 @@
 </li>
 <li class="nav-item"><a href="/core/crypto">crypto</a><ul>
 <li><a href="/core/crypto/aead">aead</a></li>
+<li><a href="/core/crypto/aegis">aegis</a></li>
 <li><a href="/core/crypto/aes">aes</a></li>
 <li><a href="/core/crypto/blake2b">blake2b</a></li>
 <li><a href="/core/crypto/blake2s">blake2s</a></li>
 <li><a href="/core/crypto/chacha20">chacha20</a></li>
 <li><a href="/core/crypto/chacha20poly1305">chacha20poly1305</a></li>
+<li><a href="/core/crypto/deoxysii">deoxysii</a></li>
 <li><a href="/core/crypto/ed25519">ed25519</a></li>
 <li><a href="/core/crypto/hash">hash</a></li>
 <li><a href="/core/crypto/hkdf">hkdf</a></li>
@@ -124,6 +126,7 @@
 <li><a href="/core/crypto/sm3">sm3</a></li>
 <li><a href="/core/crypto/tuplehash">tuplehash</a></li>
 <li><a href="/core/crypto/x25519">x25519</a></li>
+<li><a href="/core/crypto/x448">x448</a></li>
 </ul>
 
 </li>
@@ -503,7 +506,7 @@ scalar.</p>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="ge_add"><span><a class="doc-id-link" href="#ge_add">ge_add<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L308"><em>Source</em></a></div></h3>
+<h3 id="ge_add"><span><a class="doc-id-link" href="#ge_add">ge_add<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L304"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ge_add :: <span class="keyword-type">proc</span>(ge, a, b: ^<a class="code-typename" href="/core/crypto/ristretto255/#Group_Element">Group_Element</a>) {…}</pre>
 </div>
@@ -513,7 +516,7 @@ scalar.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ge_bytes"><span><a class="doc-id-link" href="#ge_bytes">ge_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L224"><em>Source</em></a></div></h3>
+<h3 id="ge_bytes"><span><a class="doc-id-link" href="#ge_bytes">ge_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L222"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ge_bytes :: <span class="keyword-type">proc</span>(ge: ^<a class="code-typename" href="/core/crypto/ristretto255/#Group_Element">Group_Element</a>, dst: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) {…}</pre>
 </div>
@@ -533,7 +536,7 @@ scalar.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ge_cond_assign"><span><a class="doc-id-link" href="#ge_cond_assign">ge_cond_assign<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L378"><em>Source</em></a></div></h3>
+<h3 id="ge_cond_assign"><span><a class="doc-id-link" href="#ge_cond_assign">ge_cond_assign<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L374"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ge_cond_assign :: <span class="keyword-type">proc</span>(ge, a: ^<a class="code-typename" href="/core/crypto/ristretto255/#Group_Element">Group_Element</a>, ctrl: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
@@ -544,7 +547,7 @@ Behavior for all other values of ctrl are undefined,</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ge_cond_negate"><span><a class="doc-id-link" href="#ge_cond_negate">ge_cond_negate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L369"><em>Source</em></a></div></h3>
+<h3 id="ge_cond_negate"><span><a class="doc-id-link" href="#ge_cond_negate">ge_cond_negate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L365"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ge_cond_negate :: <span class="keyword-type">proc</span>(ge, a: ^<a class="code-typename" href="/core/crypto/ristretto255/#Group_Element">Group_Element</a>, ctrl: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
@@ -555,7 +558,7 @@ Behavior for all other values of ctrl are undefined,</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ge_cond_select"><span><a class="doc-id-link" href="#ge_cond_select">ge_cond_select<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L386"><em>Source</em></a></div></h3>
+<h3 id="ge_cond_select"><span><a class="doc-id-link" href="#ge_cond_select">ge_cond_select<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L382"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ge_cond_select :: <span class="keyword-type">proc</span>(ge, a, b: ^<a class="code-typename" href="/core/crypto/ristretto255/#Group_Element">Group_Element</a>, ctrl: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
@@ -566,7 +569,7 @@ Behavior for all other values of ctrl are undefined,</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ge_double"><span><a class="doc-id-link" href="#ge_double">ge_double<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L316"><em>Source</em></a></div></h3>
+<h3 id="ge_double"><span><a class="doc-id-link" href="#ge_double">ge_double<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L312"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ge_double :: <span class="keyword-type">proc</span>(ge, a: ^<a class="code-typename" href="/core/crypto/ristretto255/#Group_Element">Group_Element</a>) {…}</pre>
 </div>
@@ -576,7 +579,7 @@ Behavior for all other values of ctrl are undefined,</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ge_double_scalarmult_generator_vartime"><span><a class="doc-id-link" href="#ge_double_scalarmult_generator_vartime">ge_double_scalarmult_generator_vartime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L355"><em>Source</em></a></div></h3>
+<h3 id="ge_double_scalarmult_generator_vartime"><span><a class="doc-id-link" href="#ge_double_scalarmult_generator_vartime">ge_double_scalarmult_generator_vartime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L351"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ge_double_scalarmult_generator_vartime :: <span class="keyword-type">proc</span>(ge: ^<a class="code-typename" href="/core/crypto/ristretto255/#Group_Element">Group_Element</a>, a: ^field_scalar25519.<a class="code-typename" href="//#Montgomery_Domain_Field_Element">Montgomery_Domain_Field_Element</a>, A: ^<a class="code-typename" href="/core/crypto/ristretto255/#Group_Element">Group_Element</a>, b: ^field_scalar25519.<a class="code-typename" href="//#Montgomery_Domain_Field_Element">Montgomery_Domain_Field_Element</a>) {…}</pre>
 </div>
@@ -587,7 +590,7 @@ time.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ge_equal"><span><a class="doc-id-link" href="#ge_equal">ge_equal<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L395"><em>Source</em></a></div></h3>
+<h3 id="ge_equal"><span><a class="doc-id-link" href="#ge_equal">ge_equal<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L391"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ge_equal :: <span class="keyword-type">proc</span>(a, b: ^<a class="code-typename" href="/core/crypto/ristretto255/#Group_Element">Group_Element</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
@@ -617,7 +620,7 @@ time.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ge_is_identity"><span><a class="doc-id-link" href="#ge_is_identity">ge_is_identity<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L414"><em>Source</em></a></div></h3>
+<h3 id="ge_is_identity"><span><a class="doc-id-link" href="#ge_is_identity">ge_is_identity<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L410"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ge_is_identity :: <span class="keyword-type">proc</span>(ge: ^<a class="code-typename" href="/core/crypto/ristretto255/#Group_Element">Group_Element</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
@@ -627,7 +630,7 @@ time.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ge_negate"><span><a class="doc-id-link" href="#ge_negate">ge_negate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L324"><em>Source</em></a></div></h3>
+<h3 id="ge_negate"><span><a class="doc-id-link" href="#ge_negate">ge_negate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L320"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ge_negate :: <span class="keyword-type">proc</span>(ge, a: ^<a class="code-typename" href="/core/crypto/ristretto255/#Group_Element">Group_Element</a>) {…}</pre>
 </div>
@@ -637,7 +640,7 @@ time.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ge_scalarmult"><span><a class="doc-id-link" href="#ge_scalarmult">ge_scalarmult<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L332"><em>Source</em></a></div></h3>
+<h3 id="ge_scalarmult"><span><a class="doc-id-link" href="#ge_scalarmult">ge_scalarmult<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L328"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ge_scalarmult :: <span class="keyword-type">proc</span>(ge, A: ^<a class="code-typename" href="/core/crypto/ristretto255/#Group_Element">Group_Element</a>, sc: ^field_scalar25519.<a class="code-typename" href="//#Montgomery_Domain_Field_Element">Montgomery_Domain_Field_Element</a>) {…}</pre>
 </div>
@@ -647,7 +650,7 @@ time.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ge_scalarmult_generator"><span><a class="doc-id-link" href="#ge_scalarmult_generator">ge_scalarmult_generator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L340"><em>Source</em></a></div></h3>
+<h3 id="ge_scalarmult_generator"><span><a class="doc-id-link" href="#ge_scalarmult_generator">ge_scalarmult_generator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L336"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ge_scalarmult_generator :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ge: ^<a class="code-typename" href="/core/crypto/ristretto255/#Group_Element">Group_Element</a>, sc: ^field_scalar25519.<a class="code-typename" href="//#Montgomery_Domain_Field_Element">Montgomery_Domain_Field_Element</a>) {…}</pre>
 </div>
@@ -657,7 +660,7 @@ time.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ge_scalarmult_vartime"><span><a class="doc-id-link" href="#ge_scalarmult_vartime">ge_scalarmult_vartime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L346"><em>Source</em></a></div></h3>
+<h3 id="ge_scalarmult_vartime"><span><a class="doc-id-link" href="#ge_scalarmult_vartime">ge_scalarmult_vartime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255.odin#L342"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ge_scalarmult_vartime :: <span class="keyword-type">proc</span>(ge, A: ^<a class="code-typename" href="/core/crypto/ristretto255/#Group_Element">Group_Element</a>, sc: ^field_scalar25519.<a class="code-typename" href="//#Montgomery_Domain_Field_Element">Montgomery_Domain_Field_Element</a>) {…}</pre>
 </div>
@@ -699,7 +702,7 @@ group element, from a wide (512-bit) byte string.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="sc_add"><span><a class="doc-id-link" href="#sc_add">sc_add<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L63"><em>Source</em></a></div></h3>
+<h3 id="sc_add"><span><a class="doc-id-link" href="#sc_add">sc_add<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L59"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sc_add :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (sc, a, b: ^field_scalar25519.<a class="code-typename" href="//#Montgomery_Domain_Field_Element">Montgomery_Domain_Field_Element</a>) {…}</pre>
 </div>
@@ -709,7 +712,7 @@ group element, from a wide (512-bit) byte string.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="sc_bytes"><span><a class="doc-id-link" href="#sc_bytes">sc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L54"><em>Source</em></a></div></h3>
+<h3 id="sc_bytes"><span><a class="doc-id-link" href="#sc_bytes">sc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L52"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sc_bytes :: <span class="keyword-type">proc</span>(sc: ^field_scalar25519.<a class="code-typename" href="//#Montgomery_Domain_Field_Element">Montgomery_Domain_Field_Element</a>, dst: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) {…}</pre>
 </div>
@@ -729,7 +732,7 @@ group element, from a wide (512-bit) byte string.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="sc_cond_assign"><span><a class="doc-id-link" href="#sc_cond_assign">sc_cond_assign<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L89"><em>Source</em></a></div></h3>
+<h3 id="sc_cond_assign"><span><a class="doc-id-link" href="#sc_cond_assign">sc_cond_assign<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L85"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sc_cond_assign :: <span class="keyword-type">proc</span>(sc, a: ^field_scalar25519.<a class="code-typename" href="//#Montgomery_Domain_Field_Element">Montgomery_Domain_Field_Element</a>, ctrl: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
@@ -740,7 +743,7 @@ Behavior for all other values of ctrl are undefined,</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="sc_equal"><span><a class="doc-id-link" href="#sc_equal">sc_equal<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L95"><em>Source</em></a></div></h3>
+<h3 id="sc_equal"><span><a class="doc-id-link" href="#sc_equal">sc_equal<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L91"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sc_equal :: <span class="keyword-type">proc</span>(a, b: ^field_scalar25519.<a class="code-typename" href="//#Montgomery_Domain_Field_Element">Montgomery_Domain_Field_Element</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
@@ -750,7 +753,7 @@ Behavior for all other values of ctrl are undefined,</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="sc_mul"><span><a class="doc-id-link" href="#sc_mul">sc_mul<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L78"><em>Source</em></a></div></h3>
+<h3 id="sc_mul"><span><a class="doc-id-link" href="#sc_mul">sc_mul<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L74"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sc_mul :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (sc, a, b: ^field_scalar25519.<a class="code-typename" href="//#Montgomery_Domain_Field_Element">Montgomery_Domain_Field_Element</a>) {…}</pre>
 </div>
@@ -760,7 +763,7 @@ Behavior for all other values of ctrl are undefined,</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="sc_negate"><span><a class="doc-id-link" href="#sc_negate">sc_negate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L73"><em>Source</em></a></div></h3>
+<h3 id="sc_negate"><span><a class="doc-id-link" href="#sc_negate">sc_negate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L69"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sc_negate :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (sc, a: ^field_scalar25519.<a class="code-typename" href="//#Montgomery_Domain_Field_Element">Montgomery_Domain_Field_Element</a>) {…}</pre>
 </div>
@@ -813,7 +816,7 @@ little-endian value, and reducing it mod the group order.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="sc_square"><span><a class="doc-id-link" href="#sc_square">sc_square<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L83"><em>Source</em></a></div></h3>
+<h3 id="sc_square"><span><a class="doc-id-link" href="#sc_square">sc_square<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L79"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sc_square :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (sc, a: ^field_scalar25519.<a class="code-typename" href="//#Montgomery_Domain_Field_Element">Montgomery_Domain_Field_Element</a>) {…}</pre>
 </div>
@@ -823,7 +826,7 @@ little-endian value, and reducing it mod the group order.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="sc_sub"><span><a class="doc-id-link" href="#sc_sub">sc_sub<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L68"><em>Source</em></a></div></h3>
+<h3 id="sc_sub"><span><a class="doc-id-link" href="#sc_sub">sc_sub<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin#L64"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sc_sub :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (sc, a, b: ^field_scalar25519.<a class="code-typename" href="//#Montgomery_Domain_Field_Element">Montgomery_Domain_Field_Element</a>) {…}</pre>
 </div>
@@ -841,7 +844,7 @@ little-endian value, and reducing it mod the group order.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/ristretto255/ristretto255_scalar.odin">ristretto255_scalar.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-22 21:10:38.548171900 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-23 21:10:42.414786400 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

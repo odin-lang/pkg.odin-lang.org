@@ -102,11 +102,13 @@
 </li>
 <li class="nav-item"><a href="/core/crypto">crypto</a><ul>
 <li><a href="/core/crypto/aead">aead</a></li>
+<li><a href="/core/crypto/aegis">aegis</a></li>
 <li><a href="/core/crypto/aes">aes</a></li>
 <li><a href="/core/crypto/blake2b">blake2b</a></li>
 <li><a href="/core/crypto/blake2s">blake2s</a></li>
 <li><a href="/core/crypto/chacha20">chacha20</a></li>
 <li><a href="/core/crypto/chacha20poly1305">chacha20poly1305</a></li>
+<li><a href="/core/crypto/deoxysii">deoxysii</a></li>
 <li><a href="/core/crypto/ed25519">ed25519</a></li>
 <li><a href="/core/crypto/hash">hash</a></li>
 <li><a href="/core/crypto/hkdf">hkdf</a></li>
@@ -124,6 +126,7 @@
 <li><a href="/core/crypto/sm3">sm3</a></li>
 <li><a href="/core/crypto/tuplehash">tuplehash</a></li>
 <li><a href="/core/crypto/x25519">x25519</a></li>
+<li><a href="/core/crypto/x448">x448</a></li>
 </ul>
 
 </li>
@@ -381,7 +384,7 @@ Procedure Groups (0)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Context"><span><a class="doc-id-link" href="#Context">Context<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/kmac/kmac.odin#L46"><em>Source</em></a></div></h3>
+<h3 id="Context"><span><a class="doc-id-link" href="#Context">Context<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/kmac/kmac.odin#L47"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Context :: <span class="keyword-type">struct</span> {
 	st:             <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
@@ -447,7 +450,7 @@ size.</p>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="clone"><span><a class="doc-id-link" href="#clone">clone<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/kmac/kmac.odin#L82"><em>Source</em></a></div></h3>
+<h3 id="clone"><span><a class="doc-id-link" href="#clone">clone<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/kmac/kmac.odin#L78"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">clone :: <span class="keyword-type">proc</span>(ctx, other: ^<a class="code-typename" href="/core/crypto/kmac/#Context">Context</a>) {…}</pre>
 </div>
@@ -457,7 +460,7 @@ size.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="final"><span><a class="doc-id-link" href="#final">final<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/kmac/kmac.odin#L70"><em>Source</em></a></div></h3>
+<h3 id="final"><span><a class="doc-id-link" href="#final">final<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/kmac/kmac.odin#L69"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">final :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/core/crypto/kmac/#Context">Context</a>, dst: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) {…}</pre>
 </div>
@@ -469,7 +472,7 @@ MIN_TAG_SIZE.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="init_128"><span><a class="doc-id-link" href="#init_128">init_128<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/kmac/kmac.odin#L50"><em>Source</em></a></div></h3>
+<h3 id="init_128"><span><a class="doc-id-link" href="#init_128">init_128<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/kmac/kmac.odin#L51"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">init_128 :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/core/crypto/kmac/#Context">Context</a>, key, domain_sep: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) {…}</pre>
 </div>
@@ -480,7 +483,7 @@ the key length is less than MIN_KEY_SIZE_128.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="init_256"><span><a class="doc-id-link" href="#init_256">init_256<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/kmac/kmac.odin#L56"><em>Source</em></a></div></h3>
+<h3 id="init_256"><span><a class="doc-id-link" href="#init_256">init_256<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/kmac/kmac.odin#L57"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">init_256 :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/core/crypto/kmac/#Context">Context</a>, key, domain_sep: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) {…}</pre>
 </div>
@@ -491,7 +494,7 @@ the key length is less than MIN_KEY_SIZE_256.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="reset"><span><a class="doc-id-link" href="#reset">reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/kmac/kmac.odin#L92"><em>Source</em></a></div></h3>
+<h3 id="reset"><span><a class="doc-id-link" href="#reset">reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/kmac/kmac.odin#L88"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">reset :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/core/crypto/kmac/#Context">Context</a>) {…}</pre>
 </div>
@@ -514,7 +517,7 @@ dst.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="update"><span><a class="doc-id-link" href="#update">update<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/kmac/kmac.odin#L61"><em>Source</em></a></div></h3>
+<h3 id="update"><span><a class="doc-id-link" href="#update">update<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/kmac/kmac.odin#L62"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">update :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/core/crypto/kmac/#Context">Context</a>, data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) {…}</pre>
 </div>
@@ -547,7 +550,7 @@ tag is valid.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/kmac/kmac.odin">kmac.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-22 21:10:38.543492300 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-23 21:10:42.409650300 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

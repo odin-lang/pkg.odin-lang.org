@@ -102,11 +102,13 @@
 </li>
 <li class="nav-item"><a href="/core/crypto">crypto</a><ul>
 <li><a href="/core/crypto/aead">aead</a></li>
+<li><a href="/core/crypto/aegis">aegis</a></li>
 <li><a href="/core/crypto/aes">aes</a></li>
 <li><a href="/core/crypto/blake2b">blake2b</a></li>
 <li><a href="/core/crypto/blake2s">blake2s</a></li>
 <li><a href="/core/crypto/chacha20">chacha20</a></li>
 <li><a href="/core/crypto/chacha20poly1305">chacha20poly1305</a></li>
+<li><a href="/core/crypto/deoxysii">deoxysii</a></li>
 <li><a href="/core/crypto/ed25519">ed25519</a></li>
 <li><a href="/core/crypto/hash">hash</a></li>
 <li><a href="/core/crypto/hkdf">hkdf</a></li>
@@ -124,6 +126,7 @@
 <li><a href="/core/crypto/sm3">sm3</a></li>
 <li><a href="/core/crypto/tuplehash">tuplehash</a></li>
 <li><a href="/core/crypto/x25519">x25519</a></li>
+<li><a href="/core/crypto/x448">x448</a></li>
 </ul>
 
 </li>
@@ -362,7 +365,7 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (9)</summary>
+Procedures (10)</summary>
 <ul>
 <li><a href="#clone">clone</a></li>
 <li><a href="#final">final</a></li>
@@ -371,6 +374,7 @@ Procedures (9)</summary>
 <li><a href="#init_384">init_384</a></li>
 <li><a href="#init_512">init_512</a></li>
 <li><a href="#init_512_256">init_512_256</a></li>
+<li><a href="#is_hardware_accelerated_256">is_hardware_accelerated_256</a></li>
 <li><a href="#reset">reset</a></li>
 <li><a href="#update">update</a></li>
 </ul>
@@ -508,7 +512,7 @@ in bytes.</p>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="clone"><span><a class="doc-id-link" href="#clone">clone<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/sha2/sha2.odin#L255"><em>Source</em></a></div></h3>
+<h3 id="clone"><span><a class="doc-id-link" href="#clone">clone<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/sha2/sha2.odin#L252"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">clone :: <span class="keyword-type">proc</span>(ctx, other: ^$T) {…}</pre>
 </div>
@@ -581,7 +585,18 @@ which is useful for for calculating rolling digests.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="reset"><span><a class="doc-id-link" href="#reset">reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/sha2/sha2.odin#L261"><em>Source</em></a></div></h3>
+<h3 id="is_hardware_accelerated_256"><span><a class="doc-id-link" href="#is_hardware_accelerated_256">is_hardware_accelerated_256<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/sha2/sha2_impl_hw_intel.odin#L54"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">is_hardware_accelerated_256 :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>is_hardware_accelerated_256 returns true iff hardware accelerated
+SHA-224/SHA-256 is supported.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="reset"><span><a class="doc-id-link" href="#reset">reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/sha2/sha2.odin#L258"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">reset :: <span class="keyword-type">proc</span>(ctx: ^$T) {…}</pre>
 </div>
@@ -607,9 +622,10 @@ be used again.</p>
 <h2 id="pkg-source-files">Source Files</h2>
 <ul>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/sha2/sha2.odin">sha2.odin</a></li>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/crypto/sha2/sha2_impl_hw_intel.odin">sha2_impl_hw_intel.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-22 21:10:38.549033500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-23 21:10:42.415770900 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -637,6 +653,7 @@ be used again.</p>
 <li><a href="#init_384">init_384</a></li>
 <li><a href="#init_512">init_512</a></li>
 <li><a href="#init_512_256">init_512_256</a></li>
+<li><a href="#is_hardware_accelerated_256">is_hardware_accelerated_256</a></li>
 <li><a href="#reset">reset</a></li>
 <li><a href="#update">update</a></li>
 </ul>

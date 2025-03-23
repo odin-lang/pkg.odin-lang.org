@@ -102,11 +102,13 @@
 </li>
 <li class="nav-item"><a href="/core/crypto">crypto</a><ul>
 <li><a href="/core/crypto/aead">aead</a></li>
+<li><a href="/core/crypto/aegis">aegis</a></li>
 <li><a href="/core/crypto/aes">aes</a></li>
 <li><a href="/core/crypto/blake2b">blake2b</a></li>
 <li><a href="/core/crypto/blake2s">blake2s</a></li>
 <li><a href="/core/crypto/chacha20">chacha20</a></li>
 <li><a href="/core/crypto/chacha20poly1305">chacha20poly1305</a></li>
+<li><a href="/core/crypto/deoxysii">deoxysii</a></li>
 <li><a href="/core/crypto/ed25519">ed25519</a></li>
 <li><a href="/core/crypto/hash">hash</a></li>
 <li><a href="/core/crypto/hkdf">hkdf</a></li>
@@ -124,6 +126,7 @@
 <li><a href="/core/crypto/sm3">sm3</a></li>
 <li><a href="/core/crypto/tuplehash">tuplehash</a></li>
 <li><a href="/core/crypto/x25519">x25519</a></li>
+<li><a href="/core/crypto/x448">x448</a></li>
 </ul>
 
 </li>
@@ -471,6 +474,7 @@ Procedure Groups (0)</summary>
 	popcnt,             <span class="comment">// Hamming weight instruction POPCNT.</span>
 	rdrand,             <span class="comment">// RDRAND instruction (on-chip random number generator)</span>
 	rdseed,             <span class="comment">// RDSEED instruction (on-chip random number generator)</span>
+	sha,                <span class="comment">// SHA Extensions (SHA-1, SHA-224, SHA-256)</span>
 	sse2,               <span class="comment">// Streaming SIMD extension 2 (always available on amd64)</span>
 	sse3,               <span class="comment">// Streaming SIMD extension 3</span>
 	ssse3,              <span class="comment">// Supplemental streaming SIMD extension 3</span>
@@ -496,7 +500,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CPU_Features"><span><a class="doc-id-link" href="#CPU_Features">CPU_Features<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/info/cpu_intel.odin#L50"><em>Source</em></a></div></h3>
+<h3 id="CPU_Features"><span><a class="doc-id-link" href="#CPU_Features">CPU_Features<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/info/cpu_intel.odin#L51"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CPU_Features :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/core/sys/info/#CPU_Feature">CPU_Feature</a>; <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>]</pre>
 </div>
@@ -563,13 +567,13 @@ Procedure Groups (0)</summary>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Variables" class="pkg-header">Variables</h2>
 <div class="pkg-entity">
-<h3 id="cpu_features"><span><a class="doc-id-link" href="#cpu_features">cpu_features<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/info/cpu_intel.odin#L52"><em>Source</em></a></div></h3>
+<h3 id="cpu_features"><span><a class="doc-id-link" href="#cpu_features">cpu_features<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/info/cpu_intel.odin#L53"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">cpu_features: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=CPU_Features)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="cpu_name"><span><a class="doc-id-link" href="#cpu_name">cpu_name<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/info/cpu_intel.odin#L53"><em>Source</em></a></div></h3>
+<h3 id="cpu_name"><span><a class="doc-id-link" href="#cpu_name">cpu_name<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/info/cpu_intel.odin#L54"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">cpu_name: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=string)</pre>
 </div>
@@ -634,7 +638,7 @@ Procedure Groups (0)</summary>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-22 21:10:38.932576600 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-03 (vendor "odin") Windows_amd64 @ 2025-03-23 21:10:42.820751900 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
