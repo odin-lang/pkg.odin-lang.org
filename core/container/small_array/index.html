@@ -322,6 +322,60 @@
 </div>
 <ul id="odin-search-results"></ul>
 <div id="pkg-top">
+<h2>Overview</h2>
+<div id="pkg-overview">
+<p>Package small_array implements a dynamic array like
+interface on a stack-allocated, fixed-size array.</p>
+<p>The Small_Array type is optimal for scenarios where you need
+a container for a fixed number of elements of a specific type,
+with the total number known at compile time but the exact
+number to be used determined at runtime.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:fmt"
+import "core:container/small_array"
+
+create :: proc() -&gt; (result: small_array.Small_Array(10, rune)) {
+	// appending single elements
+	small_array.push(&result, 'e')
+	// pushing a bunch of elements at once
+	small_array.push(&result, 'l', 'i', 'x', '-', 'e')
+	// pre-pending
+	small_array.push_front(&result, 'H')
+	// removing elements
+	small_array.ordered_remove(&result, 4)
+	// resizing to the desired length (the capacity will stay unchanged)
+	small_array.resize(&result, 7)
+	// inserting elements
+	small_array.inject_at(&result, 'p', 5)
+	// updating elements
+	small_array.set(&result, 3, 'l')
+	// getting pointers to elements
+	o := small_array.get_ptr(&result, 4)
+	o^ = 'o'
+	// and much more ....
+	return
+}
+
+// the Small_Array can be an ordinary parameter 'generic' over
+// the actual length to be usable with different sizes
+print_elements :: proc(arr: ^small_array.Small_Array($N, rune)) {
+	for r in small_array.slice(arr) {
+		fmt.print(r)
+	}
+}
+
+main :: proc() {
+	arr := create()
+	// ...
+	print_elements(&arr)
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">Hellope
+</pre>
+</div>
 <div id="pkg-index">
 <h2>Index</h2>
 <div>
@@ -394,10 +448,27 @@ Procedure Groups (2)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Small_Array"><span><a class="doc-id-link" href="#Small_Array">Small_Array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L7"><em>Source</em></a></div></h3>
+<h3 id="Small_Array"><span><a class="doc-id-link" href="#Small_Array">Small_Array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L23"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Small_Array :: <span class="keyword-type">struct</span> {}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>A fixed-size stack-allocated array operated on in a dynamic fashion.</p>
+<p>Fields:
+<span class="doc-list"><code>data</code>: The underlying array</span>
+<span class="doc-list"><code>len</code>: Amount of items that the <code>Small_Array</code> currently holds</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+
+example :: proc() {
+	a: small_array.Small_Array(100, int)
+	small_array.push_back(&a, 10)
+}
+</code></pre>
+</details>
+</details>
 </div>
 <h2 id="pkg-Constants" class="pkg-header">Constants</h2>
 <p class="pkg-empty-section">This section is empty.</p>
@@ -405,152 +476,749 @@ Procedure Groups (2)</summary>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="append_elem"><span><a class="doc-id-link" href="#append_elem">append_elem<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L60"><em>Source</em></a></div></h3>
+<h3 id="append_elem"><span><a class="doc-id-link" href="#append_elem">append_elem<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L319"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_elem :: <a class="code-procedure" href="/core/container/small_array/#push_back">push_back</a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Attempts to add the given element to the end.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span>
+<span class="doc-list"><code>item</code>: The item to append</span></p>
+<p><b>Returns</b> 
+<span class="doc-list">true if there was enough space to fit the element, false otherwise</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+push_back_example :: proc() {
+	a: small_array.Small_Array(2, int)
+
+	assert(small_array.push_back(&a, 1), "this should fit")
+	assert(small_array.push_back(&a, 2), "this should fit")
+	assert(!small_array.push_back(&a, 3), "this should not fit")
+
+	fmt.println(small_array.slice(&a))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[1, 2]
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="append_elems"><span><a class="doc-id-link" href="#append_elems">append_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L142"><em>Source</em></a></div></h3>
+<h3 id="append_elems"><span><a class="doc-id-link" href="#append_elems">append_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L688"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_elems :: <a class="code-procedure" href="/core/container/small_array/#push_back_elems">push_back_elems</a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Attempts to append all elements to the small-array returning
+false if there is not enough space to fit all of them.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span>
+<span class="doc-list"><code>item</code>: The item to append</span>
+<span class="doc-list">..:</span></p>
+<p><b>Returns</b>
+<span class="doc-list">true if there was enough space to fit the element, false otherwise</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+push_back_elems_example :: proc() {
+	a: small_array.Small_Array(100, int)
+	small_array.push_back_elems(&a, 0, 1, 2, 3, 4)
+	fmt.println(small_array.slice(&a))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[0, 1, 2, 3, 4]
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="cap"><span><a class="doc-id-link" href="#cap">cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L17"><em>Source</em></a></div></h3>
+<h3 id="cap"><span><a class="doc-id-link" href="#cap">cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L49"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">cap :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: $A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the capacity of the small-array.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: The small-array</span></p>
+<p><b>Returns</b> the capacity</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="clear"><span><a class="doc-id-link" href="#clear">clear<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L138"><em>Source</em></a></div></h3>
+<h3 id="clear"><span><a class="doc-id-link" href="#clear">clear<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L657"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">clear :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Sets the length of the small-array to 0.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+clear_example :: proc() {
+	a: small_array.Small_Array(4, int)
+	small_array.push(&a, 0, 1, 2, 3)
+
+	fmt.println("BEFORE:", small_array.slice(&a))
+	small_array.clear(&a)
+	fmt.println("AFTER :", small_array.slice(&a))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">BEFORE: [0, 1, 2, 3]
+AFTER : []
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="consume"><span><a class="doc-id-link" href="#consume">consume<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L116"><em>Source</em></a></div></h3>
+<h3 id="consume"><span><a class="doc-id-link" href="#consume">consume<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L554"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">consume :: <span class="keyword-type">proc</span>(a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, count: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Decreases the length of the small-array by the given amount.
+The elements are therefore not really removed and can be
+recovered by calling <code>resize</code>.</p>
+<p>Note: This procedure assumes that the array has a sufficient length.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span>
+<span class="doc-list"><code>count</code>: The amount the length should be reduced by</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+consume_example :: proc() {
+	a: small_array.Small_Array(3, int)
+	small_array.push(&a, 0, 1, 2)
+
+	fmt.println("BEFORE:", small_array.slice(&a))
+	small_array.consume(&a, 2)
+	fmt.println("AFTER :", small_array.slice(&a))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">BEFORE: [0, 1, 2]
+AFTER : [0]
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="get"><span><a class="doc-id-link" href="#get">get<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L30"><em>Source</em></a></div></h3>
+<h3 id="get"><span><a class="doc-id-link" href="#get">get<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L118"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">get :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: $A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> $T {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Get a copy of the item at the specified position.
+This operation assumes that the small-array is large enough.</p>
+<p>This will result in:</p>
+<pre>- the value if 0 &lt;= index &lt; len
+- the zero value of the type if len &lt; index &lt; capacity
+- 'crash' if capacity &lt; index or index &lt; 0
+
+</pre>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: The small-array</span>
+<span class="doc-list"><code>index</code>: The position of the item to get</span></p>
+<p><b>Returns</b>
+<span class="doc-list">the element at the specified position</span></p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="get_ptr"><span><a class="doc-id-link" href="#get_ptr">get_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L33"><em>Source</em></a></div></h3>
+<h3 id="get_ptr"><span><a class="doc-id-link" href="#get_ptr">get_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L138"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">get_ptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> ^$T {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Get a pointer to the item at the specified position.
+This operation assumes that the small-array is large enough.</p>
+<p>This will result in:</p>
+<pre>- the pointer if 0 &lt;= index &lt; len
+- the pointer to the zero value if len &lt; index &lt; capacity
+- 'crash' if capacity &lt; index or index &lt; 0
+
+</pre>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span>
+<span class="doc-list"><code>index</code>: The position of the item to get</span></p>
+<p><b>Returns</b>
+<span class="doc-list">the pointer to the element at the specified position</span></p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="get_ptr_safe"><span><a class="doc-id-link" href="#get_ptr_safe">get_ptr_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L44"><em>Source</em></a></div></h3>
+<h3 id="get_ptr_safe"><span><a class="doc-id-link" href="#get_ptr_safe">get_ptr_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L190"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">get_ptr_safe :: <span class="keyword-type">proc</span>(a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> (^$T, <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Get a pointer to the item at the specified position.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span>
+<span class="doc-list"><code>index</code>: The position of the item to get</span></p>
+<p><b>Returns</b> 
+<span class="doc-list">the pointer to the element at the specified position</span>
+<span class="doc-list">true if element exists, false otherwise</span></p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="get_safe"><span><a class="doc-id-link" href="#get_safe">get_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L37"><em>Source</em></a></div></h3>
+<h3 id="get_safe"><span><a class="doc-id-link" href="#get_safe">get_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L172"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">get_safe :: <span class="keyword-type">proc</span>(a: $A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> ($T, <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Attempt to get a copy of the item at the specified position.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: The small-array</span>
+<span class="doc-list"><code>index</code>: The position of the item to get</span></p>
+<p><b>Returns</b>
+<span class="doc-list">the element at the specified position</span>
+<span class="doc-list">true if element exists, false otherwise</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+get_safe_example :: proc() {
+	a: small_array.Small_Array(5, rune)
+	small_array.push_back(&a, 'A')
+	
+	fmt.println(small_array.get_safe(a, 0) or_else 'x')
+	fmt.println(small_array.get_safe(a, 1) or_else 'x')
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">A
+x
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="inject_at"><span><a class="doc-id-link" href="#inject_at">inject_at<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L151"><em>Source</em></a></div></h3>
+<h3 id="inject_at"><span><a class="doc-id-link" href="#inject_at">inject_at<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L727"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">inject_at :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, item: $T, index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Tries to insert an element at the specified position.</p>
+<p>Note: Performing this operation will cause pointers obtained
+through get_ptr(_save) to reference incorrect elements.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span>
+<span class="doc-list"><code>item</code>: The item to insert</span>
+<span class="doc-list"><code>index</code>: The index to insert the item at</span></p>
+<p><b>Returns</b>
+<span class="doc-list">true if there was enough space to fit the element, false otherwise</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+inject_at_example :: proc() {
+	arr: small_array.Small_Array(100, rune)
+	small_array.push(&arr,  'A', 'C', 'D')
+	small_array.inject_at(&arr, 'B', 1)
+	fmt.println(small_array.slice(&arr))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[A, B, C, D]
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="len"><span><a class="doc-id-link" href="#len">len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L13"><em>Source</em></a></div></h3>
+<h3 id="len"><span><a class="doc-id-link" href="#len">len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L37"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">len :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: $A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the amount of items in the small-array.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: The small-array</span></p>
+<p><b>Returns</b>
+<span class="doc-list">the amount of items in the array</span></p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="ordered_remove"><span><a class="doc-id-link" href="#ordered_remove">ordered_remove<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L121"><em>Source</em></a></div></h3>
+<h3 id="ordered_remove"><span><a class="doc-id-link" href="#ordered_remove">ordered_remove<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L588"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ordered_remove :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Removes the element at the specified index while retaining order.</p>
+<p>Note: Performing this operation will cause pointers obtained
+through get_ptr(_save) to reference incorrect elements.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span>
+<span class="doc-list"><code>index</code>: The position of the element to remove</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+ordered_remove_example :: proc() {
+	a: small_array.Small_Array(4, int)
+	small_array.push(&a, 0, 1, 2, 3)
+
+	fmt.println("BEFORE:", small_array.slice(&a))
+	small_array.ordered_remove(&a, 1)
+	fmt.println("AFTER :", small_array.slice(&a))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">BEFORE: [0, 1, 2, 3]
+AFTER : [0, 2, 3]
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="pop_back"><span><a class="doc-id-link" href="#pop_back">pop_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L80"><em>Source</em></a></div></h3>
+<h3 id="pop_back"><span><a class="doc-id-link" href="#pop_back">pop_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L401"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pop_back :: <span class="keyword-type">proc</span>(a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> $T {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Removes and returns the last element of the small-array.
+This operation assumes that the small-array is not empty.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span></p>
+<p><b>Returns</b> 
+<span class="doc-list">a copy of the element removed from the end of the small-array</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+pop_back_example :: proc() {
+	a: small_array.Small_Array(5, int)
+	small_array.push(&a, 0, 1, 2)
+
+	fmt.println("BEFORE:", small_array.slice(&a))
+	small_array.pop_back(&a)
+	fmt.println("AFTER: ", small_array.slice(&a))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">BEFORE: [0, 1, 2]
+AFTER:  [0, 1]
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="pop_back_safe"><span><a class="doc-id-link" href="#pop_back_safe">pop_back_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L96"><em>Source</em></a></div></h3>
+<h3 id="pop_back_safe"><span><a class="doc-id-link" href="#pop_back_safe">pop_back_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L475"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pop_back_safe :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) -> (item: $T, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Attempts to remove and return the last element of the small array.
+Unlike <code>pop_back</code>, it does not assume that the array is non-empty.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span></p>
+<p><b>Returns</b> 
+<span class="doc-list">a copy of the element removed from the end of the small-array</span>
+<span class="doc-list">true if the small-array was not empty, false otherwise</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+
+pop_back_safe_example :: proc() {
+	a: small_array.Small_Array(3, int)
+	small_array.push(&a, 1)
+
+	el, ok := small_array.pop_back_safe(&a)
+	assert(ok, "there was an element in the array")
+
+	el, ok = small_array.pop_back_safe(&a)
+	assert(!ok, "there was NO element in the array")
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="pop_front"><span><a class="doc-id-link" href="#pop_front">pop_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L87"><em>Source</em></a></div></h3>
+<h3 id="pop_front"><span><a class="doc-id-link" href="#pop_front">pop_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L440"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pop_front :: <span class="keyword-type">proc</span>(a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> $T {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Removes and returns the first element of the small-array.
+This operation assumes that the small-array is not empty.</p>
+<p>Note: Performing this operation will cause pointers obtained
+through get_ptr(_save) to reference incorrect elements.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span></p>
+<p><b>Returns</b> 
+<span class="doc-list">a copy of the element removed from the beginning of the small-array</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+pop_front_example :: proc() {
+	a: small_array.Small_Array(5, int)
+	small_array.push(&a, 0, 1, 2)
+
+	fmt.println("BEFORE:", small_array.slice(&a))
+	small_array.pop_front(&a)
+	fmt.println("AFTER: ", small_array.slice(&a))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">BEFORE: [0, 1, 2]
+AFTER:  [1, 2]
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="pop_front_safe"><span><a class="doc-id-link" href="#pop_front_safe">pop_front_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L105"><em>Source</em></a></div></h3>
+<h3 id="pop_front_safe"><span><a class="doc-id-link" href="#pop_front_safe">pop_front_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L513"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pop_front_safe :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) -> (item: $T, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Attempts to remove and return the first element of the small array.
+Unlike <code>pop_front</code>, it does not assume that the array is non-empty.</p>
+<p>Note: Performing this operation will cause pointers obtained
+through get_ptr(_save) to reference incorrect elements.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span></p>
+<p><b>Returns</b> 
+<span class="doc-list">a copy of the element removed from the beginning of the small-array</span>
+<span class="doc-list">true if the small-array was not empty, false otherwise</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+
+pop_front_safe_example :: proc() {
+	a: small_array.Small_Array(3, int)
+	small_array.push(&a, 1)
+
+	el, ok := small_array.pop_front_safe(&a)
+	assert(ok, "there was an element in the array")
+
+	el, ok = small_array.pop_front_(&a)
+	assert(!ok, "there was NO element in the array")
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="push_back"><span><a class="doc-id-link" href="#push_back">push_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L60"><em>Source</em></a></div></h3>
+<h3 id="push_back"><span><a class="doc-id-link" href="#push_back">push_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L319"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">push_back :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, item: $T) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Attempts to add the given element to the end.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span>
+<span class="doc-list"><code>item</code>: The item to append</span></p>
+<p><b>Returns</b> 
+<span class="doc-list">true if there was enough space to fit the element, false otherwise</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+push_back_example :: proc() {
+	a: small_array.Small_Array(2, int)
+
+	assert(small_array.push_back(&a, 1), "this should fit")
+	assert(small_array.push_back(&a, 2), "this should fit")
+	assert(!small_array.push_back(&a, 3), "this should not fit")
+
+	fmt.println(small_array.slice(&a))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[1, 2]
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="push_back_elems"><span><a class="doc-id-link" href="#push_back_elems">push_back_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L142"><em>Source</em></a></div></h3>
+<h3 id="push_back_elems"><span><a class="doc-id-link" href="#push_back_elems">push_back_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L688"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">push_back_elems :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, <span class="keyword-type">..</span> items: ..$T) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Attempts to append all elements to the small-array returning
+false if there is not enough space to fit all of them.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span>
+<span class="doc-list"><code>item</code>: The item to append</span>
+<span class="doc-list">..:</span></p>
+<p><b>Returns</b>
+<span class="doc-list">true if there was enough space to fit the element, false otherwise</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+push_back_elems_example :: proc() {
+	a: small_array.Small_Array(100, int)
+	small_array.push_back_elems(&a, 0, 1, 2, 3, 4)
+	fmt.println(small_array.slice(&a))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[0, 1, 2, 3, 4]
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="push_front"><span><a class="doc-id-link" href="#push_front">push_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L69"><em>Source</em></a></div></h3>
+<h3 id="push_front"><span><a class="doc-id-link" href="#push_front">push_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L361"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">push_front :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, item: $T) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Attempts to add the given element at the beginning.
+This operation assumes that the small-array is not empty.</p>
+<p>Note: Performing this operation will cause pointers obtained
+through get_ptr(_save) to reference incorrect elements.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span>
+<span class="doc-list"><code>item</code>: The item to append</span></p>
+<p><b>Returns</b> 
+<span class="doc-list">true if there was enough space to fit the element, false otherwise</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+push_front_example :: proc() {
+	a: small_array.Small_Array(2, int)
+
+	assert(small_array.push_front(&a, 2), "this should fit")
+	assert(small_array.push_front(&a, 1), "this should fit")
+	assert(!small_array.push_back(&a, 0), "this should not fit")
+
+	fmt.println(small_array.slice(&a))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[1, 2]
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="resize"><span><a class="doc-id-link" href="#resize">resize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L55"><em>Source</em></a></div></h3>
+<h3 id="resize"><span><a class="doc-id-link" href="#resize">resize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L286"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">resize :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Tries to resize the small-array to the specified length.</p>
+<p>The new length will be:</p>
+<pre>- `length` if `length` &lt;= capacity
+- capacity if length &gt; capacity
+
+</pre>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span>
+<span class="doc-list"><code>length</code>: The new desired length</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+resize_example :: proc() {
+	a: small_array.Small_Array(5, int)
+
+	small_array.push_back(&a, 1)
+	small_array.push_back(&a, 2)
+	fmt.println(small_array.slice(&a))
+	
+	small_array.resize(&a, 1)
+	fmt.println(small_array.slice(&a))
+
+	small_array.resize(&a, 100)
+	fmt.println(small_array.slice(&a))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[1, 2]
+[1]
+[1, 2, 0, 0, 0]
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="set"><span><a class="doc-id-link" href="#set">set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L51"><em>Source</em></a></div></h3>
+<h3 id="set"><span><a class="doc-id-link" href="#set">set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L246"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">set :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, item: $T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Set the element at the specified position to the given value.
+This operation assumes that the small-array is large enough.</p>
+<p>This will result in:</p>
+<pre>- the value being set if 0 &lt;= index &lt; capacity
+- 'crash' otherwise
+
+</pre>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span>
+<span class="doc-list"><code>index</code>: The position of the item to set</span>
+<span class="doc-list"><code>value</code>: The value to set the element to</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+set_example :: proc() {
+	a: small_array.Small_Array(5, rune)
+	small_array.push_back(&a, 'A')
+	small_array.push_back(&a, 'B')
+	fmt.println(small_array.slice(&a))
+
+	// updates index 0
+	small_array.set(&a, 0, 'Z')
+	fmt.println(small_array.slice(&a))
+
+	// updates to a position x, where
+	// len &lt;= x &lt; cap are not visible since
+	// the length of the small-array remains unchanged
+	small_array.set(&a, 2, 'X')
+	small_array.set(&a, 3, 'Y')
+	small_array.set(&a, 4, 'Z')
+	fmt.println(small_array.slice(&a))
+
+	// resizing makes the change visible
+	small_array.resize(&a, 100)
+	fmt.println(small_array.slice(&a))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[A, B]
+[Z, B]
+[Z, B]
+[Z, B, X, Y, Z]
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="slice"><span><a class="doc-id-link" href="#slice">slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L25"><em>Source</em></a></div></h3>
+<h3 id="slice"><span><a class="doc-id-link" href="#slice">slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L98"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">slice :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) -> []$T {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns a slice of the data.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: The pointer to the small-array</span></p>
+<p><b>Returns</b>
+<span class="doc-list">the slice</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+slice_example :: proc() {
+	print :: proc(a: ^small_array.Small_Array($N, int)) {
+		for item in small_array.slice(a) {
+			fmt.println(item)
+		}
+	}
+
+	a: small_array.Small_Array(5, int)
+	small_array.push_back(&a, 1)
+	small_array.push_back(&a, 2)
+	print(&a)
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">1
+2
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="space"><span><a class="doc-id-link" href="#space">space<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L21"><em>Source</em></a></div></h3>
+<h3 id="space"><span><a class="doc-id-link" href="#space">space<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L62"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">space :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: $A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns how many more items the small-array could fit.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: The small-array</span></p>
+<p><b>Returns</b>
+<span class="doc-list">the number of unused slots</span></p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="unordered_remove"><span><a class="doc-id-link" href="#unordered_remove">unordered_remove<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L129"><em>Source</em></a></div></h3>
+<h3 id="unordered_remove"><span><a class="doc-id-link" href="#unordered_remove">unordered_remove<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L622"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">unordered_remove :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Removes the element at the specified index without retaining order.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span>
+<span class="doc-list"><code>index</code>: The position of the element to remove</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+unordered_remove_example :: proc() {
+	a: small_array.Small_Array(4, int)
+	small_array.push(&a, 0, 1, 2, 3)
+
+	fmt.println("BEFORE:", small_array.slice(&a))
+	small_array.unordered_remove(&a, 1)
+	fmt.println("AFTER :", small_array.slice(&a))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">BEFORE: [0, 1, 2, 3]
+AFTER : [0, 3, 2]
+</pre>
+</details>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="append"><span><a class="doc-id-link" href="#append">append<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L166"><em>Source</em></a></div></h3>
+<h3 id="append"><span><a class="doc-id-link" href="#append">append<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L773"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/container/small_array/#push_back">push_back</a>,
@@ -558,9 +1226,13 @@ Procedure Groups (2)</summary>
 }
 </pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Alias for <code>push</code></p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="push"><span><a class="doc-id-link" href="#push">push<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L165"><em>Source</em></a></div></h3>
+<h3 id="push"><span><a class="doc-id-link" href="#push">push<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L771"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">push :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/container/small_array/#push_back">push_back</a>,
@@ -568,19 +1240,46 @@ Procedure Groups (2)</summary>
 }
 </pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Tries to append the element(s) to the small-array.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span>
+<span class="doc-list"><code>item</code>: The item to append</span>
+<span class="doc-list">..:</span></p>
+<p><b>Returns</b>
+<span class="doc-list">true if there was enough space to fit the element, false otherwise</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+push_example :: proc() {
+	a: small_array.Small_Array(100, int)
+	small_array.push(&a, 0)
+	small_array.push(&a, 1, 2, 3, 4)
+	fmt.println(small_array.slice(&a))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[0, 1, 2, 3, 4]
+</pre>
+</details>
 </div>
 </section>
 <h2 id="pkg-source-files">Source Files</h2>
 <ul>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/doc.odin">doc.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin">small_array.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-04 21:11:40.670587700 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-05 21:11:02.785074900 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
 <ul>
-<li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#pkg-overview">Overview</a><li><a href="#pkg-Types">Types</a><ul>
 <li><a href="#Small_Array">Small_Array</a></li>
 </ul>
 </li>

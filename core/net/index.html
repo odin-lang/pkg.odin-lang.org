@@ -353,7 +353,7 @@ we'll do our best to loudly complain the first time you try it.</p>
 <div>
 <details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
 <summary id="#doc-index-Types-header">
-Types (61)</summary>
+Types (60)</summary>
 <ul>
 <li><a href="#Accept_Error">Accept_Error</a></li>
 <li><a href="#Address">Address</a></li>
@@ -383,11 +383,11 @@ Types (61)</summary>
 <li><a href="#Digit_Parse_Base">Digit_Parse_Base</a></li>
 <li><a href="#Digit_Parse_Bases">Digit_Parse_Bases</a></li>
 <li><a href="#Endpoint">Endpoint</a></li>
-<li><a href="#General_Error">General_Error</a></li>
 <li><a href="#Host">Host</a></li>
 <li><a href="#Host_Or_Endpoint">Host_Or_Endpoint</a></li>
 <li><a href="#IP4_Address">IP4_Address</a></li>
 <li><a href="#IP6_Address">IP6_Address</a></li>
+<li><a href="#Interfaces_Error">Interfaces_Error</a></li>
 <li><a href="#Lease">Lease</a></li>
 <li><a href="#Link_State">Link_State</a></li>
 <li><a href="#Link_States">Link_States</a></li>
@@ -397,7 +397,6 @@ Types (61)</summary>
 <li><a href="#Network_Error">Network_Error</a></li>
 <li><a href="#Network_Interface">Network_Interface</a></li>
 <li><a href="#Parse_Endpoint_Error">Parse_Endpoint_Error</a></li>
-<li><a href="#Platform_Error">Platform_Error</a></li>
 <li><a href="#Prefix_Origin">Prefix_Origin</a></li>
 <li><a href="#Resolve_Error">Resolve_Error</a></li>
 <li><a href="#Set_Blocking_Error">Set_Blocking_Error</a></li>
@@ -456,7 +455,7 @@ Variables (6)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (65)</summary>
+Procedures (68)</summary>
 <ul>
 <li><a href="#accept_tcp">accept_tcp</a></li>
 <li><a href="#address_to_string">address_to_string</a></li>
@@ -486,6 +485,8 @@ Procedures (65)</summary>
 <li><a href="#init_dns_configuration">init_dns_configuration</a></li>
 <li><a href="#join_port">join_port</a></li>
 <li><a href="#join_url">join_url</a></li>
+<li><a href="#last_platform_error">last_platform_error</a></li>
+<li><a href="#last_platform_error_string">last_platform_error_string</a></li>
 <li><a href="#listen_tcp">listen_tcp</a></li>
 <li><a href="#load_hosts">load_hosts</a></li>
 <li><a href="#load_resolv_conf">load_resolv_conf</a></li>
@@ -516,6 +517,7 @@ Procedures (65)</summary>
 <li><a href="#send_tcp">send_tcp</a></li>
 <li><a href="#send_udp">send_udp</a></li>
 <li><a href="#set_blocking">set_blocking</a></li>
+<li><a href="#set_last_platform_error">set_last_platform_error</a></li>
 <li><a href="#set_option">set_option</a></li>
 <li><a href="#shutdown">shutdown</a></li>
 <li><a href="#skip_hostname">skip_hostname</a></li>
@@ -543,22 +545,39 @@ Procedure Groups (4)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Accept_Error"><span><a class="doc-id-link" href="#Accept_Error">Accept_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors_windows.odin#L76"><em>Source</em></a></div></h3>
+<h3 id="Accept_Error"><span><a class="doc-id-link" href="#Accept_Error">Accept_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L117"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Accept_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
-	None                                              = 0, 
-	Not_Listening                                     = 10022, 
-	No_Socket_Descriptors_Available_For_Client_Socket = 10024, 
-	No_Buffer_Space_Available                         = 10055, 
-	Not_Socket                                        = 10038, 
-	Not_Connection_Oriented_Socket                    = 10045, 
-	<span class="comment">// TODO: we may need special handling for this; maybe make a socket a struct with metadata?</span>
-	Would_Block                                       = 10035, 
+	None, 
+	<span class="comment">// No network connection, or the network stack is not initialized.</span>
+	Network_Unreachable, 
+	<span class="comment">// Not enough space in internal tables/buffers to create a new socket, or an unsupported protocol is given.</span>
+	Insufficient_Resources, 
+	<span class="comment">// Invalid socket, or options.</span>
+	Invalid_Argument, 
+	<span class="comment">// The given socket does not support accepting connections.</span>
+	Unsupported_Socket, 
+	<span class="comment">// accept called on a socket which is not listening.</span>
+	Not_Listening, 
+	<span class="comment">// A connection arrived but was closed while in the listen queue.</span>
+	Aborted, 
+	<span class="comment">// Timed out before being able to accept a connection.</span>
+	Timeout, 
+	<span class="comment">// Non-blocking socket that would need to block waiting for a connection.</span>
+	Would_Block, 
+	<span class="comment">// Interrupted by a signal or other method of cancellation like WSACancelBlockingCall on Windows.</span>
+	Interrupted, 
+	<span class="comment">// An error unable to be categorized in above categories, `last_platform_error` may have more info.</span>
+	Unknown, 
 }</pre>
 </div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/net/#accept_tcp">accept_tcp</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Address"><span><a class="doc-id-link" href="#Address">Address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L143"><em>Source</em></a></div></h3>
+<h3 id="Address"><span><a class="doc-id-link" href="#Address">Address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L141"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Address :: <span class="keyword-type">union</span> {
 	<a class="code-typename" href="/core/net/#IP4_Address">IP4_Address</a>, 
@@ -582,7 +601,7 @@ Procedure Groups (4)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Address_Duplication"><span><a class="doc-id-link" href="#Address_Duplication">Address_Duplication<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L251"><em>Source</em></a></div></h3>
+<h3 id="Address_Duplication"><span><a class="doc-id-link" href="#Address_Duplication">Address_Duplication<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L249"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Address_Duplication :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	Invalid    = 0, 
@@ -594,7 +613,7 @@ Procedure Groups (4)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Address_Family"><span><a class="doc-id-link" href="#Address_Family">Address_Family<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L159"><em>Source</em></a></div></h3>
+<h3 id="Address_Family"><span><a class="doc-id-link" href="#Address_Family">Address_Family<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L157"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Address_Family :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
 	IP4, 
@@ -614,7 +633,7 @@ Procedure Groups (4)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Any_Socket"><span><a class="doc-id-link" href="#Any_Socket">Any_Socket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L132"><em>Source</em></a></div></h3>
+<h3 id="Any_Socket"><span><a class="doc-id-link" href="#Any_Socket">Any_Socket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L130"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Any_Socket :: <span class="keyword-type">union</span> {
 	<a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, 
@@ -641,36 +660,56 @@ Procedure Groups (4)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Bind_Error"><span><a class="doc-id-link" href="#Bind_Error">Bind_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors_windows.odin#L55"><em>Source</em></a></div></h3>
+<h3 id="Bind_Error"><span><a class="doc-id-link" href="#Bind_Error">Bind_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L79"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Bind_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
-	None                    = 0, 
-	Address_In_Use          = 10048, <span class="comment">// Another application is currently bound to this endpoint.</span>
-	Given_Nonlocal_Address  = 10049, <span class="comment">// The address is not a local address on this machine.</span>
-	Broadcast_Disabled      = 10013, <span class="comment">// To bind a UDP socket to the broadcast address, the appropriate socket option must be set.</span>
-	Address_Family_Mismatch = 10014, <span class="comment">// The address family of the address does not match that of the socket.</span>
-	Already_Bound           = 10022, <span class="comment">// The socket is already bound to an address.</span>
-	No_Ports_Available      = 10055, <span class="comment">// There are not enough ephemeral ports available.</span>
+	None, 
+	<span class="comment">// No network connection, or the network stack is not initialized.</span>
+	Network_Unreachable, 
+	<span class="comment">// Not enough space in internal tables/buffers to create a new socket, or an unsupported protocol is given.</span>
+	Insufficient_Resources, 
+	<span class="comment">// Invalid socket or endpoint, or invalid combination of the two.</span>
+	Invalid_Argument, 
+	<span class="comment">// The socket is already bound to an address.</span>
+	Already_Bound, 
+	<span class="comment">// The address is protected and the current user has insufficient permissions to access it.</span>
+	Insufficient_Permissions_For_Address, 
+	<span class="comment">// The address is already in use.</span>
+	Address_In_Use, 
+	<span class="comment">// An error unable to be categorized in above categories, `last_platform_error` may have more info.</span>
+	Unknown, 
 }</pre>
 </div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/net/#bind">bind</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Create_Socket_Error"><span><a class="doc-id-link" href="#Create_Socket_Error">Create_Socket_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors_windows.odin#L26"><em>Source</em></a></div></h3>
+<h3 id="Create_Socket_Error"><span><a class="doc-id-link" href="#Create_Socket_Error">Create_Socket_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L29"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Create_Socket_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
-	None                                 = 0, 
-	Network_Subsystem_Failure            = 10050, 
-	Family_Not_Supported_For_This_Socket = 10047, 
-	No_Socket_Descriptors_Available      = 10024, 
-	No_Buffer_Space_Available            = 10055, 
-	Protocol_Unsupported_By_System       = 10043, 
-	Wrong_Protocol_For_Socket            = 10041, 
-	Family_And_Socket_Type_Mismatch      = 10044, 
+	None, 
+	<span class="comment">// No network connection, or the network stack is not initialized.</span>
+	Network_Unreachable, 
+	<span class="comment">// Not enough space in internal tables/buffers to create a new socket, or an unsupported protocol is given.</span>
+	Insufficient_Resources, 
+	<span class="comment">// Invalid/unsupported family or protocol.</span>
+	Invalid_Argument, 
+	<span class="comment">// The user has no permission to create a socket of this type and/or protocol.</span>
+	Insufficient_Permissions, 
+	<span class="comment">// An error unable to be categorized in above categories, `last_platform_error` may have more info.</span>
+	Unknown, 
 }</pre>
 </div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/net/#create_socket">create_socket</a></li>
+<li><a href="/core/net/#make_unbound_udp_socket">make_unbound_udp_socket</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Configuration"><span><a class="doc-id-link" href="#DNS_Configuration">DNS_Configuration<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L260"><em>Source</em></a></div></h3>
+<h3 id="DNS_Configuration"><span><a class="doc-id-link" href="#DNS_Configuration">DNS_Configuration<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L258"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Configuration :: <span class="keyword-type">struct</span> {
 	<span class="comment">// Configuration files.</span>
@@ -692,7 +731,7 @@ Procedure Groups (4)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Error"><span><a class="doc-id-link" href="#DNS_Error">DNS_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L97"><em>Source</em></a></div></h3>
+<h3 id="DNS_Error"><span><a class="doc-id-link" href="#DNS_Error">DNS_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L95"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	None                        = 0, 
@@ -711,7 +750,7 @@ Procedure Groups (4)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Header"><span><a class="doc-id-link" href="#DNS_Header">DNS_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L403"><em>Source</em></a></div></h3>
+<h3 id="DNS_Header"><span><a class="doc-id-link" href="#DNS_Header">DNS_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L401"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Header :: <span class="keyword-type">struct</span> {
 	id:                     <a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a>,
@@ -734,7 +773,7 @@ Procedure Groups (4)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Host_Entry"><span><a class="doc-id-link" href="#DNS_Host_Entry">DNS_Host_Entry<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L421"><em>Source</em></a></div></h3>
+<h3 id="DNS_Host_Entry"><span><a class="doc-id-link" href="#DNS_Host_Entry">DNS_Host_Entry<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L419"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Host_Entry :: <span class="keyword-type">struct</span> {
 	name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
@@ -743,7 +782,7 @@ Procedure Groups (4)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Query"><span><a class="doc-id-link" href="#DNS_Query">DNS_Query<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L394"><em>Source</em></a></div></h3>
+<h3 id="DNS_Query"><span><a class="doc-id-link" href="#DNS_Query">DNS_Query<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L392"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Query :: <span class="keyword-type">enum</span> <a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a> {
 	Host_Address              = 1, 
@@ -756,7 +795,7 @@ Procedure Groups (4)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record"><span><a class="doc-id-link" href="#DNS_Record">DNS_Record<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L375"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record"><span><a class="doc-id-link" href="#DNS_Record">DNS_Record<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L373"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record :: <span class="keyword-type">union</span> {
 	<a class="code-typename" href="/core/net/#DNS_Record_IP4">DNS_Record_IP4</a>, 
@@ -774,7 +813,7 @@ Procedure Groups (4)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_Base"><span><a class="doc-id-link" href="#DNS_Record_Base">DNS_Record_Base<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L290"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_Base"><span><a class="doc-id-link" href="#DNS_Record_Base">DNS_Record_Base<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L288"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_Base :: <span class="keyword-type">struct</span> {
 	record_name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
@@ -787,7 +826,7 @@ Procedure Groups (4)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_CNAME"><span><a class="doc-id-link" href="#DNS_Record_CNAME">DNS_Record_CNAME<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L312"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_CNAME"><span><a class="doc-id-link" href="#DNS_Record_CNAME">DNS_Record_CNAME<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L310"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_CNAME :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> base: <a class="code-typename" href="/core/net/#DNS_Record_Base">DNS_Record_Base</a>,
@@ -802,7 +841,7 @@ Domains can be pointed to another domain instead of directly to an IP address.
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_Header"><span><a class="doc-id-link" href="#DNS_Record_Header">DNS_Record_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L414"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_Header"><span><a class="doc-id-link" href="#DNS_Record_Header">DNS_Record_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L412"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_Header :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
 	type:   <a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a>,
@@ -813,7 +852,7 @@ Domains can be pointed to another domain instead of directly to an IP address.
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_IP4"><span><a class="doc-id-link" href="#DNS_Record_IP4">DNS_Record_IP4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L296"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_IP4"><span><a class="doc-id-link" href="#DNS_Record_IP4">DNS_Record_IP4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L294"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_IP4 :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> base: <a class="code-typename" href="/core/net/#DNS_Record_Base">DNS_Record_Base</a>,
@@ -826,7 +865,7 @@ Domains can be pointed to another domain instead of directly to an IP address.
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_IP6"><span><a class="doc-id-link" href="#DNS_Record_IP6">DNS_Record_IP6<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L302"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_IP6"><span><a class="doc-id-link" href="#DNS_Record_IP6">DNS_Record_IP6<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L300"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_IP6 :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> base: <a class="code-typename" href="/core/net/#DNS_Record_Base">DNS_Record_Base</a>,
@@ -839,7 +878,7 @@ Domains can be pointed to another domain instead of directly to an IP address.
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_MX"><span><a class="doc-id-link" href="#DNS_Record_MX">DNS_Record_MX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L338"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_MX"><span><a class="doc-id-link" href="#DNS_Record_MX">DNS_Record_MX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L336"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_MX :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> base: <a class="code-typename" href="/core/net/#DNS_Record_Base">DNS_Record_Base</a>,
@@ -854,7 +893,7 @@ These records also have values which ranks them in the order they should be pref
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_NS"><span><a class="doc-id-link" href="#DNS_Record_NS">DNS_Record_NS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L331"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_NS"><span><a class="doc-id-link" href="#DNS_Record_NS">DNS_Record_NS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L329"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_NS :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> base: <a class="code-typename" href="/core/net/#DNS_Record_Base">DNS_Record_Base</a>,
@@ -868,7 +907,7 @@ TODO(tetra): Expand on what these records are used for, and when you should use 
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_SRV"><span><a class="doc-id-link" href="#DNS_Record_SRV">DNS_Record_SRV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L355"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_SRV"><span><a class="doc-id-link" href="#DNS_Record_SRV">DNS_Record_SRV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L353"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_SRV :: <span class="keyword-type">struct</span> {
 	<span class="comment">// base contains the full name of this record.</span>
@@ -900,7 +939,7 @@ A weight of zero indicates a very low weight, or, when there is no choice (to re
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_TXT"><span><a class="doc-id-link" href="#DNS_Record_TXT">DNS_Record_TXT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L322"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_TXT"><span><a class="doc-id-link" href="#DNS_Record_TXT">DNS_Record_TXT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L320"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_TXT :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> base: <a class="code-typename" href="/core/net/#DNS_Record_Base">DNS_Record_Base</a>,
@@ -915,7 +954,7 @@ These can be used for any purpose.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_Type"><span><a class="doc-id-link" href="#DNS_Record_Type">DNS_Record_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L271"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_Type"><span><a class="doc-id-link" href="#DNS_Record_Type">DNS_Record_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L269"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_Type :: <span class="keyword-type">enum</span> <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> {
 	DNS_TYPE_A     = 1,  <span class="comment">// IP4 address.</span>
@@ -943,7 +982,7 @@ These can be used for any purpose.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Response_Code"><span><a class="doc-id-link" href="#DNS_Response_Code">DNS_Response_Code<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L385"><em>Source</em></a></div></h3>
+<h3 id="DNS_Response_Code"><span><a class="doc-id-link" href="#DNS_Response_Code">DNS_Response_Code<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L383"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Response_Code :: <span class="keyword-type">enum</span> <a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a> {
 	No_Error, 
@@ -956,24 +995,40 @@ These can be used for any purpose.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Dial_Error"><span><a class="doc-id-link" href="#Dial_Error">Dial_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors_windows.odin#L37"><em>Source</em></a></div></h3>
+<h3 id="Dial_Error"><span><a class="doc-id-link" href="#Dial_Error">Dial_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L44"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Dial_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
-	None                      = 0, 
-	Port_Required             = -1, 
-	Address_In_Use            = 10048, 
-	In_Progress               = 10037, 
-	Cannot_Use_Any_Address    = 10049, 
-	Wrong_Family_For_Socket   = 10047, 
-	Refused                   = 10061, 
-	Is_Listening_Socket       = 10022, 
-	Already_Connected         = 10056, 
-	Network_Unreachable       = 10051, <span class="comment">// Device is offline</span>
-	Host_Unreachable          = 10065, <span class="comment">// Remote host cannot be reached</span>
-	No_Buffer_Space_Available = 10055, 
-	Not_Socket                = 10038, 
-	Timeout                   = 10060, 
-	Would_Block               = 10035, <span class="comment">// TODO: we may need special handling for this; maybe make a socket a struct with metadata?</span>
+	None, 
+	<span class="comment">// No network connection, or the network stack is not initialized.</span>
+	Network_Unreachable, 
+	<span class="comment">// Not enough space in internal tables/buffers to create a new socket, or an unsupported protocol is given.</span>
+	Insufficient_Resources, 
+	<span class="comment">// Invalid endpoint and/or options.	</span>
+	Invalid_Argument, 
+	<span class="comment">// An attempt was made to connect to a broadcast socket on a socket that doesn't support it.</span>
+	Broadcast_Not_Supported, 
+	<span class="comment">// The socket is already connected.</span>
+	Already_Connected, 
+	<span class="comment">// The socket is already in the progress of making a connection.</span>
+	Already_Connecting, 
+	<span class="comment">// The address is already in use.</span>
+	Address_In_Use, 
+	<span class="comment">// Could not reach the remote host.</span>
+	Host_Unreachable, 
+	<span class="comment">// The remote host refused the connection or isn't listening.</span>
+	Refused, 
+	<span class="comment">// The connection was reset by the remote host.</span>
+	Reset, 
+	<span class="comment">// Timed out before making a connection.</span>
+	Timeout, 
+	<span class="comment">// Non-blocking socket that would need to block waiting to connect.</span>
+	Would_Block, 
+	<span class="comment">// Interrupted by a signal or other method of cancellation like WSACancelBlockingCall on Windows.</span>
+	Interrupted, 
+	<span class="comment">// Endpoint given without a port, which is required.</span>
+	Port_Required, 
+	<span class="comment">// An error unable to be categorized in above categories, `last_platform_error` may have more info.</span>
+	Unknown, 
 }</pre>
 </div>
 </div>
@@ -999,7 +1054,7 @@ These can be used for any purpose.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Endpoint"><span><a class="doc-id-link" href="#Endpoint">Endpoint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L154"><em>Source</em></a></div></h3>
+<h3 id="Endpoint"><span><a class="doc-id-link" href="#Endpoint">Endpoint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L152"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Endpoint :: <span class="keyword-type">struct</span> {
 	address: <a class="code-typename" href="/core/net/#Address">Address</a>,
@@ -1030,15 +1085,6 @@ These can be used for any purpose.</p>
 <li><a href="/core/net/#resolve_ip6">resolve_ip6</a></li>
 <li><a href="/core/net/#recv">recv</a>&nbsp;<em>(procedure groups)</em></li>
 </ul>
-</div>
-<div class="pkg-entity">
-<h3 id="General_Error"><span><a class="doc-id-link" href="#General_Error">General_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L77"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">General_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
-	None                                   = 0, 
-	Unable_To_Enumerate_Network_Interfaces = 1, 
-}</pre>
-</div>
 </div>
 <div class="pkg-entity">
 <h3 id="Host"><span><a class="doc-id-link" href="#Host">Host<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/addr.odin#L401"><em>Source</em></a></div></h3>
@@ -1073,7 +1119,7 @@ These can be used for any purpose.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="IP4_Address"><span><a class="doc-id-link" href="#IP4_Address">IP4_Address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L141"><em>Source</em></a></div></h3>
+<h3 id="IP4_Address"><span><a class="doc-id-link" href="#IP4_Address">IP4_Address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L139"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">IP4_Address :: <span class="keyword-type">distinct</span> [4]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a></pre>
 </div>
@@ -1087,7 +1133,7 @@ These can be used for any purpose.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="IP6_Address"><span><a class="doc-id-link" href="#IP6_Address">IP6_Address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L142"><em>Source</em></a></div></h3>
+<h3 id="IP6_Address"><span><a class="doc-id-link" href="#IP6_Address">IP6_Address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L140"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">IP6_Address :: <span class="keyword-type">distinct</span> [8]<a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a></pre>
 </div>
@@ -1101,7 +1147,22 @@ These can be used for any purpose.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Lease"><span><a class="doc-id-link" href="#Lease">Lease<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L207"><em>Source</em></a></div></h3>
+<h3 id="Interfaces_Error"><span><a class="doc-id-link" href="#Interfaces_Error">Interfaces_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L76"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Interfaces_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+	None, 
+	Unable_To_Enumerate_Network_Interfaces, 
+	Allocation_Failure, 
+	Unknown, 
+}</pre>
+</div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/net/#enumerate_interfaces">enumerate_interfaces</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Lease"><span><a class="doc-id-link" href="#Lease">Lease<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L205"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Lease :: <span class="keyword-type">struct</span> {
 	address:             <a class="code-typename" href="/core/net/#Address">Address</a>,
@@ -1120,13 +1181,13 @@ These can be used for any purpose.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Link_State"><span><a class="doc-id-link" href="#Link_State">Link_State<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L205"><em>Source</em></a></div></h3>
+<h3 id="Link_State"><span><a class="doc-id-link" href="#Link_State">Link_State<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L203"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Link_State :: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/core/net/#Link_States">Link_States</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Link_States"><span><a class="doc-id-link" href="#Link_States">Link_States<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L196"><em>Source</em></a></div></h3>
+<h3 id="Link_States"><span><a class="doc-id-link" href="#Link_States">Link_States<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L194"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Link_States :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	Up               = 1, 
@@ -1144,19 +1205,30 @@ These can be used for any purpose.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Listen_Error"><span><a class="doc-id-link" href="#Listen_Error">Listen_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors_windows.odin#L65"><em>Source</em></a></div></h3>
+<h3 id="Listen_Error"><span><a class="doc-id-link" href="#Listen_Error">Listen_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L98"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Listen_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
-	None                                    = 0, 
-	Address_In_Use                          = 10048, 
-	Already_Connected                       = 10056, 
-	No_Socket_Descriptors_Available         = 10024, 
-	No_Buffer_Space_Available               = 10055, 
-	Nonlocal_Address                        = 10049, 
-	Not_Socket                              = 10038, 
-	Listening_Not_Supported_For_This_Socket = 10045, 
+	None, 
+	<span class="comment">// No network connection, or the network stack is not initialized.</span>
+	Network_Unreachable, 
+	<span class="comment">// Not enough space in internal tables/buffers to create a new socket, or an unsupported protocol is given.</span>
+	Insufficient_Resources, 
+	<span class="comment">// The socket or backlog is invalid.</span>
+	Invalid_Argument, 
+	<span class="comment">// The socket is valid, but does not support listening.</span>
+	Unsupported_Socket, 
+	<span class="comment">// The socket is already connected.</span>
+	Already_Connected, 
+	<span class="comment">// The address is already in use.</span>
+	Address_In_Use, 
+	<span class="comment">// An error unable to be categorized in above categories, `last_platform_error` may have more info.</span>
+	Unknown, 
 }</pre>
 </div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/net/#bound_endpoint">bound_endpoint</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
 <h3 id="Maybe"><span><a class="doc-id-link" href="#Maybe">Maybe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L53"><em>Source</em></a></div></h3>
@@ -1179,7 +1251,7 @@ These can be used for any purpose.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Netmask"><span><a class="doc-id-link" href="#Netmask">Netmask<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L164"><em>Source</em></a></div></h3>
+<h3 id="Netmask"><span><a class="doc-id-link" href="#Netmask">Netmask<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L162"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Netmask :: <span class="keyword-type">union</span> {
 	<a class="code-typename" href="/core/net/#IP4_Address">IP4_Address</a>, 
@@ -1191,8 +1263,6 @@ These can be used for any purpose.</p>
 <h3 id="Network_Error"><span><a class="doc-id-link" href="#Network_Error">Network_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L55"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Network_Error :: <span class="keyword-type">union</span> {
-	<a class="code-typename" href="/core/net/#General_Error">General_Error</a>, 
-	<a class="code-typename" href="/core/net/#Platform_Error">Platform_Error</a>, 
 	<a class="code-typename" href="/core/net/#Create_Socket_Error">Create_Socket_Error</a>, 
 	<a class="code-typename" href="/core/net/#Dial_Error">Dial_Error</a>, 
 	<a class="code-typename" href="/core/net/#Listen_Error">Listen_Error</a>, 
@@ -1203,6 +1273,7 @@ These can be used for any purpose.</p>
 	<a class="code-typename" href="/core/net/#TCP_Recv_Error">TCP_Recv_Error</a>, 
 	<a class="code-typename" href="/core/net/#UDP_Recv_Error">UDP_Recv_Error</a>, 
 	<a class="code-typename" href="/core/net/#Shutdown_Error">Shutdown_Error</a>, 
+	<a class="code-typename" href="/core/net/#Interfaces_Error">Interfaces_Error</a>, 
 	<a class="code-typename" href="/core/net/#Socket_Option_Error">Socket_Option_Error</a>, 
 	<a class="code-typename" href="/core/net/#Set_Blocking_Error">Set_Blocking_Error</a>, 
 	<a class="code-typename" href="/core/net/#Parse_Endpoint_Error">Parse_Endpoint_Error</a>, 
@@ -1212,39 +1283,26 @@ These can be used for any purpose.</p>
 </div>
 <h5>Related Procedures With Returns</h5>
 <ul>
-<li><a href="/core/net/#accept_tcp">accept_tcp</a></li>
-<li><a href="/core/net/#bind">bind</a></li>
-<li><a href="/core/net/#bound_endpoint">bound_endpoint</a></li>
-<li><a href="/core/net/#create_socket">create_socket</a></li>
 <li><a href="/core/net/#dial_tcp_from_address_and_port">dial_tcp_from_address_and_port</a></li>
 <li><a href="/core/net/#dial_tcp_from_endpoint">dial_tcp_from_endpoint</a></li>
 <li><a href="/core/net/#dial_tcp_from_host">dial_tcp_from_host</a></li>
 <li><a href="/core/net/#dial_tcp_from_host_or_endpoint">dial_tcp_from_host_or_endpoint</a></li>
 <li><a href="/core/net/#dial_tcp_from_hostname_and_port_string">dial_tcp_from_hostname_and_port_string</a></li>
 <li><a href="/core/net/#dial_tcp_from_hostname_with_port_override">dial_tcp_from_hostname_with_port_override</a></li>
-<li><a href="/core/net/#enumerate_interfaces">enumerate_interfaces</a></li>
 <li><a href="/core/net/#listen_tcp">listen_tcp</a></li>
 <li><a href="/core/net/#make_bound_udp_socket">make_bound_udp_socket</a></li>
-<li><a href="/core/net/#make_unbound_udp_socket">make_unbound_udp_socket</a></li>
 <li><a href="/core/net/#recv_any">recv_any</a></li>
-<li><a href="/core/net/#recv_tcp">recv_tcp</a></li>
-<li><a href="/core/net/#recv_udp">recv_udp</a></li>
 <li><a href="/core/net/#resolve">resolve</a></li>
 <li><a href="/core/net/#resolve_ip4">resolve_ip4</a></li>
 <li><a href="/core/net/#resolve_ip6">resolve_ip6</a></li>
 <li><a href="/core/net/#send_any">send_any</a></li>
-<li><a href="/core/net/#send_tcp">send_tcp</a></li>
-<li><a href="/core/net/#send_udp">send_udp</a></li>
-<li><a href="/core/net/#set_blocking">set_blocking</a></li>
-<li><a href="/core/net/#set_option">set_option</a></li>
-<li><a href="/core/net/#shutdown">shutdown</a></li>
 <li><a href="/core/net/#dial_tcp">dial_tcp</a>&nbsp;<em>(procedure groups)</em></li>
 <li><a href="/core/net/#recv">recv</a>&nbsp;<em>(procedure groups)</em></li>
 <li><a href="/core/net/#send">send</a>&nbsp;<em>(procedure groups)</em></li>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Network_Interface"><span><a class="doc-id-link" href="#Network_Interface">Network_Interface<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L169"><em>Source</em></a></div></h3>
+<h3 id="Network_Interface"><span><a class="doc-id-link" href="#Network_Interface">Network_Interface<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L167"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Network_Interface :: <span class="keyword-type">struct</span> {
 	adapter_name:     <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
@@ -1275,7 +1333,7 @@ These can be used for any purpose.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Parse_Endpoint_Error"><span><a class="doc-id-link" href="#Parse_Endpoint_Error">Parse_Endpoint_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L85"><em>Source</em></a></div></h3>
+<h3 id="Parse_Endpoint_Error"><span><a class="doc-id-link" href="#Parse_Endpoint_Error">Parse_Endpoint_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L83"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Parse_Endpoint_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	None         = 0, 
@@ -1290,18 +1348,7 @@ These can be used for any purpose.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Platform_Error"><span><a class="doc-id-link" href="#Platform_Error">Platform_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L83"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Platform_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
-}</pre>
-</div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>Platform_Error</code> is used to wrap errors returned by the different platforms that don't fit a common error.</p>
-</details>
-</div>
-<div class="pkg-entity">
-<h3 id="Prefix_Origin"><span><a class="doc-id-link" href="#Prefix_Origin">Prefix_Origin<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L232"><em>Source</em></a></div></h3>
+<h3 id="Prefix_Origin"><span><a class="doc-id-link" href="#Prefix_Origin">Prefix_Origin<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L230"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Prefix_Origin :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	Other                = 0, 
@@ -1314,7 +1361,7 @@ These can be used for any purpose.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Resolve_Error"><span><a class="doc-id-link" href="#Resolve_Error">Resolve_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L92"><em>Source</em></a></div></h3>
+<h3 id="Resolve_Error"><span><a class="doc-id-link" href="#Resolve_Error">Resolve_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L90"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Resolve_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	None              = 0, 
@@ -1323,35 +1370,45 @@ These can be used for any purpose.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Set_Blocking_Error"><span><a class="doc-id-link" href="#Set_Blocking_Error">Set_Blocking_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors_windows.odin#L259"><em>Source</em></a></div></h3>
+<h3 id="Set_Blocking_Error"><span><a class="doc-id-link" href="#Set_Blocking_Error">Set_Blocking_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L266"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Set_Blocking_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
-	None                              = 0, 
-	Network_Subsystem_Failure         = 10050, 
-	Blocking_Call_In_Progress         = 10036, 
-	Not_Socket                        = 10038, 
-	<span class="comment">// TODO: are those errors possible?</span>
-	Network_Subsystem_Not_Initialized = 10093, 
-	Invalid_Argument_Pointer          = 10014, 
+	None, 
+	<span class="comment">// No network connection, or the network stack is not initialized.</span>
+	Network_Unreachable, 
+	<span class="comment">// Socket is invalid.</span>
+	Invalid_Argument, 
+	<span class="comment">// An error unable to be categorized in above categories, `last_platform_error` may have more info.</span>
+	Unknown, 
 }</pre>
 </div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/net/#set_blocking">set_blocking</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Shutdown_Error"><span><a class="doc-id-link" href="#Shutdown_Error">Shutdown_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors_windows.odin#L188"><em>Source</em></a></div></h3>
+<h3 id="Shutdown_Error"><span><a class="doc-id-link" href="#Shutdown_Error">Shutdown_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L236"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Shutdown_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
-	None           = 0, 
-	Aborted        = 10053, 
-	Reset          = 10054, 
-	Offline        = 10050, 
-	Not_Connected  = 10057, 
-	Not_Socket     = 10038, 
-	Invalid_Manner = 10022, 
+	None, 
+	<span class="comment">// No network connection, or the network stack is not initialized.</span>
+	Network_Unreachable, 
+	<span class="comment">// Socket is invalid or not connected, or the manner given is invalid.</span>
+	Invalid_Argument, 
+	<span class="comment">// Connection was closed/aborted/shutdown.</span>
+	Connection_Closed, 
+	<span class="comment">// An error unable to be categorized in above categories, `last_platform_error` may have more info.</span>
+	Unknown, 
 }</pre>
 </div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/net/#shutdown">shutdown</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Shutdown_Manner"><span><a class="doc-id-link" href="#Shutdown_Manner">Shutdown_Manner<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors_windows.odin#L182"><em>Source</em></a></div></h3>
+<h3 id="Shutdown_Manner"><span><a class="doc-id-link" href="#Shutdown_Manner">Shutdown_Manner<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket_windows.odin#L75"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Shutdown_Manner :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	Receive = 0, 
@@ -1365,7 +1422,7 @@ These can be used for any purpose.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Socket"><span><a class="doc-id-link" href="#Socket">Socket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L122"><em>Source</em></a></div></h3>
+<h3 id="Socket"><span><a class="doc-id-link" href="#Socket">Socket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L120"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Socket :: <span class="keyword-type">distinct</span> <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a></pre>
 </div>
@@ -1381,7 +1438,7 @@ we treat it as a handle large enough to accomodate OS-specific notions of socket
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Socket_Option"><span><a class="doc-id-link" href="#Socket_Option">Socket_Option<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors_windows.odin#L198"><em>Source</em></a></div></h3>
+<h3 id="Socket_Option"><span><a class="doc-id-link" href="#Socket_Option">Socket_Option<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket_windows.odin#L27"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Socket_Option :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	<span class="comment">// bool: Whether the address that this socket is bound to can be reused by other sockets.</span>
@@ -1424,23 +1481,31 @@ we treat it as a handle large enough to accomodate OS-specific notions of socket
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Socket_Option_Error"><span><a class="doc-id-link" href="#Socket_Option_Error">Socket_Option_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors_windows.odin#L245"><em>Source</em></a></div></h3>
+<h3 id="Socket_Option_Error"><span><a class="doc-id-link" href="#Socket_Option_Error">Socket_Option_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L249"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Socket_Option_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
-	None                               = 0, 
-	Linger_Only_Supports_Whole_Seconds = 1, 
-	<span class="comment">// The given value is too big or small to be given to the OS.</span>
-	Value_Out_Of_Range, 
-	Network_Subsystem_Failure          = 10050, 
-	Timeout_When_Keepalive_Set         = 10052, 
-	Invalid_Option_For_Socket          = 10042, 
-	Reset_When_Keepalive_Set           = 10057, 
-	Not_Socket                         = 10038, 
+	None, 
+	<span class="comment">// No network connection, or the network stack is not initialized.</span>
+	Network_Unreachable, 
+	<span class="comment">// Not enough space in internal tables/buffers to create a new socket, or an unsupported protocol is given.</span>
+	Insufficient_Resources, 
+	<span class="comment">// Socket is invalid, not connected, or the connection has been closed/reset/shutdown.</span>
+	Invalid_Socket, 
+	<span class="comment">// Unknown or unsupported option for the socket.</span>
+	Invalid_Option, 
+	<span class="comment">// Invalid level or value.</span>
+	Invalid_Value, 
+	<span class="comment">// An error unable to be categorized in above categories, `last_platform_error` may have more info.</span>
+	Unknown, 
 }</pre>
 </div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/net/#set_option">set_option</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Socket_Protocol"><span><a class="doc-id-link" href="#Socket_Protocol">Socket_Protocol<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L127"><em>Source</em></a></div></h3>
+<h3 id="Socket_Protocol"><span><a class="doc-id-link" href="#Socket_Protocol">Socket_Protocol<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L125"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Socket_Protocol :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
 	TCP, 
@@ -1453,7 +1518,7 @@ we treat it as a handle large enough to accomodate OS-specific notions of socket
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Suffix_Origin"><span><a class="doc-id-link" href="#Suffix_Origin">Suffix_Origin<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L241"><em>Source</em></a></div></h3>
+<h3 id="Suffix_Origin"><span><a class="doc-id-link" href="#Suffix_Origin">Suffix_Origin<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L239"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Suffix_Origin :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	Other              = 0, 
@@ -1467,7 +1532,7 @@ we treat it as a handle large enough to accomodate OS-specific notions of socket
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="TCP_Options"><span><a class="doc-id-link" href="#TCP_Options">TCP_Options<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L108"><em>Source</em></a></div></h3>
+<h3 id="TCP_Options"><span><a class="doc-id-link" href="#TCP_Options">TCP_Options<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L106"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">TCP_Options :: <span class="keyword-type">struct</span> {
 	no_delay: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
@@ -1490,58 +1555,71 @@ we treat it as a handle large enough to accomodate OS-specific notions of socket
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="TCP_Recv_Error"><span><a class="doc-id-link" href="#TCP_Recv_Error">TCP_Recv_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors_windows.odin#L88"><em>Source</em></a></div></h3>
+<h3 id="TCP_Recv_Error"><span><a class="doc-id-link" href="#TCP_Recv_Error">TCP_Recv_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L142"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">TCP_Recv_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
-	None                      = 0, 
-	Network_Subsystem_Failure = 10050, 
-	Not_Connected             = 10057, 
-	Bad_Buffer                = 10014, 
-	Keepalive_Failure         = 10052, 
-	Not_Socket                = 10038, 
-	Shutdown                  = 10058, 
-	Would_Block               = 10035, 
-	Aborted                   = 10053, 
-	Timeout                   = 10060, 
-	<span class="comment">// TODO(tetra): Determine when this is different from the syscall returning n=0 and maybe normalize them?</span>
-	Connection_Closed         = 10054, 
-	<span class="comment">// TODO: verify can actually happen</span>
-	Host_Unreachable          = 10065, 
+	None, 
+	<span class="comment">// No network connection, or the network stack is not initialized.</span>
+	Network_Unreachable, 
+	<span class="comment">// Not enough space in internal tables/buffers to create a new socket, or an unsupported protocol is given.</span>
+	Insufficient_Resources, 
+	<span class="comment">// Invalid socket or buffer given.</span>
+	Invalid_Argument, 
+	<span class="comment">// The socket is not connected.</span>
+	Not_Connected, 
+	<span class="comment">// Connection was closed/broken/shutdown while receiving data.</span>
+	Connection_Closed, 
+	<span class="comment">// Timed out before being able to receive any data.</span>
+	Timeout, 
+	<span class="comment">// Non-blocking socket that would need to block waiting on data.</span>
+	Would_Block, 
+	<span class="comment">// Interrupted by a signal or other method of cancellation like WSACancelBlockingCall on Windows.</span>
+	Interrupted, 
+	<span class="comment">// An error unable to be categorized in above categories, `last_platform_error` may have more info.</span>
+	Unknown, 
 }</pre>
 </div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/net/#recv_tcp">recv_tcp</a></li>
+<li><a href="/core/net/#recv">recv</a>&nbsp;<em>(procedure groups)</em></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="TCP_Send_Error"><span><a class="doc-id-link" href="#TCP_Send_Error">TCP_Send_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors_windows.odin#L130"><em>Source</em></a></div></h3>
+<h3 id="TCP_Send_Error"><span><a class="doc-id-link" href="#TCP_Send_Error">TCP_Send_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L188"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">TCP_Send_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
-	None                      = 0, 
-	Aborted                   = 10053, 
-	Not_Connected             = 10057, 
-	Shutdown                  = 10058, 
-	Connection_Closed         = 10054, 
-	No_Buffer_Space_Available = 10055, 
-	Network_Subsystem_Failure = 10050, 
-	Host_Unreachable          = 10065, 
-	Would_Block               = 10035, 
-	<span class="comment">// TODO: verify possible, as not mentioned in docs</span>
-	Offline                   = 10051, 
-	Timeout                   = 10060, 
-	<span class="comment">// A broadcast address was specified, but the .Broadcast socket option isn't set.</span>
-	Broadcast_Disabled        = 10013, 
-	Bad_Buffer                = 10014, 
-	<span class="comment">// Connection is broken due to keepalive activity detecting a failure during the operation.</span>
-	Keepalive_Failure         = 10052, <span class="comment">// TODO: not functionally different from Reset; merge?</span>
-	Not_Socket                = 10038, <span class="comment">// The so-called socket is not an open socket.</span>
+	None, 
+	<span class="comment">// No network connection, or the network stack is not initialized.</span>
+	Network_Unreachable, 
+	<span class="comment">// Not enough space in internal tables/buffers to create a new socket, or an unsupported protocol is given.</span>
+	Insufficient_Resources, 
+	<span class="comment">// Invalid socket or buffer given.</span>
+	Invalid_Argument, 
+	<span class="comment">// Connection was closed/broken/shutdown while receiving data.</span>
+	Connection_Closed, 
+	<span class="comment">// The socket is not connected.</span>
+	Not_Connected, 
+	<span class="comment">// Could not reach the remote host.</span>
+	Host_Unreachable, 
+	<span class="comment">// Timed out before being able to send any data.</span>
+	Timeout, 
+	<span class="comment">// Non-blocking socket that would need to block waiting on the remote to be able to receive the data.</span>
+	Would_Block, 
+	<span class="comment">// Interrupted by a signal or other method of cancellation like WSACancelBlockingCall on Windows.</span>
+	Interrupted, 
+	<span class="comment">// An error unable to be categorized in above categories, `last_platform_error` may have more info.</span>
+	Unknown, 
 }</pre>
 </div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>TODO: consider merging some errors to make handling them easier
-TODO: verify once more what errors to actually expose</p>
-</details>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/net/#send_tcp">send_tcp</a></li>
+<li><a href="/core/net/#send">send</a>&nbsp;<em>(procedure groups)</em></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="TCP_Socket"><span><a class="doc-id-link" href="#TCP_Socket">TCP_Socket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L124"><em>Source</em></a></div></h3>
+<h3 id="TCP_Socket"><span><a class="doc-id-link" href="#TCP_Socket">TCP_Socket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L122"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">TCP_Socket :: <span class="keyword-type">distinct</span> <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a></pre>
 </div>
@@ -1566,7 +1644,7 @@ TODO: verify once more what errors to actually expose</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Tunnel_Type"><span><a class="doc-id-link" href="#Tunnel_Type">Tunnel_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L222"><em>Source</em></a></div></h3>
+<h3 id="Tunnel_Type"><span><a class="doc-id-link" href="#Tunnel_Type">Tunnel_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L220"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Tunnel_Type :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	None         = 0, 
@@ -1580,59 +1658,69 @@ TODO: verify once more what errors to actually expose</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="UDP_Recv_Error"><span><a class="doc-id-link" href="#UDP_Recv_Error">UDP_Recv_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors_windows.odin#L107"><em>Source</em></a></div></h3>
+<h3 id="UDP_Recv_Error"><span><a class="doc-id-link" href="#UDP_Recv_Error">UDP_Recv_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L165"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">UDP_Recv_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
-	None                      = 0, 
-	Network_Subsystem_Failure = 10050, 
-	Aborted                   = 10053, 
-	Buffer_Too_Small          = 10040, <span class="comment">// The buffer is too small to fit the entire message, and the message was truncated. When this happens, the rest of message is lost.</span>
-	Remote_Not_Listening      = 10054, <span class="comment">// The machine at the remote endpoint doesn't have the given port open to receiving UDP data.</span>
-	Shutdown                  = 10058, 
-	Broadcast_Disabled        = 10013, <span class="comment">// A broadcast address was specified, but the .Broadcast socket option isn't set.</span>
-	Bad_Buffer                = 10014, 
-	No_Buffer_Space_Available = 10055, 
-	Not_Socket                = 10038, <span class="comment">// The socket is not valid socket handle.</span>
-	Would_Block               = 10035, 
-	Host_Unreachable          = 10065, <span class="comment">// The remote host cannot be reached from this host at this time.</span>
-	Offline                   = 10051, <span class="comment">// The network cannot be reached from this host at this time.</span>
-	Timeout                   = 10060, 
-	<span class="comment">// TODO: can this actually happen? The socket isn't bound; an unknown flag specified; or MSG_OOB specified with SO_OOBINLINE enabled.</span>
-	Incorrectly_Configured    = 10022, 
-	TTL_Expired               = 10052, <span class="comment">// The message took more hops than was allowed (the Time To Live) to reach the remote endpoint.</span>
+	None, 
+	<span class="comment">// No network connection, or the network stack is not initialized.</span>
+	Network_Unreachable, 
+	<span class="comment">// Not enough space in internal tables/buffers to create a new socket, or an unsupported protocol is given.</span>
+	Insufficient_Resources, 
+	<span class="comment">// Invalid socket or buffer given.</span>
+	Invalid_Argument, 
+	<span class="comment">// "Connection" was refused by remote, or closed/broken/shutdown while receiving data.</span>
+	Connection_Refused, 
+	<span class="comment">// Timed out before being able to receive any data.</span>
+	Timeout, 
+	<span class="comment">// Non-blocking socket that would need to block waiting on data.</span>
+	Would_Block, 
+	<span class="comment">// Interrupted by a signal or other method of cancellation like WSACancelBlockingCall on Windows.</span>
+	Interrupted, 
+	<span class="comment">// Linux and UDP only: indicates the buffer was too small to receive all data, and the excess is truncated and discarded.</span>
+	Excess_Truncated, 
+	<span class="comment">// An error unable to be categorized in above categories, `last_platform_error` may have more info.</span>
+	Unknown, 
 }</pre>
 </div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/net/#recv_udp">recv_udp</a></li>
+<li><a href="/core/net/#recv">recv</a>&nbsp;<em>(procedure groups)</em></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="UDP_Send_Error"><span><a class="doc-id-link" href="#UDP_Send_Error">UDP_Send_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors_windows.odin#L155"><em>Source</em></a></div></h3>
+<h3 id="UDP_Send_Error"><span><a class="doc-id-link" href="#UDP_Send_Error">UDP_Send_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L213"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">UDP_Send_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
-	None                                 = 0, 
-	Network_Subsystem_Failure            = 10050, 
-	Aborted                              = 10053, 
-	Message_Too_Long                     = 10040, <span class="comment">// The message is larger than the maximum UDP packet size.</span>
-	Remote_Not_Listening                 = 10054, <span class="comment">// The machine at the remote endpoint doesn't have the given port open to receiving UDP data.</span>
-	Shutdown                             = 10058, <span class="comment">// A broadcast address was specified, but the .Broadcast socket option isn't set.</span>
-	Broadcast_Disabled                   = 10013, 
-	Bad_Buffer                           = 10014, <span class="comment">// Connection is broken due to keepalive activity detecting a failure during the operation.</span>
-	<span class="comment">// TODO: not functionally different from Reset; merge?</span>
-	Keepalive_Failure                    = 10052, 
-	No_Buffer_Space_Available            = 10055, 
-	Not_Socket                           = 10038, <span class="comment">// The socket is not valid socket handle.</span>
-	<span class="comment">// This socket is unidirectional and cannot be used to send any data.</span>
-	<span class="comment">// TODO: verify possible; decide whether to keep if not</span>
-	Receive_Only                         = 10045, 
-	Would_Block                          = 10035, 
-	Host_Unreachable                     = 10065, <span class="comment">// The remote host cannot be reached from this host at this time.</span>
-	Cannot_Use_Any_Address               = 10049, <span class="comment">// Attempt to send to the Any address.</span>
-	Family_Not_Supported_For_This_Socket = 10047, <span class="comment">// The address is of an incorrect address family for this socket.</span>
-	Offline                              = 10051, <span class="comment">// The network cannot be reached from this host at this time.</span>
-	Timeout                              = 10060, 
+	None, 
+	<span class="comment">// No network connection, or the network stack is not initialized.</span>
+	Network_Unreachable, 
+	<span class="comment">// Not enough space in internal tables/buffers to create a new socket, or an unsupported protocol is given.</span>
+	Insufficient_Resources, 
+	<span class="comment">// Invalid socket or buffer given.</span>
+	Invalid_Argument, 
+	<span class="comment">// Could not reach the remote host.</span>
+	Host_Unreachable, 
+	<span class="comment">// "Connection" was refused by remote, or closed/broken/shutdown while sending data.</span>
+	Connection_Refused, 
+	<span class="comment">// Timed out before being able to send any data.</span>
+	Timeout, 
+	<span class="comment">// Non-blocking socket that would need to block waiting on the remote to be able to receive the data.</span>
+	Would_Block, 
+	<span class="comment">// Interrupted by a signal or other method of cancellation like WSACancelBlockingCall on Windows.</span>
+	Interrupted, 
+	<span class="comment">// An error unable to be categorized in above categories, `last_platform_error` may have more info.</span>
+	Unknown, 
 }</pre>
 </div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/net/#send_udp">send_udp</a></li>
+<li><a href="/core/net/#send">send</a>&nbsp;<em>(procedure groups)</em></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="UDP_Socket"><span><a class="doc-id-link" href="#UDP_Socket">UDP_Socket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L125"><em>Source</em></a></div></h3>
+<h3 id="UDP_Socket"><span><a class="doc-id-link" href="#UDP_Socket">UDP_Socket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L123"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">UDP_Socket :: <span class="keyword-type">distinct</span> <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a></pre>
 </div>
@@ -1663,13 +1751,13 @@ TODO: verify once more what errors to actually expose</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="IP4_Loopback"><span><a class="doc-id-link" href="#IP4_Loopback">IP4_Loopback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L145"><em>Source</em></a></div></h3>
+<h3 id="IP4_Loopback"><span><a class="doc-id-link" href="#IP4_Loopback">IP4_Loopback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L143"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">IP4_Loopback :: IP4_Address{127, 0, 0, 1}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="IP6_Loopback"><span><a class="doc-id-link" href="#IP6_Loopback">IP6_Loopback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L146"><em>Source</em></a></div></h3>
+<h3 id="IP6_Loopback"><span><a class="doc-id-link" href="#IP6_Loopback">IP6_Loopback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L144"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">IP6_Loopback :: IP6_Address{0, 0, 0, 0, 0, 0, 0, 1}</pre>
 </div>
@@ -1732,31 +1820,31 @@ and at most 9 (using <code>::</code> for a trailing or leading 0)</p>
 </div>
 <h2 id="pkg-Variables" class="pkg-header">Variables</h2>
 <div class="pkg-entity">
-<h3 id="IP4_Any"><span><a class="doc-id-link" href="#IP4_Any">IP4_Any<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L148"><em>Source</em></a></div></h3>
+<h3 id="IP4_Any"><span><a class="doc-id-link" href="#IP4_Any">IP4_Any<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L146"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">IP4_Any: <a class="code-typename" href="/core/net/#IP4_Address">IP4_Address</a> = …</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="IP4_mDNS_Broadcast"><span><a class="doc-id-link" href="#IP4_mDNS_Broadcast">IP4_mDNS_Broadcast<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L151"><em>Source</em></a></div></h3>
+<h3 id="IP4_mDNS_Broadcast"><span><a class="doc-id-link" href="#IP4_mDNS_Broadcast">IP4_mDNS_Broadcast<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L149"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">IP4_mDNS_Broadcast: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a> = …</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="IP6_Any"><span><a class="doc-id-link" href="#IP6_Any">IP6_Any<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L149"><em>Source</em></a></div></h3>
+<h3 id="IP6_Any"><span><a class="doc-id-link" href="#IP6_Any">IP6_Any<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L147"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">IP6_Any: <a class="code-typename" href="/core/net/#IP6_Address">IP6_Address</a> = …</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="IP6_mDNS_Broadcast"><span><a class="doc-id-link" href="#IP6_mDNS_Broadcast">IP6_mDNS_Broadcast<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L152"><em>Source</em></a></div></h3>
+<h3 id="IP6_mDNS_Broadcast"><span><a class="doc-id-link" href="#IP6_mDNS_Broadcast">IP6_mDNS_Broadcast<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L150"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">IP6_mDNS_Broadcast: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a> = …</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="default_tcp_options"><span><a class="doc-id-link" href="#default_tcp_options">default_tcp_options<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L112"><em>Source</em></a></div></h3>
+<h3 id="default_tcp_options"><span><a class="doc-id-link" href="#default_tcp_options">default_tcp_options<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L110"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">default_tcp_options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = …</pre>
 </div>
@@ -1769,9 +1857,9 @@ and at most 9 (using <code>::</code> for a trailing or leading 0)</p>
 </div>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="accept_tcp"><span><a class="doc-id-link" href="#accept_tcp">accept_tcp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L157"><em>Source</em></a></div></h3>
+<h3 id="accept_tcp"><span><a class="doc-id-link" href="#accept_tcp">accept_tcp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L181"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">accept_tcp :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = default_tcp_options) -> (client: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, source: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">accept_tcp :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = default_tcp_options) -> (client: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, source: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, err: <a class="code-typename" href="/core/net/#Accept_Error">Accept_Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1817,15 +1905,15 @@ a       - where `a` gives the entire 32-bit value
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="bind"><span><a class="doc-id-link" href="#bind">bind<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L112"><em>Source</em></a></div></h3>
+<h3 id="bind"><span><a class="doc-id-link" href="#bind">bind<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L129"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">bind :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#Any_Socket">Any_Socket</a>, ep: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>) -> (err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">bind :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#Any_Socket">Any_Socket</a>, ep: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>) -> (err: <a class="code-typename" href="/core/net/#Bind_Error">Bind_Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="bound_endpoint"><span><a class="doc-id-link" href="#bound_endpoint">bound_endpoint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L153"><em>Source</em></a></div></h3>
+<h3 id="bound_endpoint"><span><a class="doc-id-link" href="#bound_endpoint">bound_endpoint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L177"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">bound_endpoint :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#Any_Socket">Any_Socket</a>) -> (endpoint: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">bound_endpoint :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#Any_Socket">Any_Socket</a>) -> (endpoint: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, err: <a class="code-typename" href="/core/net/#Listen_Error">Listen_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1833,15 +1921,15 @@ a       - where `a` gives the entire 32-bit value
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="close"><span><a class="doc-id-link" href="#close">close<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L161"><em>Source</em></a></div></h3>
+<h3 id="close"><span><a class="doc-id-link" href="#close">close<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L185"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">close :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#Any_Socket">Any_Socket</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="create_socket"><span><a class="doc-id-link" href="#create_socket">create_socket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L108"><em>Source</em></a></div></h3>
+<h3 id="create_socket"><span><a class="doc-id-link" href="#create_socket">create_socket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L125"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">create_socket :: <span class="keyword-type">proc</span>(family: <a class="code-typename" href="/core/net/#Address_Family">Address_Family</a>, protocol: <a class="code-typename" href="/core/net/#Socket_Protocol">Socket_Protocol</a>) -> (socket: <a class="code-typename" href="/core/net/#Any_Socket">Any_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">create_socket :: <span class="keyword-type">proc</span>(family: <a class="code-typename" href="/core/net/#Address_Family">Address_Family</a>, protocol: <a class="code-typename" href="/core/net/#Socket_Protocol">Socket_Protocol</a>) -> (socket: <a class="code-typename" href="/core/net/#Any_Socket">Any_Socket</a>, err: <a class="code-typename" href="/core/net/#Create_Socket_Error">Create_Socket_Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1871,33 +1959,41 @@ a       - where `a` gives the entire 32-bit value
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dial_tcp_from_address_and_port"><span><a class="doc-id-link" href="#dial_tcp_from_address_and_port">dial_tcp_from_address_and_port<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L91"><em>Source</em></a></div></h3>
+<h3 id="dial_tcp_from_address_and_port"><span><a class="doc-id-link" href="#dial_tcp_from_address_and_port">dial_tcp_from_address_and_port<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L103"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dial_tcp_from_address_and_port :: <span class="keyword-type">proc</span>(address: <a class="code-typename" href="/core/net/#Address">Address</a>, port: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = default_tcp_options) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Dial from an Address</p>
+<p>Dial from an Address.</p>
+<p>Errors that can be returned: <code>Create_Socket_Error</code>, or <code>Dial_Error</code></p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dial_tcp_from_endpoint"><span><a class="doc-id-link" href="#dial_tcp_from_endpoint">dial_tcp_from_endpoint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L95"><em>Source</em></a></div></h3>
+<h3 id="dial_tcp_from_endpoint"><span><a class="doc-id-link" href="#dial_tcp_from_endpoint">dial_tcp_from_endpoint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L112"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dial_tcp_from_endpoint :: <span class="keyword-type">proc</span>(endpoint: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = default_tcp_options) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Dial from an Endpoint.</p>
+<p>Errors that can be returned: <code>Create_Socket_Error</code>, or <code>Dial_Error</code></p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="dial_tcp_from_host"><span><a class="doc-id-link" href="#dial_tcp_from_host">dial_tcp_from_host<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L66"><em>Source</em></a></div></h3>
+<h3 id="dial_tcp_from_host"><span><a class="doc-id-link" href="#dial_tcp_from_host">dial_tcp_from_host<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L72"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dial_tcp_from_host :: <span class="keyword-type">proc</span>(host: <a class="code-typename" href="/core/net/#Host">Host</a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = default_tcp_options) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Expects the <code>host</code> as Host.</p>
+<pre>Errors that can be returned: `Resolve_Error`, `DNS_Error`, `Create_Socket_Error`, or `Dial_Error`
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dial_tcp_from_host_or_endpoint"><span><a class="doc-id-link" href="#dial_tcp_from_host_or_endpoint">dial_tcp_from_host_or_endpoint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L80"><em>Source</em></a></div></h3>
+<h3 id="dial_tcp_from_host_or_endpoint"><span><a class="doc-id-link" href="#dial_tcp_from_host_or_endpoint">dial_tcp_from_host_or_endpoint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L88"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dial_tcp_from_host_or_endpoint :: <span class="keyword-type">proc</span>(target: <a class="code-typename" href="/core/net/#Host_Or_Endpoint">Host_Or_Endpoint</a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = default_tcp_options) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
@@ -1905,10 +2001,12 @@ a       - where `a` gives the entire 32-bit value
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Expects the <code>target</code> as a Host_OrEndpoint.
     Unwraps the underlying type and calls <code>dial_tcp_from_host</code> or <code>dial_tcp_from_endpoint</code>.</p>
+<pre>Errors that can be returned: `Parse_Endpoint_Error`, `Resolve_Error`, `DNS_Error`, `Create_Socket_Error`, or `Dial_Error`
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dial_tcp_from_hostname_and_port_string"><span><a class="doc-id-link" href="#dial_tcp_from_hostname_and_port_string">dial_tcp_from_hostname_and_port_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L39"><em>Source</em></a></div></h3>
+<h3 id="dial_tcp_from_hostname_and_port_string"><span><a class="doc-id-link" href="#dial_tcp_from_hostname_and_port_string">dial_tcp_from_hostname_and_port_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L41"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dial_tcp_from_hostname_and_port_string :: <span class="keyword-type">proc</span>(hostname_and_port: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = default_tcp_options) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
@@ -1917,10 +2015,12 @@ a       - where `a` gives the entire 32-bit value
 <p>Expects both hostname and port to be present in the <code>hostname_and_port</code> parameter, either as:
     <code>a.host.name:9999</code>, or as <code>1.2.3.4:9999</code>, or IP6 equivalent.</p>
 <p>    Calls <code>parse_hostname_or_endpoint</code> and <code>dial_tcp_from_host_or_endpoint</code>.</p>
+<pre>Errors that can be returned: `Parse_Endpoint_Error`, `Resolve_Error`, `DNS_Error`, `Create_Socket_Error`, or `Dial_Error`
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dial_tcp_from_hostname_with_port_override"><span><a class="doc-id-link" href="#dial_tcp_from_hostname_with_port_override">dial_tcp_from_hostname_with_port_override<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L51"><em>Source</em></a></div></h3>
+<h3 id="dial_tcp_from_hostname_with_port_override"><span><a class="doc-id-link" href="#dial_tcp_from_hostname_with_port_override">dial_tcp_from_hostname_with_port_override<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L55"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dial_tcp_from_hostname_with_port_override :: <span class="keyword-type">proc</span>(hostname: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, port: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = default_tcp_options) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
@@ -1929,6 +2029,8 @@ a       - where `a` gives the entire 32-bit value
 <p>Expects the <code>hostname</code> as a string and <code>port</code> as a <code>int</code>.
     <code>parse_hostname_or_endpoint</code> is called and the <code>hostname</code> will be resolved into an IP.</p>
 <p>    If a <code>hostname</code> of form <code>a.host.name:9999</code> is given, the port will be ignored in favor of the explicit <code>port</code> param.</p>
+<pre>Errors that can be returned: `Parse_Endpoint_Error`, `Resolve_Error`, `DNS_Error`, `Create_Socket_Error`, or `Dial_Error`
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1955,7 +2057,7 @@ If there's a port, uses the <code>ip4address:port</code> or <code>[ip6address]:p
 <div class="pkg-entity">
 <h3 id="enumerate_interfaces"><span><a class="doc-id-link" href="#enumerate_interfaces">enumerate_interfaces<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/interface.odin#L30"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">enumerate_interfaces :: <span class="keyword-type">proc</span>(allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (interfaces: []<a class="code-typename" href="/core/net/#Network_Interface">Network_Interface</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">enumerate_interfaces :: <span class="keyword-type">proc</span>(allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (interfaces: []<a class="code-typename" href="/core/net/#Network_Interface">Network_Interface</a>, err: <a class="code-typename" href="/core/net/#Interfaces_Error">Interfaces_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -2043,10 +2145,40 @@ See <code>destroy_records</code>.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="listen_tcp"><span><a class="doc-id-link" href="#listen_tcp">listen_tcp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L144"><em>Source</em></a></div></h3>
+<h3 id="last_platform_error"><span><a class="doc-id-link" href="#last_platform_error">last_platform_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L13"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">last_platform_error :: <span class="keyword-type">proc</span>() -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Retrieve a platform specific error code, for when the categorized cross-platform errors are not enough.</p>
+<p>Platforms specific returns:
+<span class="doc-list">Darwin:  <code>posix.Errno</code>          (<code>core:sys/posix</code>)</span>
+<span class="doc-list">Linux:   <code>linux.Errno</code>          (<code>core:sys/linux</code>)</span>
+<span class="doc-list">FreeBSD: <code>freebsd.Errno</code>        (<code>core:sys/freebsd</code>)</span>
+<span class="doc-list">Windows: <code>windows.System_Error</code> (<code>core:sys/windows</code>)</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="last_platform_error_string"><span><a class="doc-id-link" href="#last_platform_error_string">last_platform_error_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L21"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">last_platform_error_string :: <span class="keyword-type">proc</span>() -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Retrieve a stringified version of the last platform error.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="listen_tcp"><span><a class="doc-id-link" href="#listen_tcp">listen_tcp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L168"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">listen_tcp :: <span class="keyword-type">proc</span>(interface_endpoint: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, backlog: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = 1000) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Creates a TCP socket and starts listening on the given endpoint.</p>
+<p>Errors that can be returned: <code>Create_Socket_Error</code>, <code>Bind_Error</code>, or <code>Listen_Error</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="load_hosts"><span><a class="doc-id-link" href="#load_hosts">load_hosts<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L427"><em>Source</em></a></div></h3>
@@ -2061,7 +2193,7 @@ See <code>destroy_records</code>.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="make_bound_udp_socket"><span><a class="doc-id-link" href="#make_bound_udp_socket">make_bound_udp_socket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L135"><em>Source</em></a></div></h3>
+<h3 id="make_bound_udp_socket"><span><a class="doc-id-link" href="#make_bound_udp_socket">make_bound_udp_socket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L154"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">make_bound_udp_socket :: <span class="keyword-type">proc</span>(bound_address: <a class="code-typename" href="/core/net/#Address">Address</a>, port: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> (socket: <a class="code-typename" href="/core/net/#UDP_Socket">UDP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
@@ -2071,12 +2203,13 @@ See <code>destroy_records</code>.</p>
 Since it's UDP, it's also able to send data without receiving any first.</p>
 <p>This is like a listening TCP socket, except that data packets can be sent and received without needing to establish a connection first.
 The <code>bound_address</code> is the address of the network interface that you want to use, or a loopback address if you don't care which to use.</p>
+<p>Errors that can be returned: <code>Parse_Endpoint_Error</code>, <code>Create_Socket_Error</code>, or <code>Bind_Error</code></p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="make_unbound_udp_socket"><span><a class="doc-id-link" href="#make_unbound_udp_socket">make_unbound_udp_socket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L122"><em>Source</em></a></div></h3>
+<h3 id="make_unbound_udp_socket"><span><a class="doc-id-link" href="#make_unbound_udp_socket">make_unbound_udp_socket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L139"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_unbound_udp_socket :: <span class="keyword-type">proc</span>(family: <a class="code-typename" href="/core/net/#Address_Family">Address_Family</a>) -> (socket: <a class="code-typename" href="/core/net/#UDP_Socket">UDP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">make_unbound_udp_socket :: <span class="keyword-type">proc</span>(family: <a class="code-typename" href="/core/net/#Address_Family">Address_Family</a>) -> (socket: <a class="code-typename" href="/core/net/#UDP_Socket">UDP_Socket</a>, err: <a class="code-typename" href="/core/net/#Create_Socket_Error">Create_Socket_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -2185,7 +2318,7 @@ Numbers will otherwise be considered to be in base 10.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="parse_socket_address"><span><a class="doc-id-link" href="#parse_socket_address">parse_socket_address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/interface_windows.odin#L151"><em>Source</em></a></div></h3>
+<h3 id="parse_socket_address"><span><a class="doc-id-link" href="#parse_socket_address">parse_socket_address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/interface_windows.odin#L152"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parse_socket_address :: <span class="keyword-type">proc</span>(addr_in: sys_windows.<a class="code-typename" href="/core/sys/windows/#SOCKET_ADDRESS">SOCKET_ADDRESS</a>) -> (addr: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>) {…}</pre>
 </div>
@@ -2217,7 +2350,7 @@ Numbers will otherwise be considered to be in base 10.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="recv_any"><span><a class="doc-id-link" href="#recv_any">recv_any<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L179"><em>Source</em></a></div></h3>
+<h3 id="recv_any"><span><a class="doc-id-link" href="#recv_any">recv_any<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L205"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">recv_any :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#Any_Socket">Any_Socket</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (bytes_read: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, remote_endpoint: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=Endpoint), err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
@@ -2226,18 +2359,19 @@ Numbers will otherwise be considered to be in base 10.</p>
 <p>Receive data from into a buffer from any socket.</p>
 <p>Note: <code>remote_endpoint</code> parameter is non-nil only if the socket type is UDP. On TCP sockets it
 will always return <code>nil</code>.</p>
+<p>Errors that can be returned: <code>TCP_Recv_Error</code>, or <code>UDP_Recv_Error</code></p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="recv_tcp"><span><a class="doc-id-link" href="#recv_tcp">recv_tcp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L165"><em>Source</em></a></div></h3>
+<h3 id="recv_tcp"><span><a class="doc-id-link" href="#recv_tcp">recv_tcp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L189"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">recv_tcp :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (bytes_read: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">recv_tcp :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (bytes_read: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/net/#TCP_Recv_Error">TCP_Recv_Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="recv_udp"><span><a class="doc-id-link" href="#recv_udp">recv_udp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L169"><em>Source</em></a></div></h3>
+<h3 id="recv_udp"><span><a class="doc-id-link" href="#recv_udp">recv_udp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L193"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">recv_udp :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#UDP_Socket">UDP_Socket</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (bytes_read: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, remote_endpoint: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">recv_udp :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#UDP_Socket">UDP_Socket</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (bytes_read: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, remote_endpoint: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, err: <a class="code-typename" href="/core/net/#UDP_Recv_Error">UDP_Recv_Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -2281,15 +2415,20 @@ back an endpoint in both cases.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="send_any"><span><a class="doc-id-link" href="#send_any">send_any<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L214"><em>Source</em></a></div></h3>
+<h3 id="send_any"><span><a class="doc-id-link" href="#send_any">send_any<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L245"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">send_any :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#Any_Socket">Any_Socket</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, to: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=Endpoint) = nil) -> (bytes_written: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Sends data over the socket.</p>
+<p>Errors that can be returned: <code>TCP_Send_Error</code>, or <code>UDP_Send_Error</code></p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="send_tcp"><span><a class="doc-id-link" href="#send_tcp">send_tcp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L200"><em>Source</em></a></div></h3>
+<h3 id="send_tcp"><span><a class="doc-id-link" href="#send_tcp">send_tcp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L226"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">send_tcp :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (bytes_written: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">send_tcp :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (bytes_written: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/net/#TCP_Send_Error">TCP_Send_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -2298,9 +2437,9 @@ If a send fails before all data is sent, returns the amount sent up to that poin
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="send_udp"><span><a class="doc-id-link" href="#send_udp">send_udp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L210"><em>Source</em></a></div></h3>
+<h3 id="send_udp"><span><a class="doc-id-link" href="#send_udp">send_udp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L236"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">send_udp :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#UDP_Socket">UDP_Socket</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, to: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>) -> (bytes_written: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">send_udp :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#UDP_Socket">UDP_Socket</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, to: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>) -> (bytes_written: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/net/#UDP_Send_Error">UDP_Send_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -2310,21 +2449,27 @@ UDP packets are not guarenteed to be received in order.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="set_blocking"><span><a class="doc-id-link" href="#set_blocking">set_blocking<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L237"><em>Source</em></a></div></h3>
+<h3 id="set_blocking"><span><a class="doc-id-link" href="#set_blocking">set_blocking<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L268"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">set_blocking :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#Any_Socket">Any_Socket</a>, should_block: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) -> (err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">set_blocking :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#Any_Socket">Any_Socket</a>, should_block: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) -> (err: <a class="code-typename" href="/core/net/#Set_Blocking_Error">Set_Blocking_Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="set_option"><span><a class="doc-id-link" href="#set_option">set_option<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L233"><em>Source</em></a></div></h3>
+<h3 id="set_last_platform_error"><span><a class="doc-id-link" href="#set_last_platform_error">set_last_platform_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L25"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">set_option :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#Any_Socket">Any_Socket</a>, option: <a class="code-typename" href="/core/net/#Socket_Option">Socket_Option</a>, value: <a href="/base/builtin#any"><span class="doc-builtin">any</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a> {…}</pre>
+<pre class="doc-code">set_last_platform_error :: <span class="keyword-type">proc</span>(err: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="shutdown"><span><a class="doc-id-link" href="#shutdown">shutdown<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L229"><em>Source</em></a></div></h3>
+<h3 id="set_option"><span><a class="doc-id-link" href="#set_option">set_option<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L264"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">shutdown :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#Any_Socket">Any_Socket</a>, manner: <a class="code-typename" href="/core/net/#Shutdown_Manner">Shutdown_Manner</a>) -> (err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">set_option :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#Any_Socket">Any_Socket</a>, option: <a class="code-typename" href="/core/net/#Socket_Option">Socket_Option</a>, value: <a href="/base/builtin#any"><span class="doc-builtin">any</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/core/net/#Socket_Option_Error">Socket_Option_Error</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="shutdown"><span><a class="doc-id-link" href="#shutdown">shutdown<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L260"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">shutdown :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#Any_Socket">Any_Socket</a>, manner: <a class="code-typename" href="/core/net/#Shutdown_Manner">Shutdown_Manner</a>) -> (err: <a class="code-typename" href="/core/net/#Shutdown_Error">Shutdown_Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -2368,7 +2513,7 @@ Returns ok=false if port is not a number.</p>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="dial_tcp"><span><a class="doc-id-link" href="#dial_tcp">dial_tcp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L99"><em>Source</em></a></div></h3>
+<h3 id="dial_tcp"><span><a class="doc-id-link" href="#dial_tcp">dial_tcp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L116"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dial_tcp :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/net/#dial_tcp_from_endpoint">dial_tcp_from_endpoint</a>,
@@ -2382,7 +2527,7 @@ Returns ok=false if port is not a number.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="recv"><span><a class="doc-id-link" href="#recv">recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L194"><em>Source</em></a></div></h3>
+<h3 id="recv"><span><a class="doc-id-link" href="#recv">recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L220"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">recv :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/net/#recv_tcp">recv_tcp</a>,
@@ -2393,7 +2538,7 @@ Returns ok=false if port is not a number.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="send"><span><a class="doc-id-link" href="#send">send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L227"><em>Source</em></a></div></h3>
+<h3 id="send"><span><a class="doc-id-link" href="#send">send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L258"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">send :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/net/#send_tcp">send_tcp</a>,
@@ -2420,13 +2565,14 @@ Returns ok=false if port is not a number.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin">common.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin">dns.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/net/doc.odin">doc.odin</a></li>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin">errors.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/net/interface.odin">interface.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin">socket.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/net/url.odin">url.odin</a></li>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-04 21:11:40.934371900 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-05 21:11:03.051552800 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -2460,11 +2606,11 @@ Returns ok=false if port is not a number.</p>
 <li><a href="#Digit_Parse_Base">Digit_Parse_Base</a></li>
 <li><a href="#Digit_Parse_Bases">Digit_Parse_Bases</a></li>
 <li><a href="#Endpoint">Endpoint</a></li>
-<li><a href="#General_Error">General_Error</a></li>
 <li><a href="#Host">Host</a></li>
 <li><a href="#Host_Or_Endpoint">Host_Or_Endpoint</a></li>
 <li><a href="#IP4_Address">IP4_Address</a></li>
 <li><a href="#IP6_Address">IP6_Address</a></li>
+<li><a href="#Interfaces_Error">Interfaces_Error</a></li>
 <li><a href="#Lease">Lease</a></li>
 <li><a href="#Link_State">Link_State</a></li>
 <li><a href="#Link_States">Link_States</a></li>
@@ -2474,7 +2620,6 @@ Returns ok=false if port is not a number.</p>
 <li><a href="#Network_Error">Network_Error</a></li>
 <li><a href="#Network_Interface">Network_Interface</a></li>
 <li><a href="#Parse_Endpoint_Error">Parse_Endpoint_Error</a></li>
-<li><a href="#Platform_Error">Platform_Error</a></li>
 <li><a href="#Prefix_Origin">Prefix_Origin</a></li>
 <li><a href="#Resolve_Error">Resolve_Error</a></li>
 <li><a href="#Set_Blocking_Error">Set_Blocking_Error</a></li>
@@ -2548,6 +2693,8 @@ Returns ok=false if port is not a number.</p>
 <li><a href="#init_dns_configuration">init_dns_configuration</a></li>
 <li><a href="#join_port">join_port</a></li>
 <li><a href="#join_url">join_url</a></li>
+<li><a href="#last_platform_error">last_platform_error</a></li>
+<li><a href="#last_platform_error_string">last_platform_error_string</a></li>
 <li><a href="#listen_tcp">listen_tcp</a></li>
 <li><a href="#load_hosts">load_hosts</a></li>
 <li><a href="#load_resolv_conf">load_resolv_conf</a></li>
@@ -2578,6 +2725,7 @@ Returns ok=false if port is not a number.</p>
 <li><a href="#send_tcp">send_tcp</a></li>
 <li><a href="#send_udp">send_udp</a></li>
 <li><a href="#set_blocking">set_blocking</a></li>
+<li><a href="#set_last_platform_error">set_last_platform_error</a></li>
 <li><a href="#set_option">set_option</a></li>
 <li><a href="#shutdown">shutdown</a></li>
 <li><a href="#skip_hostname">skip_hostname</a></li>

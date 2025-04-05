@@ -1111,7 +1111,7 @@ res:
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="bit_not"><span><a class="doc-id-link" href="#bit_not">bit_not<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2396"><em>Source</em></a></div></h3>
+<h3 id="bit_not"><span><a class="doc-id-link" href="#bit_not">bit_not<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2454"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">bit_not :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $T) -> $T {…}</pre>
 </div>
@@ -1269,7 +1269,7 @@ res:
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="copysign"><span><a class="doc-id-link" href="#copysign">copysign<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2403"><em>Source</em></a></div></h3>
+<h3 id="copysign"><span><a class="doc-id-link" href="#copysign">copysign<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2461"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">copysign :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v, sign: $T) -> $T {…}</pre>
 </div>
@@ -1405,8 +1405,14 @@ return res
 <summary><b>Example:</b></summary>
 <pre><code class="hljs language-odin" data-lang="odin">// Since lanes 0, 2, 4, 6 contain odd integers, the least significant bits
 // for these lanes are set.
-v := #simd [8]i32 { -1, -2, +3, +4, -5, +6, +7, -8 }
-fmt.println(simd.extract_lsbs(v))
+
+import "core:fmt"
+import "core:simd"
+
+simd_extract_lsbs_example :: proc() {
+	v := #simd [8]i32 { -1, -2, +3, +4, -5, +6, +7, -8 }
+	fmt.println(simd.extract_lsbs(v))
+}
 </code></pre>
 </details>
 <b>Output:</b>
@@ -1446,8 +1452,14 @@ return res
 <summary><b>Example:</b></summary>
 <pre><code class="hljs language-odin" data-lang="odin">// Since lanes 0, 1, 4, 7 contain negative numbers, the most significant
 // bits for them will be set.
-v := #simd [8]i32 { -1, -2, +3, +4, -5, +6, +7, -8 }
-fmt.println(simd.extract_msbs(v))
+
+import "core:fmt"
+import "core:simd"
+
+simd_extract_msbs_example :: proc() {
+	v := #simd [8]i32 { -1, -2, +3, +4, -5, +6, +7, -8 }
+	fmt.println(simd.extract_msbs(v))
+}
 </code></pre>
 </details>
 <b>Output:</b>
@@ -1491,7 +1503,7 @@ return res
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="from_array"><span><a class="doc-id-link" href="#from_array">from_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2357"><em>Source</em></a></div></h3>
+<h3 id="from_array"><span><a class="doc-id-link" href="#from_array">from_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2415"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">from_array :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $A/container_small_array.<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) -> <span class="directive">#simd</span>[0]$E {…}</pre>
 </div>
@@ -1501,7 +1513,7 @@ return res
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="from_slice"><span><a class="doc-id-link" href="#from_slice">from_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2364"><em>Source</em></a></div></h3>
+<h3 id="from_slice"><span><a class="doc-id-link" href="#from_slice">from_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2422"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">from_slice :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[0][0]$E, slice: []$E) -> $/[0][0]$E {…}</pre>
 </div>
@@ -1594,13 +1606,18 @@ return res
 // to load valid positions of the `ptrs` array, and the array of defaults which
 // will have `127` in each position as the default value.
 
-v1 := [4] f32 {1, 2, 3, 4};
-v2 := [4] f32 {9, 10,11,12};
-ptrs := #simd [4]rawptr { &v1[1], nil, &v2[1], nil }
-mask := #simd [4]bool { true, false, true, false }
-defaults := #simd [4]f32 { 0x7f, 0x7f, 0x7f, 0x7f }
-res := simd.gather(ptrs, defaults, mask)
-fmt.println(res)
+import "core:fmt"
+import "core:simd"
+
+simd_gather_example :: proc() {
+	v1 := [4] f32 {1, 2, 3, 4};
+	v2 := [4] f32 {9, 10,11,12};
+	ptrs := #simd [4]rawptr { &v1[1], nil, &v2[1], nil }
+	mask := #simd [4]bool { true, false, true, false }
+	defaults := #simd [4]f32 { 0x7f, 0x7f, 0x7f, 0x7f }
+	res := simd.gather(ptrs, defaults, mask)
+	fmt.println(res)
+}
 </code></pre>
 </details>
 <b>Output:</b>
@@ -1967,11 +1984,16 @@ for i in 0 ..&lt; len(mask) {
 // vector, the first and the third value. The items in the mask are set to `true`
 // in those lanes.
 
-v := [2] f64 { };
-mask := #simd [4]bool { true, false, true, false }
-vals := #simd [4]f64 { 1, 2, 3, 4 }
-simd.masked_compress_store(&v, vals, mask)
-fmt.println(v)
+import "core:fmt"
+import "core:simd"
+
+simd_masked_compress_store_example :: proc() {
+	v := [2] f64 { };
+	mask := #simd [4]bool { true, false, true, false }
+	vals := #simd [4]f64 { 1, 2, 3, 4 }
+	simd.masked_compress_store(&v, vals, mask)
+	fmt.println(v)
+}
 </code></pre>
 </details>
 <b>Output:</b>
@@ -2039,11 +2061,16 @@ return res
 // the third lane of the result vector. All the other lanes of the result vector
 // will be initialized to the default value `127`.
 
-v := [2] f64 {1, 2};
-mask := #simd [4]bool { true, false, true, false }
-vals := #simd [4]f64 { 0x7f, 0x7f, 0x7f, 0x7f }
-res := simd.masked_expand_load(&v, vals, mask)
-fmt.println(res)
+import "core:fmt"
+import "core:simd"
+
+simd_masked_expand_load_example :: proc() {
+	v := [2] f64 {1, 2};
+	mask := #simd [4]bool { true, false, true, false }
+	vals := #simd [4]f64 { 0x7f, 0x7f, 0x7f, 0x7f }
+	res := simd.masked_expand_load(&v, vals, mask)
+	fmt.println(res)
+}
 </code></pre>
 </details>
 <b>Output:</b>
@@ -2108,11 +2135,16 @@ return res
 // third value (selected by the mask). The masked-off values are given the value
 // of 127 (`0x7f`).
 
-src := [4] f32 {1, 2, 3, 4};
-mask := #simd [4]bool { true, false, true, false }
-vals := #simd [4]f32 { 0x7f, 0x7f, 0x7f, 0x7f }
-res := simd.masked_load(&src, vals, mask)
-fmt.println(res)
+import "core:fmt"
+import "core:simd"
+
+simd_masked_load_example :: proc() {
+	src := [4] f32 {1, 2, 3, 4};
+	mask := #simd [4]bool { true, false, true, false }
+	vals := #simd [4]f32 { 0x7f, 0x7f, 0x7f, 0x7f }
+	res := simd.masked_load(&src, vals, mask)
+	fmt.println(res)
+}
 </code></pre>
 </details>
 <b>Output:</b>
@@ -2168,11 +2200,16 @@ stored into memory.</p>
 <pre><code class="hljs language-odin" data-lang="odin">// Example below stores the value 127 into the first and the third slot of the
 // vector `v`.
 
-v := [4] f32 {1, 2, 3, 4};
-mask := #simd [4]bool { true, false, true, false }
-vals := #simd [4]f32 { 0x7f, 0x7f, 0x7f, 0x7f }
-simd.masked_store(&v, vals, mask)
-fmt.println(v)
+import "core:fmt"
+import "core:simd"
+
+simd_masked_store_example :: proc() {
+	v := [4] f32 {1, 2, 3, 4};
+	mask := #simd [4]bool { true, false, true, false }
+	vals := #simd [4]f32 { 0x7f, 0x7f, 0x7f, 0x7f }
+	simd.masked_store(&v, vals, mask)
+	fmt.println(v)
+}
 </code></pre>
 </details>
 <b>Output:</b>
@@ -2354,7 +2391,7 @@ res:
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="recip"><span><a class="doc-id-link" href="#recip">recip<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2452"><em>Source</em></a></div></h3>
+<h3 id="recip"><span><a class="doc-id-link" href="#recip">recip<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2510"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">recip :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $T) -> $T {…}</pre>
 </div>
@@ -2742,14 +2779,19 @@ written into memory.
 // vectors. The addresses of store destinations are written to the first and the
 // third argument of the `ptr` vector, and the `mask` is set accordingly.
 
-v1 := [4] f32 {1, 2, 3, 4};
-v2 := [4] f32 {5, 6, 7, 8};
-ptrs := #simd [4]rawptr { &v1[1], nil, &v2[1], nil }
-mask := #simd [4]bool { true, false, true, false }
-vals := #simd [4]f32 { 0x7f, 0x7f, 0x7f, 0x7f }
-simd.scatter(ptrs, vals, mask)
-fmt.println(v1)
-fmt.println(v2)
+import "core:fmt"
+import "core:simd"
+
+simd_scatter_example :: proc() {
+	v1 := [4] f32 {1, 2, 3, 4};
+	v2 := [4] f32 {5, 6, 7, 8};
+	ptrs := #simd [4]rawptr { &v1[1], nil, &v2[1], nil }
+	mask := #simd [4]bool { true, false, true, false }
+	vals := #simd [4]f32 { 0x7f, 0x7f, 0x7f, 0x7f }
+	simd.scatter(ptrs, vals, mask)
+	fmt.println(v1)
+	fmt.println(v2)
+}
 </code></pre>
 </details>
 <b>Output:</b>
@@ -2807,14 +2849,20 @@ return res
 <summary><b>Example:</b></summary>
 <pre><code class="hljs language-odin" data-lang="odin">// The following example selects values from the two input vectors, `a` and `b`
 // into a single vector.
-a := #simd [4] f64 { 1,2,3,4 }
-b := #simd [4] f64 { 5,6,7,8 }
-cond := #simd[4] int { 1, 0, 1, 0 }
-fmt.println(simd.select(cond,a,b))
+
+import "core:fmt"
+import "core:simd"
+
+simd_select_example :: proc() {
+	a := #simd [4] f64 { 1,2,3,4 }
+	b := #simd [4] f64 { 5,6,7,8 }
+	cond := #simd[4] int { 1, 0, 1, 0 }
+	fmt.println(simd.select(cond,a,b))
+}
 </code></pre>
 </details>
 <b>Output:</b>
-<pre class="doc-code">[ 1, 6, 3, 8 ]
+<pre class="doc-code">&lt;1, 6, 3, 8&gt;
 </pre>
 <p>Graphically, the operation looks as follows. The <code>t</code> and <code>f</code> represent the
 <code>true</code> and <code>false</code> vectors respectively:</p>
@@ -3062,14 +3110,19 @@ return res
 <pre><code class="hljs language-odin" data-lang="odin">// The example below shows how the indices are used to determine lanes of the
 // input vector that are shuffled into the result vector.
 
-a := #simd [4]f32 { 1, 2, 3, 4 }
-b := #simd [4]f32 { 5, 6, 7, 8 }
-res := simd.shuffle(a, b, 0, 4, 2, 5)
-fmt.println("res")
+import "core:fmt"
+import "core:simd"
+
+simd_shuffle_example :: proc() {
+	a := #simd [4]f32 { 1, 2, 3, 4 }
+	b := #simd [4]f32 { 5, 6, 7, 8 }
+	res := simd.shuffle(a, b, 0, 4, 2, 5)
+	fmt.println(res)
+}
 </code></pre>
 </details>
 <b>Output:</b>
-<pre class="doc-code">[ 1, 5, 3, 6 ]
+<pre class="doc-code">&lt;1, 5, 3, 6&gt;
 </pre>
 <p>The graphical representation of the operation is as follows. The <code>idx</code> vector in
 the picture represents the <code>indices</code> parameter:</p>
@@ -3094,7 +3147,7 @@ res:  |  1  |  5  |  3  |  6  |
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="signum"><span><a class="doc-id-link" href="#signum">signum<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2418"><em>Source</em></a></div></h3>
+<h3 id="signum"><span><a class="doc-id-link" href="#signum">signum<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2476"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">signum :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $T) -> $T {…}</pre>
 </div>
@@ -3184,13 +3237,18 @@ return res
 <pre><code class="hljs language-odin" data-lang="odin">// The example below shows how the indices are used to determine which lanes of the
 // input vector get written into the result vector.
 
-x := #simd [4]f32 { 1.5, 2.5, 3.5, 4.5 }
-res := simd.swizzle(x, 0, 3, 1, 1)
-fmt.println("res")
+import "core:fmt"
+import "core:simd"
+
+swizzle_example :: proc() {
+	x := #simd [4]f32 { 1.5, 2.5, 3.5, 4.5 }
+	res := simd.swizzle(x, 0, 3, 1, 1)
+	fmt.println(res)
+}
 </code></pre>
 </details>
 <b>Output:</b>
-<pre class="doc-code">[ 1.5, 3.5, 2.5, 2.5 ]
+<pre class="doc-code">&lt;1.5, 4.5, 2.5, 2.5&gt;
 </pre>
 <p>The graphical representation of the operation is as follows. The <code>idx</code> vector in
 the picture represents the <code>indices</code> parameter:</p>
@@ -3216,7 +3274,7 @@ res:  | 1.5 | 3.5 | 2.5 | 2.5 |
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="to_array"><span><a class="doc-id-link" href="#to_array">to_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2350"><em>Source</em></a></div></h3>
+<h3 id="to_array"><span><a class="doc-id-link" href="#to_array">to_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2408"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">to_array :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: <span class="directive">#simd</span>[0]$E) -> [0]$E {…}</pre>
 </div>
@@ -3226,7 +3284,7 @@ res:  | 1.5 | 3.5 | 2.5 | 2.5 |
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="to_array_ptr"><span><a class="doc-id-link" href="#to_array_ptr">to_array_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2343"><em>Source</em></a></div></h3>
+<h3 id="to_array_ptr"><span><a class="doc-id-link" href="#to_array_ptr">to_array_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2401"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">to_array_ptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: ^<span class="directive">#simd</span>[0]$E) -> ^[0]$E {…}</pre>
 </div>
@@ -3263,7 +3321,7 @@ res:  | 1.5 | 3.5 | 2.5 | 2.5 |
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin">simd.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-04 21:11:40.968838900 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-05 21:11:03.083538200 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
