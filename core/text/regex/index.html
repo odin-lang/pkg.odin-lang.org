@@ -411,7 +411,7 @@ handle a regular expression.</p>
 <div>
 <details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
 <summary id="#doc-index-Types-header">
-Types (8)</summary>
+Types (9)</summary>
 <ul>
 <li><a href="#Capture">Capture</a></li>
 <li><a href="#Compiler_Error">Compiler_Error</a></li>
@@ -419,6 +419,7 @@ Types (8)</summary>
 <li><a href="#Error">Error</a></li>
 <li><a href="#Flag">Flag</a></li>
 <li><a href="#Flags">Flags</a></li>
+<li><a href="#Match_Iterator">Match_Iterator</a></li>
 <li><a href="#Parser_Error">Parser_Error</a></li>
 <li><a href="#Regular_Expression">Regular_Expression</a></li>
 </ul>
@@ -441,15 +442,19 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (7)</summary>
+Procedures (11)</summary>
 <ul>
 <li><a href="#create">create</a></li>
 <li><a href="#create_by_user">create_by_user</a></li>
+<li><a href="#create_iterator">create_iterator</a></li>
 <li><a href="#destroy_capture">destroy_capture</a></li>
+<li><a href="#destroy_iterator">destroy_iterator</a></li>
 <li><a href="#destroy_regex">destroy_regex</a></li>
 <li><a href="#match_and_allocate_capture">match_and_allocate_capture</a></li>
+<li><a href="#match_iterator">match_iterator</a></li>
 <li><a href="#match_with_preallocated_capture">match_with_preallocated_capture</a></li>
 <li><a href="#preallocate_capture">preallocate_capture</a></li>
+<li><a href="#reset">reset</a></li>
 </ul>
 </details>
 </div>
@@ -468,7 +473,7 @@ Procedure Groups (2)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Capture"><span><a class="doc-id-link" href="#Capture">Capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L53"><em>Source</em></a></div></h3>
+<h3 id="Capture"><span><a class="doc-id-link" href="#Capture">Capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L54"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Capture :: <span class="keyword-type">struct</span> {
 	pos:    [][2]<a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
@@ -491,17 +496,18 @@ such that <code>str[pos[0][0]:pos[0][1]] == groups[0]</code>.</p>
 <h5>Related Procedures With Returns</h5>
 <ul>
 <li><a href="/core/text/regex/#match_and_allocate_capture">match_and_allocate_capture</a></li>
+<li><a href="/core/text/regex/#match_iterator">match_iterator</a></li>
 <li><a href="/core/text/regex/#preallocate_capture">preallocate_capture</a></li>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Compiler_Error"><span><a class="doc-id-link" href="#Compiler_Error">Compiler_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L20"><em>Source</em></a></div></h3>
+<h3 id="Compiler_Error"><span><a class="doc-id-link" href="#Compiler_Error">Compiler_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L21"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Compiler_Error :: regex_compiler.<a class="code-typename" href="/core/text/regex/compiler/#Error">Error</a></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Creation_Error"><span><a class="doc-id-link" href="#Creation_Error">Creation_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L22"><em>Source</em></a></div></h3>
+<h3 id="Creation_Error"><span><a class="doc-id-link" href="#Creation_Error">Creation_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L23"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Creation_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
 	None, 
@@ -515,7 +521,7 @@ such that <code>str[pos[0][0]:pos[0][1]] == groups[0]</code>.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Error"><span><a class="doc-id-link" href="#Error">Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L32"><em>Source</em></a></div></h3>
+<h3 id="Error"><span><a class="doc-id-link" href="#Error">Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L33"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Error :: <span class="keyword-type">union</span> {
 	regex_parser.<a class="code-typename" href="/core/text/regex/parser/#Error">Error</a>, 
@@ -527,28 +533,58 @@ such that <code>str[pos[0][0]:pos[0][1]] == groups[0]</code>.</p>
 <ul>
 <li><a href="/core/text/regex/#create">create</a></li>
 <li><a href="/core/text/regex/#create_by_user">create_by_user</a></li>
+<li><a href="/core/text/regex/#create_iterator">create_iterator</a></li>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Flag"><span><a class="doc-id-link" href="#Flag">Flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L17"><em>Source</em></a></div></h3>
+<h3 id="Flag"><span><a class="doc-id-link" href="#Flag">Flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L18"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Flag :: regex_common.<a class="code-typename" href="/core/text/regex/common/#Flag">Flag</a></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Flags"><span><a class="doc-id-link" href="#Flags">Flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L18"><em>Source</em></a></div></h3>
+<h3 id="Flags"><span><a class="doc-id-link" href="#Flags">Flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L19"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Flags :: <span class="keyword-type">bit_set</span>[regex_common.<a class="code-typename" href="/core/text/regex/common/#Flag">Flag</a>; <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>]</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Parser_Error"><span><a class="doc-id-link" href="#Parser_Error">Parser_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L19"><em>Source</em></a></div></h3>
+<h3 id="Match_Iterator"><span><a class="doc-id-link" href="#Match_Iterator">Match_Iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L71"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Match_Iterator :: <span class="keyword-type">struct</span> {
+	haystack: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
+	offset:   <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	regex:    <a class="code-typename" href="/core/text/regex/#Regular_Expression">Regular_Expression</a>,
+	capture:  <a class="code-typename" href="/core/text/regex/#Capture">Capture</a>,
+	idx:      <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	temp:     runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>,
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>An iterator to repeatedly match a pattern against a string, to be used with <code>*_iterator</code> procedures.</p>
+</details>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/core/text/regex/#destroy_iterator">destroy_iterator</a></li>
+<li><a href="/core/text/regex/#match_iterator">match_iterator</a></li>
+<li><a href="/core/text/regex/#reset">reset</a></li>
+<li><a href="/core/text/regex/#destroy">destroy</a>&nbsp;<em>(procedure groups)</em></li>
+<li><a href="/core/text/regex/#match">match</a>&nbsp;<em>(procedure groups)</em></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/text/regex/#create_iterator">create_iterator</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Parser_Error"><span><a class="doc-id-link" href="#Parser_Error">Parser_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L20"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Parser_Error :: regex_parser.<a class="code-typename" href="/core/text/regex/parser/#Error">Error</a></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Regular_Expression"><span><a class="doc-id-link" href="#Regular_Expression">Regular_Expression<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L61"><em>Source</em></a></div></h3>
+<h3 id="Regular_Expression"><span><a class="doc-id-link" href="#Regular_Expression">Regular_Expression<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L62"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Regular_Expression :: <span class="keyword-type">struct</span> {
 	flags:      <span class="keyword-type">bit_set</span>[regex_common.<a class="code-typename" href="/core/text/regex/common/#Flag">Flag</a>; <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>] <span class="string">`fmt:"-"`</span>,
@@ -580,7 +616,7 @@ such that <code>str[pos[0][0]:pos[0][1]] == groups[0]</code>.</p>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="create"><span><a class="doc-id-link" href="#create">create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L84"><em>Source</em></a></div></h3>
+<h3 id="create"><span><a class="doc-id-link" href="#create">create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L96"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create :: <span class="keyword-type">proc</span>(pattern: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, flags: <span class="keyword-type">bit_set</span>[regex_common.<a class="code-typename" href="/core/text/regex/common/#Flag">Flag</a>; <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>] = {}, permanent_allocator := <a href="/base/runtime/#Context">context.allocator</a>, temporary_allocator := <a href="/base/runtime/#Context">context.temp_allocator</a>) -> (result: <a class="code-typename" href="/core/text/regex/#Regular_Expression">Regular_Expression</a>, err: <a class="code-typename" href="/core/text/regex/#Error">Error</a>) {…}</pre>
 </div>
@@ -597,7 +633,7 @@ such that <code>str[pos[0][0]:pos[0][1]] == groups[0]</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_by_user"><span><a class="doc-id-link" href="#create_by_user">create_by_user<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L177"><em>Source</em></a></div></h3>
+<h3 id="create_by_user"><span><a class="doc-id-link" href="#create_by_user">create_by_user<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L189"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_by_user :: <span class="keyword-type">proc</span>(pattern: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, permanent_allocator := <a href="/base/runtime/#Context">context.allocator</a>, temporary_allocator := <a href="/base/runtime/#Context">context.temp_allocator</a>) -> (result: <a class="code-typename" href="/core/text/regex/#Regular_Expression">Regular_Expression</a>, err: <a class="code-typename" href="/core/text/regex/#Error">Error</a>) {…}</pre>
 </div>
@@ -637,7 +673,25 @@ to escape the delimiter if found in the middle of the string.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="destroy_capture"><span><a class="doc-id-link" href="#destroy_capture">destroy_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L442"><em>Source</em></a></div></h3>
+<h3 id="create_iterator"><span><a class="doc-id-link" href="#create_iterator">create_iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L276"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">create_iterator :: <span class="keyword-type">proc</span>(str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, pattern: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, flags: <span class="keyword-type">bit_set</span>[regex_common.<a class="code-typename" href="/core/text/regex/common/#Flag">Flag</a>; <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>] = {}, permanent_allocator := <a href="/base/runtime/#Context">context.allocator</a>, temporary_allocator := <a href="/base/runtime/#Context">context.temp_allocator</a>) -> (result: <a class="code-typename" href="/core/text/regex/#Match_Iterator">Match_Iterator</a>, err: <a class="code-typename" href="/core/text/regex/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Create a <code>Match_Iterator</code> using a string to search, a regular expression to match against it, and a set of flags.</p>
+<p><i>Allocates Using Provided Allocators</i></p>
+<p><b>Inputs:</b><br><span class="doc-list">str:     The string to iterate over.</span>
+<span class="doc-list">pattern: The pattern to match.</span>
+<span class="doc-list">flags: A <code>bit_set</code> of RegEx flags.</span>
+<span class="doc-list">permanent_allocator: The allocator to use for the compiled regular expression. (default: context.allocator)</span>
+<span class="doc-list">temporary_allocator: The allocator to use for the intermediate compilation and iteration stages. (default: context.temp_allocator)</span></p>
+<p><b>Returns:</b><br><span class="doc-list">result: The <code>Match_Iterator</code>.</span>
+<span class="doc-list">err: An error, if one occurred.</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="destroy_capture"><span><a class="doc-id-link" href="#destroy_capture">destroy_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L528"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy_capture :: <span class="keyword-type">proc</span>(capture: <a class="code-typename" href="/core/text/regex/#Capture">Capture</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
@@ -645,12 +699,25 @@ to escape the delimiter if found in the middle of the string.</p>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Free all data allocated by the <code>match_and_allocate_capture</code> procedure.</p>
 <p><i>Frees Using Provided Allocator</i></p>
-<p><b>Inputs:</b><br><span class="doc-list">capture: A Capture.</span>
+<p><b>Inputs:</b><br><span class="doc-list">capture: A <code>Capture</code>.</span>
 <span class="doc-list">allocator: (default: context.allocator)</span></p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="destroy_regex"><span><a class="doc-id-link" href="#destroy_regex">destroy_regex<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L423"><em>Source</em></a></div></h3>
+<h3 id="destroy_iterator"><span><a class="doc-id-link" href="#destroy_iterator">destroy_iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L543"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">destroy_iterator :: <span class="keyword-type">proc</span>(it: <a class="code-typename" href="/core/text/regex/#Match_Iterator">Match_Iterator</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Free all data allocated by the <code>create_iterator</code> procedure.</p>
+<p><i>Frees Using Provided Allocator</i></p>
+<p><b>Inputs:</b><br><span class="doc-list">it: A <code>Match_Iterator</code></span>
+<span class="doc-list">allocator: (default: context.allocator)</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="destroy_regex"><span><a class="doc-id-link" href="#destroy_regex">destroy_regex<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L509"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy_regex :: <span class="keyword-type">proc</span>(regex: <a class="code-typename" href="/core/text/regex/#Regular_Expression">Regular_Expression</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
@@ -663,7 +730,7 @@ to escape the delimiter if found in the middle of the string.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="match_and_allocate_capture"><span><a class="doc-id-link" href="#match_and_allocate_capture">match_and_allocate_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L268"><em>Source</em></a></div></h3>
+<h3 id="match_and_allocate_capture"><span><a class="doc-id-link" href="#match_and_allocate_capture">match_and_allocate_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L314"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">match_and_allocate_capture :: <span class="keyword-type">proc</span>(regex: <a class="code-typename" href="/core/text/regex/#Regular_Expression">Regular_Expression</a>, str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, permanent_allocator := <a href="/base/runtime/#Context">context.allocator</a>, temporary_allocator := <a href="/base/runtime/#Context">context.temp_allocator</a>) -> (capture: <a class="code-typename" href="/core/text/regex/#Capture">Capture</a>, success: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -683,7 +750,20 @@ copied strings, so they won't need to be individually deleted.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="match_with_preallocated_capture"><span><a class="doc-id-link" href="#match_with_preallocated_capture">match_with_preallocated_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L343"><em>Source</em></a></div></h3>
+<h3 id="match_iterator"><span><a class="doc-id-link" href="#match_iterator">match_iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L446"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">match_iterator :: <span class="keyword-type">proc</span>(it: ^<a class="code-typename" href="/core/text/regex/#Match_Iterator">Match_Iterator</a>) -> (result: <a class="code-typename" href="/core/text/regex/#Capture">Capture</a>, index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Iterate over a <code>Match_Iterator</code> and return successive captures.</p>
+<p><b>Inputs:</b><br><span class="doc-list">it: Pointer to the <code>Match_Iterator</code> to iterate over.</span></p>
+<p><b>Returns:</b><br><span class="doc-list">result: <code>Capture</code> for this iteration.</span>
+<span class="doc-list">ok:     A bool indicating if there was a match, stopping the iteration on <code>false</code>.</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="match_with_preallocated_capture"><span><a class="doc-id-link" href="#match_with_preallocated_capture">match_with_preallocated_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L389"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">match_with_preallocated_capture :: <span class="keyword-type">proc</span>(regex: <a class="code-typename" href="/core/text/regex/#Regular_Expression">Regular_Expression</a>, str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, capture: ^<a class="code-typename" href="/core/text/regex/#Capture">Capture</a>, temporary_allocator := <a href="/base/runtime/#Context">context.temp_allocator</a>) -> (num_groups: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, success: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -703,7 +783,7 @@ copied strings, so they won't need to be individually deleted.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="preallocate_capture"><span><a class="doc-id-link" href="#preallocate_capture">preallocate_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L407"><em>Source</em></a></div></h3>
+<h3 id="preallocate_capture"><span><a class="doc-id-link" href="#preallocate_capture">preallocate_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L493"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">preallocate_capture :: <span class="keyword-type">proc</span>(allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (result: <a class="code-typename" href="/core/text/regex/#Capture">Capture</a>) {…}</pre>
 </div>
@@ -716,23 +796,31 @@ between matches.</p>
 <p><b>Returns:</b><br><span class="doc-list">result: The <code>Capture</code> with the maximum number of groups allocated.</span></p>
 </details>
 </div>
+<div class="pkg-entity">
+<h3 id="reset"><span><a class="doc-id-link" href="#reset">reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L476"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">reset :: <span class="keyword-type">proc</span>(it: ^<a class="code-typename" href="/core/text/regex/#Match_Iterator">Match_Iterator</a>) {…}</pre>
+</div>
+</div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L448"><em>Source</em></a></div></h3>
+<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L549"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/text/regex/#destroy_regex">destroy_regex</a>,
 	<a class="code-procedure" href="/core/text/regex/#destroy_capture">destroy_capture</a>,
+	<a class="code-procedure" href="/core/text/regex/#destroy_iterator">destroy_iterator</a>,
 }
 </pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="match"><span><a class="doc-id-link" href="#match">match<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L390"><em>Source</em></a></div></h3>
+<h3 id="match"><span><a class="doc-id-link" href="#match">match<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L470"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">match :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/text/regex/#match_and_allocate_capture">match_and_allocate_capture</a>,
 	<a class="code-procedure" href="/core/text/regex/#match_with_preallocated_capture">match_with_preallocated_capture</a>,
+	<a class="code-procedure" href="/core/text/regex/#match_iterator">match_iterator</a>,
 }
 </pre>
 </div>
@@ -744,7 +832,7 @@ between matches.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin">regex.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-05 21:11:04.269559100 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-06 21:11:15.133540300 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -756,6 +844,7 @@ between matches.</p>
 <li><a href="#Error">Error</a></li>
 <li><a href="#Flag">Flag</a></li>
 <li><a href="#Flags">Flags</a></li>
+<li><a href="#Match_Iterator">Match_Iterator</a></li>
 <li><a href="#Parser_Error">Parser_Error</a></li>
 <li><a href="#Regular_Expression">Regular_Expression</a></li>
 </ul>
@@ -763,11 +852,15 @@ between matches.</p>
 <li><a href="#pkg-Procedures">Procedures</a><ul>
 <li><a href="#create">create</a></li>
 <li><a href="#create_by_user">create_by_user</a></li>
+<li><a href="#create_iterator">create_iterator</a></li>
 <li><a href="#destroy_capture">destroy_capture</a></li>
+<li><a href="#destroy_iterator">destroy_iterator</a></li>
 <li><a href="#destroy_regex">destroy_regex</a></li>
 <li><a href="#match_and_allocate_capture">match_and_allocate_capture</a></li>
+<li><a href="#match_iterator">match_iterator</a></li>
 <li><a href="#match_with_preallocated_capture">match_with_preallocated_capture</a></li>
 <li><a href="#preallocate_capture">preallocate_capture</a></li>
+<li><a href="#reset">reset</a></li>
 </ul>
 </li>
 <li><a href="#pkg-Procedure Groups">Procedure Groups</a><ul>
