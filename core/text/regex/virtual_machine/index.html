@@ -515,11 +515,12 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (9)</summary>
+Procedures (10)</summary>
 <ul>
 <li><a href="#add_thread">add_thread</a></li>
 <li><a href="#check_busy_map">check_busy_map</a></li>
 <li><a href="#create">create</a></li>
+<li><a href="#destroy">destroy</a></li>
 <li><a href="#is_word_class">is_word_class</a></li>
 <li><a href="#iterate_opcodes">iterate_opcodes</a></li>
 <li><a href="#opcode_count">opcode_count</a></li>
@@ -566,6 +567,7 @@ Procedure Groups (0)</summary>
 <ul>
 <li><a href="/core/text/regex/virtual_machine/#add_thread">add_thread</a></li>
 <li><a href="/core/text/regex/virtual_machine/#check_busy_map">check_busy_map</a></li>
+<li><a href="/core/text/regex/virtual_machine/#destroy">destroy</a></li>
 <li><a href="/core/text/regex/virtual_machine/#run">run</a></li>
 <li><a href="/core/text/regex/virtual_machine/#set_busy_map">set_busy_map</a></li>
 </ul>
@@ -679,7 +681,13 @@ as this data doesn't need to be a dynamic array once it hits the VM.</p>
 <div class="pkg-entity">
 <h3 id="create"><span><a class="doc-id-link" href="#create">create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/virtual_machine/virtual_machine.odin#L630"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">create :: <span class="keyword-type">proc</span>(code: []<a class="code-typename" href="/core/text/regex/virtual_machine/#Opcode">Opcode</a>, str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> (vm: <a class="code-typename" href="/core/text/regex/virtual_machine/#Machine">Machine</a>) {…}</pre>
+<pre class="doc-code">create :: <span class="keyword-type">proc</span>(code: []<a class="code-typename" href="/core/text/regex/virtual_machine/#Opcode">Opcode</a>, str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (vm: <a class="code-typename" href="/core/text/regex/virtual_machine/#Machine">Machine</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/virtual_machine/virtual_machine.odin#L649"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">destroy :: <span class="keyword-type">proc</span>(vm: <a class="code-typename" href="/core/text/regex/virtual_machine/#Machine">Machine</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -733,7 +741,7 @@ NOTE: This must be kept in sync with the compiler & tokenizer.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/virtual_machine/virtual_machine.odin">virtual_machine.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-06 21:11:15.139525500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-07 21:12:40.201266100 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -752,6 +760,7 @@ NOTE: This must be kept in sync with the compiler & tokenizer.</p>
 <li><a href="#add_thread">add_thread</a></li>
 <li><a href="#check_busy_map">check_busy_map</a></li>
 <li><a href="#create">create</a></li>
+<li><a href="#destroy">destroy</a></li>
 <li><a href="#is_word_class">is_word_class</a></li>
 <li><a href="#iterate_opcodes">iterate_opcodes</a></li>
 <li><a href="#opcode_count">opcode_count</a></li>
