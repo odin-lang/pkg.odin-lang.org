@@ -298,13 +298,13 @@ Procedures (104)</summary>
 <li><a href="/base/runtime">runtime</a>.<a href="#panic">panic</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#unimplemented">unimplemented</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#assert_contextless">assert_contextless</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#raw_soa_footer_slice">raw_soa_footer_slice</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#ensure_contextless">ensure_contextless</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#raw_soa_footer_dynamic_array">raw_soa_footer_dynamic_array</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#panic_contextless">panic_contextless</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#unimplemented_contextless">unimplemented_contextless</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#raw_soa_footer_slice">raw_soa_footer_slice</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#raw_soa_footer_dynamic_array">raw_soa_footer_dynamic_array</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#make_soa_aligned">make_soa_aligned</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#make_soa_slice">make_soa_slice</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#unimplemented_contextless">unimplemented_contextless</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#make_soa_dynamic_array">make_soa_dynamic_array</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#make_soa_dynamic_array_len">make_soa_dynamic_array_len</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#make_soa_dynamic_array_len_cap">make_soa_dynamic_array_len_cap</a></li>
@@ -2027,27 +2027,33 @@ execute.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="raw_soa_footer_slice"><span><a class="doc-id-link" href="#raw_soa_footer_slice">raw_soa_footer_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L54"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">raw_soa_footer_slice :: <span class="keyword-type">proc</span>(array: ^$T) -> (footer: ^<a class="code-typename" href="/base/runtime/#Raw_SOA_Footer_Slice">Raw_SOA_Footer_Slice</a>) {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
 <h3 id="ensure_contextless"><span><a class="doc-id-link" href="#ensure_contextless">ensure_contextless<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1049"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ensure_contextless :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (condition: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = #caller_expression(condition), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="raw_soa_footer_dynamic_array"><span><a class="doc-id-link" href="#raw_soa_footer_dynamic_array">raw_soa_footer_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L63"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">raw_soa_footer_dynamic_array :: <span class="keyword-type">proc</span>(array: ^$T) -> (footer: ^<a class="code-typename" href="/base/runtime/#Raw_SOA_Footer_Dynamic_Array">Raw_SOA_Footer_Dynamic_Array</a>) {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
 <h3 id="panic_contextless"><span><a class="doc-id-link" href="#panic_contextless">panic_contextless<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1060"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">panic_contextless :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ! {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="unimplemented_contextless"><span><a class="doc-id-link" href="#unimplemented_contextless">unimplemented_contextless<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1065"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">unimplemented_contextless :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ! {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="raw_soa_footer_slice"><span><a class="doc-id-link" href="#raw_soa_footer_slice">raw_soa_footer_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L54"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">raw_soa_footer_slice :: <span class="keyword-type">proc</span>(array: ^$T) -> (footer: ^<a class="code-typename" href="/base/runtime/#Raw_SOA_Footer_Slice">Raw_SOA_Footer_Slice</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="raw_soa_footer_dynamic_array"><span><a class="doc-id-link" href="#raw_soa_footer_dynamic_array">raw_soa_footer_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L63"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">raw_soa_footer_dynamic_array :: <span class="keyword-type">proc</span>(array: ^$T) -> (footer: ^<a class="code-typename" href="/base/runtime/#Raw_SOA_Footer_Dynamic_Array">Raw_SOA_Footer_Dynamic_Array</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -2060,12 +2066,6 @@ execute.</p>
 <h3 id="make_soa_slice"><span><a class="doc-id-link" href="#make_soa_slice">make_soa_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L138"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">make_soa_slice :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[0][0]$E, <span class="keyword-type">#any_int</span> length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: $/[0][0]$E, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="unimplemented_contextless"><span><a class="doc-id-link" href="#unimplemented_contextless">unimplemented_contextless<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1065"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">unimplemented_contextless :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ! {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
