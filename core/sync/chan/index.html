@@ -322,6 +322,74 @@
 </div>
 <ul id="odin-search-results"></ul>
 <div id="pkg-top">
+<h2>Overview</h2>
+<div id="pkg-overview">
+<p>This package provides both high-level and low-level channel types
+for thread-safe communication.</p>
+<p>While channels are essentially thread-safe queues under the hood,
+their primary purpose is to facilitate safe communication between
+multiple readers and multiple writers.
+Although they can be used like queues, channels are designed with
+synchronization and concurrent messaging patterns in mind.</p>
+<p>Provided types:
+<span class="doc-list"><code>Chan</code> a high level channel</span>
+<span class="doc-list"><code>Raw_Chan</code> a low level channel</span>
+<span class="doc-list"><code>Raw_Queue</code> a low level non-threadsafe queue implementation used internally</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+import "core:fmt"
+import "core:thread"
+
+// The consumer reads from the channel until it's closed.
+// Closing the channel acts as a signal to stop.
+consumer :: proc(recv_chan: chan.Chan(int, .Recv)) {
+	for {
+		value, ok := chan.recv(recv_chan)
+		if !ok {
+			break // More idiomatic than return here
+		}
+		fmt.println("[CONSUMER] Received:", value)
+	}
+	fmt.println("[CONSUMER] Channel closed, stopping.")
+}
+
+// The producer sends `count` number of messages.
+producer :: proc(send_chan: chan.Chan(int, .Send), count: int) {
+	for i in 0..&lt;count {
+		fmt.println("[PRODUCER] Sending:", i)
+		success := chan.send(send_chan, i)
+		if !success {
+			fmt.println("[PRODUCER] Failed to send, channel may be closed.")
+			return
+		}
+	}
+
+	// Signal that production is complete by closing the channel.
+	chan.close(send_chan)
+	fmt.println("[PRODUCER] Done producing, channel closed.")
+}
+
+chan_example :: proc() {
+	// Create an unbuffered channel for int messages
+	c, err := chan.create(chan.Chan(int), context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+
+	// Start the consumer thread
+	consumer_thread := thread.create_and_start_with_poly_data(chan.as_recv(c), consumer)
+	defer thread.destroy(consumer_thread)
+
+	// Start the producer thread with 5 messages (change count as needed)
+	producer_thread := thread.create_and_start_with_poly_data2(chan.as_send(c), 5, producer)
+	defer thread.destroy(producer_thread)
+
+	// Wait for both threads to complete
+	thread.join_multiple(consumer_thread, producer_thread)
+}
+</code></pre>
+</details>
+</div>
 <div id="pkg-index">
 <h2>Index</h2>
 <div>
@@ -400,10 +468,37 @@ Procedure Groups (2)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Chan"><span><a class="doc-id-link" href="#Chan">Chan<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L16"><em>Source</em></a></div></h3>
+<h3 id="Chan"><span><a class="doc-id-link" href="#Chan">Chan<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L46"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Chan :: <span class="keyword-type">struct</span> {}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>A typed wrapper around <code>Raw_Chan</code> which should be used
+preferably.</p>
+<p>Note: all procedures accepting <code>Raw_Chan</code> also accept <code>Chan</code>.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>$T</code>: The type of the messages</span>
+<span class="doc-list"><code>Direction</code>: what <code>Direction</code> the channel supports</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+chan_example :: proc() {
+	// Create an unbuffered channel with messages of type int,
+	// supporting both sending and receiving.
+	// Creating unidirectional channels, although possible, is useless.
+	c, _ := chan.create(chan.Chan(int), context.allocator)
+	defer chan.destroy(c)
+
+	// This channel can now only be used for receiving messages
+	recv_only_channel: chan.Chan(int, .Recv) = chan.as_recv(c)
+	// This channel can now only be used for sending messages
+	send_only_channel: chan.Chan(int, .Send) = chan.as_send(c)
+}
+</code></pre>
+</details>
+</details>
 <h5>Related Procedures With Returns</h5>
 <ul>
 <li><a href="/core/sync/chan/#as_recv">as_recv</a></li>
@@ -411,7 +506,7 @@ Procedure Groups (2)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Direction"><span><a class="doc-id-link" href="#Direction">Direction<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L10"><em>Source</em></a></div></h3>
+<h3 id="Direction"><span><a class="doc-id-link" href="#Direction">Direction<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L13"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Direction :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
 	Send = -1, 
@@ -419,9 +514,13 @@ Procedure Groups (2)</summary>
 	Recv = 1, 
 }</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Determines what operations <code>Chan</code> supports.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="Raw_Chan"><span><a class="doc-id-link" href="#Raw_Chan">Raw_Chan<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L20"><em>Source</em></a></div></h3>
+<h3 id="Raw_Chan"><span><a class="doc-id-link" href="#Raw_Chan">Raw_Chan<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L66"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Raw_Chan :: <span class="keyword-type">struct</span> {
 	<span class="comment">// Shared</span>
@@ -442,6 +541,23 @@ Procedure Groups (2)</summary>
 	unbuffered_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
 }</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>Raw_Chan</code> allows for thread-safe communication using fixed-size messages.
+This is the low-level implementation of <code>Chan</code>, which does not include
+the concept of Direction.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+raw_chan_example :: proc() {
+	// Create an unbuffered channel with messages of type int,
+	c, _ := chan.create_raw(size_of(int), align_of(int), context.allocator)
+	defer chan.destroy(c)
+}
+</code></pre>
+</details>
+</details>
 <h5>Related Procedures With Parameters</h5>
 <ul>
 <li><a href="/core/sync/chan/#can_recv">can_recv</a></li>
@@ -466,7 +582,7 @@ Procedure Groups (2)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Raw_Queue"><span><a class="doc-id-link" href="#Raw_Queue">Raw_Queue<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L376"><em>Source</em></a></div></h3>
+<h3 id="Raw_Queue"><span><a class="doc-id-link" href="#Raw_Queue">Raw_Queue<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1050"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Raw_Queue :: <span class="keyword-type">struct</span> {
 	data: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
@@ -476,6 +592,14 @@ Procedure Groups (2)</summary>
 	size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
 }</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>Raw_Queue</code> is a non-thread-safe queue implementation designed to store messages
+of fixed size and alignment.</p>
+<p>Note: For most use cases, it is recommended to use <code>core:container/queue</code> instead,
+as <code>Raw_Queue</code> is used internally by <code>Raw_Chan</code> and may not provide the desired
+level of convenience for typical applications.</p>
+</details>
 <h5>Related Procedures With Parameters</h5>
 <ul>
 <li><a href="/core/sync/chan/#raw_queue_init">raw_queue_init</a></li>
@@ -489,170 +613,896 @@ Procedure Groups (2)</summary>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="as_recv"><span><a class="doc-id-link" href="#as_recv">as_recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L126"><em>Source</em></a></div></h3>
+<h3 id="as_recv"><span><a class="doc-id-link" href="#as_recv">as_recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L407"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">as_recv :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: $C) -> (r: <a class="code-typename" href="/core/sync/chan/#Chan">Chan</a>($T, $D=1)) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Creates a version of a channel that can only be used for receiving
+not sending.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span></p>
+<p><b>Returns</b>:
+<span class="doc-list">An <code>Allocator_Error</code></span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+as_recv_example :: proc() {
+	consumer :: proc(c: chan.Chan(int, .Recv)) {
+		value, ok := chan.recv(c)
+
+		// compile-time error:
+		// chan.send(c, 22)
+	}
+
+	c, err := chan.create(chan.Chan(int), 1, context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+
+	chan.send(c, 112)
+	consumer(chan.as_recv(c))
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="as_send"><span><a class="doc-id-link" href="#as_send">as_send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L122"><em>Source</em></a></div></h3>
+<h3 id="as_send"><span><a class="doc-id-link" href="#as_send">as_send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L372"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">as_send :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: $C) -> (s: <a class="code-typename" href="/core/sync/chan/#Chan">Chan</a>($T, $D=-1)) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Creates a version of a channel that can only be used for sending
+not receiving.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span></p>
+<p><b>Returns</b>:
+<span class="doc-list">An <code>Allocator_Error</code></span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+as_send_example :: proc() {
+	// this procedure takes a channel that can only
+	// be used for sending not receiving.
+	producer :: proc(c: chan.Chan(int, .Send)) {
+		chan.send(c, 112)
+
+		// compile-time error:
+		// value, ok := chan.recv(c)
+	}
+
+	c, err := chan.create(chan.Chan(int), 1, context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+
+	producer(chan.as_send(c))
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="can_recv"><span><a class="doc-id-link" href="#can_recv">can_recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L424"><em>Source</em></a></div></h3>
+<h3 id="can_recv"><span><a class="doc-id-link" href="#can_recv">can_recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1198"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">can_recv :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns whether a message is ready to be read, i.e.,
+if a call to <code>recv</code> or <code>recv_raw</code> would block</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span></p>
+<p><b>Returns</b>
+<span class="doc-list"><code>true</code> if a message can be read, <code>false</code> otherwise</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+can_recv_example :: proc() {
+	c, err := chan.create(chan.Chan(int), 1, context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+
+	assert(!chan.can_recv(c), "the cannel is empty")
+	assert(chan.send(c, 2))
+	assert(chan.can_recv(c), "there is message to read")
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="can_send"><span><a class="doc-id-link" href="#can_send">can_send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L434"><em>Source</em></a></div></h3>
+<h3 id="can_send"><span><a class="doc-id-link" href="#can_send">can_send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1233"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">can_send :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns whether a message can be sent without blocking the current
+thread. Specifically, it checks if the channel is buffered and not full,
+or if there is already a reader waiting for a message.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span></p>
+<p><b>Returns</b>
+<span class="doc-list"><code>true</code> if a message can be send, <code>false</code> otherwise</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+can_send_example :: proc() {
+	c, err := chan.create(chan.Chan(int), 1, context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+
+	assert(chan.can_send(c), "the channel's buffer is not full")
+	assert(chan.send(c, 2))
+	assert(!chan.can_send(c), "the channel's buffer is full")
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="cap"><span><a class="doc-id-link" href="#cap">cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L342"><em>Source</em></a></div></h3>
+<h3 id="cap"><span><a class="doc-id-link" href="#cap">cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L970"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">cap :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the number of elements the channel could hold.</p>
+<p>Note: Unbuffered channels will always return <code>0</code>
+because they cannot hold elements.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span></p>
+<p><b>Returns</b>:
+<span class="doc-list">Number of elements</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+import "core:fmt"
+
+cap_example :: proc() {
+	c, _ := chan.create(chan.Chan(int), 2, context.allocator)
+	defer chan.destroy(c)
+
+	fmt.println(chan.cap(c))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">2
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="close"><span><a class="doc-id-link" href="#close">close<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L350"><em>Source</em></a></div></h3>
+<h3 id="close"><span><a class="doc-id-link" href="#close">close<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1008"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">close :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Closes the channel, preventing new messages from being added.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span></p>
+<p><b>Returns</b>:
+<span class="doc-list"><code>true</code> if the channel was closed by this operation, <code>false</code> if it was already closed</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+close_example :: proc() {
+	c, _ := chan.create(chan.Chan(int), 2, context.allocator)
+	defer chan.destroy(c)
+
+	// Sending a message to an open channel
+	assert(chan.send(c, 1), "allowed to send")
+
+	// Closing the channel successfully
+	assert(chan.close(c), "successfully closed")
+
+	// Trying to send a message after the channel is closed (should fail)
+	assert(!chan.send(c, 1), "not allowed to send after close")
+
+	// Trying to close the channel again (should fail since it's already closed)
+	assert(!chan.close(c), "was already closed")
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_buffered"><span><a class="doc-id-link" href="#create_buffered">create_buffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L53"><em>Source</em></a></div></h3>
+<h3 id="create_buffered"><span><a class="doc-id-link" href="#create_buffered">create_buffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L177"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_buffered :: <span class="keyword-type">proc</span>($C: <span class="keyword-type">typeid</span>/[0][0]$E, <span class="keyword-type">#any_int</span> cap: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (c: $/[0][0]$E, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Creates a buffered version of the specified <code>Chan</code> type.</p>
+<p><i>Allocates Using Provided Allocator</i></p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>$C</code>: Type of <code>Chan</code> to create</span>
+<span class="doc-list"><code>cap</code>: The capacity of the channel</span>
+<span class="doc-list"><code>allocator</code>: The allocator to use</span></p>
+<p><b>Returns</b>:
+<span class="doc-list">The initialized <code>Chan</code></span>
+<span class="doc-list">An <code>Allocator_Error</code></span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+create_buffered_example :: proc() {
+	c, err := chan.create_buffered(chan.Chan(int), 10, context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_raw_buffered"><span><a class="doc-id-link" href="#create_raw_buffered">create_raw_buffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L84"><em>Source</em></a></div></h3>
+<h3 id="create_raw_buffered"><span><a class="doc-id-link" href="#create_raw_buffered">create_raw_buffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L293"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_raw_buffered :: <span class="keyword-type">proc</span>(<span class="keyword-type">#any_int</span> msg_size, <span class="keyword-type">#any_int</span> msg_alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">#any_int</span> cap: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Creates a buffered <code>Raw_Chan</code> for messages of the specified
+size and alignment.</p>
+<p><i>Allocates Using Provided Allocator</i></p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>msg_size</code>: The size of the messages the messages being sent</span>
+<span class="doc-list"><code>msg_alignment</code>: The alignment of the messages being sent</span>
+<span class="doc-list"><code>cap</code>: The capacity of the channel</span>
+<span class="doc-list"><code>allocator</code>: The allocator to use</span></p>
+<p><b>Returns</b>:
+<span class="doc-list">The initialized <code>Raw_Chan</code></span>
+<span class="doc-list">An <code>Allocator_Error</code></span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+create_raw_unbuffered_example :: proc() {
+	c, err := chan.create_raw_buffered(size_of(int), align_of(int), 10, context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_raw_unbuffered"><span><a class="doc-id-link" href="#create_raw_unbuffered">create_raw_unbuffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L65"><em>Source</em></a></div></h3>
+<h3 id="create_raw_unbuffered"><span><a class="doc-id-link" href="#create_raw_unbuffered">create_raw_unbuffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L248"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_raw_unbuffered :: <span class="keyword-type">proc</span>(<span class="keyword-type">#any_int</span> msg_size, <span class="keyword-type">#any_int</span> msg_alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Creates an unbuffered <code>Raw_Chan</code> for messages of the specified
+size and alignment.</p>
+<p><i>Allocates Using Provided Allocator</i></p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>msg_size</code>: The size of the messages the messages being sent</span>
+<span class="doc-list"><code>msg_alignment</code>: The alignment of the messages being sent</span>
+<span class="doc-list"><code>allocator</code>: The allocator to use</span></p>
+<p><b>Returns</b>:
+<span class="doc-list">The initialized <code>Raw_Chan</code></span>
+<span class="doc-list">An <code>Allocator_Error</code></span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+create_raw_unbuffered_example :: proc() {
+	unbuffered, err := chan.create_raw(size_of(int), align_of(int), context.allocator)
+	assert(err == .None)
+	defer chan.destroy(unbuffered)
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_unbuffered"><span><a class="doc-id-link" href="#create_unbuffered">create_unbuffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L46"><em>Source</em></a></div></h3>
+<h3 id="create_unbuffered"><span><a class="doc-id-link" href="#create_unbuffered">create_unbuffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L146"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_unbuffered :: <span class="keyword-type">proc</span>($C: <span class="keyword-type">typeid</span>/[0][0]$E, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (c: $/[0][0]$E, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Creates an unbuffered version of the specified <code>Chan</code> type.</p>
+<p><i>Allocates Using Provided Allocator</i></p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>$C</code>: Type of <code>Chan</code> to create</span>
+<span class="doc-list"><code>allocator</code>: The allocator to use</span></p>
+<p><b>Returns</b>:
+<span class="doc-list">The initialized <code>Chan</code></span>
+<span class="doc-list">An <code>Allocator_Error</code></span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+create_unbuffered_example :: proc() {
+	c, err := chan.create_unbuffered(chan.Chan(int), context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L113"><em>Source</em></a></div></h3>
+<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L332"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy :: <span class="keyword-type">proc</span>(c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> (err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Destroys the Channel.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel to destroy</span></p>
+<p><b>Returns</b>:
+<span class="doc-list">An <code>Allocator_Error</code></span></p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="is_buffered"><span><a class="doc-id-link" href="#is_buffered">is_buffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L323"><em>Source</em></a></div></h3>
+<h3 id="is_buffered"><span><a class="doc-id-link" href="#is_buffered">is_buffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L873"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_buffered :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Checks if the given channel is buffered.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span></p>
+<p><b>Returns</b>:
+<span class="doc-list"><code>true</code> if the channel is buffered, <code>false</code> otherwise</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+is_buffered_example :: proc() {
+	c, _ := chan.create(chan.Chan(int), 1, context.allocator)
+	defer chan.destroy(c)
+	assert(chan.is_buffered(c))
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="is_closed"><span><a class="doc-id-link" href="#is_closed">is_closed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L365"><em>Source</em></a></div></h3>
+<h3 id="is_closed"><span><a class="doc-id-link" href="#is_closed">is_closed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1032"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_closed :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns if the channel is closed or not</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span></p>
+<p><b>Returns</b>:
+<span class="doc-list"><code>true</code> if the channel is closed, <code>false</code> otherwise</span></p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="is_unbuffered"><span><a class="doc-id-link" href="#is_unbuffered">is_unbuffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L328"><em>Source</em></a></div></h3>
+<h3 id="is_unbuffered"><span><a class="doc-id-link" href="#is_unbuffered">is_unbuffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L897"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_unbuffered :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Checks if the given channel is unbuffered.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span></p>
+<p><b>Returns</b>:
+<span class="doc-list"><code>true</code> if the channel is unbuffered, <code>false</code> otherwise</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+is_buffered_example :: proc() {
+	c, _ := chan.create(chan.Chan(int), context.allocator)
+	defer chan.destroy(c)
+	assert(chan.is_unbuffered(c))
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="len"><span><a class="doc-id-link" href="#len">len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L333"><em>Source</em></a></div></h3>
+<h3 id="len"><span><a class="doc-id-link" href="#len">len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L933"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">len :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the number of elements currently in the channel.</p>
+<p>Note: Unbuffered channels will always return <code>0</code>
+because they cannot hold elements.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span></p>
+<p><b>Returns</b>:
+<span class="doc-list">Number of elements</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+import "core:fmt"
+
+len_example :: proc() {
+	c, _ := chan.create(chan.Chan(int), 2, context.allocator)
+	defer chan.destroy(c)
+
+	fmt.println(chan.len(c))
+	assert(chan.send(c, 1))   // add an element
+	fmt.println(chan.len(c))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">0
+1
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="raw_queue_init"><span><a class="doc-id-link" href="#raw_queue_init">raw_queue_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L384"><em>Source</em></a></div></h3>
+<h3 id="raw_queue_init"><span><a class="doc-id-link" href="#raw_queue_init">raw_queue_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1079"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">raw_queue_init :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (q: ^<a class="code-typename" href="/core/sync/chan/#Raw_Queue">Raw_Queue</a>, data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, cap: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Initializes a <code>Raw_Queue</code></p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>q</code>: A pointert to the <code>Raw_Queue</code> to initialize</span>
+<span class="doc-list"><code>data</code>: The pointer to backing slice storing the messages</span>
+<span class="doc-list"><code>cap</code>: The capacity of the queue</span>
+<span class="doc-list"><code>size</code>: The size of a message</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+raw_queue_init_example :: proc() {
+	// use a stack allocated array as backing storage
+	storage: [100]int
+
+	rq: chan.Raw_Queue
+	chan.raw_queue_init(&rq, &storage, cap(storage), size_of(int))
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="raw_queue_pop"><span><a class="doc-id-link" href="#raw_queue_pop">raw_queue_pop<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L410"><em>Source</em></a></div></h3>
+<h3 id="raw_queue_pop"><span><a class="doc-id-link" href="#raw_queue_pop">raw_queue_pop<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1161"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">raw_queue_pop :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (q: ^<a class="code-typename" href="/core/sync/chan/#Raw_Queue">Raw_Queue</a>) -> (data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Removes and returns the first element of the queue.</p>
+<p>Note: The returned element is only guaranteed to be valid until the next
+<code>raw_queue_push</code> operation. Accessing it after that point may result in
+undefined behavior.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: A pointer to the <code>Raw_Queue</code>.</span></p>
+<p><b>Returns</b>
+<span class="doc-list">A pointer to the first element in the queue, or <code>nil</code> if the queue is empty.</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+raw_queue_pop_example :: proc() {
+	storage: [100]int
+	rq: chan.Raw_Queue
+	chan.raw_queue_init(&rq, &storage, cap(storage), size_of(int))
+
+	assert(chan.raw_queue_pop(&rq) == nil, "queue was empty")
+
+	// add an element to the queue
+	value := 2
+	assert(chan.raw_queue_push(&rq, &value), "there was enough space")
+
+	assert((cast(^int)chan.raw_queue_pop(&rq))^ == 2, "retrieved the element")
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="raw_queue_push"><span><a class="doc-id-link" href="#raw_queue_push">raw_queue_push<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L394"><em>Source</em></a></div></h3>
+<h3 id="raw_queue_push"><span><a class="doc-id-link" href="#raw_queue_push">raw_queue_push<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1114"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">raw_queue_push :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (q: ^<a class="code-typename" href="/core/sync/chan/#Raw_Queue">Raw_Queue</a>, data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Add an element to the queue.</p>
+<p>Note: The message referenced by <code>data</code> must match the size
+and alignment used when the <code>Raw_Queue</code> was initialized.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>q</code>: A pointert to the <code>Raw_Queue</code></span>
+<span class="doc-list"><code>data</code>: The pointer to message to add</span></p>
+<p><b>Returns</b>
+<span class="doc-list"><code>true</code> if the element was added, <code>false</code> when the queue is already full</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+raw_queue_push_example :: proc() {
+	storage: [100]int
+	rq: chan.Raw_Queue
+	chan.raw_queue_init(&rq, &storage, cap(storage), size_of(int))
+
+	value := 2
+	assert(chan.raw_queue_push(&rq, &value), "there was enough space")
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="recv"><span><a class="doc-id-link" href="#recv">recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L145"><em>Source</em></a></div></h3>
+<h3 id="recv"><span><a class="doc-id-link" href="#recv">recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L521"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">recv :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: $C) -> (data: $T, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reads a message from the channel, blocking the current thread if:
+<span class="doc-list">the channel is unbuffered</span>
+<span class="doc-list">the channel's buffer is empty</span>
+until the channel is being written to. <code>recv</code> will return
+<code>false</code> when attempting to receive a message on an already closed channel.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span></p>
+<p><b>Returns</b>
+<span class="doc-list">The message</span>
+<span class="doc-list"><code>true</code> if a message was received, <code>false</code> when the channel was already closed</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+recv_example :: proc() {
+	c, err := chan.create(chan.Chan(int), 1, context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+
+	assert(chan.send(c, 2))
+
+	value, ok := chan.recv(c)
+	assert(ok, "the value was received")
+
+	// this would block since the channel is now empty
+	// value, ok = chan.recv(c)
+
+	// reading from a closed channel returns false
+	chan.close(c)
+	value, ok = chan.recv(c)
+	assert(!ok, "the channel is closed")
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="recv_raw"><span><a class="doc-id-link" href="#recv_raw">recv_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L198"><em>Source</em></a></div></h3>
+<h3 id="recv_raw"><span><a class="doc-id-link" href="#recv_raw">recv_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L673"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">recv_raw :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, msg_out: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reads a message from the channel, blocking the current thread if:
+<span class="doc-list">the channel is unbuffered</span>
+<span class="doc-list">the channel's buffer is empty</span>
+until the channel is being written to. <code>recv_raw</code> will return
+<code>false</code> when attempting to receive a message on an already closed channel.</p>
+<p>Note: The location pointed to by <code>msg_out</code> must match the size
+and alignment used when the <code>Raw_Chan</code> was created.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span>
+<span class="doc-list"><code>msg_out</code>: Pointer to where the message should be stored</span></p>
+<p><b>Returns</b>
+<span class="doc-list"><code>true</code> if a message was received, <code>false</code> when the channel was already closed</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+recv_raw_example :: proc() {
+	c, err := chan.create_raw(size_of(int), align_of(int), 1, context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+
+	value := 2
+	assert(chan.send_raw(c, &value))
+
+	assert(chan.recv_raw(c, &value))
+
+	// this would block since the channel is now empty
+	// assert(chan.recv_raw(c, &value))
+
+	// reading from a closed channel returns false
+	chan.close(c)
+	assert(! chan.recv_raw(c, &value))
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="select_raw"><span><a class="doc-id-link" href="#select_raw">select_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L445"><em>Source</em></a></div></h3>
+<h3 id="select_raw"><span><a class="doc-id-link" href="#select_raw">select_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1306"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">select_raw :: <span class="keyword-type">proc</span>(recvs: []^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, sends: []^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, send_msgs: []<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, recv_out: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> (select_idx: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Attempts to either send or receive messages on the specified channels.</p>
+<p><code>select_raw</code> first identifies which channels have messages ready to be received
+and which are available for sending. It then randomly selects one operation
+(either a send or receive) to perform.</p>
+<p>Note: Each message in <code>send_msgs</code> corresponds to the send channel at the same index in <code>sends</code>.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>recv</code>: A slice of channels to read from</span>
+<span class="doc-list"><code>sends</code>: A slice of channels to send messages on</span>
+<span class="doc-list"><code>send_msgs</code>: A slice of messages to send</span>
+<span class="doc-list"><code>recv_out</code>: A pointer to the location where, when receiving, the message should be stored</span></p>
+<p><b>Returns</b>
+<span class="doc-list">Position of the available channel which was used for receiving or sending</span>
+<span class="doc-list"><code>true</code> if sending/receiving was successfull, <code>false</code> if the channel was closed or no channel was available</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+import "core:fmt"
+
+select_raw_example :: proc() {
+	c, err := chan.create(chan.Chan(int), 1, context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+
+	// sending value '1' on the channel
+	value1 := 1
+	msgs := [?]rawptr{&value1}
+	send_chans := [?]^chan.Raw_Chan{c}
+
+	// for simplicity the same channel used for sending is also used for receiving
+	receive_chans := [?]^chan.Raw_Chan{c}
+	// where the value from the read should be stored
+	received_value: int
+
+	idx, ok := chan.select_raw(receive_chans[:], send_chans[:], msgs[:], &received_value)
+	fmt.println("SELECT:        ", idx, ok)
+	fmt.println("RECEIVED VALUE ", received_value)
+
+	idx, ok = chan.select_raw(receive_chans[:], send_chans[:], msgs[:], &received_value)
+	fmt.println("SELECT:        ", idx, ok)
+	fmt.println("RECEIVED VALUE ", received_value)
+
+	// closing of a channel also affects the select operation
+	chan.close(c)
+
+	idx, ok = chan.select_raw(receive_chans[:], send_chans[:], msgs[:], &received_value)
+	fmt.println("SELECT:        ", idx, ok)
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">SELECT:         0 true
+RECEIVED VALUE  0
+SELECT:         0 true
+RECEIVED VALUE  1
+SELECT:         0 false
+</pre>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="send"><span><a class="doc-id-link" href="#send">send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L131"><em>Source</em></a></div></h3>
+<h3 id="send"><span><a class="doc-id-link" href="#send">send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L444"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">send :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: $C, data: $T) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Sends the specified message, blocking the current thread if:
+<span class="doc-list">the channel is unbuffered</span>
+<span class="doc-list">the channel's buffer is full</span>
+until the channel is being read from. <code>send</code> will return
+<code>false</code> when attempting to send on an already closed channel.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span>
+<span class="doc-list"><code>data</code>: The message to send</span></p>
+<p><b>Returns</b>
+<span class="doc-list"><code>true</code> if the message was sent, <code>false</code> when the channel was already closed</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+send_example :: proc() {
+	c, err := chan.create(chan.Chan(int), 1, context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+
+	assert(chan.send(c, 2))
+
+	// this would block since the channel has a buffersize of 1
+	// assert(chan.send(c, 2))
+
+	// sending on a closed channel returns false
+	chan.close(c)
+	assert(! chan.send(c, 2))
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="send_raw"><span><a class="doc-id-link" href="#send_raw">send_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L159"><em>Source</em></a></div></h3>
+<h3 id="send_raw"><span><a class="doc-id-link" href="#send_raw">send_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L595"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">send_raw :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, msg_in: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Sends the specified message, blocking the current thread if:
+<span class="doc-list">the channel is unbuffered</span>
+<span class="doc-list">the channel's buffer is full</span>
+until the channel is being read from. <code>send_raw</code> will return
+<code>false</code> when attempting to send on an already closed channel.</p>
+<p>Note: The message referenced by <code>msg_out</code> must match the size
+and alignment used when the <code>Raw_Chan</code> was created.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span>
+<span class="doc-list"><code>msg_out</code>: Pointer to the data to send</span></p>
+<p><b>Returns</b>
+<span class="doc-list"><code>true</code> if the message was sent, <code>false</code> when the channel was already closed</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+send_raw_example :: proc() {
+	c, err := chan.create_raw(size_of(int), align_of(int), 1, context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+
+	value := 2
+	assert(chan.send_raw(c, &value))
+
+	// this would block since the channel has a buffersize of 1
+	// assert(chan.send_raw(c, &value))
+
+	// sending on a closed channel returns false
+	chan.close(c)
+	assert(! chan.send_raw(c, &value))
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="try_recv"><span><a class="doc-id-link" href="#try_recv">try_recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L152"><em>Source</em></a></div></h3>
+<h3 id="try_recv"><span><a class="doc-id-link" href="#try_recv">try_recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L551"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">try_recv :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: $C) -> (data: $T, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Tries reading a message from the channel in a non-blocking fashion.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span></p>
+<p><b>Returns</b>
+<span class="doc-list">The message</span>
+<span class="doc-list"><code>true</code> if a message was received, <code>false</code> when the channel was already closed or no message was available</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+try_recv_example :: proc() {
+	c, err := chan.create(chan.Chan(int), context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+
+	_, ok := chan.try_recv(c)
+	assert(!ok, "there is not value to read")
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="try_recv_raw"><span><a class="doc-id-link" href="#try_recv_raw">try_recv_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L285"><em>Source</em></a></div></h3>
+<h3 id="try_recv_raw"><span><a class="doc-id-link" href="#try_recv_raw">try_recv_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L816"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">try_recv_raw :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, msg_out: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reads a message from the channel if one is available.</p>
+<p>Note: The location pointed to by <code>msg_out</code> must match the size
+and alignment used when the <code>Raw_Chan</code> was created.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span>
+<span class="doc-list"><code>msg_out</code>: Pointer to where the message should be stored</span></p>
+<p><b>Returns</b>
+<span class="doc-list"><code>true</code> if a message was received, <code>false</code> when the channel was already closed or no message was available</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+try_recv_raw_example :: proc() {
+	c, err := chan.create_raw(size_of(int), align_of(int), context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+
+	value: int
+	assert(!chan.try_recv_raw(c, &value))
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="try_send"><span><a class="doc-id-link" href="#try_send">try_send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L138"><em>Source</em></a></div></h3>
+<h3 id="try_send"><span><a class="doc-id-link" href="#try_send">try_send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L477"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">try_send :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: $C, data: $T) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Tries sending the specified message which is:
+<span class="doc-list">blocking: given the channel is unbuffered</span>
+<span class="doc-list">non-blocking: given the channel is buffered</span></p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: The channel</span>
+<span class="doc-list"><code>data</code>: The message to send</span></p>
+<p><b>Returns</b>
+<span class="doc-list"><code>true</code> if the message was sent, <code>false</code> when the channel was</span>
+already closed or the channel's buffer was full</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+try_send_example :: proc() {
+	c, err := chan.create(chan.Chan(int), 1, context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+
+	assert(chan.try_send(c, 2), "there is enough space")
+	assert(!chan.try_send(c, 2), "the buffer is already full")
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="try_send_raw"><span><a class="doc-id-link" href="#try_send_raw">try_send_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L248"><em>Source</em></a></div></h3>
+<h3 id="try_send_raw"><span><a class="doc-id-link" href="#try_send_raw">try_send_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L753"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">try_send_raw :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, msg_in: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Tries sending the specified message which is:
+<span class="doc-list">blocking: given the channel is unbuffered</span>
+<span class="doc-list">non-blocking: given the channel is buffered</span></p>
+<p>Note: The message referenced by <code>msg_out</code> must match the size
+and alignment used when the <code>Raw_Chan</code> was created.</p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>c</code>: the channel</span>
+<span class="doc-list"><code>msg_out</code>: pointer to the data to send</span></p>
+<p><b>Returns</b>
+<span class="doc-list"><code>true</code> if the message was sent, <code>false</code> when the channel was</span>
+already closed or the channel's buffer was full</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+try_send_raw_example :: proc() {
+	c, err := chan.create_raw(size_of(int), align_of(int), 1, context.allocator)
+	assert(err == .None)
+	defer chan.destroy(c)
+
+	value := 2
+	assert(chan.try_send_raw(c, &value), "there is enough space")
+	assert(!chan.try_send_raw(c, &value), "the buffer is already full")
+}
+</code></pre>
+</details>
+</details>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="create"><span><a class="doc-id-link" href="#create">create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L40"><em>Source</em></a></div></h3>
+<h3 id="create"><span><a class="doc-id-link" href="#create">create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L117"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/sync/chan/#create_unbuffered">create_unbuffered</a>,
@@ -660,9 +1510,40 @@ Procedure Groups (2)</summary>
 }
 </pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Creates a buffered or unbuffered <code>Chan</code> instance.</p>
+<p><i>Allocates Using Provided Allocator</i></p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>$C</code>: Type of <code>Chan</code> to create</span>
+<span class="doc-list">[<code>cap</code>: The capacity of the channel] omit for creating unbuffered channels</span>
+<span class="doc-list"><code>allocator</code>: The allocator to use</span></p>
+<p><b>Returns</b>:
+<span class="doc-list">The initialized <code>Chan</code></span>
+<span class="doc-list">An <code>Allocator_Error</code></span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+create_example :: proc() {
+	unbuffered: chan.Chan(int)
+	buffered: chan.Chan(int)
+	err: runtime.Allocator_Error
+
+	unbuffered, err = chan.create(chan.Chan(int), context.allocator)
+	assert(err == .None)
+	defer chan.destroy(unbuffered)
+
+	buffered, err = chan.create(chan.Chan(int), 10, context.allocator)
+	assert(err == .None)
+	defer chan.destroy(buffered)
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_raw"><span><a class="doc-id-link" href="#create_raw">create_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L59"><em>Source</em></a></div></h3>
+<h3 id="create_raw"><span><a class="doc-id-link" href="#create_raw">create_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L217"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_raw :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/sync/chan/#create_raw_unbuffered">create_raw_unbuffered</a>,
@@ -670,19 +1551,53 @@ Procedure Groups (2)</summary>
 }
 </pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Creates a buffered or unbuffered <code>Raw_Chan</code> for messages of the specified
+size and alignment.</p>
+<p><i>Allocates Using Provided Allocator</i></p>
+<p><b>Inputs</b>
+<span class="doc-list"><code>msg_size</code>: The size of the messages the messages being sent</span>
+<span class="doc-list"><code>msg_alignment</code>: The alignment of the messages being sent</span>
+<span class="doc-list">[<code>cap</code>: The capacity of the channel] omit for creating unbuffered channels</span>
+<span class="doc-list"><code>allocator</code>: The allocator to use</span></p>
+<p><b>Returns</b>:
+<span class="doc-list">The initialized <code>Raw_Chan</code></span>
+<span class="doc-list">An <code>Allocator_Error</code></span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
+
+create_raw_example :: proc() {
+	unbuffered: ^chan.Raw_Chan
+	buffered: ^chan.Raw_Chan
+	err: runtime.Allocator_Error
+
+	unbuffered, err = chan.create_raw(size_of(int), align_of(int), context.allocator)
+	assert(err == .None)
+	defer chan.destroy(unbuffered)
+
+	buffered, err = chan.create_raw(size_of(int), align_of(int), 10, context.allocator)
+	assert(err == .None)
+	defer chan.destroy(buffered)
+}
+</code></pre>
+</details>
+</details>
 </div>
 </section>
 <h2 id="pkg-source-files">Source Files</h2>
 <ul>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin">chan.odin</a></li>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/doc.odin">doc.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-12 21:10:56.825947500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-13 20:02:25.443463000 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
 <ul>
-<li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#pkg-overview">Overview</a><li><a href="#pkg-Types">Types</a><ul>
 <li><a href="#Chan">Chan</a></li>
 <li><a href="#Direction">Direction</a></li>
 <li><a href="#Raw_Chan">Raw_Chan</a></li>
