@@ -1281,7 +1281,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		indent -= 1
 		do_indent(writer, flags)
 		io.write_string(w, "}")
-	case .Tuple:
+	case .Parameters:
 		if len(type_entities) == 0 {
 			return
 		}
@@ -2146,7 +2146,7 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 		rentities: []doc.Entity_Index
 
 		params := &cfg.types[array(pt.types)[0]]
-		if params.kind == .Tuple {
+		if params.kind == .Parameters {
 			pentities = array(params.entities)
 			if !is_class_method {
 				pentities = pentities[1:]
@@ -2154,7 +2154,7 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 		}
 
 		results := &cfg.types[array(pt.types)[1]]
-		if results.kind == .Tuple {
+		if results.kind == .Parameters {
 			rentities = array(results.entities)
 		}
 
