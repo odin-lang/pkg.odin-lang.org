@@ -395,12 +395,11 @@ chan_example :: proc() {
 <div>
 <details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
 <summary id="#doc-index-Types-header">
-Types (4)</summary>
+Types (3)</summary>
 <ul>
 <li><a href="#Chan">Chan</a></li>
 <li><a href="#Direction">Direction</a></li>
 <li><a href="#Raw_Chan">Raw_Chan</a></li>
-<li><a href="#Raw_Queue">Raw_Queue</a></li>
 </ul>
 </details>
 </div>
@@ -421,7 +420,7 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (27)</summary>
+Procedures (24)</summary>
 <ul>
 <li><a href="#as_recv">as_recv</a></li>
 <li><a href="#as_send">as_send</a></li>
@@ -438,9 +437,6 @@ Procedures (27)</summary>
 <li><a href="#is_closed">is_closed</a></li>
 <li><a href="#is_unbuffered">is_unbuffered</a></li>
 <li><a href="#len">len</a></li>
-<li><a href="#raw_queue_init">raw_queue_init</a></li>
-<li><a href="#raw_queue_pop">raw_queue_pop</a></li>
-<li><a href="#raw_queue_push">raw_queue_push</a></li>
 <li><a href="#recv">recv</a></li>
 <li><a href="#recv_raw">recv_raw</a></li>
 <li><a href="#select_raw">select_raw</a></li>
@@ -536,7 +532,7 @@ chan_example :: proc() {
 	<span class="comment">// guarded by `mutex`</span>
 	w_waiting:       <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
 	<span class="comment">// Buffered</span>
-	queue:           ^<a class="code-typename" href="/core/sync/chan/#Raw_Queue">Raw_Queue</a>,
+	queue:           ^Raw_Queue,
 	<span class="comment">// Unbuffered</span>
 	unbuffered_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
 }</pre>
@@ -579,32 +575,6 @@ raw_chan_example :: proc() {
 <li><a href="/core/sync/chan/#create_raw_buffered">create_raw_buffered</a></li>
 <li><a href="/core/sync/chan/#create_raw_unbuffered">create_raw_unbuffered</a></li>
 <li><a href="/core/sync/chan/#create_raw">create_raw</a>&nbsp;<em>(procedure groups)</em></li>
-</ul>
-</div>
-<div class="pkg-entity">
-<h3 id="Raw_Queue"><span><a class="doc-id-link" href="#Raw_Queue">Raw_Queue<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1050"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Raw_Queue :: <span class="keyword-type">struct</span> {
-	data: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
-	len:  <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
-	cap:  <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
-	next: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
-	size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
-}</pre>
-</div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>Raw_Queue</code> is a non-thread-safe queue implementation designed to store messages
-of fixed size and alignment.</p>
-<p>Note: For most use cases, it is recommended to use <code>core:container/queue</code> instead,
-as <code>Raw_Queue</code> is used internally by <code>Raw_Chan</code> and may not provide the desired
-level of convenience for typical applications.</p>
-</details>
-<h5>Related Procedures With Parameters</h5>
-<ul>
-<li><a href="/core/sync/chan/#raw_queue_init">raw_queue_init</a></li>
-<li><a href="/core/sync/chan/#raw_queue_pop">raw_queue_pop</a></li>
-<li><a href="/core/sync/chan/#raw_queue_push">raw_queue_push</a></li>
 </ul>
 </div>
 <h2 id="pkg-Constants" class="pkg-header">Constants</h2>
@@ -686,7 +656,7 @@ as_send_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="can_recv"><span><a class="doc-id-link" href="#can_recv">can_recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1198"><em>Source</em></a></div></h3>
+<h3 id="can_recv"><span><a class="doc-id-link" href="#can_recv">can_recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1065"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">can_recv :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -716,7 +686,7 @@ can_recv_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="can_send"><span><a class="doc-id-link" href="#can_send">can_send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1233"><em>Source</em></a></div></h3>
+<h3 id="can_send"><span><a class="doc-id-link" href="#can_send">can_send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1100"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">can_send :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -1046,101 +1016,6 @@ len_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="raw_queue_init"><span><a class="doc-id-link" href="#raw_queue_init">raw_queue_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1079"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">raw_queue_init :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (q: ^<a class="code-typename" href="/core/sync/chan/#Raw_Queue">Raw_Queue</a>, data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, cap: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
-</div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>Initializes a <code>Raw_Queue</code></p>
-<p><b>Inputs</b>
-<span class="doc-list"><code>q</code>: A pointert to the <code>Raw_Queue</code> to initialize</span>
-<span class="doc-list"><code>data</code>: The pointer to backing slice storing the messages</span>
-<span class="doc-list"><code>cap</code>: The capacity of the queue</span>
-<span class="doc-list"><code>size</code>: The size of a message</span></p>
-<details open class="code-example">
-<summary><b>Example:</b></summary>
-<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
-
-raw_queue_init_example :: proc() {
-	// use a stack allocated array as backing storage
-	storage: [100]int
-
-	rq: chan.Raw_Queue
-	chan.raw_queue_init(&rq, &storage, cap(storage), size_of(int))
-}
-</code></pre>
-</details>
-</details>
-</div>
-<div class="pkg-entity">
-<h3 id="raw_queue_pop"><span><a class="doc-id-link" href="#raw_queue_pop">raw_queue_pop<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1161"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">raw_queue_pop :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (q: ^<a class="code-typename" href="/core/sync/chan/#Raw_Queue">Raw_Queue</a>) -> (data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) {…}</pre>
-</div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>Removes and returns the first element of the queue.</p>
-<p>Note: The returned element is only guaranteed to be valid until the next
-<code>raw_queue_push</code> operation. Accessing it after that point may result in
-undefined behavior.</p>
-<p><b>Inputs</b>
-<span class="doc-list"><code>c</code>: A pointer to the <code>Raw_Queue</code>.</span></p>
-<p><b>Returns</b>
-<span class="doc-list">A pointer to the first element in the queue, or <code>nil</code> if the queue is empty.</span></p>
-<details open class="code-example">
-<summary><b>Example:</b></summary>
-<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
-
-raw_queue_pop_example :: proc() {
-	storage: [100]int
-	rq: chan.Raw_Queue
-	chan.raw_queue_init(&rq, &storage, cap(storage), size_of(int))
-
-	assert(chan.raw_queue_pop(&rq) == nil, "queue was empty")
-
-	// add an element to the queue
-	value := 2
-	assert(chan.raw_queue_push(&rq, &value), "there was enough space")
-
-	assert((cast(^int)chan.raw_queue_pop(&rq))^ == 2, "retrieved the element")
-}
-</code></pre>
-</details>
-</details>
-</div>
-<div class="pkg-entity">
-<h3 id="raw_queue_push"><span><a class="doc-id-link" href="#raw_queue_push">raw_queue_push<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1114"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">raw_queue_push :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (q: ^<a class="code-typename" href="/core/sync/chan/#Raw_Queue">Raw_Queue</a>, data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
-</div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>Add an element to the queue.</p>
-<p>Note: The message referenced by <code>data</code> must match the size
-and alignment used when the <code>Raw_Queue</code> was initialized.</p>
-<p><b>Inputs</b>
-<span class="doc-list"><code>q</code>: A pointert to the <code>Raw_Queue</code></span>
-<span class="doc-list"><code>data</code>: The pointer to message to add</span></p>
-<p><b>Returns</b>
-<span class="doc-list"><code>true</code> if the element was added, <code>false</code> when the queue is already full</span></p>
-<details open class="code-example">
-<summary><b>Example:</b></summary>
-<pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
-
-raw_queue_push_example :: proc() {
-	storage: [100]int
-	rq: chan.Raw_Queue
-	chan.raw_queue_init(&rq, &storage, cap(storage), size_of(int))
-
-	value := 2
-	assert(chan.raw_queue_push(&rq, &value), "there was enough space")
-}
-</code></pre>
-</details>
-</details>
-</div>
-<div class="pkg-entity">
 <h3 id="recv"><span><a class="doc-id-link" href="#recv">recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L521"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">recv :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: $C) -> (data: $T, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
@@ -1228,7 +1103,7 @@ recv_raw_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="select_raw"><span><a class="doc-id-link" href="#select_raw">select_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1306"><em>Source</em></a></div></h3>
+<h3 id="select_raw"><span><a class="doc-id-link" href="#select_raw">select_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1173"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">select_raw :: <span class="keyword-type">proc</span>(recvs: []^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, sends: []^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, send_msgs: []<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, recv_out: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> (select_idx: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1592,7 +1467,7 @@ create_raw_example :: proc() {
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/doc.odin">doc.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-13 21:11:30.261897500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-14 21:12:18.081564500 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -1601,7 +1476,6 @@ create_raw_example :: proc() {
 <li><a href="#Chan">Chan</a></li>
 <li><a href="#Direction">Direction</a></li>
 <li><a href="#Raw_Chan">Raw_Chan</a></li>
-<li><a href="#Raw_Queue">Raw_Queue</a></li>
 </ul>
 </li>
 <li><a href="#pkg-Procedures">Procedures</a><ul>
@@ -1620,9 +1494,6 @@ create_raw_example :: proc() {
 <li><a href="#is_closed">is_closed</a></li>
 <li><a href="#is_unbuffered">is_unbuffered</a></li>
 <li><a href="#len">len</a></li>
-<li><a href="#raw_queue_init">raw_queue_init</a></li>
-<li><a href="#raw_queue_pop">raw_queue_pop</a></li>
-<li><a href="#raw_queue_push">raw_queue_push</a></li>
 <li><a href="#recv">recv</a></li>
 <li><a href="#recv_raw">recv_raw</a></li>
 <li><a href="#select_raw">select_raw</a></li>
