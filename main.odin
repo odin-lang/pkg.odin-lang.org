@@ -946,8 +946,10 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 					io.write_string(w, ": ")
 					write_padding(w, name, name_width)
 					write_type(writer, the_type, type_flags)
-					io.write_string(w, " = ")
-					io.write_string(w, init_string)
+					if init_string != "" {
+						io.write_string(w, " = ")
+						io.write_string(w, init_string)
+					}
 				} else {
 					io.write_string(w, " := ")
 					io.write_string(w, init_string)

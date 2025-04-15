@@ -478,12 +478,12 @@ intrinsics_table := []Builtin{
 		"- `0`: the thread blocked and then was woken up\n"+
 		"- `1`: the loaded value from `ptr` did not match `expected`, the thread did not block\n"+
 		"- `2`: the thread blocked, but the timeout expired\n"+
-		""
+		"",
 	},
 	{name = "wasm_memory_atomic_notify32", kind = "b", type ="proc(ptr: ^u32, waiters: u32) -> (waiters_woken_up: u32)",
 		comment = "Wakes threads waiting on the address indicated by `ptr`, up to the given maximum (`waiters`). If `waiters` is zero, no threads are woken up. Threads previously blocked with `wasm_memory_atomic_wait32` will be woken up.\n"+
 		"Returns:\n"+
-		"The number of threads woken up.\n"
+		"The number of threads woken up.\n",
 	},
 
 	// x86 Targets (i386, amd64)
