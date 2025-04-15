@@ -822,7 +822,7 @@ write_license :: proc(w: io.Writer, collection: ^Collection) {
 
 write_where_clauses :: proc(w: io.Writer, where_clauses: []doc.String) {
 	if len(where_clauses) != 0 {
-		io.write_string(w, " where ")
+		io.write_string(w, " <span class=\"keyword\">where</span> ")
 		for clause, i in where_clauses {
 			if i > 0 {
 				io.write_string(w, ", ")
@@ -1180,36 +1180,48 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		}
 		io.write_string(w, " {")
 
-		tags := array(type.tags)
-
-		if len(type_entities) != 0 {
+		if type.polymorphic_params != 0 && len(type_entities) == 0 {
 			do_newline(writer, flags)
 			indent += 1
-			name_width := calc_name_width(type_entities)
-
-			for entity_index, i in type_entities {
-				e := &cfg.entities[entity_index]
-				docs, comment := str(e.docs), str(e.comment)
-				_ = comment
-
-				write_lead_comment(writer, flags, docs, i)
-
-				do_indent(writer, flags)
-				write_param_entity(writer, e, /*next_entity*/nil, flags, name_width)
-
-				if tag := str(tags[i]); tag != "" {
-					io.write_string(w, " <span class=\"string\">`")
-					io.write_string(w, tag)
-					io.write_string(w, "`</span>")
-					// io.write_byte(w, ' ')
-					// io.write_quoted_string(w, tag)
-				}
-
-				io.write_byte(w, ',')
-				do_newline(writer, flags)
-			}
-			indent -= 1
 			do_indent(writer, flags)
+			indent -= 1
+			io.write_string(w, "<span class=\"comment\">… ")
+			io.write_string(w, "// ")
+			io.write_string(w, "See source for fields")
+			io.write_string(w, "</span>")
+			do_newline(writer, flags)
+		} else {
+			tags := array(type.tags)
+
+			if len(type_entities) != 0 {
+				do_newline(writer, flags)
+				indent += 1
+				name_width := calc_name_width(type_entities)
+
+				for entity_index, i in type_entities {
+					e := &cfg.entities[entity_index]
+					docs, comment := str(e.docs), str(e.comment)
+					_ = comment
+
+					write_lead_comment(writer, flags, docs, i)
+
+					do_indent(writer, flags)
+					write_param_entity(writer, e, /*next_entity*/nil, flags, name_width)
+
+					if tag := str(tags[i]); tag != "" {
+						io.write_string(w, " <span class=\"string\">`")
+						io.write_string(w, tag)
+						io.write_string(w, "`</span>")
+						// io.write_byte(w, ' ')
+						// io.write_quoted_string(w, tag)
+					}
+
+					io.write_byte(w, ',')
+					do_newline(writer, flags)
+				}
+				indent -= 1
+				do_indent(writer, flags)
+			}
 		}
 		io.write_string(w, "}")
 	case .Union:
@@ -1223,7 +1235,18 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			io.write_string(w, custom_align)
 		}
 		io.write_string(w, " {")
-		if len(type_types) > 1 {
+
+		if type.polymorphic_params != 0 && len(type_entities) == 0 {
+			do_newline(writer, flags)
+			indent += 1
+			do_indent(writer, flags)
+			indent -= 1
+			io.write_string(w, "<span class=\"comment\">… ")
+			io.write_string(w, "// ")
+			io.write_string(w, "See source for fields")
+			io.write_string(w, "</span>")
+			do_newline(writer, flags)
+		} else {
 			do_newline(writer, flags)
 			indent += 1
 			for type_index in type_types {
