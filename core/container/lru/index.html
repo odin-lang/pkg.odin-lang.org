@@ -387,6 +387,18 @@ Procedure Groups (0)</summary>
 added if the capacity is reached. Entries are removed based on how recently
 they were used where the oldest entries are removed first.</p>
 </details>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/core/container/lru/#clear">clear</a></li>
+<li><a href="/core/container/lru/#destroy">destroy</a></li>
+<li><a href="/core/container/lru/#exists">exists</a></li>
+<li><a href="/core/container/lru/#get">get</a></li>
+<li><a href="/core/container/lru/#get_ptr">get_ptr</a></li>
+<li><a href="/core/container/lru/#init">init</a></li>
+<li><a href="/core/container/lru/#peek">peek</a></li>
+<li><a href="/core/container/lru/#remove">remove</a></li>
+<li><a href="/core/container/lru/#set">set</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
 <h3 id="Node"><span><a class="doc-id-link" href="#Node">Node<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/lru/lru_cache.odin#L8"><em>Source</em></a></div></h3>
@@ -402,7 +414,7 @@ they were used where the oldest entries are removed first.</p>
 <div class="pkg-entity">
 <h3 id="clear"><span><a class="doc-id-link" href="#clear">clear<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/lru/lru_cache.odin#L46"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">clear :: <span class="keyword-type">proc</span>(c: ^$C, call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+<pre class="doc-code">clear :: <span class="keyword-type">proc</span>(c: ^$C/<a class="code-typename" href="/core/container/lru/#Cache">Cache</a>($Key, $Value), call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -412,7 +424,7 @@ they were used where the oldest entries are removed first.</p>
 <div class="pkg-entity">
 <h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/lru/lru_cache.odin#L40"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">destroy :: <span class="keyword-type">proc</span>(c: ^$C, call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+<pre class="doc-code">destroy :: <span class="keyword-type">proc</span>(c: ^$C/<a class="code-typename" href="/core/container/lru/#Cache">Cache</a>($Key, $Value), call_on_remove: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -422,7 +434,7 @@ they were used where the oldest entries are removed first.</p>
 <div class="pkg-entity">
 <h3 id="exists"><span><a class="doc-id-link" href="#exists">exists<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/lru/lru_cache.odin#L121"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">exists :: <span class="keyword-type">proc</span>(c: ^$C, key: $Key) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+<pre class="doc-code">exists :: <span class="keyword-type">proc</span>(c: ^$C/<a class="code-typename" href="/core/container/lru/#Cache">Cache</a>($Key, $Value), key: $Key) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -432,7 +444,7 @@ they were used where the oldest entries are removed first.</p>
 <div class="pkg-entity">
 <h3 id="get"><span><a class="doc-id-link" href="#get">get<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/lru/lru_cache.odin#L87"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">get :: <span class="keyword-type">proc</span>(c: ^$C, key: $Key) -> (value: $Value, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">get :: <span class="keyword-type">proc</span>(c: ^$C/<a class="code-typename" href="/core/container/lru/#Cache">Cache</a>($Key, $Value), key: $Key) -> (value: $Value, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -442,7 +454,7 @@ they were used where the oldest entries are removed first.</p>
 <div class="pkg-entity">
 <h3 id="get_ptr"><span><a class="doc-id-link" href="#get_ptr">get_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/lru/lru_cache.odin#L99"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">get_ptr :: <span class="keyword-type">proc</span>(c: ^$C, key: $Key) -> (value: ^$Value, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">get_ptr :: <span class="keyword-type">proc</span>(c: ^$C/<a class="code-typename" href="/core/container/lru/#Cache">Cache</a>($Key, $Value), key: $Key) -> (value: ^$Value, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -452,7 +464,7 @@ they were used where the oldest entries are removed first.</p>
 <div class="pkg-entity">
 <h3 id="init"><span><a class="doc-id-link" href="#init">init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/lru/lru_cache.odin#L33"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">init :: <span class="keyword-type">proc</span>(c: ^$C, capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, entries_allocator := <a href="/base/runtime/#Context">context.allocator</a>, node_allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
+<pre class="doc-code">init :: <span class="keyword-type">proc</span>(c: ^$C/<a class="code-typename" href="/core/container/lru/#Cache">Cache</a>($Key, $Value), capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, entries_allocator := <a href="/base/runtime/#Context">context.allocator</a>, node_allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -462,7 +474,7 @@ they were used where the oldest entries are removed first.</p>
 <div class="pkg-entity">
 <h3 id="peek"><span><a class="doc-id-link" href="#peek">peek<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/lru/lru_cache.odin#L111"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">peek :: <span class="keyword-type">proc</span>(c: ^$C, key: $Key) -> (value: $Value, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">peek :: <span class="keyword-type">proc</span>(c: ^$C/<a class="code-typename" href="/core/container/lru/#Cache">Cache</a>($Key, $Value), key: $Key) -> (value: $Value, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -472,7 +484,7 @@ they were used where the oldest entries are removed first.</p>
 <div class="pkg-entity">
 <h3 id="remove"><span><a class="doc-id-link" href="#remove">remove<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/lru/lru_cache.odin#L126"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">remove :: <span class="keyword-type">proc</span>(c: ^$C, key: $Key) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+<pre class="doc-code">remove :: <span class="keyword-type">proc</span>(c: ^$C/<a class="code-typename" href="/core/container/lru/#Cache">Cache</a>($Key, $Value), key: $Key) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -482,7 +494,7 @@ they were used where the oldest entries are removed first.</p>
 <div class="pkg-entity">
 <h3 id="set"><span><a class="doc-id-link" href="#set">set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/lru/lru_cache.odin#L60"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">set :: <span class="keyword-type">proc</span>(c: ^$C, key: $Key, value: $Value) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
+<pre class="doc-code">set :: <span class="keyword-type">proc</span>(c: ^$C/<a class="code-typename" href="/core/container/lru/#Cache">Cache</a>($Key, $Value), key: $Key, value: $Value) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -497,7 +509,7 @@ they were used where the oldest entries are removed first.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/container/lru/lru_cache.odin">lru_cache.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-14 21:12:17.745224900 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-15 10:56:52.025532600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
