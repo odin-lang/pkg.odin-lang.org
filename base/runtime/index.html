@@ -2880,13 +2880,13 @@ of len(src) and len(dst).</p>
 <div class="pkg-entity">
 <h3 id="default_hasher_cstring"><span><a class="doc-id-link" href="#default_hasher_cstring">default_hasher_cstring<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/dynamic_map_internal.odin#L1021"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">default_hasher_cstring :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, seed: <a href="/base/builtin#uintptr"><span class="doc-builtin">uintptr</span></a> = 0) -> <a href="/base/builtin#uintptr"><span class="doc-builtin">uintptr</span></a> {…}</pre>
+<pre class="doc-code">default_hasher_cstring :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, seed: <a href="/base/builtin#uintptr"><span class="doc-builtin">uintptr</span></a>) -> <a href="/base/builtin#uintptr"><span class="doc-builtin">uintptr</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="default_hasher_string"><span><a class="doc-id-link" href="#default_hasher_string">default_hasher_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/dynamic_map_internal.odin#L1017"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">default_hasher_string :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, seed: <a href="/base/builtin#uintptr"><span class="doc-builtin">uintptr</span></a> = 0) -> <a href="/base/builtin#uintptr"><span class="doc-builtin">uintptr</span></a> {…}</pre>
+<pre class="doc-code">default_hasher_string :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, seed: <a href="/base/builtin#uintptr"><span class="doc-builtin">uintptr</span></a>) -> <a href="/base/builtin#uintptr"><span class="doc-builtin">uintptr</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -2947,7 +2947,7 @@ of len(src) and len(dst).</p>
 <div class="pkg-entity">
 <h3 id="default_temp_allocator_temp_begin"><span><a class="doc-id-link" href="#default_temp_allocator_temp_begin">default_temp_allocator_temp_begin<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/default_temporary_allocator.odin#L47"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">default_temp_allocator_temp_begin :: <span class="keyword-type">proc</span>(loc: <a class="code-typename" href="/base/runtime/#Source_Code_Location">Source_Code_Location</a>) -> (temp: <a class="code-typename" href="/base/runtime/#Arena_Temp">Arena_Temp</a>) {…}</pre>
+<pre class="doc-code">default_temp_allocator_temp_begin :: <span class="keyword-type">proc</span>(loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (temp: <a class="code-typename" href="/base/runtime/#Arena_Temp">Arena_Temp</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -4565,13 +4565,13 @@ thread's lifetime.</p>
 <div class="pkg-entity">
 <h3 id="unimplemented"><span><a class="doc-id-link" href="#unimplemented">unimplemented<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1023"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">unimplemented :: <span class="keyword-type">proc</span>(message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ! {…}</pre>
+<pre class="doc-code">unimplemented :: <span class="keyword-type">proc</span>(message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = "", loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ! {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="unimplemented_contextless"><span><a class="doc-id-link" href="#unimplemented_contextless">unimplemented_contextless<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1065"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">unimplemented_contextless :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ! {…}</pre>
+<pre class="doc-code">unimplemented_contextless :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = "", loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ! {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -4923,7 +4923,7 @@ Make uses the specified allocator, default is context.allocator.</p>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-15 10:56:51.918157400 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-15 11:11:32.411066600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

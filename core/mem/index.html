@@ -2530,7 +2530,7 @@ freed.
 <div class="pkg-entity">
 <h3 id="default_resize_bytes_align"><span><a class="doc-id-link" href="#default_resize_bytes_align">default_resize_bytes_align<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L1202"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">default_resize_bytes_align :: <span class="keyword-type">proc</span>(old_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, new_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">default_resize_bytes_align :: <span class="keyword-type">proc</span>(old_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, new_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -2554,7 +2554,7 @@ freed.
 <div class="pkg-entity">
 <h3 id="default_resize_bytes_align_non_zeroed"><span><a class="doc-id-link" href="#default_resize_bytes_align_non_zeroed">default_resize_bytes_align_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L1174"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">default_resize_bytes_align_non_zeroed :: <span class="keyword-type">proc</span>(old_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, new_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">default_resize_bytes_align_non_zeroed :: <span class="keyword-type">proc</span>(old_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, new_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3195,7 +3195,7 @@ from an allocator specified by <code>allocator</code>.</p>
 <div class="pkg-entity">
 <h3 id="make_over_aligned"><span><a class="doc-id-link" href="#make_over_aligned">make_over_aligned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L903"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_over_aligned :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (slice: $/[]$E, original_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">make_over_aligned :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (slice: $/[]$E, original_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3427,7 +3427,7 @@ returns the pointer <code>ptr</code>.</p>
 <div class="pkg-entity">
 <h3 id="ptr_to_bytes"><span><a class="doc-id-link" href="#ptr_to_bytes">ptr_to_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/mem.odin#L362"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">ptr_to_bytes :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: ^$T, len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {…}</pre>
+<pre class="doc-code">ptr_to_bytes :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: ^$T, len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = 1) -> []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3439,7 +3439,7 @@ the address specified by <code>ptr</code>.</p>
 <div class="pkg-entity">
 <h3 id="query_features"><span><a class="doc-id-link" href="#query_features">query_features<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L711"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">query_features :: <span class="keyword-type">proc</span>(allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (set: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Mode_Set">Allocator_Mode_Set</a>) {…}</pre>
+<pre class="doc-code">query_features :: <span class="keyword-type">proc</span>(allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (set: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Mode_Set">Allocator_Mode_Set</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -4829,7 +4829,7 @@ to zero, and returns the slice <code>data</code>.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin">tracking_allocator.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-15 10:56:52.282219800 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-15 11:11:32.783595600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
