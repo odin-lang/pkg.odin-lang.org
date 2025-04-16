@@ -808,52 +808,55 @@ Procedure Groups (1)</summary>
 <div>
 <pre class="doc-code">BodyDef :: <span class="keyword-type">struct</span> {
 	<span class="comment">// The body type: static, kinematic, or dynamic.</span>
-	type:            <a class="code-typename" href="/vendor/box2d/#BodyType">BodyType</a>,
+	type:              <a class="code-typename" href="/vendor/box2d/#BodyType">BodyType</a>,
 	<span class="comment">// The initial world position of the body. Bodies should be created with the desired position.</span>
 	<span class="comment">// @note Creating bodies at the origin and then moving them nearly doubles the cost of body creation, especially</span>
 	<span class="comment">// 	if the body is moved after shapes have been added.</span>
-	position:        [2]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	position:          [2]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	<span class="comment">// The initial world rotation of the body. Use b2MakeRot() if you have an angle.</span>
-	rotation:        <a class="code-typename" href="/vendor/box2d/#Rot">Rot</a>,
+	rotation:          <a class="code-typename" href="/vendor/box2d/#Rot">Rot</a>,
 	<span class="comment">// The initial linear velocity of the body's origin. Typically in meters per second.</span>
-	linearVelocity:  [2]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	linearVelocity:    [2]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	<span class="comment">// The initial angular velocity of the body. Radians per second.</span>
-	angularVelocity: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	angularVelocity:   <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	<span class="comment">// Linear damping is use to reduce the linear velocity. The damping parameter</span>
 	<span class="comment">// can be larger than 1 but the damping effect becomes sensitive to the</span>
 	<span class="comment">// time step when the damping parameter is large.</span>
 	<span class="comment">// 	Generally linear damping is undesirable because it makes objects move slowly</span>
 	<span class="comment">// 	as if they are f32ing.</span>
-	linearDamping:   <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	linearDamping:     <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	<span class="comment">// Angular damping is use to reduce the angular velocity. The damping parameter</span>
 	<span class="comment">// can be larger than 1.0f but the damping effect becomes sensitive to the</span>
 	<span class="comment">// time step when the damping parameter is large.</span>
 	<span class="comment">// 	Angular damping can be use slow down rotating bodies.</span>
-	angularDamping:  <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	angularDamping:    <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	<span class="comment">// Scale the gravity applied to this body. Non-dimensional.</span>
-	gravityScale:    <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	gravityScale:      <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	<span class="comment">// Sleep velocity threshold, default is 0.05 meter per second</span>
-	sleepThreshold:  <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	sleepThreshold:    <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	<span class="comment">// Use this to store application specific body data.</span>
-	userData:        <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
+	userData:          <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
 	<span class="comment">// Set this flag to false if this body should never fall asleep.</span>
-	enableSleep:     <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	enableSleep:       <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
 	<span class="comment">// Is this body initially awake or sleeping?</span>
-	isAwake:         <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isAwake:           <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
 	<span class="comment">// Should this body be prevented from rotating? Useful for characters.</span>
-	fixedRotation:   <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	fixedRotation:     <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
 	<span class="comment">// Treat this body as high speed object that performs continuous collision detection</span>
 	<span class="comment">// against dynamic and kinematic bodies, but not other bullet bodies.</span>
 	<span class="comment">// 	@warning Bullets should be used sparingly. They are not a solution for general dynamic-versus-dynamic</span>
 	<span class="comment">// 	continuous collision. They may interfere with joint constraints.</span>
-	isBullet:        <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isBullet:          <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
 	<span class="comment">// Used to disable a body. A disabled body does not move or collide.</span>
-	isEnabled:       <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	isEnabled:         <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
 	<span class="comment">// Automatically compute mass and related properties on this body from shapes.</span>
 	<span class="comment">// Triggers whenever a shape is add/removed/changed. Default is true.</span>
-	automaticMass:   <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	automaticMass:     <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	<span class="comment">// This allows this body to bypass rotational speed limits. Should only be used</span>
+	<span class="comment">// for circular objects, like wheels.</span>
+	allowFastRotation: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
 	<span class="comment">// Used internally to detect a valid definition. DO NOT SET.</span>
-	internalValue:   <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	internalValue:     <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
 }</pre>
 </div>
 <details class="odin-doc-toggle" open>
@@ -875,7 +878,7 @@ You can safely re-use body definitions. Shapes are added to a body after constru
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="BodyEvents"><span><a class="doc-id-link" href="#BodyEvents">BodyEvents<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L925"><em>Source</em></a></div></h3>
+<h3 id="BodyEvents"><span><a class="doc-id-link" href="#BodyEvents">BodyEvents<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L929"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BodyEvents :: <span class="keyword-type">struct</span> {
 	<span class="comment">// Array of move events</span>
@@ -991,7 +994,7 @@ Note: this date becomes invalid if bodies are destroyed
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="BodyMoveEvent"><span><a class="doc-id-link" href="#BodyMoveEvent">BodyMoveEvent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L915"><em>Source</em></a></div></h3>
+<h3 id="BodyMoveEvent"><span><a class="doc-id-link" href="#BodyMoveEvent">BodyMoveEvent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L919"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BodyMoveEvent :: <span class="keyword-type">struct</span> {
 	transform:  <a class="code-typename" href="/vendor/box2d/#Transform">Transform</a>,
@@ -1117,7 +1120,7 @@ Each body is one of these three types. The type determines how the body behaves 
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="CastResultFcn"><span><a class="doc-id-link" href="#CastResultFcn">CastResultFcn<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L995"><em>Source</em></a></div></h3>
+<h3 id="CastResultFcn"><span><a class="doc-id-link" href="#CastResultFcn">CastResultFcn<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L999"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CastResultFcn :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (shapeId: <a class="code-typename" href="/vendor/box2d/#ShapeId">ShapeId</a>, point: [2]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, normal: [2]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, fraction: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, ctx: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a></pre>
 </div>
@@ -1150,7 +1153,7 @@ return 1: don't clip the ray and continue
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="ChainDef"><span><a class="doc-id-link" href="#ChainDef">ChainDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L334"><em>Source</em></a></div></h3>
+<h3 id="ChainDef"><span><a class="doc-id-link" href="#ChainDef">ChainDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L338"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ChainDef :: <span class="keyword-type">struct</span> {
 	<span class="comment">// Use this to store application specific shape data.</span>
@@ -1269,7 +1272,7 @@ Must be initialized using b2DefaultChainDef().</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="ContactBeginTouchEvent"><span><a class="doc-id-link" href="#ContactBeginTouchEvent">ContactBeginTouchEvent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L847"><em>Source</em></a></div></h3>
+<h3 id="ContactBeginTouchEvent"><span><a class="doc-id-link" href="#ContactBeginTouchEvent">ContactBeginTouchEvent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L851"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ContactBeginTouchEvent :: <span class="keyword-type">struct</span> {
 	<span class="comment">// Id of the first shape</span>
@@ -1284,7 +1287,7 @@ Must be initialized using b2DefaultChainDef().</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ContactData"><span><a class="doc-id-link" href="#ContactData">ContactData<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L937"><em>Source</em></a></div></h3>
+<h3 id="ContactData"><span><a class="doc-id-link" href="#ContactData">ContactData<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L941"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ContactData :: <span class="keyword-type">struct</span> {
 	shapeIdA: <a class="code-typename" href="/vendor/box2d/#ShapeId">ShapeId</a>,
@@ -1301,7 +1304,7 @@ Must be initialized using b2DefaultChainDef().</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ContactEndTouchEvent"><span><a class="doc-id-link" href="#ContactEndTouchEvent">ContactEndTouchEvent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L856"><em>Source</em></a></div></h3>
+<h3 id="ContactEndTouchEvent"><span><a class="doc-id-link" href="#ContactEndTouchEvent">ContactEndTouchEvent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L860"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ContactEndTouchEvent :: <span class="keyword-type">struct</span> {
 	<span class="comment">// Id of the first shape</span>
@@ -1316,7 +1319,7 @@ Must be initialized using b2DefaultChainDef().</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ContactEvents"><span><a class="doc-id-link" href="#ContactEvents">ContactEvents<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L885"><em>Source</em></a></div></h3>
+<h3 id="ContactEvents"><span><a class="doc-id-link" href="#ContactEvents">ContactEvents<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L889"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ContactEvents :: <span class="keyword-type">struct</span> {
 	<span class="comment">// Array of begin touch events</span>
@@ -1346,7 +1349,7 @@ Note: these may become invalid if bodies and/or shapes are destroyed
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="ContactHitEvent"><span><a class="doc-id-link" href="#ContactHitEvent">ContactHitEvent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L865"><em>Source</em></a></div></h3>
+<h3 id="ContactHitEvent"><span><a class="doc-id-link" href="#ContactHitEvent">ContactHitEvent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L869"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ContactHitEvent :: <span class="keyword-type">struct</span> {
 	<span class="comment">// Id of the first shape</span>
@@ -1367,7 +1370,7 @@ Note: these may become invalid if bodies and/or shapes are destroyed
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Counters"><span><a class="doc-id-link" href="#Counters">Counters<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L389"><em>Source</em></a></div></h3>
+<h3 id="Counters"><span><a class="doc-id-link" href="#Counters">Counters<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L393"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Counters :: <span class="keyword-type">struct</span> {
 	staticBodyCount:  <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
@@ -1394,7 +1397,7 @@ Note: these may become invalid if bodies and/or shapes are destroyed
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="CustomFilterFcn"><span><a class="doc-id-link" href="#CustomFilterFcn">CustomFilterFcn<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L956"><em>Source</em></a></div></h3>
+<h3 id="CustomFilterFcn"><span><a class="doc-id-link" href="#CustomFilterFcn">CustomFilterFcn<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L960"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CustomFilterFcn :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (shapeIdA, shapeIdB: <a class="code-typename" href="/vendor/box2d/#ShapeId">ShapeId</a>, ctx: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a></pre>
 </div>
@@ -1421,7 +1424,7 @@ one of the two shapes has custom filtering enabled. @see b2ShapeDef.
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="DebugDraw"><span><a class="doc-id-link" href="#DebugDraw">DebugDraw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L1162"><em>Source</em></a></div></h3>
+<h3 id="DebugDraw"><span><a class="doc-id-link" href="#DebugDraw">DebugDraw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L1166"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DebugDraw :: <span class="keyword-type">struct</span> {
 	<span class="comment">// Draw a closed polygon provided in CCW order.</span>
@@ -1538,7 +1541,7 @@ one of the two shapes has custom filtering enabled. @see b2ShapeDef.
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="DistanceJointDef"><span><a class="doc-id-link" href="#DistanceJointDef">DistanceJointDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L427"><em>Source</em></a></div></h3>
+<h3 id="DistanceJointDef"><span><a class="doc-id-link" href="#DistanceJointDef">DistanceJointDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L431"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DistanceJointDef :: <span class="keyword-type">struct</span> {
 	<span class="comment">// The first attached body</span>
@@ -1723,7 +1726,7 @@ The exception of course is when itemCount &lt; minRange.
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Filter"><span><a class="doc-id-link" href="#Filter">Filter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L199"><em>Source</em></a></div></h3>
+<h3 id="Filter"><span><a class="doc-id-link" href="#Filter">Filter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L203"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Filter :: <span class="keyword-type">struct</span> {
 	<span class="comment">// The collision category bits. Normally you would just set one bit. The category bits should</span>
@@ -1802,7 +1805,7 @@ The exception of course is when itemCount &lt; minRange.
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="HexColor"><span><a class="doc-id-link" href="#HexColor">HexColor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L999"><em>Source</em></a></div></h3>
+<h3 id="HexColor"><span><a class="doc-id-link" href="#HexColor">HexColor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L1003"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">HexColor :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	AliceBlue            = 15792383, 
@@ -2147,7 +2150,7 @@ The exception of course is when itemCount &lt; minRange.
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="JointType"><span><a class="doc-id-link" href="#JointType">JointType<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L410"><em>Source</em></a></div></h3>
+<h3 id="JointType"><span><a class="doc-id-link" href="#JointType">JointType<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L414"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">JointType :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	distanceJoint, 
@@ -2279,7 +2282,7 @@ of the contact points.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="MotorJointDef"><span><a class="doc-id-link" href="#MotorJointDef">MotorJointDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L486"><em>Source</em></a></div></h3>
+<h3 id="MotorJointDef"><span><a class="doc-id-link" href="#MotorJointDef">MotorJointDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L490"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MotorJointDef :: <span class="keyword-type">struct</span> {
 	<span class="comment">// The first attached body</span>
@@ -2320,7 +2323,7 @@ of the contact points.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="MouseJointDef"><span><a class="doc-id-link" href="#MouseJointDef">MouseJointDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L524"><em>Source</em></a></div></h3>
+<h3 id="MouseJointDef"><span><a class="doc-id-link" href="#MouseJointDef">MouseJointDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L528"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MouseJointDef :: <span class="keyword-type">struct</span> {
 	<span class="comment">// The first attached body.</span>
@@ -2360,7 +2363,7 @@ applying huge forces. This also applies rotation constraint heuristic to improve
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="OverlapResultFcn"><span><a class="doc-id-link" href="#OverlapResultFcn">OverlapResultFcn<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L978"><em>Source</em></a></div></h3>
+<h3 id="OverlapResultFcn"><span><a class="doc-id-link" href="#OverlapResultFcn">OverlapResultFcn<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L982"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OverlapResultFcn :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (shapeId: <a class="code-typename" href="/vendor/box2d/#ShapeId">ShapeId</a>, ctx: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a></pre>
 </div>
@@ -2437,7 +2440,7 @@ b2MakePolygon or b2MakeBox.
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="PreSolveFcn"><span><a class="doc-id-link" href="#PreSolveFcn">PreSolveFcn<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L971"><em>Source</em></a></div></h3>
+<h3 id="PreSolveFcn"><span><a class="doc-id-link" href="#PreSolveFcn">PreSolveFcn<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L975"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PreSolveFcn :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (shapeIdA, shapeIdB: <a class="code-typename" href="/vendor/box2d/#ShapeId">ShapeId</a>, manifold: ^<a class="code-typename" href="/vendor/box2d/#Manifold">Manifold</a>, ctx: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a></pre>
 </div>
@@ -2465,7 +2468,7 @@ Notes:</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="PrismaticJointDef"><span><a class="doc-id-link" href="#PrismaticJointDef">PrismaticJointDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L561"><em>Source</em></a></div></h3>
+<h3 id="PrismaticJointDef"><span><a class="doc-id-link" href="#PrismaticJointDef">PrismaticJointDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L565"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PrismaticJointDef :: <span class="keyword-type">struct</span> {
 	<span class="comment">// The first attached body</span>
@@ -2525,7 +2528,7 @@ when the local anchor points coincide in world space.
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Profile"><span><a class="doc-id-link" href="#Profile">Profile<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L363"><em>Source</em></a></div></h3>
+<h3 id="Profile"><span><a class="doc-id-link" href="#Profile">Profile<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L367"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Profile :: <span class="keyword-type">struct</span> {
 	step:                <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
@@ -2563,7 +2566,7 @@ Profiling data. Times are in milliseconds.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="QueryFilter"><span><a class="doc-id-link" href="#QueryFilter">QueryFilter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L237"><em>Source</em></a></div></h3>
+<h3 id="QueryFilter"><span><a class="doc-id-link" href="#QueryFilter">QueryFilter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L241"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">QueryFilter :: <span class="keyword-type">struct</span> {
 	<span class="comment">// The collision category bits of this query. Normally you would just set one bit.</span>
@@ -2647,7 +2650,7 @@ but not debris.
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="RevoluteJointDef"><span><a class="doc-id-link" href="#RevoluteJointDef">RevoluteJointDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L630"><em>Source</em></a></div></h3>
+<h3 id="RevoluteJointDef"><span><a class="doc-id-link" href="#RevoluteJointDef">RevoluteJointDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L634"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">RevoluteJointDef :: <span class="keyword-type">struct</span> {
 	<span class="comment">// The first attached body</span>
@@ -2805,7 +2808,7 @@ rather than the center of mass because:
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="SensorBeginTouchEvent"><span><a class="doc-id-link" href="#SensorBeginTouchEvent">SensorBeginTouchEvent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L812"><em>Source</em></a></div></h3>
+<h3 id="SensorBeginTouchEvent"><span><a class="doc-id-link" href="#SensorBeginTouchEvent">SensorBeginTouchEvent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L816"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SensorBeginTouchEvent :: <span class="keyword-type">struct</span> {
 	<span class="comment">// The id of the sensor shape</span>
@@ -2820,7 +2823,7 @@ rather than the center of mass because:
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="SensorEndTouchEvent"><span><a class="doc-id-link" href="#SensorEndTouchEvent">SensorEndTouchEvent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L821"><em>Source</em></a></div></h3>
+<h3 id="SensorEndTouchEvent"><span><a class="doc-id-link" href="#SensorEndTouchEvent">SensorEndTouchEvent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L825"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SensorEndTouchEvent :: <span class="keyword-type">struct</span> {
 	<span class="comment">// The id of the sensor shape</span>
@@ -2835,7 +2838,7 @@ rather than the center of mass because:
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="SensorEvents"><span><a class="doc-id-link" href="#SensorEvents">SensorEvents<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L832"><em>Source</em></a></div></h3>
+<h3 id="SensorEvents"><span><a class="doc-id-link" href="#SensorEvents">SensorEvents<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L836"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SensorEvents :: <span class="keyword-type">struct</span> {
 	<span class="comment">// Array of sensor begin touch events</span>
@@ -2919,7 +2922,7 @@ A capsule is two points with a non-zero radius. A box is four points with a zero
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="ShapeDef"><span><a class="doc-id-link" href="#ShapeDef">ShapeDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L274"><em>Source</em></a></div></h3>
+<h3 id="ShapeDef"><span><a class="doc-id-link" href="#ShapeDef">ShapeDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L278"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ShapeDef :: <span class="keyword-type">struct</span> {
 	<span class="comment">// Use this to store application specific shape data.</span>
@@ -3043,7 +3046,7 @@ This is a temporary object used to bundle shape creation parameters. You may use
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="ShapeType"><span><a class="doc-id-link" href="#ShapeType">ShapeType<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L249"><em>Source</em></a></div></h3>
+<h3 id="ShapeType"><span><a class="doc-id-link" href="#ShapeType">ShapeType<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L253"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ShapeType :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	<span class="comment">// A circle with an offset</span>
@@ -3434,7 +3437,7 @@ returns the new ray fraction.
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="WeldJointDef"><span><a class="doc-id-link" href="#WeldJointDef">WeldJointDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L694"><em>Source</em></a></div></h3>
+<h3 id="WeldJointDef"><span><a class="doc-id-link" href="#WeldJointDef">WeldJointDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L698"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">WeldJointDef :: <span class="keyword-type">struct</span> {
 	<span class="comment">// The first attached body</span>
@@ -3482,7 +3485,7 @@ returns the new ray fraction.
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="WheelJointDef"><span><a class="doc-id-link" href="#WheelJointDef">WheelJointDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L740"><em>Source</em></a></div></h3>
+<h3 id="WheelJointDef"><span><a class="doc-id-link" href="#WheelJointDef">WheelJointDef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L744"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">WheelJointDef :: <span class="keyword-type">struct</span> {
 	<span class="comment">// The first attached body</span>
@@ -3773,7 +3776,7 @@ Must be initialized using b2DefaultWorldDef().
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="shapeTypeCount"><span><a class="doc-id-link" href="#shapeTypeCount">shapeTypeCount<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L267"><em>Source</em></a></div></h3>
+<h3 id="shapeTypeCount"><span><a class="doc-id-link" href="#shapeTypeCount">shapeTypeCount<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin#L271"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">shapeTypeCount: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : len(ShapeType)</pre>
 </div>
@@ -8270,7 +8273,7 @@ Typically in meters per second.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/box2d/types.odin">types.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-15 21:12:36.165558200 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-16 21:11:58.909107700 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
