@@ -327,7 +327,8 @@
 for dealing with memory, pointers and slices.</p>
 <p>The documentation below describes basic concepts, applicable to the <code>mem</code>
 package.</p>
-<p><h4> Pointers, multipointers, and slices</h4></p>
+<p></p>
+<h4> Pointers, multipointers, and slices</h4><p></p>
 <p>A <i>pointer</i> is an abstraction of an <i>address</i>, a numberic value representing the
 location of an object in memory. That object is said to be <i>pointed to</i> by the
 pointer. To obtain the address of a pointer, cast it to <code>uintptr</code>.</p>
@@ -339,7 +340,8 @@ the amount of objects a slice points to.</p>
 <i>load</i> operation. When memory is written to through a pointer, that operation is
 called a <i>store</i> operation. Both of these operations can be called a *memory
 access operation*.</p>
-<p><h4> Allocators</h4></p>
+<p></p>
+<h4> Allocators</h4><p></p>
 <p>In C and C++ memory models, allocations of objects in memory are typically
 treated individually with a generic allocator (The <code>malloc</code> procedure). Which in
 some scenarios can lead to poor cache utilization, slowdowns on individual
@@ -364,7 +366,8 @@ allocator.</p>
 procedures, which is ownership. If the memory was allocated via a specific
 allocator, that allocator is said to be the <i>owner</i> of that memory region. To
 note, unlike Rust, in Odin the memory ownership model is not strict.</p>
-<p><h4> Alignment</h4></p>
+<p></p>
+<h4> Alignment</h4><p></p>
 <p>An address is said to be <i>aligned to `N` bytes</i>, if the addresses's numeric
 value is divisible by <code>N</code>. The number <code>N</code> in this case can be referred to as
 the <i>alignment boundary</i>. Typically an alignment is a power of two integer
@@ -382,7 +385,8 @@ operations are:</p>
 <p>As such, many operations that allocate memory in this package allow to
 explicitly specify the alignment of allocated pointers/slices. The default
 alignment for all operations is specified in a constant <code>mem.DEFAULT_ALIGNMENT</code>.</p>
-<p><h4> Zero by default</h4></p>
+<p></p>
+<h4> Zero by default</h4><p></p>
 <p>Whenever new memory is allocated, via an allocator, or on the stack, by default
 Odin will zero-initialize that memory, even if it wasn't explicitly
 initialized. This allows for some convenience in certain scenarios and ease of
@@ -391,7 +395,8 @@ debugging, which will not be described in detail here.</p>
 buffers. For this reason, allocators have <code>*_non_zeroed</code> modes of allocation
 that allow the user to request for uninitialized memory and will avoid a
 relatively expensive zero-filling of the buffer.</p>
-<p><h4> Naming conventions</h4></p>
+<p></p>
+<h4> Naming conventions</h4><p></p>
 <p>The word <code>size</code> is used to denote the <b>size in bytes</b>. The word <code>length</code> is
 used to denote the count of objects.</p>
 <p>The allocation procedures use the following conventions:</p>
@@ -852,7 +857,8 @@ value of the <code>mode</code> parameter. For any operation the following constr
 apply:</p>
 <p><span class="doc-list">The <code>alignment</code> must be a power of two.</span>
 <span class="doc-list">The <code>size</code> must be a positive integer.</span></p>
-<p><h4> 1. <code>.Alloc</code>, <code>.Alloc_Non_Zeroed</code></h4></p>
+<p></p>
+<h4> 1. <code>.Alloc</code>, <code>.Alloc_Non_Zeroed</code></h4><p></p>
 <p>Allocates a memory region of size <code>size</code>, aligned on a boundary specified by
 <code>alignment</code>.</p>
 <p><b>Inputs</b>:
@@ -869,7 +875,8 @@ apply:</p>
 Always check both the error and the allocated buffer.</p>
 <p><b>Note</b>: The <code>.Alloc</code> mode is required to be implemented for an allocator
 and can not return a <code>.Mode_Not_Implemented</code> error.</p>
-<p><h4> 2. <code>Free</code></h4></p>
+<p></p>
+<h4> 2. <code>Free</code></h4><p></p>
 <p>Frees a memory region located at the address specified by <code>old_memory</code>. If the
 allocator does not track sizes of allocations, the size should be specified in
 the <code>old_size</code> parameter.</p>
@@ -886,7 +893,8 @@ the <code>old_size</code> parameter.</p>
 <p><b>Returns</b>:
 1. <code>nil</code>
 2. Error, if freeing failed.</p>
-<p><h4> 3. <code>Free_All</code></h4></p>
+<p></p>
+<h4> 3. <code>Free_All</code></h4><p></p>
 <p>Frees all allocations, associated with the allocator, making it available for
 further allocations using the same backing buffers.</p>
 <p><b>Inputs</b>:
@@ -899,7 +907,8 @@ further allocations using the same backing buffers.</p>
 <p><b>Returns</b>:
 1. <code>nil</code>.
 2. Error, if freeing failed.</p>
-<p><h4> 4. <code>Resize</code>, <code>Resize_Non_Zeroed</code></h4></p>
+<p></p>
+<h4> 4. <code>Resize</code>, <code>Resize_Non_Zeroed</code></h4><p></p>
 <p>Resizes the memory region, of the size <code>old_size</code> located at the address
 specified by <code>old_memory</code> to have the new size <code>size</code>. The slice of the new
 memory region is returned from the procedure. The allocator may attempt to
@@ -4829,7 +4838,7 @@ to zero, and returns the slice <code>data</code>.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin">tracking_allocator.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-17 09:07:41.262781000 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-17 09:10:59.482764100 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
