@@ -1872,9 +1872,11 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 							break
 						}
 					}
+					io.write_string(w, "</p>\n")
 					fmt.wprintf(w, "<h%d>", n+2)
 					write_markup_text(w, line[n:])
 					fmt.wprintf(w, "</h%d>", n+2)
+					io.write_string(w, "<p>")
 					continue
 				}
 
