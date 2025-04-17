@@ -1863,6 +1863,22 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 				if line_idx > 0 {
 					io.write_string(w, "\n")
 				}
+				if strings.has_prefix(line, "##") {
+					n := 0
+					for c in line {
+						if c == '#' {
+							n += 1
+						} else {
+							break
+						}
+					}
+					fmt.wprintf(w, "<h%d>", n+2)
+					write_markup_text(w, line[n:])
+					fmt.wprintf(w, "</h%d>", n+2)
+					continue
+				}
+
+
 				write_markup_text(w, line)
 			}
 			io.write_string(w, "</p>\n")
