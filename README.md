@@ -9,6 +9,8 @@ GitHub Actions automatically generates the site each night from the master Odin 
 * Doc Format: https://github.com/odin-lang/Odin/blob/master/core/odin/doc-format/doc_format.odin
 * examples/all: https://github.com/odin-lang/Odin/tree/master/examples/all
 
+This implementation of the documentation generator relies on the [commonmark](https://github.com/commonmark/cmark) library under `vendor:commonmark`. A library is provided for Windows. On other platforms you'll have to install it yourself.
+
 ## Markup rules
 
 The generator uses simple markup rules to generate more structured documentation such as code blocks or examples.
