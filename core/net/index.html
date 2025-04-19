@@ -421,10 +421,11 @@ Types (60)</summary>
 <div>
 <details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
 <summary id="#doc-index-Constants-header">
-Constants (12)</summary>
+Constants (13)</summary>
 <ul>
 <li><a href="#DEFAULT_DIGIT_BASES">DEFAULT_DIGIT_BASES</a></li>
 <li><a href="#DEFAULT_DNS_CONFIGURATION">DEFAULT_DNS_CONFIGURATION</a></li>
+<li><a href="#DEFAULT_TCP_OPTIONS">DEFAULT_TCP_OPTIONS</a></li>
 <li><a href="#IP4_Loopback">IP4_Loopback</a></li>
 <li><a href="#IP6_Loopback">IP6_Loopback</a></li>
 <li><a href="#IPv6_MAX_STRING_LENGTH">IPv6_MAX_STRING_LENGTH</a></li>
@@ -441,13 +442,12 @@ Constants (12)</summary>
 <div>
 <details class="doc-index" id="doc-index-Variables" aria-labelledby="#doc-index-Variables-header">
 <summary id="#doc-index-Variables-header">
-Variables (6)</summary>
+Variables (5)</summary>
 <ul>
 <li><a href="#IP4_Any">IP4_Any</a></li>
 <li><a href="#IP4_mDNS_Broadcast">IP4_mDNS_Broadcast</a></li>
 <li><a href="#IP6_Any">IP6_Any</a></li>
 <li><a href="#IP6_mDNS_Broadcast">IP6_mDNS_Broadcast</a></li>
-<li><a href="#default_tcp_options">default_tcp_options</a></li>
 <li><a href="#dns_configuration">dns_configuration</a></li>
 </ul>
 </details>
@@ -1553,6 +1553,10 @@ we treat it as a handle large enough to accomodate OS-specific notions of socket
 <li><a href="/core/net/#dial_tcp_from_hostname_with_port_override">dial_tcp_from_hostname_with_port_override</a></li>
 <li><a href="/core/net/#dial_tcp">dial_tcp</a>&nbsp;<em>(procedure groups)</em></li>
 </ul>
+<h5>Related Constants</h5>
+<ul>
+<li><a href="/core/net/#DEFAULT_TCP_OPTIONS">DEFAULT_TCP_OPTIONS</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
 <h3 id="TCP_Recv_Error"><span><a class="doc-id-link" href="#TCP_Recv_Error">TCP_Recv_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/errors.odin#L142"><em>Source</em></a></div></h3>
@@ -1751,6 +1755,12 @@ we treat it as a handle large enough to accomodate OS-specific notions of socket
 </div>
 </div>
 <div class="pkg-entity">
+<h3 id="DEFAULT_TCP_OPTIONS"><span><a class="doc-id-link" href="#DEFAULT_TCP_OPTIONS">DEFAULT_TCP_OPTIONS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L110"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DEFAULT_TCP_OPTIONS :: TCP_Options{no_delay = ODIN_NET_TCP_NODELAY_DEFAULT}</pre>
+</div>
+</div>
+<div class="pkg-entity">
 <h3 id="IP4_Loopback"><span><a class="doc-id-link" href="#IP4_Loopback">IP4_Loopback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L143"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">IP4_Loopback :: IP4_Address{127, 0, 0, 1}</pre>
@@ -1844,12 +1854,6 @@ and at most 9 (using <code>::</code> for a trailing or leading 0)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="default_tcp_options"><span><a class="doc-id-link" href="#default_tcp_options">default_tcp_options<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L110"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">default_tcp_options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = …</pre>
-</div>
-</div>
-<div class="pkg-entity">
 <h3 id="dns_configuration"><span><a class="doc-id-link" href="#dns_configuration">dns_configuration<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L64"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dns_configuration: <a class="code-typename" href="/core/net/#DNS_Configuration">DNS_Configuration</a> = …</pre>
@@ -1859,7 +1863,7 @@ and at most 9 (using <code>::</code> for a trailing or leading 0)</p>
 <div class="pkg-entity">
 <h3 id="accept_tcp"><span><a class="doc-id-link" href="#accept_tcp">accept_tcp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L181"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">accept_tcp :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = default_tcp_options) -> (client: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, source: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, err: <a class="code-typename" href="/core/net/#Accept_Error">Accept_Error</a>) {…}</pre>
+<pre class="doc-code">accept_tcp :: <span class="keyword-type">proc</span>(socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = DEFAULT_TCP_OPTIONS) -> (client: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, source: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, err: <a class="code-typename" href="/core/net/#Accept_Error">Accept_Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1961,7 +1965,7 @@ a       - where `a` gives the entire 32-bit value
 <div class="pkg-entity">
 <h3 id="dial_tcp_from_address_and_port"><span><a class="doc-id-link" href="#dial_tcp_from_address_and_port">dial_tcp_from_address_and_port<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L103"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">dial_tcp_from_address_and_port :: <span class="keyword-type">proc</span>(address: <a class="code-typename" href="/core/net/#Address">Address</a>, port: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = default_tcp_options) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">dial_tcp_from_address_and_port :: <span class="keyword-type">proc</span>(address: <a class="code-typename" href="/core/net/#Address">Address</a>, port: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = DEFAULT_TCP_OPTIONS) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1972,7 +1976,7 @@ a       - where `a` gives the entire 32-bit value
 <div class="pkg-entity">
 <h3 id="dial_tcp_from_endpoint"><span><a class="doc-id-link" href="#dial_tcp_from_endpoint">dial_tcp_from_endpoint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L112"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">dial_tcp_from_endpoint :: <span class="keyword-type">proc</span>(endpoint: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = default_tcp_options) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">dial_tcp_from_endpoint :: <span class="keyword-type">proc</span>(endpoint: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = DEFAULT_TCP_OPTIONS) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1983,7 +1987,7 @@ a       - where `a` gives the entire 32-bit value
 <div class="pkg-entity">
 <h3 id="dial_tcp_from_host"><span><a class="doc-id-link" href="#dial_tcp_from_host">dial_tcp_from_host<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L72"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">dial_tcp_from_host :: <span class="keyword-type">proc</span>(host: <a class="code-typename" href="/core/net/#Host">Host</a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = default_tcp_options) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">dial_tcp_from_host :: <span class="keyword-type">proc</span>(host: <a class="code-typename" href="/core/net/#Host">Host</a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = DEFAULT_TCP_OPTIONS) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1995,7 +1999,7 @@ a       - where `a` gives the entire 32-bit value
 <div class="pkg-entity">
 <h3 id="dial_tcp_from_host_or_endpoint"><span><a class="doc-id-link" href="#dial_tcp_from_host_or_endpoint">dial_tcp_from_host_or_endpoint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L88"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">dial_tcp_from_host_or_endpoint :: <span class="keyword-type">proc</span>(target: <a class="code-typename" href="/core/net/#Host_Or_Endpoint">Host_Or_Endpoint</a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = default_tcp_options) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">dial_tcp_from_host_or_endpoint :: <span class="keyword-type">proc</span>(target: <a class="code-typename" href="/core/net/#Host_Or_Endpoint">Host_Or_Endpoint</a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = DEFAULT_TCP_OPTIONS) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -2008,7 +2012,7 @@ a       - where `a` gives the entire 32-bit value
 <div class="pkg-entity">
 <h3 id="dial_tcp_from_hostname_and_port_string"><span><a class="doc-id-link" href="#dial_tcp_from_hostname_and_port_string">dial_tcp_from_hostname_and_port_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L41"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">dial_tcp_from_hostname_and_port_string :: <span class="keyword-type">proc</span>(hostname_and_port: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = default_tcp_options) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">dial_tcp_from_hostname_and_port_string :: <span class="keyword-type">proc</span>(hostname_and_port: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = DEFAULT_TCP_OPTIONS) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -2022,7 +2026,7 @@ a       - where `a` gives the entire 32-bit value
 <div class="pkg-entity">
 <h3 id="dial_tcp_from_hostname_with_port_override"><span><a class="doc-id-link" href="#dial_tcp_from_hostname_with_port_override">dial_tcp_from_hostname_with_port_override<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/socket.odin#L55"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">dial_tcp_from_hostname_with_port_override :: <span class="keyword-type">proc</span>(hostname: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, port: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = default_tcp_options) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
+<pre class="doc-code">dial_tcp_from_hostname_with_port_override :: <span class="keyword-type">proc</span>(hostname: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, port: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, options: <a class="code-typename" href="/core/net/#TCP_Options">TCP_Options</a> = DEFAULT_TCP_OPTIONS) -> (socket: <a class="code-typename" href="/core/net/#TCP_Socket">TCP_Socket</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -2572,7 +2576,7 @@ Returns ok=false if port is not a number.</p>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-18 21:12:05.561349400 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-19 21:11:15.348965300 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -2643,6 +2647,7 @@ Returns ok=false if port is not a number.</p>
 <li><a href="#pkg-Constants">Constants</a><ul>
 <li><a href="#DEFAULT_DIGIT_BASES">DEFAULT_DIGIT_BASES</a></li>
 <li><a href="#DEFAULT_DNS_CONFIGURATION">DEFAULT_DNS_CONFIGURATION</a></li>
+<li><a href="#DEFAULT_TCP_OPTIONS">DEFAULT_TCP_OPTIONS</a></li>
 <li><a href="#IP4_Loopback">IP4_Loopback</a></li>
 <li><a href="#IP6_Loopback">IP6_Loopback</a></li>
 <li><a href="#IPv6_MAX_STRING_LENGTH">IPv6_MAX_STRING_LENGTH</a></li>
@@ -2660,7 +2665,6 @@ Returns ok=false if port is not a number.</p>
 <li><a href="#IP4_mDNS_Broadcast">IP4_mDNS_Broadcast</a></li>
 <li><a href="#IP6_Any">IP6_Any</a></li>
 <li><a href="#IP6_mDNS_Broadcast">IP6_mDNS_Broadcast</a></li>
-<li><a href="#default_tcp_options">default_tcp_options</a></li>
 <li><a href="#dns_configuration">dns_configuration</a></li>
 </ul>
 </li>
