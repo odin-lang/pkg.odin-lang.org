@@ -388,7 +388,7 @@ Variables (1)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (66)</summary>
+Procedures (67)</summary>
 <ul>
 <li><a href="#SCOPED_TICK_DURATION">SCOPED_TICK_DURATION</a></li>
 <li><a href="#accurate_sleep">accurate_sleep</a></li>
@@ -432,6 +432,7 @@ Procedures (66)</summary>
 <li><a href="#stopwatch_reset">stopwatch_reset</a></li>
 <li><a href="#stopwatch_start">stopwatch_start</a></li>
 <li><a href="#stopwatch_stop">stopwatch_stop</a></li>
+<li><a href="#tick_add">tick_add</a></li>
 <li><a href="#tick_diff">tick_diff</a></li>
 <li><a href="#tick_lap_time">tick_lap_time</a></li>
 <li><a href="#tick_now">tick_now</a></li>
@@ -476,7 +477,7 @@ Procedure Groups (4)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Benchmark_Error"><span><a class="doc-id-link" href="#Benchmark_Error">Benchmark_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L144"><em>Source</em></a></div></h3>
+<h3 id="Benchmark_Error"><span><a class="doc-id-link" href="#Benchmark_Error">Benchmark_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L151"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Benchmark_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
 	Okay             = 0, 
@@ -493,7 +494,7 @@ Procedure Groups (4)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Benchmark_Options"><span><a class="doc-id-link" href="#Benchmark_Options">Benchmark_Options<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L152"><em>Source</em></a></div></h3>
+<h3 id="Benchmark_Options"><span><a class="doc-id-link" href="#Benchmark_Options">Benchmark_Options<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L159"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Benchmark_Options :: <span class="keyword-type">struct</span> {
 	<span class="comment">// The initialization procedure. `benchmark()` will call this before taking measurements.</span>
@@ -561,6 +562,7 @@ This is the regular Unix timestamp, scaled to nanosecond precision.</p>
 <li><a href="/core/time/#duration_truncate">duration_truncate</a></li>
 <li><a href="/core/time/#precise_clock_from_duration">precise_clock_from_duration</a></li>
 <li><a href="/core/time/#sleep">sleep</a></li>
+<li><a href="/core/time/#tick_add">tick_add</a></li>
 <li><a href="/core/time/#time_add">time_add</a></li>
 <li><a href="/core/time/#tsc_frequency">tsc_frequency</a></li>
 <li><a href="/core/time/#clock">clock</a>&nbsp;<em>(procedure groups)</em></li>
@@ -658,6 +660,7 @@ total. When the stopwatch resets, the total is reset.</p>
 </details>
 <h5>Related Procedures With Parameters</h5>
 <ul>
+<li><a href="/core/time/#tick_add">tick_add</a></li>
 <li><a href="/core/time/#tick_diff">tick_diff</a></li>
 <li><a href="/core/time/#tick_lap_time">tick_lap_time</a></li>
 <li><a href="/core/time/#tick_since">tick_since</a></li>
@@ -1008,7 +1011,7 @@ days_before: [13]<a href="/base/builtin#i32"><span class="doc-builtin">i32</span
 </div>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="SCOPED_TICK_DURATION"><span><a class="doc-id-link" href="#SCOPED_TICK_DURATION">SCOPED_TICK_DURATION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L60"><em>Source</em></a></div></h3>
+<h3 id="SCOPED_TICK_DURATION"><span><a class="doc-id-link" href="#SCOPED_TICK_DURATION">SCOPED_TICK_DURATION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L67"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SCOPED_TICK_DURATION :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (d: ^<a class="code-typename" href="/core/time/#Duration">Duration</a>) -> <a class="code-typename" href="/core/time/#Tick">Tick</a> {…}</pre>
 </div>
@@ -1036,7 +1039,7 @@ once you're done with <code>accurate_sleep</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="benchmark"><span><a class="doc-id-link" href="#benchmark">benchmark<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L197"><em>Source</em></a></div></h3>
+<h3 id="benchmark"><span><a class="doc-id-link" href="#benchmark">benchmark<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L204"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">benchmark :: <span class="keyword-type">proc</span>(options: ^<a class="code-typename" href="/core/time/#Benchmark_Options">Benchmark_Options</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (err: <a class="code-typename" href="/core/time/#Benchmark_Error">Benchmark_Error</a>) {…}</pre>
 </div>
@@ -1283,7 +1286,7 @@ fmt.println(time.to_string_hms(now, buf[:]))
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="has_invariant_tsc"><span><a class="doc-id-link" href="#has_invariant_tsc">has_invariant_tsc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L97"><em>Source</em></a></div></h3>
+<h3 id="has_invariant_tsc"><span><a class="doc-id-link" href="#has_invariant_tsc">has_invariant_tsc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L104"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">has_invariant_tsc :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -1590,7 +1593,17 @@ start and the current time is also accounted for.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="tick_diff"><span><a class="doc-id-link" href="#tick_diff">tick_diff<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L23"><em>Source</em></a></div></h3>
+<h3 id="tick_add"><span><a class="doc-id-link" href="#tick_add">tick_add<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L23"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">tick_add :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (t: <a class="code-typename" href="/core/time/#Tick">Tick</a>, d: <a class="code-typename" href="/core/time/#Duration">Duration</a>) -> <a class="code-typename" href="/core/time/#Tick">Tick</a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Add duration to a tick.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="tick_diff"><span><a class="doc-id-link" href="#tick_diff">tick_diff<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L30"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">tick_diff :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (start, end: <a class="code-typename" href="/core/time/#Tick">Tick</a>) -> <a class="code-typename" href="/core/time/#Duration">Duration</a> {…}</pre>
 </div>
@@ -1600,7 +1613,7 @@ start and the current time is also accounted for.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="tick_lap_time"><span><a class="doc-id-link" href="#tick_lap_time">tick_lap_time<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L39"><em>Source</em></a></div></h3>
+<h3 id="tick_lap_time"><span><a class="doc-id-link" href="#tick_lap_time">tick_lap_time<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L46"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">tick_lap_time :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (prev: ^<a class="code-typename" href="/core/time/#Tick">Tick</a>) -> <a class="code-typename" href="/core/time/#Duration">Duration</a> {…}</pre>
 </div>
@@ -1626,7 +1639,7 @@ might want to obtain time between multiple ticks at specific points.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="tick_since"><span><a class="doc-id-link" href="#tick_since">tick_since<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L52"><em>Source</em></a></div></h3>
+<h3 id="tick_since"><span><a class="doc-id-link" href="#tick_since">tick_since<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L59"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">tick_since :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (start: <a class="code-typename" href="/core/time/#Tick">Tick</a>) -> <a class="code-typename" href="/core/time/#Duration">Duration</a> {…}</pre>
 </div>
@@ -1884,7 +1897,7 @@ fmt.println(time.to_string_yyyy_mm_dd(now, buf[:]))
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="tsc_frequency"><span><a class="doc-id-link" href="#tsc_frequency">tsc_frequency<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L116"><em>Source</em></a></div></h3>
+<h3 id="tsc_frequency"><span><a class="doc-id-link" href="#tsc_frequency">tsc_frequency<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/perf.odin#L123"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">tsc_frequency :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fallback_sleep: <a class="code-typename" href="/core/time/#Duration">Duration</a> = 2 * Second) -> (<a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>, <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1994,7 +2007,7 @@ dividing the readings from TSC by the duration of the sleep.</p>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-23 21:12:32.143889800 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-24 21:12:45.220575500 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -2089,6 +2102,7 @@ dividing the readings from TSC by the duration of the sleep.</p>
 <li><a href="#stopwatch_reset">stopwatch_reset</a></li>
 <li><a href="#stopwatch_start">stopwatch_start</a></li>
 <li><a href="#stopwatch_stop">stopwatch_stop</a></li>
+<li><a href="#tick_add">tick_add</a></li>
 <li><a href="#tick_diff">tick_diff</a></li>
 <li><a href="#tick_lap_time">tick_lap_time</a></li>
 <li><a href="#tick_now">tick_now</a></li>
