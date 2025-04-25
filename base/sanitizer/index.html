@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>package sanitizer - pkg.odin-lang.org</title>	<link rel="icon" href="/favicon.svg">
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/scss/custom.min.css">
+	<link rel=stylesheet href="//odin-lang.org/lib/highlight/styles/github-dark.min.css">
+	<script src="//odin-lang.org/lib/highlight/highlight.min.js"></script>
+
+	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
+	<script>hljs.highlightAll()</script>
+	<script>
+		function toggleDarkMode() {
+			if (document.body.classList.toggle("dark-mode")) {
+				window.localStorage.setItem("theme", "dark");
+			} else {
+				window.localStorage.setItem("theme", "light");
+			}
+		}
+	</script>
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
+
+	<link rel="stylesheet" type="text/css" href="/style.css">
+
+	</style>
+</head>
+<body>
+<script>
+	if (window.localStorage.getItem("theme") === "dark")
+		document.body.classList.add("dark-mode");
+	else
+		document.body.classList.remove("dark-mode");
+</script>
+<header class="sticky-top">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
+		<div class="container">
+			<a class="navbar-brand" href="https://odin-lang.org/">
+			<img src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#odin-navbar-content" aria-controls="odin-navbar-content" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+			<div class="collapse navbar-collapse" id="odin-navbar-content">
+			<ul class="navbar-nav ms-md-auto">
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/">Home</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/docs">Docs</a></li>
+				<li class="nav-item"><a class="nav-link active" href="/">Packages</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/news">News</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/showcase">Showcase</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://forum.odin-lang.org">Forum</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/community">Community</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://github.com/odin-lang/Odin" target="_blank">GitHub</a></li>
+				<li class="nav-item">
+					<a
+						class="nav-link btn-dark-mode"
+						onclick="toggleDarkMode();"
+						title="Toggle Light/Dark Mode"
+					>
+						<span class="dark-mode-appearance">Appearance:</span>
+						<svg fill="white" id="dark-mode-icon" viewBox="0 0 384 512"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"/></svg>
+						<svg fill="white" id="light-mode-icon" viewBox="0 0 16 16">
+						  <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+						</svg>
+					</button>
+					</a>
+				</li>
+			</ul>
+		</div>
+		</div>
+	</nav>
+</header>
+<main>
+<div class="container full-width">
+<div class="row odin-main my-4" id="pkg">
+<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">
+<div class="py-3">
+<h4><a style="text-transform: capitalize; color: inherit;" href="/base">base Library</a></h4>
+<ul>
+<li class="nav-item"><a href="/base/builtin">builtin</a></li>
+<li class="nav-item"><a href="/base/intrinsics">intrinsics</a></li>
+<li class="nav-item"><a href="/base/runtime">runtime</a></li>
+<li class="nav-item"><a class="active" href="/base/sanitizer">sanitizer</a></li>
+</ul>
+</div>
+</nav>
+<article class="col-lg-8 p-4 documentation odin-article">
+<nav class="pkg-breadcrumb" aria-label="breadcrumb">
+<ol class="breadcrumb">
+<li class="breadcrumb-item"><a href="/base">base</a></li>
+<li class="breadcrumb-item active" aria-current="page"><a href="/base/sanitizer">sanitizer</a></li>
+</ol>
+</nav>
+<h1>package base:sanitizer<div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer"><em>Source</em></a></div></h1>
+
+		<div class="odin-search-wrapper">
+			<input type="search" id="odin-search" class="odin-search-package" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">
+			<div class="odin-search-shortcut">
+				<div class="odin-search-key key-macos">⌘K</div>
+				<div class="odin-search-key key-windows">Ctrl+K</div>
+				<span class="odin-search-or">or</span>
+				<div class="odin-search-key">/</div>
+			</div>
+		</div>
+	
+<div id="odin-search-info">
+<div id="odin-search-time"></div>
+
+		<div id="odin-search-options">
+			<input type="checkbox" id="odin-search-filter" name="odin-search-filter">
+			<label for="odin-search-filter">Filter Results</label>
+		</div>
+</div>
+<ul id="odin-search-results"></ul>
+<div id="pkg-top">
+<div id="pkg-index">
+<h2>Index</h2>
+<div>
+<details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
+<summary id="#doc-index-Types-header">
+Types (4)</summary>
+<ul>
+<li><a href="#Address_Access_Type">Address_Access_Type</a></li>
+<li><a href="#Address_Death_Callback">Address_Death_Callback</a></li>
+<li><a href="#Address_Located_Address_String">Address_Located_Address_String</a></li>
+<li><a href="#Address_Shadow_Mapping">Address_Shadow_Mapping</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
+<summary id="#doc-index-Constants-header">
+Constants (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Variables" aria-labelledby="#doc-index-Variables-header">
+<summary id="#doc-index-Variables-header">
+Variables (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
+<summary id="#doc-index-Procedures-header">
+Procedures (29)</summary>
+<ul>
+<li><a href="#address_address_is_poisoned">address_address_is_poisoned</a></li>
+<li><a href="#address_describe_address">address_describe_address</a></li>
+<li><a href="#address_get_alloc_stack_trace">address_get_alloc_stack_trace</a></li>
+<li><a href="#address_get_current_fake_stack">address_get_current_fake_stack</a></li>
+<li><a href="#address_get_free_stack_trace">address_get_free_stack_trace</a></li>
+<li><a href="#address_get_report_access_size">address_get_report_access_size</a></li>
+<li><a href="#address_get_report_access_type">address_get_report_access_type</a></li>
+<li><a href="#address_get_report_address">address_get_report_address</a></li>
+<li><a href="#address_get_report_bp">address_get_report_bp</a></li>
+<li><a href="#address_get_report_description">address_get_report_description</a></li>
+<li><a href="#address_get_report_pc">address_get_report_pc</a></li>
+<li><a href="#address_get_report_sp">address_get_report_sp</a></li>
+<li><a href="#address_get_shadow_mapping">address_get_shadow_mapping</a></li>
+<li><a href="#address_handle_no_return">address_handle_no_return</a></li>
+<li><a href="#address_is_in_fake_stack">address_is_in_fake_stack</a></li>
+<li><a href="#address_locate_address">address_locate_address</a></li>
+<li><a href="#address_poison_ptr">address_poison_ptr</a></li>
+<li><a href="#address_poison_rawptr">address_poison_rawptr</a></li>
+<li><a href="#address_poison_slice">address_poison_slice</a></li>
+<li><a href="#address_print_accumulated_stats">address_print_accumulated_stats</a></li>
+<li><a href="#address_region_is_poisoned_ptr">address_region_is_poisoned_ptr</a></li>
+<li><a href="#address_region_is_poisoned_rawptr">address_region_is_poisoned_rawptr</a></li>
+<li><a href="#address_region_is_poisoned_slice">address_region_is_poisoned_slice</a></li>
+<li><a href="#address_report_present">address_report_present</a></li>
+<li><a href="#address_set_death_callback">address_set_death_callback</a></li>
+<li><a href="#address_unpoison_ptr">address_unpoison_ptr</a></li>
+<li><a href="#address_unpoison_rawptr">address_unpoison_rawptr</a></li>
+<li><a href="#address_unpoison_slice">address_unpoison_slice</a></li>
+<li><a href="#address_update_allocation_context">address_update_allocation_context</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedure Groups" aria-labelledby="#doc-index-Procedure Groups-header">
+<summary id="#doc-index-Procedure Groups-header">
+Procedure Groups (3)</summary>
+<ul>
+<li><a href="#address_poison">address_poison</a></li>
+<li><a href="#address_region_is_poisoned">address_region_is_poisoned</a></li>
+<li><a href="#address_unpoison">address_unpoison</a></li>
+</ul>
+</details>
+</div>
+</div>
+</div>
+<section class="documentation">
+<h2 id="pkg-Types" class="pkg-header">Types</h2>
+<div class="pkg-entity">
+<h3 id="Address_Access_Type"><span><a class="doc-id-link" href="#Address_Access_Type">Address_Access_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L37"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Address_Access_Type :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
+	none, 
+	read, 
+	write, 
+}</pre>
+</div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/base/sanitizer/#address_get_report_access_type">address_get_report_access_type</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Address_Death_Callback"><span><a class="doc-id-link" href="#Address_Death_Callback">Address_Death_Callback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L4"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Address_Death_Callback :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (pc: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, bp: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, sp: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, is_write: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, access_size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>)</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/base/sanitizer/#address_set_death_callback">address_set_death_callback</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Address_Located_Address_String"><span><a class="doc-id-link" href="#Address_Located_Address_String">Address_Located_Address_String<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L43"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Address_Located_Address_String :: <span class="keyword-type">struct</span> {
+	category: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
+	name:     <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
+}</pre>
+</div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/base/sanitizer/#address_locate_address">address_locate_address</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Address_Shadow_Mapping"><span><a class="doc-id-link" href="#Address_Shadow_Mapping">Address_Shadow_Mapping<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L48"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Address_Shadow_Mapping :: <span class="keyword-type">struct</span> {
+	scale:  <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
+	offset: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
+}</pre>
+</div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/base/sanitizer/#address_get_shadow_mapping">address_get_shadow_mapping</a></li>
+</ul>
+</div>
+<h2 id="pkg-Constants" class="pkg-header">Constants</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+<h2 id="pkg-Variables" class="pkg-header">Variables</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+<h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
+<div class="pkg-entity">
+<h3 id="address_address_is_poisoned"><span><a class="doc-id-link" href="#address_address_is_poisoned">address_address_is_poisoned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L140"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_address_is_poisoned :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (address: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_describe_address"><span><a class="doc-id-link" href="#address_describe_address">address_describe_address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L148"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_describe_address :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (address: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_get_alloc_stack_trace"><span><a class="doc-id-link" href="#address_get_alloc_stack_trace">address_get_alloc_stack_trace<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L229"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_get_alloc_stack_trace :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, data: []<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> ([]<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_get_current_fake_stack"><span><a class="doc-id-link" href="#address_get_current_fake_stack">address_get_current_fake_stack<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L265"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_get_current_fake_stack :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_get_free_stack_trace"><span><a class="doc-id-link" href="#address_get_free_stack_trace">address_get_free_stack_trace<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L239"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_get_free_stack_trace :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, data: []<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> ([]<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_get_report_access_size"><span><a class="doc-id-link" href="#address_get_report_access_size">address_get_report_access_size<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L202"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_get_report_access_size :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_get_report_access_type"><span><a class="doc-id-link" href="#address_get_report_access_type">address_get_report_access_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L194"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_get_report_access_type :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a class="code-typename" href="/base/sanitizer/#Address_Access_Type">Address_Access_Type</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_get_report_address"><span><a class="doc-id-link" href="#address_get_report_address">address_get_report_address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L186"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_get_report_address :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_get_report_bp"><span><a class="doc-id-link" href="#address_get_report_bp">address_get_report_bp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L170"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_get_report_bp :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_get_report_description"><span><a class="doc-id-link" href="#address_get_report_description">address_get_report_description<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L210"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_get_report_description :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_get_report_pc"><span><a class="doc-id-link" href="#address_get_report_pc">address_get_report_pc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L162"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_get_report_pc :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_get_report_sp"><span><a class="doc-id-link" href="#address_get_report_sp">address_get_report_sp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L178"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_get_report_sp :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_get_shadow_mapping"><span><a class="doc-id-link" href="#address_get_shadow_mapping">address_get_shadow_mapping<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L249"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_get_shadow_mapping :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a class="code-typename" href="/base/sanitizer/#Address_Shadow_Mapping">Address_Shadow_Mapping</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_handle_no_return"><span><a class="doc-id-link" href="#address_handle_no_return">address_handle_no_return<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L286"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_handle_no_return :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_is_in_fake_stack"><span><a class="doc-id-link" href="#address_is_in_fake_stack">address_is_in_fake_stack<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L273"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_is_in_fake_stack :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fake_stack: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_locate_address"><span><a class="doc-id-link" href="#address_locate_address">address_locate_address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L218"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_locate_address :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (<a class="code-typename" href="/base/sanitizer/#Address_Located_Address_String">Address_Located_Address_String</a>, []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_poison_ptr"><span><a class="doc-id-link" href="#address_poison_ptr">address_poison_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L65"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_poison_ptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: ^$T) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_poison_rawptr"><span><a class="doc-id-link" href="#address_poison_rawptr">address_poison_rawptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L77"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_poison_rawptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_poison_slice"><span><a class="doc-id-link" href="#address_poison_slice">address_poison_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L53"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_poison_slice :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (region: $T/[]$E) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_print_accumulated_stats"><span><a class="doc-id-link" href="#address_print_accumulated_stats">address_print_accumulated_stats<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L259"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_print_accumulated_stats :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_region_is_poisoned_ptr"><span><a class="doc-id-link" href="#address_region_is_poisoned_ptr">address_region_is_poisoned_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L117"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_region_is_poisoned_ptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: ^$T) -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_region_is_poisoned_rawptr"><span><a class="doc-id-link" href="#address_region_is_poisoned_rawptr">address_region_is_poisoned_rawptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L125"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_region_is_poisoned_rawptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (region: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_region_is_poisoned_slice"><span><a class="doc-id-link" href="#address_region_is_poisoned_slice">address_region_is_poisoned_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L109"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_region_is_poisoned_slice :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (region: []$T/$E) -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_report_present"><span><a class="doc-id-link" href="#address_report_present">address_report_present<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L154"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_report_present :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_set_death_callback"><span><a class="doc-id-link" href="#address_set_death_callback">address_set_death_callback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L103"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_set_death_callback :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (callback: <a class="code-typename" href="/base/sanitizer/#Address_Death_Callback">Address_Death_Callback</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_unpoison_ptr"><span><a class="doc-id-link" href="#address_unpoison_ptr">address_unpoison_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L71"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_unpoison_ptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: ^$T) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_unpoison_rawptr"><span><a class="doc-id-link" href="#address_unpoison_rawptr">address_unpoison_rawptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L84"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_unpoison_rawptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_unpoison_slice"><span><a class="doc-id-link" href="#address_unpoison_slice">address_unpoison_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L59"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_unpoison_slice :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (region: $T/[]$E) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_update_allocation_context"><span><a class="doc-id-link" href="#address_update_allocation_context">address_update_allocation_context<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L292"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_update_allocation_context :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+</div>
+</div>
+<h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
+<div class="pkg-entity">
+<h3 id="address_poison"><span><a class="doc-id-link" href="#address_poison">address_poison<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L91"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_poison :: <span class="keyword-type">proc</span>{
+	<a class="code-procedure" href="/base/sanitizer/#address_poison_slice">address_poison_slice</a>,
+	<a class="code-procedure" href="/base/sanitizer/#address_poison_ptr">address_poison_ptr</a>,
+	<a class="code-procedure" href="/base/sanitizer/#address_poison_rawptr">address_poison_rawptr</a>,
+}
+</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_region_is_poisoned"><span><a class="doc-id-link" href="#address_region_is_poisoned">address_region_is_poisoned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L134"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_region_is_poisoned :: <span class="keyword-type">proc</span>{
+	<a class="code-procedure" href="/base/sanitizer/#address_region_is_poisoned_slice">address_region_is_poisoned_slice</a>,
+	<a class="code-procedure" href="/base/sanitizer/#address_region_is_poisoned_ptr">address_region_is_poisoned_ptr</a>,
+	<a class="code-procedure" href="/base/sanitizer/#address_region_is_poisoned_rawptr">address_region_is_poisoned_rawptr</a>,
+}
+</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="address_unpoison"><span><a class="doc-id-link" href="#address_unpoison">address_unpoison<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L97"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_unpoison :: <span class="keyword-type">proc</span>{
+	<a class="code-procedure" href="/base/sanitizer/#address_unpoison_slice">address_unpoison_slice</a>,
+	<a class="code-procedure" href="/base/sanitizer/#address_unpoison_ptr">address_unpoison_ptr</a>,
+	<a class="code-procedure" href="/base/sanitizer/#address_unpoison_rawptr">address_unpoison_rawptr</a>,
+}
+</pre>
+</div>
+</div>
+</section>
+<h2 id="pkg-source-files">Source Files</h2>
+<ul>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin">address.odin</a></li>
+</ul>
+<h2 id="pkg-generation-information">Generation Information</h2>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-25 21:12:20.299782900 +0000 UTC</code></p>
+</article>
+<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
+<nav id="TableOfContents">
+<ul>
+<li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#Address_Access_Type">Address_Access_Type</a></li>
+<li><a href="#Address_Death_Callback">Address_Death_Callback</a></li>
+<li><a href="#Address_Located_Address_String">Address_Located_Address_String</a></li>
+<li><a href="#Address_Shadow_Mapping">Address_Shadow_Mapping</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Procedures">Procedures</a><ul>
+<li><a href="#address_address_is_poisoned">address_address_is_poisoned</a></li>
+<li><a href="#address_describe_address">address_describe_address</a></li>
+<li><a href="#address_get_alloc_stack_trace">address_get_alloc_stack_trace</a></li>
+<li><a href="#address_get_current_fake_stack">address_get_current_fake_stack</a></li>
+<li><a href="#address_get_free_stack_trace">address_get_free_stack_trace</a></li>
+<li><a href="#address_get_report_access_size">address_get_report_access_size</a></li>
+<li><a href="#address_get_report_access_type">address_get_report_access_type</a></li>
+<li><a href="#address_get_report_address">address_get_report_address</a></li>
+<li><a href="#address_get_report_bp">address_get_report_bp</a></li>
+<li><a href="#address_get_report_description">address_get_report_description</a></li>
+<li><a href="#address_get_report_pc">address_get_report_pc</a></li>
+<li><a href="#address_get_report_sp">address_get_report_sp</a></li>
+<li><a href="#address_get_shadow_mapping">address_get_shadow_mapping</a></li>
+<li><a href="#address_handle_no_return">address_handle_no_return</a></li>
+<li><a href="#address_is_in_fake_stack">address_is_in_fake_stack</a></li>
+<li><a href="#address_locate_address">address_locate_address</a></li>
+<li><a href="#address_poison_ptr">address_poison_ptr</a></li>
+<li><a href="#address_poison_rawptr">address_poison_rawptr</a></li>
+<li><a href="#address_poison_slice">address_poison_slice</a></li>
+<li><a href="#address_print_accumulated_stats">address_print_accumulated_stats</a></li>
+<li><a href="#address_region_is_poisoned_ptr">address_region_is_poisoned_ptr</a></li>
+<li><a href="#address_region_is_poisoned_rawptr">address_region_is_poisoned_rawptr</a></li>
+<li><a href="#address_region_is_poisoned_slice">address_region_is_poisoned_slice</a></li>
+<li><a href="#address_report_present">address_report_present</a></li>
+<li><a href="#address_set_death_callback">address_set_death_callback</a></li>
+<li><a href="#address_unpoison_ptr">address_unpoison_ptr</a></li>
+<li><a href="#address_unpoison_rawptr">address_unpoison_rawptr</a></li>
+<li><a href="#address_unpoison_slice">address_unpoison_slice</a></li>
+<li><a href="#address_update_allocation_context">address_update_allocation_context</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Procedure Groups">Procedure Groups</a><ul>
+<li><a href="#address_poison">address_poison</a></li>
+<li><a href="#address_region_is_poisoned">address_region_is_poisoned</a></li>
+<li><a href="#address_unpoison">address_unpoison</a></li>
+</ul>
+</li>
+<li><a href="#pkg-source-files">Source Files</a></ul>
+</nav>
+</div></div>
+<script type="text/javascript">var odin_pkg_name = "sanitizer";</script>
+</div>
+
+</div>
+</main>
+
+<footer class="odin-footer">
+	<div class="container pb-5 pt-5">
+		<div class="row g-4">
+		<div class="col">
+		<a class="navbar-brand" href="https://odin-lang.org">
+		<img class="mb-3" src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+		<p>
+		The Data-Oriented Language for Sane Software Development.
+		</p>
+		</div>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Resources</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://odin-lang.org/docs" class="link-light">Docs</a></li>
+			<li><a href="https://pkg.odin-lang.org/" class="link-light">Packages</a></li>
+			<li><a href="https://odin-lang.org/news" class="link-light">News</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Community</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin" target="_blank" class="link-light">GitHub</a></li>
+			<li><a href="https://forum.odin-lang.org" target="_blank" class="link-light">Forum</a></li>
+			<li><a href="https://discord.com/invite/sVBPHEv" target="_blank" class="link-light">Discord</a></li>
+			<li><a href="https://www.twitch.tv/ginger_bill" target="_blank" class="link-light">Twitch</a></li>
+			<li><a href="https://www.youtube.com/channel/UCUSck1dOH7VKmG4lRW7tZXg" target="_blank" class="link-light">YouTube</a></li>
+			<li><a href="https://odin-lang.org/showcase" target="_blank" class="link-light">Showcase</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Contribute</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin/issues" target="_blank" class="link-light">Issues</a></li>
+			<li><a href="https://www.patreon.com/gingerbill" target="_blank" class="link-light">Donate</a></li>
+			</ul>
+			</nav>
+		</div>
+		<div class="mt-4 text-muted">© 2016–2023 Ginger Bill</div>
+	</div>
+</footer>
+
+<script src="https://odin-lang.org/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://odin-lang.org/js/script.js"></script>
+<script src="/pkg-data.js"></script>
+<script src="/search.js"></script>
+</body>
+</html>
