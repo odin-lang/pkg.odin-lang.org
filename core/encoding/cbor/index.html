@@ -545,7 +545,7 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (34)</summary>
+Procedures (35)</summary>
 <ul>
 <li><a href="#decode_from_decoder">decode_from_decoder</a></li>
 <li><a href="#decode_from_reader">decode_from_reader</a></li>
@@ -578,6 +578,7 @@ Procedures (34)</summary>
 <li><a href="#to_diagnostic_format_string">to_diagnostic_format_string</a></li>
 <li><a href="#to_diagnostic_format_writer">to_diagnostic_format_writer</a></li>
 <li><a href="#to_json">to_json</a></li>
+<li><a href="#unmarshal_from_bytes">unmarshal_from_bytes</a></li>
 <li><a href="#unmarshal_from_decoder">unmarshal_from_decoder</a></li>
 <li><a href="#unmarshal_from_reader">unmarshal_from_reader</a></li>
 <li><a href="#unmarshal_from_string">unmarshal_from_string</a></li>
@@ -1071,6 +1072,7 @@ Higher 3 bits is for the major type and lower 5 bits for the additional informat
 <li><a href="/core/encoding/cbor/#decode_to_unmarshal_err">decode_to_unmarshal_err</a></li>
 <li><a href="/core/encoding/cbor/#decode_to_unmarshal_err_p">decode_to_unmarshal_err_p</a></li>
 <li><a href="/core/encoding/cbor/#decode_to_unmarshal_err_p2">decode_to_unmarshal_err_p2</a></li>
+<li><a href="/core/encoding/cbor/#unmarshal_from_bytes">unmarshal_from_bytes</a></li>
 <li><a href="/core/encoding/cbor/#unmarshal_from_decoder">unmarshal_from_decoder</a></li>
 <li><a href="/core/encoding/cbor/#unmarshal_from_reader">unmarshal_from_reader</a></li>
 <li><a href="/core/encoding/cbor/#unmarshal_from_string">unmarshal_from_string</a></li>
@@ -1594,13 +1596,30 @@ See docs on the proc group <code>diagnose</code> for more info.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="unmarshal_from_decoder"><span><a class="doc-id-link" href="#unmarshal_from_decoder">unmarshal_from_decoder<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/cbor/unmarshal.odin#L54"><em>Source</em></a></div></h3>
+<h3 id="unmarshal_from_bytes"><span><a class="doc-id-link" href="#unmarshal_from_bytes">unmarshal_from_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/cbor/unmarshal.odin#L56"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">unmarshal_from_bytes :: <span class="keyword-type">proc</span>(
+	bytes:          []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
+	ptr:            ^$T, 
+	flags:          <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/core/encoding/cbor/#Decoder_Flag">Decoder_Flag</a>] = Decoder_Flags{}, 
+	allocator := <a href="/base/runtime/#Context">context.allocator</a>, 
+	temp_allocator := <a href="/base/runtime/#Context">context.temp_allocator</a>, 
+	loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>, 
+) -> (err: <a class="code-typename" href="/core/encoding/cbor/#Unmarshal_Error">Unmarshal_Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Unmarshals from a slice of bytes, see docs on the proc group <code>Unmarshal</code> for more info.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="unmarshal_from_decoder"><span><a class="doc-id-link" href="#unmarshal_from_decoder">unmarshal_from_decoder<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/cbor/unmarshal.odin#L60"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">unmarshal_from_decoder :: <span class="keyword-type">proc</span>(d: <a class="code-typename" href="/core/encoding/cbor/#Decoder">Decoder</a>, ptr: ^$T, allocator := <a href="/base/runtime/#Context">context.allocator</a>, temp_allocator := <a href="/base/runtime/#Context">context.temp_allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (err: <a class="code-typename" href="/core/encoding/cbor/#Unmarshal_Error">Unmarshal_Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="unmarshal_from_reader"><span><a class="doc-id-link" href="#unmarshal_from_reader">unmarshal_from_reader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/cbor/unmarshal.odin#L34"><em>Source</em></a></div></h3>
+<h3 id="unmarshal_from_reader"><span><a class="doc-id-link" href="#unmarshal_from_reader">unmarshal_from_reader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/cbor/unmarshal.odin#L35"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">unmarshal_from_reader :: <span class="keyword-type">proc</span>(
 	r:              io.<a class="code-typename" href="/core/io/#Stream">Stream</a>, 
@@ -1613,7 +1632,7 @@ See docs on the proc group <code>diagnose</code> for more info.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="unmarshal_from_string"><span><a class="doc-id-link" href="#unmarshal_from_string">unmarshal_from_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/cbor/unmarshal.odin#L43"><em>Source</em></a></div></h3>
+<h3 id="unmarshal_from_string"><span><a class="doc-id-link" href="#unmarshal_from_string">unmarshal_from_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/cbor/unmarshal.odin#L44"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">unmarshal_from_string :: <span class="keyword-type">proc</span>(
 	s:              <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, 
@@ -1816,6 +1835,7 @@ this will also be valid JSON.</p>
 <pre class="doc-code">unmarshal :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/encoding/cbor/#unmarshal_from_reader">unmarshal_from_reader</a>,
 	<a class="code-procedure" href="/core/encoding/cbor/#unmarshal_from_string">unmarshal_from_string</a>,
+	<a class="code-procedure" href="/core/encoding/cbor/#unmarshal_from_bytes">unmarshal_from_bytes</a>,
 }
 </pre>
 </div>
@@ -1845,7 +1865,7 @@ an input.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/encoding/cbor/unmarshal.odin">unmarshal.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-28 21:11:26.151866700 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-29 21:12:42.507619300 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -1941,6 +1961,7 @@ an input.</p>
 <li><a href="#to_diagnostic_format_string">to_diagnostic_format_string</a></li>
 <li><a href="#to_diagnostic_format_writer">to_diagnostic_format_writer</a></li>
 <li><a href="#to_json">to_json</a></li>
+<li><a href="#unmarshal_from_bytes">unmarshal_from_bytes</a></li>
 <li><a href="#unmarshal_from_decoder">unmarshal_from_decoder</a></li>
 <li><a href="#unmarshal_from_reader">unmarshal_from_reader</a></li>
 <li><a href="#unmarshal_from_string">unmarshal_from_string</a></li>

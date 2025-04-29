@@ -110,6 +110,33 @@
 </div>
 <ul id="odin-search-results"></ul>
 <div id="pkg-top">
+<h2>Overview</h2>
+<div id="pkg-overview">
+<p>The <code>sanitizer</code> package implements various procedures for interacting with sanitizers
+from user code.</p>
+<p>An odin project can be linked with various sanitizers to help identify various different
+bugs. These sanitizers are:</p>
+<p></p>
+<h4> Address</h4><p></p>
+<p>Enabled with <code>-sanitize:address</code> when building an odin project.</p>
+<p>The address sanitizer (asan) is a runtime memory error detector used to help find common memory
+related bugs. Typically asan interacts with libc but Odin code can be marked up to interact
+with the asan runtime to extend the memory error detection outside of libc using this package.
+For more information about asan see: https://clang.llvm.org/docs/AddressSanitizer.html</p>
+<p></p>
+<h4> Memory</h4><p></p>
+<p>Enabled with <code>-sanitize:memory</code> when building an odin project.</p>
+<p>The memory sanitizer is another runtime memory error detector with the sole purpose to catch the
+use of uninitialized memory. This is not a very common bug in Odin as be default everything is
+set to zero when initialised (ZII).
+For more information about the memory sanitizer see: https://clang.llvm.org/docs/MemorySanitizer.html</p>
+<p></p>
+<h4> Thread</h4><p></p>
+<p>Enabled with <code>-sanitize:thread</code> when building an odin project.</p>
+<p>The thread sanitizer is a runtime data race detector. It can be used to detect if multiple threads
+are concurrently writing and accessing a memory location without proper syncronisation.
+For more information about the thread sanitizer see: https://clang.llvm.org/docs/ThreadSanitizer.html</p>
+</div>
 <div id="pkg-index">
 <h2>Index</h2>
 <div>
@@ -119,7 +146,7 @@ Types (4)</summary>
 <ul>
 <li><a href="#Address_Access_Type">Address_Access_Type</a></li>
 <li><a href="#Address_Death_Callback">Address_Death_Callback</a></li>
-<li><a href="#Address_Located_Address_String">Address_Located_Address_String</a></li>
+<li><a href="#Address_Located_Address">Address_Located_Address</a></li>
 <li><a href="#Address_Shadow_Mapping">Address_Shadow_Mapping</a></li>
 </ul>
 </details>
@@ -143,7 +170,6 @@ Variables (0)</summary>
 <summary id="#doc-index-Procedures-header">
 Procedures (29)</summary>
 <ul>
-<li><a href="#address_address_is_poisoned">address_address_is_poisoned</a></li>
 <li><a href="#address_describe_address">address_describe_address</a></li>
 <li><a href="#address_get_alloc_stack_trace">address_get_alloc_stack_trace</a></li>
 <li><a href="#address_get_current_fake_stack">address_get_current_fake_stack</a></li>
@@ -158,6 +184,7 @@ Procedures (29)</summary>
 <li><a href="#address_get_shadow_mapping">address_get_shadow_mapping</a></li>
 <li><a href="#address_handle_no_return">address_handle_no_return</a></li>
 <li><a href="#address_is_in_fake_stack">address_is_in_fake_stack</a></li>
+<li><a href="#address_is_poisoned">address_is_poisoned</a></li>
 <li><a href="#address_locate_address">address_locate_address</a></li>
 <li><a href="#address_poison_ptr">address_poison_ptr</a></li>
 <li><a href="#address_poison_rawptr">address_poison_rawptr</a></li>
@@ -215,11 +242,12 @@ Procedure Groups (3)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Address_Located_Address_String"><span><a class="doc-id-link" href="#Address_Located_Address_String">Address_Located_Address_String<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L43"><em>Source</em></a></div></h3>
+<h3 id="Address_Located_Address"><span><a class="doc-id-link" href="#Address_Located_Address">Address_Located_Address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L43"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">Address_Located_Address_String :: <span class="keyword-type">struct</span> {
+<pre class="doc-code">Address_Located_Address :: <span class="keyword-type">struct</span> {
 	category: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
 	name:     <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
+	region:   []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
 }</pre>
 </div>
 <h5>Related Procedures With Returns</h5>
@@ -228,7 +256,7 @@ Procedure Groups (3)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Address_Shadow_Mapping"><span><a class="doc-id-link" href="#Address_Shadow_Mapping">Address_Shadow_Mapping<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L48"><em>Source</em></a></div></h3>
+<h3 id="Address_Shadow_Mapping"><span><a class="doc-id-link" href="#Address_Shadow_Mapping">Address_Shadow_Mapping<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L49"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Address_Shadow_Mapping :: <span class="keyword-type">struct</span> {
 	scale:  <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
@@ -246,182 +274,374 @@ Procedure Groups (3)</summary>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="address_address_is_poisoned"><span><a class="doc-id-link" href="#address_address_is_poisoned">address_address_is_poisoned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L140"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">address_address_is_poisoned :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (address: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="address_describe_address"><span><a class="doc-id-link" href="#address_describe_address">address_describe_address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L148"><em>Source</em></a></div></h3>
+<h3 id="address_describe_address"><span><a class="doc-id-link" href="#address_describe_address">address_describe_address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L251"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_describe_address :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (address: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Describes the sanitizer state for an address.</p>
+<p>This procedure prints the description out to <code>stdout</code>.</p>
+<p>When asan is not enabled this procedure does nothing.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_get_alloc_stack_trace"><span><a class="doc-id-link" href="#address_get_alloc_stack_trace">address_get_alloc_stack_trace<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L229"><em>Source</em></a></div></h3>
+<h3 id="address_get_alloc_stack_trace"><span><a class="doc-id-link" href="#address_get_alloc_stack_trace">address_get_alloc_stack_trace<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L407"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_get_alloc_stack_trace :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, data: []<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> ([]<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the allocation stack trace and thread id for a heap address.</p>
+<p>The stack trace is filled into the <code>data</code> slice.</p>
+<p>When asan is not enabled this procedure returns a zero initialised value.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_get_current_fake_stack"><span><a class="doc-id-link" href="#address_get_current_fake_stack">address_get_current_fake_stack<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L265"><em>Source</em></a></div></h3>
+<h3 id="address_get_current_fake_stack"><span><a class="doc-id-link" href="#address_get_current_fake_stack">address_get_current_fake_stack<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L467"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_get_current_fake_stack :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the address of the current fake stack used by asan.</p>
+<p>This pointer can be then used for <code>address_is_in_fake_stack</code>.</p>
+<p>When asan is not enabled this procedure returns <code>nil</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_get_free_stack_trace"><span><a class="doc-id-link" href="#address_get_free_stack_trace">address_get_free_stack_trace<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L239"><em>Source</em></a></div></h3>
+<h3 id="address_get_free_stack_trace"><span><a class="doc-id-link" href="#address_get_free_stack_trace">address_get_free_stack_trace<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L424"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_get_free_stack_trace :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, data: []<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> ([]<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the free stack trace and thread id for a heap address.</p>
+<p>The stack trace is filled into the <code>data</code> slice.</p>
+<p>When asan is not enabled this procedure returns zero initialised values.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_get_report_access_size"><span><a class="doc-id-link" href="#address_get_report_access_size">address_get_report_access_size<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L202"><em>Source</em></a></div></h3>
+<h3 id="address_get_report_access_size"><span><a class="doc-id-link" href="#address_get_report_access_size">address_get_report_access_size<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L356"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_get_report_access_size :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the access size of an asan error.</p>
+<p>If no asan error has occurd <code>0</code> is returned.</p>
+<p>When asan is not enabled this procedure returns <code>0</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_get_report_access_type"><span><a class="doc-id-link" href="#address_get_report_access_type">address_get_report_access_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L194"><em>Source</em></a></div></h3>
+<h3 id="address_get_report_access_type"><span><a class="doc-id-link" href="#address_get_report_access_type">address_get_report_access_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L338"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_get_report_access_type :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a class="code-typename" href="/base/sanitizer/#Address_Access_Type">Address_Access_Type</a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the address access type of an asan error.</p>
+<p>If no asan error has occurd <code>.none</code> is returned.</p>
+<p>When asan is not enabled this procedure returns <code>.none</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_get_report_address"><span><a class="doc-id-link" href="#address_get_report_address">address_get_report_address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L186"><em>Source</em></a></div></h3>
+<h3 id="address_get_report_address"><span><a class="doc-id-link" href="#address_get_report_address">address_get_report_address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L323"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_get_report_address :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the report buffer address of an asan error.</p>
+<p>If no asan error has occurd <code>nil</code> is returned.</p>
+<p>When asan is not enabled this procedure returns <code>nil</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_get_report_bp"><span><a class="doc-id-link" href="#address_get_report_bp">address_get_report_bp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L170"><em>Source</em></a></div></h3>
+<h3 id="address_get_report_bp"><span><a class="doc-id-link" href="#address_get_report_bp">address_get_report_bp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L293"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_get_report_bp :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the base pointer register value of an asan error.</p>
+<p>If no asan error has occurd <code>nil</code> is returned.</p>
+<p>When asan is not enabled this procedure returns <code>nil</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_get_report_description"><span><a class="doc-id-link" href="#address_get_report_description">address_get_report_description<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L210"><em>Source</em></a></div></h3>
+<h3 id="address_get_report_description"><span><a class="doc-id-link" href="#address_get_report_description">address_get_report_description<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L371"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_get_report_description :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the bug description of an asan error.</p>
+<p>If no asan error has occurd an empty string is returned.</p>
+<p>When asan is not enabled this procedure returns an empty string.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_get_report_pc"><span><a class="doc-id-link" href="#address_get_report_pc">address_get_report_pc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L162"><em>Source</em></a></div></h3>
+<h3 id="address_get_report_pc"><span><a class="doc-id-link" href="#address_get_report_pc">address_get_report_pc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L278"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_get_report_pc :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the program counter register value of an asan error.</p>
+<p>If no asan error has occurd <code>nil</code> is returned.</p>
+<p>When asan is not enabled this procedure returns <code>nil</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_get_report_sp"><span><a class="doc-id-link" href="#address_get_report_sp">address_get_report_sp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L178"><em>Source</em></a></div></h3>
+<h3 id="address_get_report_sp"><span><a class="doc-id-link" href="#address_get_report_sp">address_get_report_sp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L308"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_get_report_sp :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the stack pointer register value of an asan error.</p>
+<p>If no asan error has occurd <code>nil</code> is returned.</p>
+<p>When asan is not enabled this procedure returns <code>nil</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_get_shadow_mapping"><span><a class="doc-id-link" href="#address_get_shadow_mapping">address_get_shadow_mapping<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L249"><em>Source</em></a></div></h3>
+<h3 id="address_get_shadow_mapping"><span><a class="doc-id-link" href="#address_get_shadow_mapping">address_get_shadow_mapping<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L439"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_get_shadow_mapping :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a class="code-typename" href="/base/sanitizer/#Address_Shadow_Mapping">Address_Shadow_Mapping</a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the current asan shadow memory mapping.</p>
+<p>When asan is not enabled this procedure returns a zero initialised value.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_handle_no_return"><span><a class="doc-id-link" href="#address_handle_no_return">address_handle_no_return<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L286"><em>Source</em></a></div></h3>
+<h3 id="address_handle_no_return"><span><a class="doc-id-link" href="#address_handle_no_return">address_handle_no_return<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L499"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_handle_no_return :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Performs shadow memory cleanup for the current thread before a procedure with no return is called
+i.e. a procedure such as <code>panic</code> and <code>os.exit</code>.</p>
+<p>When asan is not enabled this procedure does nothing.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_is_in_fake_stack"><span><a class="doc-id-link" href="#address_is_in_fake_stack">address_is_in_fake_stack<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L273"><em>Source</em></a></div></h3>
+<h3 id="address_is_in_fake_stack"><span><a class="doc-id-link" href="#address_is_in_fake_stack">address_is_in_fake_stack<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L480"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_is_in_fake_stack :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fake_stack: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns if an address belongs to a given fake stack and if so the region of the fake frame.</p>
+<p>When asan is not enabled this procedure returns zero initialised values.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_locate_address"><span><a class="doc-id-link" href="#address_locate_address">address_locate_address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L218"><em>Source</em></a></div></h3>
+<h3 id="address_is_poisoned"><span><a class="doc-id-link" href="#address_is_poisoned">address_is_poisoned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L236"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">address_locate_address :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (<a class="code-typename" href="/base/sanitizer/#Address_Located_Address_String">Address_Located_Address_String</a>, []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) {…}</pre>
+<pre class="doc-code">address_is_poisoned :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (address: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Checks if the address is poisoned.</p>
+<p>If it is poisoned this procedure returns <code>true</code>, otherwise it returns
+<code>false</code>.</p>
+<p>When asan is not enabled this procedure returns <code>false</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_poison_ptr"><span><a class="doc-id-link" href="#address_poison_ptr">address_poison_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L65"><em>Source</em></a></div></h3>
+<h3 id="address_locate_address"><span><a class="doc-id-link" href="#address_locate_address">address_locate_address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L389"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">address_locate_address :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> <a class="code-typename" href="/base/sanitizer/#Address_Located_Address">Address_Located_Address</a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns asan information about the address provided, writing the category into <code>data</code>.</p>
+<p>The information provided include:
+The category of the address, i.e. stack, global, heap, etc.
+The name of the variable this address belongs to
+The memory region of the address</p>
+<p>When asan is not enabled this procedure returns zero initialised values.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="address_poison_ptr"><span><a class="doc-id-link" href="#address_poison_ptr">address_poison_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L93"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_poison_ptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: ^$T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Marks a pointer as unaddressable</p>
+<p>Code instrumented with <code>-sanitize:address</code> is forbidden from accessing any address
+within the region the pointer points to. This procedure is not thread-safe because no
+two threads can poison or unpoison memory in the same memory region region simultaneously.</p>
+<p>When asan is not enabled this procedure does nothing.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_poison_rawptr"><span><a class="doc-id-link" href="#address_poison_rawptr">address_poison_rawptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L77"><em>Source</em></a></div></h3>
+<h3 id="address_poison_rawptr"><span><a class="doc-id-link" href="#address_poison_rawptr">address_poison_rawptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L124"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_poison_rawptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Marks the region covering <code>[ptr, ptr+len)</code> as unaddressable</p>
+<p>Code instrumented with <code>-sanitize:address</code> is forbidden from accessing any address
+within the region. This procedure is not thread-safe because no two threads can
+poison or unpoison memory in the same memory region region simultaneously.</p>
+<p>When asan is not enabled this procedure does nothing.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_poison_slice"><span><a class="doc-id-link" href="#address_poison_slice">address_poison_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L53"><em>Source</em></a></div></h3>
+<h3 id="address_poison_slice"><span><a class="doc-id-link" href="#address_poison_slice">address_poison_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L63"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_poison_slice :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (region: $T/[]$E) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Marks a slice as unaddressable</p>
+<p>Code instrumented with <code>-sanitize:address</code> is forbidden from accessing any address
+within the slice. This procedure is not thread-safe because no two threads can
+poison or unpoison memory in the same memory region region simultaneously.</p>
+<p>When asan is not enabled this procedure does nothing.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_print_accumulated_stats"><span><a class="doc-id-link" href="#address_print_accumulated_stats">address_print_accumulated_stats<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L259"><em>Source</em></a></div></h3>
+<h3 id="address_print_accumulated_stats"><span><a class="doc-id-link" href="#address_print_accumulated_stats">address_print_accumulated_stats<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L454"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_print_accumulated_stats :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Prints asan statistics to <code>stderr</code></p>
+<p>When asan is not enabled this procedure does nothing.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_region_is_poisoned_ptr"><span><a class="doc-id-link" href="#address_region_is_poisoned_ptr">address_region_is_poisoned_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L117"><em>Source</em></a></div></h3>
+<h3 id="address_region_is_poisoned_ptr"><span><a class="doc-id-link" href="#address_region_is_poisoned_ptr">address_region_is_poisoned_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L197"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_region_is_poisoned_ptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: ^$T) -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Checks if the memory region pointed to by the pointer is poisoned.</p>
+<p>If it is poisoned this procedure returns the address which would result
+in an asan error.</p>
+<p>When asan is not enabled this procedure returns <code>nil</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_region_is_poisoned_rawptr"><span><a class="doc-id-link" href="#address_region_is_poisoned_rawptr">address_region_is_poisoned_rawptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L125"><em>Source</em></a></div></h3>
+<h3 id="address_region_is_poisoned_rawptr"><span><a class="doc-id-link" href="#address_region_is_poisoned_rawptr">address_region_is_poisoned_rawptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L213"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_region_is_poisoned_rawptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (region: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Checks if the memory region covered by <code>[ptr, ptr+len)</code> is poisoned.</p>
+<p>If it is poisoned this procedure returns the address which would result
+in an asan error.</p>
+<p>When asan is not enabled this procedure returns <code>nil</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_region_is_poisoned_slice"><span><a class="doc-id-link" href="#address_region_is_poisoned_slice">address_region_is_poisoned_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L109"><em>Source</em></a></div></h3>
+<h3 id="address_region_is_poisoned_slice"><span><a class="doc-id-link" href="#address_region_is_poisoned_slice">address_region_is_poisoned_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L181"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_region_is_poisoned_slice :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (region: []$T/$E) -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Checks if the memory region covered by the slice is poisoned.</p>
+<p>If it is poisoned this procedure returns the address which would result
+in an asan error.</p>
+<p>When asan is not enabled this procedure returns <code>nil</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_report_present"><span><a class="doc-id-link" href="#address_report_present">address_report_present<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L154"><em>Source</em></a></div></h3>
+<h3 id="address_report_present"><span><a class="doc-id-link" href="#address_report_present">address_report_present<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L263"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_report_present :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns <code>true</code> if an asan error has occured, otherwise it returns
+<code>false</code>.</p>
+<p>When asan is not enabled this procedure returns <code>false</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_set_death_callback"><span><a class="doc-id-link" href="#address_set_death_callback">address_set_death_callback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L103"><em>Source</em></a></div></h3>
+<h3 id="address_set_death_callback"><span><a class="doc-id-link" href="#address_set_death_callback">address_set_death_callback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L167"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_set_death_callback :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (callback: <a class="code-typename" href="/base/sanitizer/#Address_Death_Callback">Address_Death_Callback</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Registers a callback to be run when asan detects a memory error right before terminating
+the process.</p>
+<p>This can be used for logging and/or debugging purposes.</p>
+<p>When asan is not enabled this procedure does nothing.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_unpoison_ptr"><span><a class="doc-id-link" href="#address_unpoison_ptr">address_unpoison_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L71"><em>Source</em></a></div></h3>
+<h3 id="address_unpoison_ptr"><span><a class="doc-id-link" href="#address_unpoison_ptr">address_unpoison_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L109"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_unpoison_ptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: ^$T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Marks a pointer as addressable</p>
+<p>Code instrumented with <code>-sanitize:address</code> is allowed to access any address
+within the region the pointer points to again. This procedure is not thread-safe
+because no two threads can poison or unpoison memory in the same memory region
+region simultaneously.</p>
+<p>When asan is not enabled this procedure does nothing.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_unpoison_rawptr"><span><a class="doc-id-link" href="#address_unpoison_rawptr">address_unpoison_rawptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L84"><em>Source</em></a></div></h3>
+<h3 id="address_unpoison_rawptr"><span><a class="doc-id-link" href="#address_unpoison_rawptr">address_unpoison_rawptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L140"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_unpoison_rawptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Marks the region covering <code>[ptr, ptr+len)</code> as addressable</p>
+<p>Code instrumented with <code>-sanitize:address</code> is allowed to access any address
+within the region again. This procedure is not thread-safe because no two
+threads can poison or unpoison memory in the same memory region region simultaneously.</p>
+<p>When asan is not enabled this procedure does nothing.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_unpoison_slice"><span><a class="doc-id-link" href="#address_unpoison_slice">address_unpoison_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L59"><em>Source</em></a></div></h3>
+<h3 id="address_unpoison_slice"><span><a class="doc-id-link" href="#address_unpoison_slice">address_unpoison_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L78"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_unpoison_slice :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (region: $T/[]$E) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Marks a slice as addressable</p>
+<p>Code instrumented with <code>-sanitize:address</code> is allowed to access any address
+within the slice again. This procedure is not thread-safe because no two threads
+can poison or unpoison memory in the same memory region region simultaneously.</p>
+<p>When asan is not enabled this procedure does nothing.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="address_update_allocation_context"><span><a class="doc-id-link" href="#address_update_allocation_context">address_update_allocation_context<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L292"><em>Source</em></a></div></h3>
+<h3 id="address_update_allocation_context"><span><a class="doc-id-link" href="#address_update_allocation_context">address_update_allocation_context<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L512"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_update_allocation_context :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Updates the allocation stack trace for the given address.</p>
+<p>Returns <code>true</code> if successful, otherwise it returns <code>false</code>.</p>
+<p>When asan is not enabled this procedure returns <code>false</code>.</p>
+</details>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="address_poison"><span><a class="doc-id-link" href="#address_poison">address_poison<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L91"><em>Source</em></a></div></h3>
+<h3 id="address_poison"><span><a class="doc-id-link" href="#address_poison">address_poison<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L147"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_poison :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/base/sanitizer/#address_poison_slice">address_poison_slice</a>,
@@ -432,7 +652,7 @@ Procedure Groups (3)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="address_region_is_poisoned"><span><a class="doc-id-link" href="#address_region_is_poisoned">address_region_is_poisoned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L134"><em>Source</em></a></div></h3>
+<h3 id="address_region_is_poisoned"><span><a class="doc-id-link" href="#address_region_is_poisoned">address_region_is_poisoned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L222"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_region_is_poisoned :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/base/sanitizer/#address_region_is_poisoned_slice">address_region_is_poisoned_slice</a>,
@@ -443,7 +663,7 @@ Procedure Groups (3)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="address_unpoison"><span><a class="doc-id-link" href="#address_unpoison">address_unpoison<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L97"><em>Source</em></a></div></h3>
+<h3 id="address_unpoison"><span><a class="doc-id-link" href="#address_unpoison">address_unpoison<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L153"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">address_unpoison :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/base/sanitizer/#address_unpoison_slice">address_unpoison_slice</a>,
@@ -457,22 +677,22 @@ Procedure Groups (3)</summary>
 <h2 id="pkg-source-files">Source Files</h2>
 <ul>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin">address.odin</a></li>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/doc.odin">doc.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-28 21:11:26.002657400 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-04 (vendor "odin") Windows_amd64 @ 2025-04-29 21:12:42.359245800 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
 <ul>
-<li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#pkg-overview">Overview</a><li><a href="#pkg-Types">Types</a><ul>
 <li><a href="#Address_Access_Type">Address_Access_Type</a></li>
 <li><a href="#Address_Death_Callback">Address_Death_Callback</a></li>
-<li><a href="#Address_Located_Address_String">Address_Located_Address_String</a></li>
+<li><a href="#Address_Located_Address">Address_Located_Address</a></li>
 <li><a href="#Address_Shadow_Mapping">Address_Shadow_Mapping</a></li>
 </ul>
 </li>
 <li><a href="#pkg-Procedures">Procedures</a><ul>
-<li><a href="#address_address_is_poisoned">address_address_is_poisoned</a></li>
 <li><a href="#address_describe_address">address_describe_address</a></li>
 <li><a href="#address_get_alloc_stack_trace">address_get_alloc_stack_trace</a></li>
 <li><a href="#address_get_current_fake_stack">address_get_current_fake_stack</a></li>
@@ -487,6 +707,7 @@ Procedure Groups (3)</summary>
 <li><a href="#address_get_shadow_mapping">address_get_shadow_mapping</a></li>
 <li><a href="#address_handle_no_return">address_handle_no_return</a></li>
 <li><a href="#address_is_in_fake_stack">address_is_in_fake_stack</a></li>
+<li><a href="#address_is_poisoned">address_is_poisoned</a></li>
 <li><a href="#address_locate_address">address_locate_address</a></li>
 <li><a href="#address_poison_ptr">address_poison_ptr</a></li>
 <li><a href="#address_poison_rawptr">address_poison_rawptr</a></li>
