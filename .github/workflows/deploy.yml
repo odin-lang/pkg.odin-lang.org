@@ -46,6 +46,8 @@ jobs:
           odin doc core/sys/unix                     -all-packages -doc-format -show-debug-messages -target:linux_amd64
           odin doc core/sys/haiku                    -all-packages -doc-format -show-debug-messages -target:haiku_amd64
           odin doc vendor/sdl3                       -all-packages -doc-format -show-debug-messages
+          odin doc vendor/sdl3/image                 -all-packages -doc-format -show-debug-messages
+          odin doc vendor/sdl3/ttf                   -all-packages -doc-format -show-debug-messages
       - name: Generate Tool
         shell: cmd
         run: |
@@ -59,7 +61,7 @@ jobs:
           copy resources\CNAME       website\static\CNAME
           copy resources\favicon.svg website\static\favicon.svg
           pushd website\static
-          ..\odin-html-docs.exe ..\all.odin-doc --merge ..\darwin.odin-doc ..\all_posix.odin-doc ..\freebsd.odin-doc ..\linux.odin-doc ..\unix.odin-doc ..\haiku.odin-doc ..\sdl3.odin-doc
+          ..\odin-html-docs.exe ..\all.odin-doc --merge ..\darwin.odin-doc ..\all_posix.odin-doc ..\freebsd.odin-doc ..\linux.odin-doc ..\unix.odin-doc ..\haiku.odin-doc ..\sdl3.odin-doc ..\sdl3_image.odin-doc ..\sdl3_ttf.odin-doc
           popd
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
