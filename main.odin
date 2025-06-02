@@ -148,6 +148,8 @@ init_cfg_from_pkg :: proc(pkg: ^doc.Pkg, loc := #caller_location) {
 
 
 generate_from_path :: proc(path: string, all_packages: bool) {
+	log.debugf("reading %q", path)
+
 	{
 		data, ok := os.read_entire_file(path)
 		if !ok {
@@ -212,6 +214,8 @@ generate_from_path :: proc(path: string, all_packages: bool) {
 				} else {
 					log.debugf("package already handled but this instance has more entries: %q", fp)
 				}
+			} else {
+				log.debugf("new package: %q", fp)
 			}
 
 			append(&pkgs, &pkg)
@@ -260,9 +264,7 @@ generate_from_path :: proc(path: string, all_packages: bool) {
 
 			log.debugf("Final package path for %s: %q", str(pkg.name), trimmed)
 
-			if trimmed not_in collection.pkgs {
-				collection.pkgs[trimmed] = pkg
-			}
+			collection.pkgs[trimmed] = pkg
 			collection.pkg_to_path[pkg] = trimmed
 			cfg.pkg_to_collection[pkg] = collection
 			cfg.pkg_to_header[pkg] = cfg.header
