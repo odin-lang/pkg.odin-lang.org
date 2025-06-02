@@ -204,11 +204,18 @@ generate_from_path :: proc(path: string, all_packages: bool) {
 
 		for &pkg in cfg.pkgs[1:] {
 			fp := str(pkg.fullpath)
+
 			if fp in cfg.handled_packages {
-				continue
+				if cfg.handled_packages[fp] >= len(array(pkg.entries)) {
+					log.debugf("package already handled: %q", fp)
+					continue
+				} else {
+					log.debugf("package already handled but this instance has more entries: %q", fp)
+				}
 			}
+
 			append(&pkgs, &pkg)
-			cfg.handled_packages[fp] = {}
+			cfg.handled_packages[fp] = len(array(pkg.entries))
 			cfg.pkg_to_header[&pkg] = cfg.header
 		}
 
