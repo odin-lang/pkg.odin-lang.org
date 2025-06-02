@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>package nanovg/gl - pkg.odin-lang.org</title>	<link rel="icon" href="/favicon.svg">
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/scss/custom.min.css">
+	<link rel=stylesheet href="//odin-lang.org/lib/highlight/styles/github-dark.min.css">
+	<script src="//odin-lang.org/lib/highlight/highlight.min.js"></script>
+
+	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
+	<script>hljs.highlightAll()</script>
+	<script>
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
+		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
+	</script>
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
+
+	<link rel="stylesheet" type="text/css" href="/style.css">
+
+	</style>
+</head>
+<body>
+<script>
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
+</script>
+<header class="sticky-top">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
+		<div class="container">
+			<a class="navbar-brand" href="https://odin-lang.org/">
+			<img src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#odin-navbar-content" aria-controls="odin-navbar-content" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+			<div class="collapse navbar-collapse" id="odin-navbar-content">
+			<ul class="navbar-nav ms-md-auto">
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/">Home</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/docs">Docs</a></li>
+				<li class="nav-item"><a class="nav-link active" href="/">Packages</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/news">News</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/showcase">Showcase</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://forum.odin-lang.org">Forum</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/community">Community</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://github.com/odin-lang/Odin" target="_blank">GitHub</a></li>
+				<li class="nav-item">
+					<a
+						class="nav-link btn-dark-mode"
+						onclick="toggleDarkMode();"
+						title="Toggle Light/Dark Mode"
+					>
+						<span class="dark-mode-appearance">Appearance:</span>
+						<svg fill="white" id="dark-mode-icon" viewBox="0 0 384 512"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"/></svg>
+						<svg fill="white" id="light-mode-icon" viewBox="0 0 16 16">
+						  <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+						</svg>
+					</button>
+					</a>
+				</li>
+			</ul>
+		</div>
+		</div>
+	</nav>
+</header>
+<main>
+<div class="container full-width">
+<div class="row odin-main my-4" id="pkg">
+<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">
+<div class="py-3">
+<h4><a style="text-transform: capitalize; color: inherit;" href="/vendor">vendor Library</a></h4>
+<ul>
+<li class="nav-item"><a href="/vendor/box2d">box2d</a></li>
+<li class="nav-item"><a href="/vendor/cgltf">cgltf</a></li>
+<li class="nav-item"><a href="/vendor/commonmark">commonmark</a></li>
+<li class="nav-item">darwin<ul>
+<li><a href="/vendor/darwin/Metal">Metal</a></li>
+<li><a href="/vendor/darwin/MetalKit">MetalKit</a></li>
+<li><a href="/vendor/darwin/QuartzCore">QuartzCore</a></li>
+</ul>
+
+</li>
+<li class="nav-item">directx<ul>
+<li><a href="/vendor/directx/d3d11">d3d11</a></li>
+<li><a href="/vendor/directx/d3d12">d3d12</a></li>
+<li><a href="/vendor/directx/d3d_compiler">d3d_compiler</a></li>
+<li><a href="/vendor/directx/dxc">dxc</a></li>
+<li><a href="/vendor/directx/dxgi">dxgi</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/ENet">ENet</a></li>
+<li class="nav-item"><a href="/vendor/fontstash">fontstash</a></li>
+<li class="nav-item"><a href="/vendor/ggpo">ggpo</a></li>
+<li class="nav-item"><a href="/vendor/glfw">glfw</a><ul>
+<li><a href="/vendor/glfw/bindings">bindings</a></li>
+</ul>
+
+</li>
+<li class="nav-item">lua<ul>
+<li><a href="/vendor/lua/5.4">5.4</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/microui">microui</a></li>
+<li class="nav-item"><a href="/vendor/miniaudio">miniaudio</a></li>
+<li class="nav-item"><a href="/vendor/nanovg">nanovg</a><ul>
+<li><a class="active" href="/vendor/nanovg/gl">gl</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/OpenEXRCore">OpenEXRCore</a></li>
+<li class="nav-item"><a href="/vendor/OpenGL">OpenGL</a></li>
+<li class="nav-item"><a href="/vendor/portmidi">portmidi</a></li>
+<li class="nav-item"><a href="/vendor/raylib">raylib</a></li>
+<li class="nav-item"><a href="/vendor/sdl2">sdl2</a></li>
+<li class="nav-item"><a href="/vendor/sdl3">sdl3</a><ul>
+<li><a href="/vendor/sdl3/image">image</a></li>
+<li><a href="/vendor/sdl3/ttf">ttf</a></li>
+</ul>
+
+</li>
+<li class="nav-item">stb<ul>
+<li><a href="/vendor/stb/easy_font">easy_font</a></li>
+<li><a href="/vendor/stb/image">image</a></li>
+<li><a href="/vendor/stb/rect_pack">rect_pack</a></li>
+<li><a href="/vendor/stb/truetype">truetype</a></li>
+<li><a href="/vendor/stb/vorbis">vorbis</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/vulkan">vulkan</a></li>
+<li class="nav-item"><a href="/vendor/wgpu">wgpu</a></li>
+<li class="nav-item">windows<ul>
+<li><a href="/vendor/windows/GameInput">GameInput</a></li>
+<li><a href="/vendor/windows/XAudio2">XAudio2</a></li>
+</ul>
+
+</li>
+<li class="nav-item">x11<ul>
+<li><a href="/vendor/x11/xlib">xlib</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/zlib">zlib</a></li>
+</ul>
+</div>
+</nav>
+<article class="col-lg-8 p-4 documentation odin-article">
+<nav class="pkg-breadcrumb" aria-label="breadcrumb">
+<ol class="breadcrumb">
+<li class="breadcrumb-item"><a href="/vendor">vendor</a></li>
+<li class="breadcrumb-item"><a href="/vendor/nanovg">nanovg</a></li>
+<li class="breadcrumb-item active" aria-current="page"><a href="/vendor/nanovg/gl">gl</a></li>
+</ol>
+</nav>
+<h1>package vendor:nanovg/gl<div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl"><em>Source</em></a></div></h1>
+
+		<div class="odin-search-wrapper">
+			<input type="search" id="odin-search" class="odin-search-package" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">
+			<div class="odin-search-shortcut">
+				<div class="odin-search-key key-macos">⌘K</div>
+				<div class="odin-search-key key-windows">Ctrl+K</div>
+				<span class="odin-search-or">or</span>
+				<div class="odin-search-key">/</div>
+			</div>
+		</div>
+	
+<div id="odin-search-info">
+<div id="odin-search-time"></div>
+
+		<div id="odin-search-options">
+			<input type="checkbox" id="odin-search-filter" name="odin-search-filter">
+			<label for="odin-search-filter">Filter Results</label>
+		</div>
+</div>
+<ul id="odin-search-results"></ul>
+<div id="pkg-top">
+<div id="pkg-index">
+<h2>Index</h2>
+<div>
+<details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
+<summary id="#doc-index-Types-header">
+Types (19)</summary>
+<ul>
+<li><a href="#Blend">Blend</a></li>
+<li><a href="#Call">Call</a></li>
+<li><a href="#CallType">CallType</a></li>
+<li><a href="#Color">Color</a></li>
+<li><a href="#Context">Context</a></li>
+<li><a href="#CreateFlag">CreateFlag</a></li>
+<li><a href="#CreateFlags">CreateFlags</a></li>
+<li><a href="#FragUniforms">FragUniforms</a></li>
+<li><a href="#ImageFlags">ImageFlags</a></li>
+<li><a href="#Paint">Paint</a></li>
+<li><a href="#Path">Path</a></li>
+<li><a href="#ScissorT">ScissorT</a></li>
+<li><a href="#Shader">Shader</a></li>
+<li><a href="#ShaderType">ShaderType</a></li>
+<li><a href="#Texture">Texture</a></li>
+<li><a href="#TextureType">TextureType</a></li>
+<li><a href="#UniformLoc">UniformLoc</a></li>
+<li><a href="#Vertex">Vertex</a></li>
+<li><a href="#framebuffer">framebuffer</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
+<summary id="#doc-index-Constants-header">
+Constants (15)</summary>
+<ul>
+<li><a href="#BLEND_FACTOR_TABLE">BLEND_FACTOR_TABLE</a></li>
+<li><a href="#DEFAULT_FBO">DEFAULT_FBO</a></li>
+<li><a href="#DEFAULT_IMPLEMENTATION_STRING">DEFAULT_IMPLEMENTATION_STRING</a></li>
+<li><a href="#GL2">GL2</a></li>
+<li><a href="#GL2_IMPLEMENTATION">GL2_IMPLEMENTATION</a></li>
+<li><a href="#GL3">GL3</a></li>
+<li><a href="#GL3_IMPLEMENTATION">GL3_IMPLEMENTATION</a></li>
+<li><a href="#GLES2">GLES2</a></li>
+<li><a href="#GLES2_IMPLEMENTATION">GLES2_IMPLEMENTATION</a></li>
+<li><a href="#GLES3">GLES3</a></li>
+<li><a href="#GLES3_IMPLEMENTATION">GLES3_IMPLEMENTATION</a></li>
+<li><a href="#GL_IMPLEMENTATION">GL_IMPLEMENTATION</a></li>
+<li><a href="#GL_UNIFORMARRAY_SIZE">GL_UNIFORMARRAY_SIZE</a></li>
+<li><a href="#GL_USE_UNIFORMBUFFER">GL_USE_UNIFORMBUFFER</a></li>
+<li><a href="#USE_STATE_FILTER">USE_STATE_FILTER</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Variables" aria-labelledby="#doc-index-Variables-header">
+<summary id="#doc-index-Variables-header">
+Variables (3)</summary>
+<ul>
+<li><a href="#defaultFBO">defaultFBO</a></li>
+<li><a href="#frag_shader">frag_shader</a></li>
+<li><a href="#vert_shader">vert_shader</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
+<summary id="#doc-index-Procedures-header">
+Procedures (7)</summary>
+<ul>
+<li><a href="#BindFramebuffer">BindFramebuffer</a></li>
+<li><a href="#Create">Create</a></li>
+<li><a href="#CreateFramebuffer">CreateFramebuffer</a></li>
+<li><a href="#CreateImageFromHandle">CreateImageFromHandle</a></li>
+<li><a href="#DeleteFramebuffer">DeleteFramebuffer</a></li>
+<li><a href="#Destroy">Destroy</a></li>
+<li><a href="#ImageHandle">ImageHandle</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedure Groups" aria-labelledby="#doc-index-Procedure Groups-header">
+<summary id="#doc-index-Procedure Groups-header">
+Procedure Groups (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+</div>
+</div>
+<section class="documentation">
+<h2 id="pkg-Types" class="pkg-header">Types</h2>
+<div class="pkg-entity">
+<h3 id="Blend"><span><a class="doc-id-link" href="#Blend">Blend<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L60"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Blend :: <span class="keyword-type">struct</span> {
+	src_RGB:   <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	dst_RGB:   <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	src_alpha: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	dst_alpha: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Call"><span><a class="doc-id-link" href="#Call">Call<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L75"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Call :: <span class="keyword-type">struct</span> {
+	type:           <a class="code-typename" href="/vendor/nanovg/gl/#CallType">CallType</a>,
+	image:          <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	pathOffset:     <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	pathCount:      <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	triangleOffset: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	triangleCount:  <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	uniformOffset:  <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	blendFunc:      <a class="code-typename" href="/vendor/nanovg/gl/#Blend">Blend</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="CallType"><span><a class="doc-id-link" href="#CallType">CallType<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L67"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CallType :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
+	NONE, 
+	FILL, 
+	CONVEX_FILL, 
+	STROKE, 
+	TRIANGLES, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Color"><span><a class="doc-id-link" href="#Color">Color<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L12"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Color :: [4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Context"><span><a class="doc-id-link" href="#Context">Context<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L168"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Context :: <span class="keyword-type">struct</span> {
+	shader:          <a class="code-typename" href="/vendor/nanovg/gl/#Shader">Shader</a>,
+	textures:        [<span class="keyword">dynamic</span>]<a class="code-typename" href="/vendor/nanovg/gl/#Texture">Texture</a>,
+	view:            [2]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	textureId:       <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	vertBuf:         <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	vertArr:         <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	<span class="comment">// GL3</span>
+	fragBuf:         <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	<span class="comment">// USE_UNIFORMBUFFER</span>
+	fragSize:        <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	flags:           <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/nanovg/gl/#CreateFlag">CreateFlag</a>],
+	frag_binding:    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	<span class="comment">// Per frame buffers</span>
+	calls:           [<span class="keyword">dynamic</span>]<a class="code-typename" href="/vendor/nanovg/gl/#Call">Call</a>,
+	paths:           [<span class="keyword">dynamic</span>]<a class="code-typename" href="/vendor/nanovg/gl/#Path">Path</a>,
+	verts:           [<span class="keyword">dynamic</span>][4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	uniforms:        [<span class="keyword">dynamic</span>]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	<span class="comment">// cached state used for state filter</span>
+	boundTexture:    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	stencilMask:     <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	stencilFunc:     <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	stencilFuncRef:  <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	stencilFuncMask: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	blendFunc:       <a class="code-typename" href="/vendor/nanovg/gl/#Blend">Blend</a>,
+	dummyTex:        <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="CreateFlag"><span><a class="doc-id-link" href="#CreateFlag">CreateFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L19"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CreateFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
+	<span class="comment">// Flag indicating if geometry based anti-aliasing is used (may not be needed when using MSAA).</span>
+	ANTI_ALIAS, 
+	<span class="comment">// Flag indicating if strokes should be drawn using stencil buffer. The rendering will be a little</span>
+	<span class="comment">// slower, but path overlaps (i.e. self-intersecting or sharp turns) will be drawn just once.</span>
+	STENCIL_STROKES, 
+	<span class="comment">// additional debug checks</span>
+	DEBUG, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="CreateFlags"><span><a class="doc-id-link" href="#CreateFlags">CreateFlags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L28"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CreateFlags :: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/nanovg/gl/#CreateFlag">CreateFlag</a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FragUniforms"><span><a class="doc-id-link" href="#FragUniforms">FragUniforms<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L115"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FragUniforms :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
+	scissorMat:   [12]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	<span class="comment">// matrices are actually 3 vec4s</span>
+	paintMat:     [12]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	innerColor:   [4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	outerColor:   [4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	scissorExt:   [2]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	scissorScale: [2]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	extent:       [2]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	radius:       <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	feather:      <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	strokeMult:   <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	strokeThr:    <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	texType:      <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	type:         <a class="code-typename" href="/vendor/nanovg/gl/#ShaderType">ShaderType</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ImageFlags"><span><a class="doc-id-link" href="#ImageFlags">ImageFlags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L14"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ImageFlags :: <span class="keyword-type">bit_set</span>[nanovg.<a class="code-typename" href="/vendor/nanovg/#ImageFlag">ImageFlag</a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Paint"><span><a class="doc-id-link" href="#Paint">Paint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L16"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Paint :: nanovg.<a class="code-typename" href="/vendor/nanovg/#Paint">Paint</a></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Path"><span><a class="doc-id-link" href="#Path">Path<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L86"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Path :: <span class="keyword-type">struct</span> {
+	fillOffset:   <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	fillCount:    <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	strokeOffset: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	strokeCount:  <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ScissorT"><span><a class="doc-id-link" href="#ScissorT">ScissorT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L17"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ScissorT :: nanovg.<a class="code-typename" href="/vendor/nanovg/#ScissorT">ScissorT</a></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Shader"><span><a class="doc-id-link" href="#Shader">Shader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L45"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Shader :: <span class="keyword-type">struct</span> {
+	prog: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	frag: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	vert: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	loc:  [<a class="code-typename" href="/vendor/nanovg/gl/#UniformLoc">UniformLoc</a>]<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ShaderType"><span><a class="doc-id-link" href="#ShaderType">ShaderType<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L38"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ShaderType :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	FILL_GRAD, 
+	FILL_IMG, 
+	SIMPLE, 
+	IMG, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Texture"><span><a class="doc-id-link" href="#Texture">Texture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L52"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Texture :: <span class="keyword-type">struct</span> {
+	id:     <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	tex:    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	width:  <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	height: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	type:   nanovg.<a class="code-typename" href="/vendor/nanovg/#Texture">Texture</a>,
+	flags:  <span class="keyword-type">bit_set</span>[nanovg.<a class="code-typename" href="/vendor/nanovg/#ImageFlag">ImageFlag</a>],
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="TextureType"><span><a class="doc-id-link" href="#TextureType">TextureType<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L15"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TextureType :: nanovg.<a class="code-typename" href="/vendor/nanovg/#Texture">Texture</a></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="UniformLoc"><span><a class="doc-id-link" href="#UniformLoc">UniformLoc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L32"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">UniformLoc :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
+	VIEW_SIZE, 
+	TEX, 
+	FRAG, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Vertex"><span><a class="doc-id-link" href="#Vertex">Vertex<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L13"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Vertex :: [4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="framebuffer"><span><a class="doc-id-link" href="#framebuffer">framebuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L1367"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">framebuffer :: <span class="keyword-type">struct</span> {
+	ctx:     ^nanovg.<a class="code-typename" href="/vendor/nanovg/#Context">Context</a>,
+	fbo:     <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	rbo:     <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	texture: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	image:   <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/nanovg/gl/#BindFramebuffer">BindFramebuffer</a></li>
+<li><a href="/vendor/nanovg/gl/#DeleteFramebuffer">DeleteFramebuffer</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/nanovg/gl/#CreateFramebuffer">CreateFramebuffer</a></li>
+</ul>
+</div>
+<h2 id="pkg-Constants" class="pkg-header">Constants</h2>
+<div class="pkg-entity">
+<h3 id="BLEND_FACTOR_TABLE"><span><a class="doc-id-link" href="#BLEND_FACTOR_TABLE">BLEND_FACTOR_TABLE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L936"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BLEND_FACTOR_TABLE: [nanovg.<a class="code-typename" href="/vendor/nanovg/#BlendFactor">BlendFactor</a>]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> : [nvg.BlendFactor]u32{.ZERO = gl.ZERO, .ONE = gl.ONE, .SRC_COLOR = gl.SRC_COLOR, .ONE_MINUS_SRC_COLOR = gl.ONE_MINUS_SRC_COLOR, .DST_COLOR = gl.DST_COLOR, .ONE_MINUS_DST_COLOR = gl.ONE_MINUS_DST_COLOR, .SRC_ALPHA = gl.SRC_ALPHA, .ONE_MINUS_SRC_ALPHA = gl.ONE_MINUS_SRC_ALPHA, .DST_ALPHA = gl.DST_ALPHA, .ONE_MINUS_DST_ALPHA = gl.ONE_MINUS_DST_ALPHA, .SRC_ALPHA_SATURATE = gl.SRC_ALPHA_SATURATE}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DEFAULT_FBO"><span><a class="doc-id-link" href="#DEFAULT_FBO">DEFAULT_FBO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L1375"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DEFAULT_FBO: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 100_000</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DEFAULT_IMPLEMENTATION_STRING"><span><a class="doc-id-link" href="#DEFAULT_IMPLEMENTATION_STRING">DEFAULT_IMPLEMENTATION_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L132"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DEFAULT_IMPLEMENTATION_STRING: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> : #config(NANOVG_GL_IMPL, "GL3")</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GL2"><span><a class="doc-id-link" href="#GL2">GL2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L146"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GL2: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : false</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GL2_IMPLEMENTATION"><span><a class="doc-id-link" href="#GL2_IMPLEMENTATION">GL2_IMPLEMENTATION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L133"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GL2_IMPLEMENTATION: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : DEFAULT_IMPLEMENTATION_STRING == "GL2"</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GL3"><span><a class="doc-id-link" href="#GL3">GL3<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L147"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GL3: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : true</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GL3_IMPLEMENTATION"><span><a class="doc-id-link" href="#GL3_IMPLEMENTATION">GL3_IMPLEMENTATION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L134"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GL3_IMPLEMENTATION: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : DEFAULT_IMPLEMENTATION_STRING == "GL3"</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GLES2"><span><a class="doc-id-link" href="#GLES2">GLES2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L148"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GLES2: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : false</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GLES2_IMPLEMENTATION"><span><a class="doc-id-link" href="#GLES2_IMPLEMENTATION">GLES2_IMPLEMENTATION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L135"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GLES2_IMPLEMENTATION: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : DEFAULT_IMPLEMENTATION_STRING == "GLES2"</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GLES3"><span><a class="doc-id-link" href="#GLES3">GLES3<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L149"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GLES3: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : false</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GLES3_IMPLEMENTATION"><span><a class="doc-id-link" href="#GLES3_IMPLEMENTATION">GLES3_IMPLEMENTATION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L136"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GLES3_IMPLEMENTATION: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : DEFAULT_IMPLEMENTATION_STRING == "GLES3"</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GL_IMPLEMENTATION"><span><a class="doc-id-link" href="#GL_IMPLEMENTATION">GL_IMPLEMENTATION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L150"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GL_IMPLEMENTATION: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : true</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GL_UNIFORMARRAY_SIZE"><span><a class="doc-id-link" href="#GL_UNIFORMARRAY_SIZE">GL_UNIFORMARRAY_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L93"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GL_UNIFORMARRAY_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 11</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GL_USE_UNIFORMBUFFER"><span><a class="doc-id-link" href="#GL_USE_UNIFORMBUFFER">GL_USE_UNIFORMBUFFER<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L151"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GL_USE_UNIFORMBUFFER: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : true</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="USE_STATE_FILTER"><span><a class="doc-id-link" href="#USE_STATE_FILTER">USE_STATE_FILTER<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L30"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">USE_STATE_FILTER: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : #config(USE_STATE_FILTER, true)</pre>
+</div>
+</div>
+<h2 id="pkg-Variables" class="pkg-header">Variables</h2>
+<div class="pkg-entity">
+<h3 id="defaultFBO"><span><a class="doc-id-link" href="#defaultFBO">defaultFBO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L1376"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">defaultFBO: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> = …</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="frag_shader"><span><a class="doc-id-link" href="#frag_shader">frag_shader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L328"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">frag_shader: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> = …</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="vert_shader"><span><a class="doc-id-link" href="#vert_shader">vert_shader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L327"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">vert_shader: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> = …</pre>
+</div>
+</div>
+<h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
+<div class="pkg-entity">
+<h3 id="BindFramebuffer"><span><a class="doc-id-link" href="#BindFramebuffer">BindFramebuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L1379"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BindFramebuffer :: <span class="keyword-type">proc</span>(fb: ^<a class="code-typename" href="/vendor/nanovg/gl/#framebuffer">framebuffer</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>helper function to create GL frame buffer to render to</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Create"><span><a class="doc-id-link" href="#Create">Create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L1323"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Create :: <span class="keyword-type">proc</span>(flags: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/nanovg/gl/#CreateFlag">CreateFlag</a>]) -> ^nanovg.<a class="code-typename" href="/vendor/nanovg/#Context">Context</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="CreateFramebuffer"><span><a class="doc-id-link" href="#CreateFramebuffer">CreateFramebuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L1386"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CreateFramebuffer :: <span class="keyword-type">proc</span>(ctx: ^nanovg.<a class="code-typename" href="/vendor/nanovg/#Context">Context</a>, w, h: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, imageFlags: <span class="keyword-type">bit_set</span>[nanovg.<a class="code-typename" href="/vendor/nanovg/#ImageFlag">ImageFlag</a>]) -> (fb: <a class="code-typename" href="/vendor/nanovg/gl/#framebuffer">framebuffer</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="CreateImageFromHandle"><span><a class="doc-id-link" href="#CreateImageFromHandle">CreateImageFromHandle<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L1348"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CreateImageFromHandle :: <span class="keyword-type">proc</span>(ctx: ^nanovg.<a class="code-typename" href="/vendor/nanovg/#Context">Context</a>, textureId: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, w, h: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, imageFlags: <span class="keyword-type">bit_set</span>[nanovg.<a class="code-typename" href="/vendor/nanovg/#ImageFlag">ImageFlag</a>]) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DeleteFramebuffer"><span><a class="doc-id-link" href="#DeleteFramebuffer">DeleteFramebuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L1431"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DeleteFramebuffer :: <span class="keyword-type">proc</span>(fb: ^<a class="code-typename" href="/vendor/nanovg/gl/#framebuffer">framebuffer</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Destroy"><span><a class="doc-id-link" href="#Destroy">Destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L1344"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Destroy :: <span class="keyword-type">proc</span>(ctx: ^nanovg.<a class="code-typename" href="/vendor/nanovg/#Context">Context</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ImageHandle"><span><a class="doc-id-link" href="#ImageHandle">ImageHandle<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin#L1359"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ImageHandle :: <span class="keyword-type">proc</span>(ctx: ^nanovg.<a class="code-typename" href="/vendor/nanovg/#Context">Context</a>, textureId: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {…}</pre>
+</div>
+</div>
+<h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+</section>
+<h2 id="pkg-source-files">Source Files</h2>
+<ul>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/nanovg/gl/gl.odin">gl.odin</a></li>
+</ul>
+<h2 id="pkg-generation-information">Generation Information</h2>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 19:18:09.758937700 +0000 UTC</code></p>
+</article>
+<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
+<nav id="TableOfContents">
+<ul>
+<li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#Blend">Blend</a></li>
+<li><a href="#Call">Call</a></li>
+<li><a href="#CallType">CallType</a></li>
+<li><a href="#Color">Color</a></li>
+<li><a href="#Context">Context</a></li>
+<li><a href="#CreateFlag">CreateFlag</a></li>
+<li><a href="#CreateFlags">CreateFlags</a></li>
+<li><a href="#FragUniforms">FragUniforms</a></li>
+<li><a href="#ImageFlags">ImageFlags</a></li>
+<li><a href="#Paint">Paint</a></li>
+<li><a href="#Path">Path</a></li>
+<li><a href="#ScissorT">ScissorT</a></li>
+<li><a href="#Shader">Shader</a></li>
+<li><a href="#ShaderType">ShaderType</a></li>
+<li><a href="#Texture">Texture</a></li>
+<li><a href="#TextureType">TextureType</a></li>
+<li><a href="#UniformLoc">UniformLoc</a></li>
+<li><a href="#Vertex">Vertex</a></li>
+<li><a href="#framebuffer">framebuffer</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Constants">Constants</a><ul>
+<li><a href="#BLEND_FACTOR_TABLE">BLEND_FACTOR_TABLE</a></li>
+<li><a href="#DEFAULT_FBO">DEFAULT_FBO</a></li>
+<li><a href="#DEFAULT_IMPLEMENTATION_STRING">DEFAULT_IMPLEMENTATION_STRING</a></li>
+<li><a href="#GL2">GL2</a></li>
+<li><a href="#GL2_IMPLEMENTATION">GL2_IMPLEMENTATION</a></li>
+<li><a href="#GL3">GL3</a></li>
+<li><a href="#GL3_IMPLEMENTATION">GL3_IMPLEMENTATION</a></li>
+<li><a href="#GLES2">GLES2</a></li>
+<li><a href="#GLES2_IMPLEMENTATION">GLES2_IMPLEMENTATION</a></li>
+<li><a href="#GLES3">GLES3</a></li>
+<li><a href="#GLES3_IMPLEMENTATION">GLES3_IMPLEMENTATION</a></li>
+<li><a href="#GL_IMPLEMENTATION">GL_IMPLEMENTATION</a></li>
+<li><a href="#GL_UNIFORMARRAY_SIZE">GL_UNIFORMARRAY_SIZE</a></li>
+<li><a href="#GL_USE_UNIFORMBUFFER">GL_USE_UNIFORMBUFFER</a></li>
+<li><a href="#USE_STATE_FILTER">USE_STATE_FILTER</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Variables">Variables</a><ul>
+<li><a href="#defaultFBO">defaultFBO</a></li>
+<li><a href="#frag_shader">frag_shader</a></li>
+<li><a href="#vert_shader">vert_shader</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Procedures">Procedures</a><ul>
+<li><a href="#BindFramebuffer">BindFramebuffer</a></li>
+<li><a href="#Create">Create</a></li>
+<li><a href="#CreateFramebuffer">CreateFramebuffer</a></li>
+<li><a href="#CreateImageFromHandle">CreateImageFromHandle</a></li>
+<li><a href="#DeleteFramebuffer">DeleteFramebuffer</a></li>
+<li><a href="#Destroy">Destroy</a></li>
+<li><a href="#ImageHandle">ImageHandle</a></li>
+</ul>
+</li>
+<li><a href="#pkg-source-files">Source Files</a></ul>
+</nav>
+</div></div>
+<script type="text/javascript">var odin_pkg_name = "nanovg_gl";</script>
+</div>
+
+</div>
+</main>
+
+<footer class="odin-footer">
+	<div class="container pb-5 pt-5">
+		<div class="row g-4">
+		<div class="col">
+		<a class="navbar-brand" href="https://odin-lang.org">
+		<img class="mb-3" src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+		<p>
+		The Data-Oriented Language for Sane Software Development.
+		</p>
+		</div>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Resources</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://odin-lang.org/docs" class="link-light">Docs</a></li>
+			<li><a href="https://pkg.odin-lang.org/" class="link-light">Packages</a></li>
+			<li><a href="https://odin-lang.org/news" class="link-light">News</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Community</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin" target="_blank" class="link-light">GitHub</a></li>
+			<li><a href="https://forum.odin-lang.org" target="_blank" class="link-light">Forum</a></li>
+			<li><a href="https://discord.com/invite/sVBPHEv" target="_blank" class="link-light">Discord</a></li>
+			<li><a href="https://www.twitch.tv/ginger_bill" target="_blank" class="link-light">Twitch</a></li>
+			<li><a href="https://www.youtube.com/channel/UCUSck1dOH7VKmG4lRW7tZXg" target="_blank" class="link-light">YouTube</a></li>
+			<li><a href="https://odin-lang.org/showcase" target="_blank" class="link-light">Showcase</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Contribute</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin/issues" target="_blank" class="link-light">Issues</a></li>
+			<li><a href="https://www.patreon.com/gingerbill" target="_blank" class="link-light">Donate</a></li>
+			</ul>
+			</nav>
+		</div>
+		<div class="mt-4 text-muted">© 2016–2023 Ginger Bill</div>
+	</div>
+</footer>
+
+<script src="https://odin-lang.org/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://odin-lang.org/js/script.js"></script>
+<script src="/pkg-data.js"></script>
+<script src="/search.js"></script>
+</body>
+</html>
