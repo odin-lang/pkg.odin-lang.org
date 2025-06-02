@@ -11,13 +11,28 @@
 	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
 	<script>hljs.highlightAll()</script>
 	<script>
-		function toggleDarkMode() {
-			if (document.body.classList.toggle("dark-mode")) {
-				window.localStorage.setItem("theme", "dark");
-			} else {
-				window.localStorage.setItem("theme", "light");
-			}
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
 		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
 	</script>
 	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
 
@@ -27,10 +42,14 @@
 </head>
 <body>
 <script>
-	if (window.localStorage.getItem("theme") === "dark")
-		document.body.classList.add("dark-mode");
-	else
-		document.body.classList.remove("dark-mode");
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
 </script>
 <header class="sticky-top">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
@@ -139,7 +158,6 @@
 </li>
 <li class="nav-item"><a href="/core/dynlib">dynlib</a></li>
 <li class="nav-item">encoding<ul>
-<li><a href="/core/encoding/ansi">ansi</a></li>
 <li><a href="/core/encoding/base32">base32</a></li>
 <li><a href="/core/encoding/base64">base64</a></li>
 <li><a href="/core/encoding/cbor">cbor</a></li>
@@ -255,6 +273,11 @@
 <li><a href="/core/sys/unix">unix</a></li>
 <li><a href="/core/sys/valgrind">valgrind</a></li>
 <li><a href="/core/sys/windows">windows</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/terminal">terminal</a><ul>
+<li><a href="/core/terminal/ansi">ansi</a></li>
 </ul>
 
 </li>
@@ -473,6 +496,7 @@ example :: proc() {
 </details>
 <h5>Related Procedures With Parameters</h5>
 <ul>
+<li><a href="/core/container/small_array/#cap">cap</a></li>
 <li><a href="/core/container/small_array/#clear">clear</a></li>
 <li><a href="/core/container/small_array/#consume">consume</a></li>
 <li><a href="/core/container/small_array/#get">get</a></li>
@@ -480,6 +504,7 @@ example :: proc() {
 <li><a href="/core/container/small_array/#get_ptr_safe">get_ptr_safe</a></li>
 <li><a href="/core/container/small_array/#get_safe">get_safe</a></li>
 <li><a href="/core/container/small_array/#inject_at">inject_at</a></li>
+<li><a href="/core/container/small_array/#len">len</a></li>
 <li><a href="/core/container/small_array/#ordered_remove">ordered_remove</a></li>
 <li><a href="/core/container/small_array/#pop_back">pop_back</a></li>
 <li><a href="/core/container/small_array/#pop_back_safe">pop_back_safe</a></li>
@@ -488,8 +513,10 @@ example :: proc() {
 <li><a href="/core/container/small_array/#push_back">push_back</a></li>
 <li><a href="/core/container/small_array/#push_back_elems">push_back_elems</a></li>
 <li><a href="/core/container/small_array/#push_front">push_front</a></li>
+<li><a href="/core/container/small_array/#resize">resize</a></li>
 <li><a href="/core/container/small_array/#set">set</a></li>
 <li><a href="/core/container/small_array/#slice">slice</a></li>
+<li><a href="/core/container/small_array/#space">space</a></li>
 <li><a href="/core/container/small_array/#unordered_remove">unordered_remove</a></li>
 <li><a href="/core/container/small_array/#append">append</a>&nbsp;<em>(procedure groups)</em></li>
 <li><a href="/core/container/small_array/#push">push</a>&nbsp;<em>(procedure groups)</em></li>
@@ -569,7 +596,7 @@ push_back_elems_example :: proc() {
 <div class="pkg-entity">
 <h3 id="cap"><span><a class="doc-id-link" href="#cap">cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L49"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">cap :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: $A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
+<pre class="doc-code">cap :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: <a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -776,7 +803,7 @@ inject_at_example :: proc() {
 <div class="pkg-entity">
 <h3 id="len"><span><a class="doc-id-link" href="#len">len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L37"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">len :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: $A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
+<pre class="doc-code">len :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: <a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1063,7 +1090,7 @@ push_front_example :: proc() {
 <div class="pkg-entity">
 <h3 id="resize"><span><a class="doc-id-link" href="#resize">resize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L286"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">resize :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+<pre class="doc-code">resize :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1198,7 +1225,7 @@ slice_example :: proc() {
 <div class="pkg-entity">
 <h3 id="space"><span><a class="doc-id-link" href="#space">space<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L62"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">space :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: $A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
+<pre class="doc-code">space :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: <a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1299,7 +1326,7 @@ push_example :: proc() {
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin">small_array.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-05 (vendor "odin") Windows_amd64 @ 2025-05-08 21:12:59.644917200 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 16:13:57.066986000 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

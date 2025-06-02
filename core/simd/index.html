@@ -11,13 +11,28 @@
 	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
 	<script>hljs.highlightAll()</script>
 	<script>
-		function toggleDarkMode() {
-			if (document.body.classList.toggle("dark-mode")) {
-				window.localStorage.setItem("theme", "dark");
-			} else {
-				window.localStorage.setItem("theme", "light");
-			}
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
 		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
 	</script>
 	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
 
@@ -27,10 +42,14 @@
 </head>
 <body>
 <script>
-	if (window.localStorage.getItem("theme") === "dark")
-		document.body.classList.add("dark-mode");
-	else
-		document.body.classList.remove("dark-mode");
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
 </script>
 <header class="sticky-top">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
@@ -139,7 +158,6 @@
 </li>
 <li class="nav-item"><a href="/core/dynlib">dynlib</a></li>
 <li class="nav-item">encoding<ul>
-<li><a href="/core/encoding/ansi">ansi</a></li>
 <li><a href="/core/encoding/base32">base32</a></li>
 <li><a href="/core/encoding/base64">base64</a></li>
 <li><a href="/core/encoding/cbor">cbor</a></li>
@@ -255,6 +273,11 @@
 <li><a href="/core/sys/unix">unix</a></li>
 <li><a href="/core/sys/valgrind">valgrind</a></li>
 <li><a href="/core/sys/windows">windows</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/terminal">terminal</a><ul>
+<li><a href="/core/terminal/ansi">ansi</a></li>
 </ul>
 
 </li>
@@ -397,7 +420,7 @@ Types (45)</summary>
 <summary id="#doc-index-Constants-header">
 Constants (1)</summary>
 <ul>
-<li><a href="#IS_EMULATED">IS_EMULATED</a></li>
+<li><a href="#HAS_HARDWARE_SIMD">HAS_HARDWARE_SIMD</a></li>
 </ul>
 </details>
 </div>
@@ -504,7 +527,7 @@ Procedure Groups (0)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="b16x16"><span><a class="doc-id-link" href="#b16x16">b16x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L177"><em>Source</em></a></div></h3>
+<h3 id="b16x16"><span><a class="doc-id-link" href="#b16x16">b16x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L174"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b16x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#b16"><span class="doc-builtin">b16</span></a></pre>
 </div>
@@ -514,7 +537,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="b16x32"><span><a class="doc-id-link" href="#b16x32">b16x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L252"><em>Source</em></a></div></h3>
+<h3 id="b16x32"><span><a class="doc-id-link" href="#b16x32">b16x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L249"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b16x32 :: <span class="directive">#simd</span>[32]<a href="/base/builtin#b16"><span class="doc-builtin">b16</span></a></pre>
 </div>
@@ -524,7 +547,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="b16x8"><span><a class="doc-id-link" href="#b16x8">b16x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L102"><em>Source</em></a></div></h3>
+<h3 id="b16x8"><span><a class="doc-id-link" href="#b16x8">b16x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L99"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b16x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#b16"><span class="doc-builtin">b16</span></a></pre>
 </div>
@@ -534,7 +557,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="b32x16"><span><a class="doc-id-link" href="#b32x16">b32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L257"><em>Source</em></a></div></h3>
+<h3 id="b32x16"><span><a class="doc-id-link" href="#b32x16">b32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L254"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b32x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a></pre>
 </div>
@@ -544,7 +567,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="b32x4"><span><a class="doc-id-link" href="#b32x4">b32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L107"><em>Source</em></a></div></h3>
+<h3 id="b32x4"><span><a class="doc-id-link" href="#b32x4">b32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L104"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b32x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a></pre>
 </div>
@@ -554,7 +577,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="b32x8"><span><a class="doc-id-link" href="#b32x8">b32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L182"><em>Source</em></a></div></h3>
+<h3 id="b32x8"><span><a class="doc-id-link" href="#b32x8">b32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L179"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b32x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a></pre>
 </div>
@@ -564,7 +587,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="b64x2"><span><a class="doc-id-link" href="#b64x2">b64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L112"><em>Source</em></a></div></h3>
+<h3 id="b64x2"><span><a class="doc-id-link" href="#b64x2">b64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L109"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b64x2 :: <span class="directive">#simd</span>[2]<a href="/base/builtin#b64"><span class="doc-builtin">b64</span></a></pre>
 </div>
@@ -574,7 +597,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="b64x4"><span><a class="doc-id-link" href="#b64x4">b64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L187"><em>Source</em></a></div></h3>
+<h3 id="b64x4"><span><a class="doc-id-link" href="#b64x4">b64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L184"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b64x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#b64"><span class="doc-builtin">b64</span></a></pre>
 </div>
@@ -584,7 +607,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="b64x8"><span><a class="doc-id-link" href="#b64x8">b64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L262"><em>Source</em></a></div></h3>
+<h3 id="b64x8"><span><a class="doc-id-link" href="#b64x8">b64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L259"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b64x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#b64"><span class="doc-builtin">b64</span></a></pre>
 </div>
@@ -594,7 +617,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="b8x16"><span><a class="doc-id-link" href="#b8x16">b8x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L97"><em>Source</em></a></div></h3>
+<h3 id="b8x16"><span><a class="doc-id-link" href="#b8x16">b8x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L94"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b8x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#b8"><span class="doc-builtin">b8</span></a></pre>
 </div>
@@ -604,7 +627,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="b8x32"><span><a class="doc-id-link" href="#b8x32">b8x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L172"><em>Source</em></a></div></h3>
+<h3 id="b8x32"><span><a class="doc-id-link" href="#b8x32">b8x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L169"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b8x32 :: <span class="directive">#simd</span>[32]<a href="/base/builtin#b8"><span class="doc-builtin">b8</span></a></pre>
 </div>
@@ -614,7 +637,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="b8x64"><span><a class="doc-id-link" href="#b8x64">b8x64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L247"><em>Source</em></a></div></h3>
+<h3 id="b8x64"><span><a class="doc-id-link" href="#b8x64">b8x64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L244"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">b8x64 :: <span class="directive">#simd</span>[64]<a href="/base/builtin#b8"><span class="doc-builtin">b8</span></a></pre>
 </div>
@@ -624,7 +647,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="boolx16"><span><a class="doc-id-link" href="#boolx16">boolx16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L92"><em>Source</em></a></div></h3>
+<h3 id="boolx16"><span><a class="doc-id-link" href="#boolx16">boolx16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L89"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">boolx16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a></pre>
 </div>
@@ -634,7 +657,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="boolx32"><span><a class="doc-id-link" href="#boolx32">boolx32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L167"><em>Source</em></a></div></h3>
+<h3 id="boolx32"><span><a class="doc-id-link" href="#boolx32">boolx32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L164"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">boolx32 :: <span class="directive">#simd</span>[32]<a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a></pre>
 </div>
@@ -644,7 +667,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="boolx64"><span><a class="doc-id-link" href="#boolx64">boolx64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L242"><em>Source</em></a></div></h3>
+<h3 id="boolx64"><span><a class="doc-id-link" href="#boolx64">boolx64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L239"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">boolx64 :: <span class="directive">#simd</span>[64]<a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a></pre>
 </div>
@@ -654,7 +677,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="f32x16"><span><a class="doc-id-link" href="#f32x16">f32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L232"><em>Source</em></a></div></h3>
+<h3 id="f32x16"><span><a class="doc-id-link" href="#f32x16">f32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L229"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">f32x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a></pre>
 </div>
@@ -664,7 +687,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="f32x4"><span><a class="doc-id-link" href="#f32x4">f32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L82"><em>Source</em></a></div></h3>
+<h3 id="f32x4"><span><a class="doc-id-link" href="#f32x4">f32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L79"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">f32x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a></pre>
 </div>
@@ -674,7 +697,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="f32x8"><span><a class="doc-id-link" href="#f32x8">f32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L157"><em>Source</em></a></div></h3>
+<h3 id="f32x8"><span><a class="doc-id-link" href="#f32x8">f32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L154"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">f32x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a></pre>
 </div>
@@ -684,7 +707,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="f64x2"><span><a class="doc-id-link" href="#f64x2">f64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L87"><em>Source</em></a></div></h3>
+<h3 id="f64x2"><span><a class="doc-id-link" href="#f64x2">f64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L84"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">f64x2 :: <span class="directive">#simd</span>[2]<a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a></pre>
 </div>
@@ -694,7 +717,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="f64x4"><span><a class="doc-id-link" href="#f64x4">f64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L162"><em>Source</em></a></div></h3>
+<h3 id="f64x4"><span><a class="doc-id-link" href="#f64x4">f64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L159"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">f64x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a></pre>
 </div>
@@ -704,7 +727,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="f64x8"><span><a class="doc-id-link" href="#f64x8">f64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L237"><em>Source</em></a></div></h3>
+<h3 id="f64x8"><span><a class="doc-id-link" href="#f64x8">f64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L234"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">f64x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a></pre>
 </div>
@@ -714,7 +737,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="i16x16"><span><a class="doc-id-link" href="#i16x16">i16x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L132"><em>Source</em></a></div></h3>
+<h3 id="i16x16"><span><a class="doc-id-link" href="#i16x16">i16x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L129"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i16x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a></pre>
 </div>
@@ -724,7 +747,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="i16x32"><span><a class="doc-id-link" href="#i16x32">i16x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L207"><em>Source</em></a></div></h3>
+<h3 id="i16x32"><span><a class="doc-id-link" href="#i16x32">i16x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L204"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i16x32 :: <span class="directive">#simd</span>[32]<a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a></pre>
 </div>
@@ -734,7 +757,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="i16x8"><span><a class="doc-id-link" href="#i16x8">i16x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L57"><em>Source</em></a></div></h3>
+<h3 id="i16x8"><span><a class="doc-id-link" href="#i16x8">i16x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L54"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i16x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a></pre>
 </div>
@@ -744,7 +767,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="i32x16"><span><a class="doc-id-link" href="#i32x16">i32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L217"><em>Source</em></a></div></h3>
+<h3 id="i32x16"><span><a class="doc-id-link" href="#i32x16">i32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L214"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i32x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a></pre>
 </div>
@@ -754,7 +777,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="i32x4"><span><a class="doc-id-link" href="#i32x4">i32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L67"><em>Source</em></a></div></h3>
+<h3 id="i32x4"><span><a class="doc-id-link" href="#i32x4">i32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L64"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i32x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a></pre>
 </div>
@@ -764,7 +787,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="i32x8"><span><a class="doc-id-link" href="#i32x8">i32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L142"><em>Source</em></a></div></h3>
+<h3 id="i32x8"><span><a class="doc-id-link" href="#i32x8">i32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L139"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i32x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a></pre>
 </div>
@@ -774,7 +797,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="i64x2"><span><a class="doc-id-link" href="#i64x2">i64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L77"><em>Source</em></a></div></h3>
+<h3 id="i64x2"><span><a class="doc-id-link" href="#i64x2">i64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L74"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i64x2 :: <span class="directive">#simd</span>[2]<a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a></pre>
 </div>
@@ -784,7 +807,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="i64x4"><span><a class="doc-id-link" href="#i64x4">i64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L152"><em>Source</em></a></div></h3>
+<h3 id="i64x4"><span><a class="doc-id-link" href="#i64x4">i64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L149"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i64x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a></pre>
 </div>
@@ -794,7 +817,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="i64x8"><span><a class="doc-id-link" href="#i64x8">i64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L227"><em>Source</em></a></div></h3>
+<h3 id="i64x8"><span><a class="doc-id-link" href="#i64x8">i64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L224"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i64x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a></pre>
 </div>
@@ -804,7 +827,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="i8x16"><span><a class="doc-id-link" href="#i8x16">i8x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L47"><em>Source</em></a></div></h3>
+<h3 id="i8x16"><span><a class="doc-id-link" href="#i8x16">i8x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L44"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i8x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a></pre>
 </div>
@@ -814,7 +837,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="i8x32"><span><a class="doc-id-link" href="#i8x32">i8x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L122"><em>Source</em></a></div></h3>
+<h3 id="i8x32"><span><a class="doc-id-link" href="#i8x32">i8x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L119"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i8x32 :: <span class="directive">#simd</span>[32]<a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a></pre>
 </div>
@@ -824,7 +847,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="i8x64"><span><a class="doc-id-link" href="#i8x64">i8x64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L197"><em>Source</em></a></div></h3>
+<h3 id="i8x64"><span><a class="doc-id-link" href="#i8x64">i8x64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L194"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">i8x64 :: <span class="directive">#simd</span>[64]<a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a></pre>
 </div>
@@ -834,7 +857,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="u16x16"><span><a class="doc-id-link" href="#u16x16">u16x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L127"><em>Source</em></a></div></h3>
+<h3 id="u16x16"><span><a class="doc-id-link" href="#u16x16">u16x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L124"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u16x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a></pre>
 </div>
@@ -844,7 +867,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="u16x32"><span><a class="doc-id-link" href="#u16x32">u16x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L202"><em>Source</em></a></div></h3>
+<h3 id="u16x32"><span><a class="doc-id-link" href="#u16x32">u16x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L199"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u16x32 :: <span class="directive">#simd</span>[32]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a></pre>
 </div>
@@ -854,7 +877,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="u16x8"><span><a class="doc-id-link" href="#u16x8">u16x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L52"><em>Source</em></a></div></h3>
+<h3 id="u16x8"><span><a class="doc-id-link" href="#u16x8">u16x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L49"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u16x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a></pre>
 </div>
@@ -864,7 +887,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="u32x16"><span><a class="doc-id-link" href="#u32x16">u32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L212"><em>Source</em></a></div></h3>
+<h3 id="u32x16"><span><a class="doc-id-link" href="#u32x16">u32x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L209"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u32x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a></pre>
 </div>
@@ -874,7 +897,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="u32x4"><span><a class="doc-id-link" href="#u32x4">u32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L62"><em>Source</em></a></div></h3>
+<h3 id="u32x4"><span><a class="doc-id-link" href="#u32x4">u32x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L59"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u32x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a></pre>
 </div>
@@ -884,7 +907,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="u32x8"><span><a class="doc-id-link" href="#u32x8">u32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L137"><em>Source</em></a></div></h3>
+<h3 id="u32x8"><span><a class="doc-id-link" href="#u32x8">u32x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L134"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u32x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a></pre>
 </div>
@@ -894,7 +917,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="u64x2"><span><a class="doc-id-link" href="#u64x2">u64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L72"><em>Source</em></a></div></h3>
+<h3 id="u64x2"><span><a class="doc-id-link" href="#u64x2">u64x2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L69"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u64x2 :: <span class="directive">#simd</span>[2]<a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a></pre>
 </div>
@@ -904,7 +927,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="u64x4"><span><a class="doc-id-link" href="#u64x4">u64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L147"><em>Source</em></a></div></h3>
+<h3 id="u64x4"><span><a class="doc-id-link" href="#u64x4">u64x4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L144"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u64x4 :: <span class="directive">#simd</span>[4]<a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a></pre>
 </div>
@@ -914,7 +937,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="u64x8"><span><a class="doc-id-link" href="#u64x8">u64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L222"><em>Source</em></a></div></h3>
+<h3 id="u64x8"><span><a class="doc-id-link" href="#u64x8">u64x8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L219"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u64x8 :: <span class="directive">#simd</span>[8]<a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a></pre>
 </div>
@@ -924,7 +947,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="u8x16"><span><a class="doc-id-link" href="#u8x16">u8x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L42"><em>Source</em></a></div></h3>
+<h3 id="u8x16"><span><a class="doc-id-link" href="#u8x16">u8x16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L39"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u8x16 :: <span class="directive">#simd</span>[16]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a></pre>
 </div>
@@ -934,7 +957,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="u8x32"><span><a class="doc-id-link" href="#u8x32">u8x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L117"><em>Source</em></a></div></h3>
+<h3 id="u8x32"><span><a class="doc-id-link" href="#u8x32">u8x32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L114"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u8x32 :: <span class="directive">#simd</span>[32]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a></pre>
 </div>
@@ -944,7 +967,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="u8x64"><span><a class="doc-id-link" href="#u8x64">u8x64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L192"><em>Source</em></a></div></h3>
+<h3 id="u8x64"><span><a class="doc-id-link" href="#u8x64">u8x64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L189"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">u8x64 :: <span class="directive">#simd</span>[64]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a></pre>
 </div>
@@ -955,16 +978,16 @@ Procedure Groups (0)</summary>
 </div>
 <h2 id="pkg-Constants" class="pkg-header">Constants</h2>
 <div class="pkg-entity">
-<h3 id="IS_EMULATED"><span><a class="doc-id-link" href="#IS_EMULATED">IS_EMULATED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L33"><em>Source</em></a></div></h3>
+<h3 id="HAS_HARDWARE_SIMD"><span><a class="doc-id-link" href="#HAS_HARDWARE_SIMD">HAS_HARDWARE_SIMD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L34"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">IS_EMULATED: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : true when (ODIN_ARCH == .amd64 || ODIN_ARCH == .i386) && !intrinsics.has_target_feature("sse2") else true when (ODIN_ARCH == .arm64 || ODIN_ARCH == .arm32) && !intrinsics.has_target_feature("neon") else true when (ODIN_ARCH == .wasm64p32 || ODIN_ARCH == .wasm32) && !intrinsics.has_target_feature("simd128") else true when (ODIN_ARCH == .riscv64) && !intrinsics.has_target_feature("v") else false</pre>
+<pre class="doc-code">HAS_HARDWARE_SIMD: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : runtime.HAS_HARDWARE_SIMD</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Check if SIMD is software-emulated on a target platform.</p>
-<p>This value is <code>false</code>, when the compile-time target has the hardware support for
-at 128-bit (or wider) SIMD. If the compile-time target lacks the hardware support
-for 128-bit SIMD, this value is <code>true</code>, and all SIMD operations will likely be
+<p>This value is <code>true</code>, when the compile-time target has the hardware support for
+at least 128-bit (or wider) SIMD. If the compile-time target lacks the hardware support
+for 128-bit SIMD, this value is <code>false</code>, and all SIMD operations will likely be
 emulated.</p>
 </details>
 </div>
@@ -1116,9 +1139,9 @@ res:
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="bit_not"><span><a class="doc-id-link" href="#bit_not">bit_not<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2644"><em>Source</em></a></div></h3>
+<h3 id="bit_not"><span><a class="doc-id-link" href="#bit_not">bit_not<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2641"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">bit_not :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $T/<span class="directive">#simd</span>[0]$E) -> $T/<span class="directive">#simd</span>[0]$E {…}</pre>
+<pre class="doc-code">bit_not :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: <span class="directive">#simd</span>[0]$E) -> <span class="directive">#simd</span>[0]$E {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1274,9 +1297,9 @@ res:
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="copysign"><span><a class="doc-id-link" href="#copysign">copysign<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2651"><em>Source</em></a></div></h3>
+<h3 id="copysign"><span><a class="doc-id-link" href="#copysign">copysign<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2648"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">copysign :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v, sign: $T/<span class="directive">#simd</span>[0]$E) -> $T/<span class="directive">#simd</span>[0]$E {…}</pre>
+<pre class="doc-code">copysign :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v, sign: <span class="directive">#simd</span>[0]$E) -> <span class="directive">#simd</span>[0]$E {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1508,9 +1531,9 @@ return res
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="from_array"><span><a class="doc-id-link" href="#from_array">from_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2605"><em>Source</em></a></div></h3>
+<h3 id="from_array"><span><a class="doc-id-link" href="#from_array">from_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2602"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">from_array :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $A/[0]$E) -> <span class="directive">#simd</span>[0]$E {…}</pre>
+<pre class="doc-code">from_array :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: [0]$E) -> <span class="directive">#simd</span>[0]$E {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1518,9 +1541,9 @@ return res
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="from_slice"><span><a class="doc-id-link" href="#from_slice">from_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2612"><em>Source</em></a></div></h3>
+<h3 id="from_slice"><span><a class="doc-id-link" href="#from_slice">from_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2609"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">from_slice :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#simd</span>[0]$E, slice: []$E) -> $/<span class="directive">#simd</span>[0]$E {…}</pre>
+<pre class="doc-code">from_slice :: <span class="keyword-type">proc</span>($T: <span class="directive">#simd</span>[0]$E, slice: T) -> <span class="directive">#simd</span>[0]$E {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -2415,9 +2438,9 @@ res:
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="recip"><span><a class="doc-id-link" href="#recip">recip<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2700"><em>Source</em></a></div></h3>
+<h3 id="recip"><span><a class="doc-id-link" href="#recip">recip<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2697"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">recip :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $T/<span class="directive">#simd</span>[0]$E) -> $T/<span class="directive">#simd</span>[0]$E {…}</pre>
+<pre class="doc-code">recip :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: <span class="directive">#simd</span>[0]$E) -> <span class="directive">#simd</span>[0]$E {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3357,9 +3380,9 @@ res:  |  1  |  5  |  3  |  6  |
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="signum"><span><a class="doc-id-link" href="#signum">signum<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2666"><em>Source</em></a></div></h3>
+<h3 id="signum"><span><a class="doc-id-link" href="#signum">signum<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2663"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">signum :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: $T/<span class="directive">#simd</span>[0]$E) -> $T/<span class="directive">#simd</span>[0]$E {…}</pre>
+<pre class="doc-code">signum :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: <span class="directive">#simd</span>[0]$E) -> <span class="directive">#simd</span>[0]$E {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3484,7 +3507,7 @@ res:  | 1.5 | 3.5 | 2.5 | 2.5 |
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="to_array"><span><a class="doc-id-link" href="#to_array">to_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2598"><em>Source</em></a></div></h3>
+<h3 id="to_array"><span><a class="doc-id-link" href="#to_array">to_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2595"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">to_array :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: <span class="directive">#simd</span>[0]$E) -> [0]$E {…}</pre>
 </div>
@@ -3494,7 +3517,7 @@ res:  | 1.5 | 3.5 | 2.5 | 2.5 |
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="to_array_ptr"><span><a class="doc-id-link" href="#to_array_ptr">to_array_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2591"><em>Source</em></a></div></h3>
+<h3 id="to_array_ptr"><span><a class="doc-id-link" href="#to_array_ptr">to_array_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin#L2588"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">to_array_ptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (v: ^<span class="directive">#simd</span>[0]$E) -> ^[0]$E {…}</pre>
 </div>
@@ -3531,7 +3554,7 @@ res:  | 1.5 | 3.5 | 2.5 | 2.5 |
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/simd/simd.odin">simd.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-05 (vendor "odin") Windows_amd64 @ 2025-05-08 21:12:59.942489500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 16:13:57.400512400 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -3585,7 +3608,7 @@ res:  | 1.5 | 3.5 | 2.5 | 2.5 |
 </ul>
 </li>
 <li><a href="#pkg-Constants">Constants</a><ul>
-<li><a href="#IS_EMULATED">IS_EMULATED</a></li>
+<li><a href="#HAS_HARDWARE_SIMD">HAS_HARDWARE_SIMD</a></li>
 </ul>
 </li>
 <li><a href="#pkg-Procedures">Procedures</a><ul>

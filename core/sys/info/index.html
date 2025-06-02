@@ -11,13 +11,28 @@
 	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
 	<script>hljs.highlightAll()</script>
 	<script>
-		function toggleDarkMode() {
-			if (document.body.classList.toggle("dark-mode")) {
-				window.localStorage.setItem("theme", "dark");
-			} else {
-				window.localStorage.setItem("theme", "light");
-			}
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
 		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
 	</script>
 	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
 
@@ -27,10 +42,14 @@
 </head>
 <body>
 <script>
-	if (window.localStorage.getItem("theme") === "dark")
-		document.body.classList.add("dark-mode");
-	else
-		document.body.classList.remove("dark-mode");
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
 </script>
 <header class="sticky-top">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
@@ -139,7 +158,6 @@
 </li>
 <li class="nav-item"><a href="/core/dynlib">dynlib</a></li>
 <li class="nav-item">encoding<ul>
-<li><a href="/core/encoding/ansi">ansi</a></li>
 <li><a href="/core/encoding/base32">base32</a></li>
 <li><a href="/core/encoding/base64">base64</a></li>
 <li><a href="/core/encoding/cbor">cbor</a></li>
@@ -258,6 +276,11 @@
 </ul>
 
 </li>
+<li class="nav-item"><a href="/core/terminal">terminal</a><ul>
+<li><a href="/core/terminal/ansi">ansi</a></li>
+</ul>
+
+</li>
 <li class="nav-item"><a href="/core/testing">testing</a></li>
 <li class="nav-item">text<ul>
 <li><a href="/core/text/edit">edit</a></li>
@@ -339,13 +362,15 @@ import "core:fmt"
 import si "core:sys/info"
 
 main :: proc() {
-	fmt.printfln("Odin:  %v",    ODIN_VERSION)
-	fmt.printfln("OS:    %v",    si.os_version.as_string)
-	fmt.printfln("OS:    %#v",   si.os_version)
-	fmt.printfln("CPU:   %v",    si.cpu_name)
-	fmt.printfln("RAM:   %#.1M", si.ram.total_ram)
+	fmt.printfln("Odin:      %v",      ODIN_VERSION)
+	fmt.printfln("OS:        %v",      si.os_version.as_string)
+	fmt.printfln("OS:        %#v",     si.os_version)
+	fmt.printfln("CPU:       %v",      si.cpu.name)
+	fmt.printfln("CPU:       %v",      si.cpu.name)
+	fmt.printfln("CPU cores: %vc/%vt", si.cpu.physical_cores, si.cpu.logical_cores)
+	fmt.printfln("RAM:       %#.1M",   si.ram.total_ram)
 
-	// fmt.printfln("Features: %v",      si.cpu_features)
+	// fmt.printfln("Features: %v",      si.cpu.features)
 	// fmt.printfln("MacOS version: %v", si.macos_version)
 
 	fmt.println()
@@ -404,8 +429,9 @@ RAM:  8.0 GiB
 <div>
 <details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
 <summary id="#doc-index-Types-header">
-Types (7)</summary>
+Types (8)</summary>
 <ul>
+<li><a href="#CPU">CPU</a></li>
 <li><a href="#CPU_Feature">CPU_Feature</a></li>
 <li><a href="#CPU_Features">CPU_Features</a></li>
 <li><a href="#GPU">GPU</a></li>
@@ -426,10 +452,9 @@ Constants (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Variables" aria-labelledby="#doc-index-Variables-header">
 <summary id="#doc-index-Variables-header">
-Variables (6)</summary>
+Variables (5)</summary>
 <ul>
-<li><a href="#cpu_features">cpu_features</a></li>
-<li><a href="#cpu_name">cpu_name</a></li>
+<li><a href="#cpu">cpu</a></li>
 <li><a href="#gpus">gpus</a></li>
 <li><a href="#macos_version">macos_version</a></li>
 <li><a href="#os_version">os_version</a></li>
@@ -459,7 +484,19 @@ Procedure Groups (0)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="CPU_Feature"><span><a class="doc-id-link" href="#CPU_Feature">CPU_Feature<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/info/cpu_intel.odin#L12"><em>Source</em></a></div></h3>
+<h3 id="CPU"><span><a class="doc-id-link" href="#CPU">CPU<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/info/cpu_intel.odin#L46"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CPU :: <span class="keyword-type">struct</span> {
+	name:           runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=string),
+	features:       runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=CPU_Features),
+	physical_cores: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	<span class="comment">// Initialized by cpu_&lt;os&gt;.odin</span>
+	logical_cores:  <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="CPU_Feature"><span><a class="doc-id-link" href="#CPU_Feature">CPU_Feature<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/info/cpu_intel.odin#L6"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CPU_Feature :: <span class="keyword-type">enum</span> <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> {
 	aes,                <span class="comment">// AES hardware implementation (AES NI)</span>
@@ -501,7 +538,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CPU_Features"><span><a class="doc-id-link" href="#CPU_Features">CPU_Features<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/info/cpu_intel.odin#L51"><em>Source</em></a></div></h3>
+<h3 id="CPU_Features"><span><a class="doc-id-link" href="#CPU_Features">CPU_Features<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/info/cpu_intel.odin#L45"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CPU_Features :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/core/sys/info/#CPU_Feature">CPU_Feature</a>; <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>]</pre>
 </div>
@@ -568,15 +605,9 @@ Procedure Groups (0)</summary>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Variables" class="pkg-header">Variables</h2>
 <div class="pkg-entity">
-<h3 id="cpu_features"><span><a class="doc-id-link" href="#cpu_features">cpu_features<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/info/cpu_intel.odin#L53"><em>Source</em></a></div></h3>
+<h3 id="cpu"><span><a class="doc-id-link" href="#cpu">cpu<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/info/cpu_intel.odin#L52"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">cpu_features: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=CPU_Features)</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="cpu_name"><span><a class="doc-id-link" href="#cpu_name">cpu_name<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/info/cpu_intel.odin#L54"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">cpu_name: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=string)</pre>
+<pre class="doc-code">cpu: <a class="code-typename" href="/core/sys/info/#CPU">CPU</a></pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -639,12 +670,13 @@ Procedure Groups (0)</summary>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-05 (vendor "odin") Windows_amd64 @ 2025-05-08 21:13:00.046904600 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 16:13:57.544116800 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
 <ul>
 <li><a href="#pkg-overview">Overview</a><li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#CPU">CPU</a></li>
 <li><a href="#CPU_Feature">CPU_Feature</a></li>
 <li><a href="#CPU_Features">CPU_Features</a></li>
 <li><a href="#GPU">GPU</a></li>
@@ -655,8 +687,7 @@ Procedure Groups (0)</summary>
 </ul>
 </li>
 <li><a href="#pkg-Variables">Variables</a><ul>
-<li><a href="#cpu_features">cpu_features</a></li>
-<li><a href="#cpu_name">cpu_name</a></li>
+<li><a href="#cpu">cpu</a></li>
 <li><a href="#gpus">gpus</a></li>
 <li><a href="#macos_version">macos_version</a></li>
 <li><a href="#os_version">os_version</a></li>

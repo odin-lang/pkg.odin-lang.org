@@ -11,13 +11,28 @@
 	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
 	<script>hljs.highlightAll()</script>
 	<script>
-		function toggleDarkMode() {
-			if (document.body.classList.toggle("dark-mode")) {
-				window.localStorage.setItem("theme", "dark");
-			} else {
-				window.localStorage.setItem("theme", "light");
-			}
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
 		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
 	</script>
 	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
 
@@ -27,10 +42,14 @@
 </head>
 <body>
 <script>
-	if (window.localStorage.getItem("theme") === "dark")
-		document.body.classList.add("dark-mode");
-	else
-		document.body.classList.remove("dark-mode");
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
 </script>
 <header class="sticky-top">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
@@ -139,7 +158,6 @@
 </li>
 <li class="nav-item"><a href="/core/dynlib">dynlib</a></li>
 <li class="nav-item">encoding<ul>
-<li><a href="/core/encoding/ansi">ansi</a></li>
 <li><a href="/core/encoding/base32">base32</a></li>
 <li><a href="/core/encoding/base64">base64</a></li>
 <li><a href="/core/encoding/cbor">cbor</a></li>
@@ -255,6 +273,11 @@
 <li><a href="/core/sys/unix">unix</a></li>
 <li><a href="/core/sys/valgrind">valgrind</a></li>
 <li><a href="/core/sys/windows">windows</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/terminal">terminal</a><ul>
+<li><a href="/core/terminal/ansi">ansi</a></li>
 </ul>
 
 </li>
@@ -667,7 +690,7 @@ if n &gt; 0, it call next n times and return the nth token and then restore the 
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="position"><span><a class="doc-id-link" href="#position">position<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L620"><em>Source</em></a></div></h3>
+<h3 id="position"><span><a class="doc-id-link" href="#position">position<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L622"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">position :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/text/scanner/#Scanner">Scanner</a>) -> <a class="code-typename" href="/core/text/scanner/#Position">Position</a> {…}</pre>
 </div>
@@ -694,7 +717,7 @@ Use the Scanner's position field for the most recently scanned token position</p
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="scan"><span><a class="doc-id-link" href="#scan">scan<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L523"><em>Source</em></a></div></h3>
+<h3 id="scan"><span><a class="doc-id-link" href="#scan">scan<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L525"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scan :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/text/scanner/#Scanner">Scanner</a>) -> (tok: untyped rune) {…}</pre>
 </div>
@@ -707,7 +730,7 @@ It reports Scanner errors by calling s.error, if not nil; otherwise it will prin
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="token_string"><span><a class="doc-id-link" href="#token_string">token_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L650"><em>Source</em></a></div></h3>
+<h3 id="token_string"><span><a class="doc-id-link" href="#token_string">token_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L652"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">token_string :: <span class="keyword-type">proc</span>(tok: untyped rune, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
@@ -718,7 +741,7 @@ By default, it uses the context.temp_allocator to produce the string</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="token_text"><span><a class="doc-id-link" href="#token_text">token_text<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L640"><em>Source</em></a></div></h3>
+<h3 id="token_text"><span><a class="doc-id-link" href="#token_text">token_text<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin#L642"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">token_text :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/text/scanner/#Scanner">Scanner</a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
@@ -735,7 +758,7 @@ By default, it uses the context.temp_allocator to produce the string</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/text/scanner/scanner.odin">scanner.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-05 (vendor "odin") Windows_amd64 @ 2025-05-08 21:13:01.122333300 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 16:13:58.814048000 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

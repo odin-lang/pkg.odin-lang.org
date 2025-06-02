@@ -11,13 +11,28 @@
 	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
 	<script>hljs.highlightAll()</script>
 	<script>
-		function toggleDarkMode() {
-			if (document.body.classList.toggle("dark-mode")) {
-				window.localStorage.setItem("theme", "dark");
-			} else {
-				window.localStorage.setItem("theme", "light");
-			}
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
 		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
 	</script>
 	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
 
@@ -27,10 +42,14 @@
 </head>
 <body>
 <script>
-	if (window.localStorage.getItem("theme") === "dark")
-		document.body.classList.add("dark-mode");
-	else
-		document.body.classList.remove("dark-mode");
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
 </script>
 <header class="sticky-top">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
@@ -125,7 +144,12 @@
 </ul>
 
 </li>
-<li class="nav-item"><a class="active" href="/vendor/sdl3">sdl3</a></li>
+<li class="nav-item"><a class="active" href="/vendor/sdl3">sdl3</a><ul>
+<li><a href="/vendor/sdl3/image">image</a></li>
+<li><a href="/vendor/sdl3/ttf">ttf</a></li>
+</ul>
+
+</li>
 <li class="nav-item">stb<ul>
 <li><a href="/vendor/stb/easy_font">easy_font</a></li>
 <li><a href="/vendor/stb/image">image</a></li>
@@ -186,7 +210,7 @@
 <div>
 <details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
 <summary id="#doc-index-Types-header">
-Types (360)</summary>
+Types (361)</summary>
 <ul>
 <li><a href="#AppEvent_func">AppEvent_func</a></li>
 <li><a href="#AppInit_func">AppInit_func</a></li>
@@ -474,6 +498,7 @@ Types (360)</summary>
 <li><a href="#Sandbox">Sandbox</a></li>
 <li><a href="#ScaleMode">ScaleMode</a></li>
 <li><a href="#Scancode">Scancode</a></li>
+<li><a href="#Semaphore">Semaphore</a></li>
 <li><a href="#Sensor">Sensor</a></li>
 <li><a href="#SensorEvent">SensorEvent</a></li>
 <li><a href="#SensorID">SensorID</a></li>
@@ -1507,7 +1532,7 @@ Variables (1)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (1325)</summary>
+Procedures (1332)</summary>
 <ul>
 <li><a href="#AUDIO_BITSIZE">AUDIO_BITSIZE</a></li>
 <li><a href="#AUDIO_BYTESIZE">AUDIO_BYTESIZE</a></li>
@@ -1636,6 +1661,7 @@ Procedures (1325)</summary>
 <li><a href="#CreateRWLock">CreateRWLock</a></li>
 <li><a href="#CreateRenderer">CreateRenderer</a></li>
 <li><a href="#CreateRendererWithProperties">CreateRendererWithProperties</a></li>
+<li><a href="#CreateSemaphore">CreateSemaphore</a></li>
 <li><a href="#CreateSoftwareRenderer">CreateSoftwareRenderer</a></li>
 <li><a href="#CreateStorageDirectory">CreateStorageDirectory</a></li>
 <li><a href="#CreateSurface">CreateSurface</a></li>
@@ -1676,6 +1702,7 @@ Procedures (1325)</summary>
 <li><a href="#DestroyProperties">DestroyProperties</a></li>
 <li><a href="#DestroyRWLock">DestroyRWLock</a></li>
 <li><a href="#DestroyRenderer">DestroyRenderer</a></li>
+<li><a href="#DestroySemaphore">DestroySemaphore</a></li>
 <li><a href="#DestroySurface">DestroySurface</a></li>
 <li><a href="#DestroyTexture">DestroyTexture</a></li>
 <li><a href="#DestroyTray">DestroyTray</a></li>
@@ -2024,6 +2051,7 @@ Procedures (1325)</summary>
 <li><a href="#GetScancodeFromKey">GetScancodeFromKey</a></li>
 <li><a href="#GetScancodeFromName">GetScancodeFromName</a></li>
 <li><a href="#GetScancodeName">GetScancodeName</a></li>
+<li><a href="#GetSemaphoreValue">GetSemaphoreValue</a></li>
 <li><a href="#GetSensorData">GetSensorData</a></li>
 <li><a href="#GetSensorFromID">GetSensorFromID</a></li>
 <li><a href="#GetSensorID">GetSensorID</a></li>
@@ -2522,6 +2550,7 @@ Procedures (1325)</summary>
 <li><a href="#ShowWindow">ShowWindow</a></li>
 <li><a href="#ShowWindowSystemMenu">ShowWindowSystemMenu</a></li>
 <li><a href="#SignalAsyncIOQueue">SignalAsyncIOQueue</a></li>
+<li><a href="#SignalSemaphore">SignalSemaphore</a></li>
 <li><a href="#StartTextInput">StartTextInput</a></li>
 <li><a href="#StartTextInputWithProperties">StartTextInputWithProperties</a></li>
 <li><a href="#StepBackUTF8">StepBackUTF8</a></li>
@@ -2561,6 +2590,7 @@ Procedures (1325)</summary>
 <li><a href="#TryLockRWLockForReading">TryLockRWLockForReading</a></li>
 <li><a href="#TryLockRWLockForWriting">TryLockRWLockForWriting</a></li>
 <li><a href="#TryLockSpinlock">TryLockSpinlock</a></li>
+<li><a href="#TryWaitSemaphore">TryWaitSemaphore</a></li>
 <li><a href="#UCS4ToUTF8">UCS4ToUTF8</a></li>
 <li><a href="#US_TO_NS">US_TO_NS</a></li>
 <li><a href="#UnbindAudioStream">UnbindAudioStream</a></li>
@@ -2614,6 +2644,8 @@ Procedures (1325)</summary>
 <li><a href="#WaitForGPUIdle">WaitForGPUIdle</a></li>
 <li><a href="#WaitForGPUSwapchain">WaitForGPUSwapchain</a></li>
 <li><a href="#WaitProcess">WaitProcess</a></li>
+<li><a href="#WaitSemaphore">WaitSemaphore</a></li>
+<li><a href="#WaitSemaphoreTimeout">WaitSemaphoreTimeout</a></li>
 <li><a href="#WaitThread">WaitThread</a></li>
 <li><a href="#WarpMouseGlobal">WarpMouseGlobal</a></li>
 <li><a href="#WarpMouseInWindow">WarpMouseInWindow</a></li>
@@ -4666,7 +4698,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUBlendFactor"><span><a class="doc-id-link" href="#GPUBlendFactor">GPUBlendFactor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L350"><em>Source</em></a></div></h3>
+<h3 id="GPUBlendFactor"><span><a class="doc-id-link" href="#GPUBlendFactor">GPUBlendFactor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L364"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUBlendFactor :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	INVALID, 
@@ -4687,7 +4719,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUBlendOp"><span><a class="doc-id-link" href="#GPUBlendOp">GPUBlendOp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L341"><em>Source</em></a></div></h3>
+<h3 id="GPUBlendOp"><span><a class="doc-id-link" href="#GPUBlendOp">GPUBlendOp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L355"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUBlendOp :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	INVALID, 
@@ -4700,7 +4732,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUBlitInfo"><span><a class="doc-id-link" href="#GPUBlitInfo">GPUBlitInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L712"><em>Source</em></a></div></h3>
+<h3 id="GPUBlitInfo"><span><a class="doc-id-link" href="#GPUBlitInfo">GPUBlitInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L726"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUBlitInfo :: <span class="keyword-type">struct</span> {
 	source:      <a class="code-typename" href="/vendor/sdl3/#GPUBlitRegion">GPUBlitRegion</a>,
@@ -4728,7 +4760,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUBlitRegion"><span><a class="doc-id-link" href="#GPUBlitRegion">GPUBlitRegion<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L450"><em>Source</em></a></div></h3>
+<h3 id="GPUBlitRegion"><span><a class="doc-id-link" href="#GPUBlitRegion">GPUBlitRegion<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L464"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUBlitRegion :: <span class="keyword-type">struct</span> {
 	texture:              ^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a>,
@@ -4766,7 +4798,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUBufferBinding"><span><a class="doc-id-link" href="#GPUBufferBinding">GPUBufferBinding<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L725"><em>Source</em></a></div></h3>
+<h3 id="GPUBufferBinding"><span><a class="doc-id-link" href="#GPUBufferBinding">GPUBufferBinding<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L739"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUBufferBinding :: <span class="keyword-type">struct</span> {
 	buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUBuffer">GPUBuffer</a>,
@@ -4781,7 +4813,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUBufferCreateInfo"><span><a class="doc-id-link" href="#GPUBufferCreateInfo">GPUBufferCreateInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L584"><em>Source</em></a></div></h3>
+<h3 id="GPUBufferCreateInfo"><span><a class="doc-id-link" href="#GPUBufferCreateInfo">GPUBufferCreateInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L598"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUBufferCreateInfo :: <span class="keyword-type">struct</span> {
 	usage: <a class="code-typename" href="/vendor/sdl3/#GPUBufferUsageFlags">GPUBufferUsageFlags</a>,
@@ -4797,7 +4829,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUBufferLocation"><span><a class="doc-id-link" href="#GPUBufferLocation">GPUBufferLocation<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L460"><em>Source</em></a></div></h3>
+<h3 id="GPUBufferLocation"><span><a class="doc-id-link" href="#GPUBufferLocation">GPUBufferLocation<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L474"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUBufferLocation :: <span class="keyword-type">struct</span> {
 	buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUBuffer">GPUBuffer</a>,
@@ -4811,7 +4843,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUBufferRegion"><span><a class="doc-id-link" href="#GPUBufferRegion">GPUBufferRegion<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L466"><em>Source</em></a></div></h3>
+<h3 id="GPUBufferRegion"><span><a class="doc-id-link" href="#GPUBufferRegion">GPUBufferRegion<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L480"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUBufferRegion :: <span class="keyword-type">struct</span> {
 	buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUBuffer">GPUBuffer</a>,
@@ -4828,7 +4860,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUBufferUsageFlag"><span><a class="doc-id-link" href="#GPUBufferUsageFlag">GPUBufferUsageFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L207"><em>Source</em></a></div></h3>
+<h3 id="GPUBufferUsageFlag"><span><a class="doc-id-link" href="#GPUBufferUsageFlag">GPUBufferUsageFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L221"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUBufferUsageFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	VERTEX                = 0, <span class="comment">// *&lt; Buffer is a vertex buffer.</span>
@@ -4841,13 +4873,13 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUBufferUsageFlags"><span><a class="doc-id-link" href="#GPUBufferUsageFlags">GPUBufferUsageFlags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L206"><em>Source</em></a></div></h3>
+<h3 id="GPUBufferUsageFlags"><span><a class="doc-id-link" href="#GPUBufferUsageFlags">GPUBufferUsageFlags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L220"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUBufferUsageFlags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/sdl3/#GPUBufferUsageFlag">GPUBufferUsageFlag</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUColorComponentFlag"><span><a class="doc-id-link" href="#GPUColorComponentFlag">GPUColorComponentFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L369"><em>Source</em></a></div></h3>
+<h3 id="GPUColorComponentFlag"><span><a class="doc-id-link" href="#GPUColorComponentFlag">GPUColorComponentFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L383"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUColorComponentFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
 	R = 0, <span class="comment">// *&lt; the red component</span>
@@ -4858,13 +4890,13 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUColorComponentFlags"><span><a class="doc-id-link" href="#GPUColorComponentFlags">GPUColorComponentFlags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L368"><em>Source</em></a></div></h3>
+<h3 id="GPUColorComponentFlags"><span><a class="doc-id-link" href="#GPUColorComponentFlags">GPUColorComponentFlags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L382"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUColorComponentFlags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/sdl3/#GPUColorComponentFlag">GPUColorComponentFlag</a>; <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>]</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUColorTargetBlendState"><span><a class="doc-id-link" href="#GPUColorTargetBlendState">GPUColorTargetBlendState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L543"><em>Source</em></a></div></h3>
+<h3 id="GPUColorTargetBlendState"><span><a class="doc-id-link" href="#GPUColorTargetBlendState">GPUColorTargetBlendState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L557"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUColorTargetBlendState :: <span class="keyword-type">struct</span> {
 	src_color_blendfactor:   <a class="code-typename" href="/vendor/sdl3/#GPUBlendFactor">GPUBlendFactor</a>,
@@ -4891,7 +4923,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUColorTargetDescription"><span><a class="doc-id-link" href="#GPUColorTargetDescription">GPUColorTargetDescription<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L636"><em>Source</em></a></div></h3>
+<h3 id="GPUColorTargetDescription"><span><a class="doc-id-link" href="#GPUColorTargetDescription">GPUColorTargetDescription<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L650"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUColorTargetDescription :: <span class="keyword-type">struct</span> {
 	format:      <a class="code-typename" href="/vendor/sdl3/#GPUTextureFormat">GPUTextureFormat</a>,
@@ -4901,7 +4933,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUColorTargetInfo"><span><a class="doc-id-link" href="#GPUColorTargetInfo">GPUColorTargetInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L682"><em>Source</em></a></div></h3>
+<h3 id="GPUColorTargetInfo"><span><a class="doc-id-link" href="#GPUColorTargetInfo">GPUColorTargetInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L696"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUColorTargetInfo :: <span class="keyword-type">struct</span> {
 	texture:               ^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a>,
@@ -4965,7 +4997,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUCompareOp"><span><a class="doc-id-link" href="#GPUCompareOp">GPUCompareOp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L317"><em>Source</em></a></div></h3>
+<h3 id="GPUCompareOp"><span><a class="doc-id-link" href="#GPUCompareOp">GPUCompareOp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L331"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUCompareOp :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	INVALID, 
@@ -5016,7 +5048,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUComputePipelineCreateInfo"><span><a class="doc-id-link" href="#GPUComputePipelineCreateInfo">GPUComputePipelineCreateInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L664"><em>Source</em></a></div></h3>
+<h3 id="GPUComputePipelineCreateInfo"><span><a class="doc-id-link" href="#GPUComputePipelineCreateInfo">GPUComputePipelineCreateInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L678"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUComputePipelineCreateInfo :: <span class="keyword-type">struct</span> {
 	code_size:                      <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
@@ -5074,7 +5106,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUCubeMapFace"><span><a class="doc-id-link" href="#GPUCubeMapFace">GPUCubeMapFace<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L196"><em>Source</em></a></div></h3>
+<h3 id="GPUCubeMapFace"><span><a class="doc-id-link" href="#GPUCubeMapFace">GPUCubeMapFace<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L210"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUCubeMapFace :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	POSITIVEX, 
@@ -5087,7 +5119,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUCullMode"><span><a class="doc-id-link" href="#GPUCullMode">GPUCullMode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L306"><em>Source</em></a></div></h3>
+<h3 id="GPUCullMode"><span><a class="doc-id-link" href="#GPUCullMode">GPUCullMode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L320"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUCullMode :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	NONE,  <span class="comment">// *&lt; No triangles are culled.</span>
@@ -5097,7 +5129,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUDepthStencilState"><span><a class="doc-id-link" href="#GPUDepthStencilState">GPUDepthStencilState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L622"><em>Source</em></a></div></h3>
+<h3 id="GPUDepthStencilState"><span><a class="doc-id-link" href="#GPUDepthStencilState">GPUDepthStencilState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L636"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUDepthStencilState :: <span class="keyword-type">struct</span> {
 	compare_op:          <a class="code-typename" href="/vendor/sdl3/#GPUCompareOp">GPUCompareOp</a>,
@@ -5123,7 +5155,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUDepthStencilTargetInfo"><span><a class="doc-id-link" href="#GPUDepthStencilTargetInfo">GPUDepthStencilTargetInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L698"><em>Source</em></a></div></h3>
+<h3 id="GPUDepthStencilTargetInfo"><span><a class="doc-id-link" href="#GPUDepthStencilTargetInfo">GPUDepthStencilTargetInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L712"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUDepthStencilTargetInfo :: <span class="keyword-type">struct</span> {
 	texture:          ^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a>,
@@ -5215,7 +5247,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUFillMode"><span><a class="doc-id-link" href="#GPUFillMode">GPUFillMode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L301"><em>Source</em></a></div></h3>
+<h3 id="GPUFillMode"><span><a class="doc-id-link" href="#GPUFillMode">GPUFillMode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L315"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUFillMode :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	FILL, <span class="comment">// *&lt; Polygons will be rendered via rasterization.</span>
@@ -5224,7 +5256,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUFilter"><span><a class="doc-id-link" href="#GPUFilter">GPUFilter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L376"><em>Source</em></a></div></h3>
+<h3 id="GPUFilter"><span><a class="doc-id-link" href="#GPUFilter">GPUFilter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L390"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUFilter :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	NEAREST, <span class="comment">// *&lt; Point filtering.</span>
@@ -5233,7 +5265,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUFrontFace"><span><a class="doc-id-link" href="#GPUFrontFace">GPUFrontFace<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L312"><em>Source</em></a></div></h3>
+<h3 id="GPUFrontFace"><span><a class="doc-id-link" href="#GPUFrontFace">GPUFrontFace<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L326"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUFrontFace :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	COUNTER_CLOCKWISE, <span class="comment">// *&lt; A triangle with counter-clockwise vertex winding will be considered front-facing.</span>
@@ -5257,7 +5289,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUGraphicsPipelineCreateInfo"><span><a class="doc-id-link" href="#GPUGraphicsPipelineCreateInfo">GPUGraphicsPipelineCreateInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L651"><em>Source</em></a></div></h3>
+<h3 id="GPUGraphicsPipelineCreateInfo"><span><a class="doc-id-link" href="#GPUGraphicsPipelineCreateInfo">GPUGraphicsPipelineCreateInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L665"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUGraphicsPipelineCreateInfo :: <span class="keyword-type">struct</span> {
 	vertex_shader:       ^<a class="code-typename" href="/vendor/sdl3/#GPUShader">GPUShader</a>,
@@ -5285,7 +5317,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUGraphicsPipelineTargetInfo"><span><a class="doc-id-link" href="#GPUGraphicsPipelineTargetInfo">GPUGraphicsPipelineTargetInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L641"><em>Source</em></a></div></h3>
+<h3 id="GPUGraphicsPipelineTargetInfo"><span><a class="doc-id-link" href="#GPUGraphicsPipelineTargetInfo">GPUGraphicsPipelineTargetInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L655"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUGraphicsPipelineTargetInfo :: <span class="keyword-type">struct</span> {
 	color_target_descriptions: [^]<a class="code-typename" href="/vendor/sdl3/#GPUColorTargetDescription">GPUColorTargetDescription</a> <span class="string">`fmt:"v,num_color_targets"`</span>,
@@ -5316,7 +5348,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUIndexedIndirectDrawCommand"><span><a class="doc-id-link" href="#GPUIndexedIndirectDrawCommand">GPUIndexedIndirectDrawCommand<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L480"><em>Source</em></a></div></h3>
+<h3 id="GPUIndexedIndirectDrawCommand"><span><a class="doc-id-link" href="#GPUIndexedIndirectDrawCommand">GPUIndexedIndirectDrawCommand<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L494"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUIndexedIndirectDrawCommand :: <span class="keyword-type">struct</span> {
 	num_indices:    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
@@ -5332,7 +5364,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUIndirectDispatchCommand"><span><a class="doc-id-link" href="#GPUIndirectDispatchCommand">GPUIndirectDispatchCommand<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L488"><em>Source</em></a></div></h3>
+<h3 id="GPUIndirectDispatchCommand"><span><a class="doc-id-link" href="#GPUIndirectDispatchCommand">GPUIndirectDispatchCommand<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L502"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUIndirectDispatchCommand :: <span class="keyword-type">struct</span> {
 	groupcount_x: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
@@ -5344,7 +5376,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUIndirectDrawCommand"><span><a class="doc-id-link" href="#GPUIndirectDrawCommand">GPUIndirectDrawCommand<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L473"><em>Source</em></a></div></h3>
+<h3 id="GPUIndirectDrawCommand"><span><a class="doc-id-link" href="#GPUIndirectDrawCommand">GPUIndirectDrawCommand<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L487"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUIndirectDrawCommand :: <span class="keyword-type">struct</span> {
 	num_vertices:   <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
@@ -5368,7 +5400,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUMultisampleState"><span><a class="doc-id-link" href="#GPUMultisampleState">GPUMultisampleState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L612"><em>Source</em></a></div></h3>
+<h3 id="GPUMultisampleState"><span><a class="doc-id-link" href="#GPUMultisampleState">GPUMultisampleState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L626"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUMultisampleState :: <span class="keyword-type">struct</span> {
 	sample_count: <a class="code-typename" href="/vendor/sdl3/#GPUSampleCount">GPUSampleCount</a>,
@@ -5384,7 +5416,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUPresentMode"><span><a class="doc-id-link" href="#GPUPresentMode">GPUPresentMode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L392"><em>Source</em></a></div></h3>
+<h3 id="GPUPresentMode"><span><a class="doc-id-link" href="#GPUPresentMode">GPUPresentMode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L406"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUPresentMode :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	VSYNC, 
@@ -5411,7 +5443,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPURasterizerState"><span><a class="doc-id-link" href="#GPURasterizerState">GPURasterizerState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L598"><em>Source</em></a></div></h3>
+<h3 id="GPURasterizerState"><span><a class="doc-id-link" href="#GPURasterizerState">GPURasterizerState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L612"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPURasterizerState :: <span class="keyword-type">struct</span> {
 	fill_mode:                  <a class="code-typename" href="/vendor/sdl3/#GPUFillMode">GPUFillMode</a>,
@@ -5467,7 +5499,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUSampleCount"><span><a class="doc-id-link" href="#GPUSampleCount">GPUSampleCount<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L189"><em>Source</em></a></div></h3>
+<h3 id="GPUSampleCount"><span><a class="doc-id-link" href="#GPUSampleCount">GPUSampleCount<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L203"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUSampleCount :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	_1, <span class="comment">// *&lt; No multisampling.</span>
@@ -5496,7 +5528,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUSamplerAddressMode"><span><a class="doc-id-link" href="#GPUSamplerAddressMode">GPUSamplerAddressMode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L386"><em>Source</em></a></div></h3>
+<h3 id="GPUSamplerAddressMode"><span><a class="doc-id-link" href="#GPUSamplerAddressMode">GPUSamplerAddressMode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L400"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUSamplerAddressMode :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	REPEAT,          <span class="comment">// *&lt; Specifies that the coordinates will wrap around.</span>
@@ -5506,7 +5538,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUSamplerCreateInfo"><span><a class="doc-id-link" href="#GPUSamplerCreateInfo">GPUSamplerCreateInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L495"><em>Source</em></a></div></h3>
+<h3 id="GPUSamplerCreateInfo"><span><a class="doc-id-link" href="#GPUSamplerCreateInfo">GPUSamplerCreateInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L509"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUSamplerCreateInfo :: <span class="keyword-type">struct</span> {
 	min_filter:        <a class="code-typename" href="/vendor/sdl3/#GPUFilter">GPUFilter</a>,
@@ -5546,7 +5578,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUSamplerMipmapMode"><span><a class="doc-id-link" href="#GPUSamplerMipmapMode">GPUSamplerMipmapMode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L381"><em>Source</em></a></div></h3>
+<h3 id="GPUSamplerMipmapMode"><span><a class="doc-id-link" href="#GPUSamplerMipmapMode">GPUSamplerMipmapMode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L395"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUSamplerMipmapMode :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	NEAREST, <span class="comment">// *&lt; Point filtering.</span>
@@ -5569,7 +5601,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUShaderCreateInfo"><span><a class="doc-id-link" href="#GPUShaderCreateInfo">GPUShaderCreateInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L557"><em>Source</em></a></div></h3>
+<h3 id="GPUShaderCreateInfo"><span><a class="doc-id-link" href="#GPUShaderCreateInfo">GPUShaderCreateInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L571"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUShaderCreateInfo :: <span class="keyword-type">struct</span> {
 	code_size:            <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
@@ -5599,7 +5631,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUShaderFormat"><span><a class="doc-id-link" href="#GPUShaderFormat">GPUShaderFormat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L226"><em>Source</em></a></div></h3>
+<h3 id="GPUShaderFormat"><span><a class="doc-id-link" href="#GPUShaderFormat">GPUShaderFormat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L240"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUShaderFormat :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/sdl3/#GPUShaderFormatFlag">GPUShaderFormatFlag</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
 </div>
@@ -5618,7 +5650,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUShaderFormatFlag"><span><a class="doc-id-link" href="#GPUShaderFormatFlag">GPUShaderFormatFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L227"><em>Source</em></a></div></h3>
+<h3 id="GPUShaderFormatFlag"><span><a class="doc-id-link" href="#GPUShaderFormatFlag">GPUShaderFormatFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L241"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUShaderFormatFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	PRIVATE  = 0, <span class="comment">// *&lt; Shaders for NDA'd platforms.</span>
@@ -5631,7 +5663,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUShaderStage"><span><a class="doc-id-link" href="#GPUShaderStage">GPUShaderStage<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L221"><em>Source</em></a></div></h3>
+<h3 id="GPUShaderStage"><span><a class="doc-id-link" href="#GPUShaderStage">GPUShaderStage<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L235"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUShaderStage :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	VERTEX, 
@@ -5640,7 +5672,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUStencilOp"><span><a class="doc-id-link" href="#GPUStencilOp">GPUStencilOp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L329"><em>Source</em></a></div></h3>
+<h3 id="GPUStencilOp"><span><a class="doc-id-link" href="#GPUStencilOp">GPUStencilOp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L343"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUStencilOp :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	INVALID, 
@@ -5656,7 +5688,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUStencilOpState"><span><a class="doc-id-link" href="#GPUStencilOpState">GPUStencilOpState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L536"><em>Source</em></a></div></h3>
+<h3 id="GPUStencilOpState"><span><a class="doc-id-link" href="#GPUStencilOpState">GPUStencilOpState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L550"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUStencilOpState :: <span class="keyword-type">struct</span> {
 	fail_op:       <a class="code-typename" href="/vendor/sdl3/#GPUStencilOp">GPUStencilOp</a>,
@@ -5670,7 +5702,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUStorageBufferReadWriteBinding"><span><a class="doc-id-link" href="#GPUStorageBufferReadWriteBinding">GPUStorageBufferReadWriteBinding<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L735"><em>Source</em></a></div></h3>
+<h3 id="GPUStorageBufferReadWriteBinding"><span><a class="doc-id-link" href="#GPUStorageBufferReadWriteBinding">GPUStorageBufferReadWriteBinding<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L749"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUStorageBufferReadWriteBinding :: <span class="keyword-type">struct</span> {
 	buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUBuffer">GPUBuffer</a>,
@@ -5688,7 +5720,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUStorageTextureReadWriteBinding"><span><a class="doc-id-link" href="#GPUStorageTextureReadWriteBinding">GPUStorageTextureReadWriteBinding<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L743"><em>Source</em></a></div></h3>
+<h3 id="GPUStorageTextureReadWriteBinding"><span><a class="doc-id-link" href="#GPUStorageTextureReadWriteBinding">GPUStorageTextureReadWriteBinding<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L757"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUStorageTextureReadWriteBinding :: <span class="keyword-type">struct</span> {
 	texture:   ^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a>,
@@ -5721,7 +5753,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUSwapchainComposition"><span><a class="doc-id-link" href="#GPUSwapchainComposition">GPUSwapchainComposition<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L398"><em>Source</em></a></div></h3>
+<h3 id="GPUSwapchainComposition"><span><a class="doc-id-link" href="#GPUSwapchainComposition">GPUSwapchainComposition<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L412"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUSwapchainComposition :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	SDR, 
@@ -5753,7 +5785,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUTextureCreateInfo"><span><a class="doc-id-link" href="#GPUTextureCreateInfo">GPUTextureCreateInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L571"><em>Source</em></a></div></h3>
+<h3 id="GPUTextureCreateInfo"><span><a class="doc-id-link" href="#GPUTextureCreateInfo">GPUTextureCreateInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L585"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUTextureCreateInfo :: <span class="keyword-type">struct</span> {
 	type:                 <a class="code-typename" href="/vendor/sdl3/#GPUTextureType">GPUTextureType</a>,
@@ -5919,7 +5951,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUTextureLocation"><span><a class="doc-id-link" href="#GPUTextureLocation">GPUTextureLocation<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L429"><em>Source</em></a></div></h3>
+<h3 id="GPUTextureLocation"><span><a class="doc-id-link" href="#GPUTextureLocation">GPUTextureLocation<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L443"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUTextureLocation :: <span class="keyword-type">struct</span> {
 	texture:   ^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a>,
@@ -5941,7 +5973,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUTextureRegion"><span><a class="doc-id-link" href="#GPUTextureRegion">GPUTextureRegion<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L438"><em>Source</em></a></div></h3>
+<h3 id="GPUTextureRegion"><span><a class="doc-id-link" href="#GPUTextureRegion">GPUTextureRegion<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L452"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUTextureRegion :: <span class="keyword-type">struct</span> {
 	texture:   ^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a>,
@@ -5970,7 +6002,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUTextureSamplerBinding"><span><a class="doc-id-link" href="#GPUTextureSamplerBinding">GPUTextureSamplerBinding<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L730"><em>Source</em></a></div></h3>
+<h3 id="GPUTextureSamplerBinding"><span><a class="doc-id-link" href="#GPUTextureSamplerBinding">GPUTextureSamplerBinding<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L744"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUTextureSamplerBinding :: <span class="keyword-type">struct</span> {
 	texture: ^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a>,
@@ -5986,7 +6018,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUTextureTransferInfo"><span><a class="doc-id-link" href="#GPUTextureTransferInfo">GPUTextureTransferInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L416"><em>Source</em></a></div></h3>
+<h3 id="GPUTextureTransferInfo"><span><a class="doc-id-link" href="#GPUTextureTransferInfo">GPUTextureTransferInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L430"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUTextureTransferInfo :: <span class="keyword-type">struct</span> {
 	transfer_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUTransferBuffer">GPUTransferBuffer</a>,
@@ -6005,7 +6037,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUTextureType"><span><a class="doc-id-link" href="#GPUTextureType">GPUTextureType<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L181"><em>Source</em></a></div></h3>
+<h3 id="GPUTextureType"><span><a class="doc-id-link" href="#GPUTextureType">GPUTextureType<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L195"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUTextureType :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	D2,         <span class="comment">// *&lt; The texture is a 2-dimensional image.</span>
@@ -6021,7 +6053,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUTextureUsageFlag"><span><a class="doc-id-link" href="#GPUTextureUsageFlag">GPUTextureUsageFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L171"><em>Source</em></a></div></h3>
+<h3 id="GPUTextureUsageFlag"><span><a class="doc-id-link" href="#GPUTextureUsageFlag">GPUTextureUsageFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L185"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUTextureUsageFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	SAMPLER                                 = 0, <span class="comment">// *&lt; Texture supports sampling.</span>
@@ -6035,7 +6067,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUTextureUsageFlags"><span><a class="doc-id-link" href="#GPUTextureUsageFlags">GPUTextureUsageFlags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L170"><em>Source</em></a></div></h3>
+<h3 id="GPUTextureUsageFlags"><span><a class="doc-id-link" href="#GPUTextureUsageFlags">GPUTextureUsageFlags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L184"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUTextureUsageFlags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/sdl3/#GPUTextureUsageFlag">GPUTextureUsageFlag</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
 </div>
@@ -6061,7 +6093,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUTransferBufferCreateInfo"><span><a class="doc-id-link" href="#GPUTransferBufferCreateInfo">GPUTransferBufferCreateInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L591"><em>Source</em></a></div></h3>
+<h3 id="GPUTransferBufferCreateInfo"><span><a class="doc-id-link" href="#GPUTransferBufferCreateInfo">GPUTransferBufferCreateInfo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L605"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUTransferBufferCreateInfo :: <span class="keyword-type">struct</span> {
 	usage: <a class="code-typename" href="/vendor/sdl3/#GPUTransferBufferUsage">GPUTransferBufferUsage</a>,
@@ -6077,7 +6109,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUTransferBufferLocation"><span><a class="doc-id-link" href="#GPUTransferBufferLocation">GPUTransferBufferLocation<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L424"><em>Source</em></a></div></h3>
+<h3 id="GPUTransferBufferLocation"><span><a class="doc-id-link" href="#GPUTransferBufferLocation">GPUTransferBufferLocation<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L438"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUTransferBufferLocation :: <span class="keyword-type">struct</span> {
 	transfer_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUTransferBuffer">GPUTransferBuffer</a>,
@@ -6092,7 +6124,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUTransferBufferUsage"><span><a class="doc-id-link" href="#GPUTransferBufferUsage">GPUTransferBufferUsage<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L216"><em>Source</em></a></div></h3>
+<h3 id="GPUTransferBufferUsage"><span><a class="doc-id-link" href="#GPUTransferBufferUsage">GPUTransferBufferUsage<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L230"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUTransferBufferUsage :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	UPLOAD, 
@@ -6101,7 +6133,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUVertexAttribute"><span><a class="doc-id-link" href="#GPUVertexAttribute">GPUVertexAttribute<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L522"><em>Source</em></a></div></h3>
+<h3 id="GPUVertexAttribute"><span><a class="doc-id-link" href="#GPUVertexAttribute">GPUVertexAttribute<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L536"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUVertexAttribute :: <span class="keyword-type">struct</span> {
 	location:    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
@@ -6115,7 +6147,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUVertexBufferDescription"><span><a class="doc-id-link" href="#GPUVertexBufferDescription">GPUVertexBufferDescription<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L515"><em>Source</em></a></div></h3>
+<h3 id="GPUVertexBufferDescription"><span><a class="doc-id-link" href="#GPUVertexBufferDescription">GPUVertexBufferDescription<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L529"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUVertexBufferDescription :: <span class="keyword-type">struct</span> {
 	slot:               <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
@@ -6129,7 +6161,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUVertexElementFormat"><span><a class="doc-id-link" href="#GPUVertexElementFormat">GPUVertexElementFormat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L237"><em>Source</em></a></div></h3>
+<h3 id="GPUVertexElementFormat"><span><a class="doc-id-link" href="#GPUVertexElementFormat">GPUVertexElementFormat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L251"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUVertexElementFormat :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	INVALID, 
@@ -6179,7 +6211,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUVertexInputRate"><span><a class="doc-id-link" href="#GPUVertexInputRate">GPUVertexInputRate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L295"><em>Source</em></a></div></h3>
+<h3 id="GPUVertexInputRate"><span><a class="doc-id-link" href="#GPUVertexInputRate">GPUVertexInputRate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L309"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUVertexInputRate :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	VERTEX,   <span class="comment">// *&lt; Attribute addressing is a function of the vertex index.</span>
@@ -6188,7 +6220,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUVertexInputState"><span><a class="doc-id-link" href="#GPUVertexInputState">GPUVertexInputState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L529"><em>Source</em></a></div></h3>
+<h3 id="GPUVertexInputState"><span><a class="doc-id-link" href="#GPUVertexInputState">GPUVertexInputState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L543"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUVertexInputState :: <span class="keyword-type">struct</span> {
 	vertex_buffer_descriptions: [^]<a class="code-typename" href="/vendor/sdl3/#GPUVertexBufferDescription">GPUVertexBufferDescription</a> <span class="string">`fmt:"v,num_vertex_buffers"`</span>,
@@ -6202,7 +6234,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUViewport"><span><a class="doc-id-link" href="#GPUViewport">GPUViewport<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L406"><em>Source</em></a></div></h3>
+<h3 id="GPUViewport"><span><a class="doc-id-link" href="#GPUViewport">GPUViewport<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L420"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUViewport :: <span class="keyword-type">struct</span> {
 	x:         <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
@@ -9004,6 +9036,25 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
+<h3 id="Semaphore"><span><a class="doc-id-link" href="#Semaphore">Semaphore<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_mutex.odin#L5"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Semaphore :: <span class="keyword-type">struct</span> {}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/sdl3/#DestroySemaphore">DestroySemaphore</a></li>
+<li><a href="/vendor/sdl3/#GetSemaphoreValue">GetSemaphoreValue</a></li>
+<li><a href="/vendor/sdl3/#SignalSemaphore">SignalSemaphore</a></li>
+<li><a href="/vendor/sdl3/#TryWaitSemaphore">TryWaitSemaphore</a></li>
+<li><a href="/vendor/sdl3/#WaitSemaphore">WaitSemaphore</a></li>
+<li><a href="/vendor/sdl3/#WaitSemaphoreTimeout">WaitSemaphoreTimeout</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/sdl3/#CreateSemaphore">CreateSemaphore</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
 <h3 id="Sensor"><span><a class="doc-id-link" href="#Sensor">Sensor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_sensor.odin#L5"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Sensor :: <span class="keyword-type">struct</span> {}</pre>
@@ -10941,7 +10992,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPU_SHADERFORMAT_INVALID"><span><a class="doc-id-link" href="#GPU_SHADERFORMAT_INVALID">GPU_SHADERFORMAT_INVALID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L235"><em>Source</em></a></div></h3>
+<h3 id="GPU_SHADERFORMAT_INVALID"><span><a class="doc-id-link" href="#GPU_SHADERFORMAT_INVALID">GPU_SHADERFORMAT_INVALID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L249"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPU_SHADERFORMAT_INVALID :: GPUShaderFormat{}</pre>
 </div>
@@ -15635,139 +15686,139 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_BUFFER_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_BUFFER_CREATE_NAME_STRING">PROP_GPU_BUFFER_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L776"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_BUFFER_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_BUFFER_CREATE_NAME_STRING">PROP_GPU_BUFFER_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L790"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_BUFFER_CREATE_NAME_STRING :: <span class="string">"SDL.gpu.buffer.create.name"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_COMPUTEPIPELINE_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_COMPUTEPIPELINE_CREATE_NAME_STRING">PROP_GPU_COMPUTEPIPELINE_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L765"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_COMPUTEPIPELINE_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_COMPUTEPIPELINE_CREATE_NAME_STRING">PROP_GPU_COMPUTEPIPELINE_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L779"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_COMPUTEPIPELINE_CREATE_NAME_STRING :: <span class="string">"SDL.gpu.computepipeline.create.name"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_DEVICE_CREATE_D3D12_SEMANTIC_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_D3D12_SEMANTIC_NAME_STRING">PROP_GPU_DEVICE_CREATE_D3D12_SEMANTIC_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L763"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_DEVICE_CREATE_D3D12_SEMANTIC_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_D3D12_SEMANTIC_NAME_STRING">PROP_GPU_DEVICE_CREATE_D3D12_SEMANTIC_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L777"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_DEVICE_CREATE_D3D12_SEMANTIC_NAME_STRING :: <span class="string">"SDL.gpu.device.create.d3d12.semantic"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_DEVICE_CREATE_DEBUGMODE_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_DEBUGMODE_BOOLEAN">PROP_GPU_DEVICE_CREATE_DEBUGMODE_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L754"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_DEVICE_CREATE_DEBUGMODE_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_DEBUGMODE_BOOLEAN">PROP_GPU_DEVICE_CREATE_DEBUGMODE_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L768"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_DEVICE_CREATE_DEBUGMODE_BOOLEAN :: <span class="string">"SDL.gpu.device.create.debugmode"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_DEVICE_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_NAME_STRING">PROP_GPU_DEVICE_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L756"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_DEVICE_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_NAME_STRING">PROP_GPU_DEVICE_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L770"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_DEVICE_CREATE_NAME_STRING :: <span class="string">"SDL.gpu.device.create.name"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_DEVICE_CREATE_PREFERLOWPOWER_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_PREFERLOWPOWER_BOOLEAN">PROP_GPU_DEVICE_CREATE_PREFERLOWPOWER_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L755"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_DEVICE_CREATE_PREFERLOWPOWER_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_PREFERLOWPOWER_BOOLEAN">PROP_GPU_DEVICE_CREATE_PREFERLOWPOWER_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L769"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_DEVICE_CREATE_PREFERLOWPOWER_BOOLEAN :: <span class="string">"SDL.gpu.device.create.preferlowpower"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_DEVICE_CREATE_SHADERS_DXBC_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_SHADERS_DXBC_BOOLEAN">PROP_GPU_DEVICE_CREATE_SHADERS_DXBC_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L759"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_DEVICE_CREATE_SHADERS_DXBC_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_SHADERS_DXBC_BOOLEAN">PROP_GPU_DEVICE_CREATE_SHADERS_DXBC_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L773"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_DEVICE_CREATE_SHADERS_DXBC_BOOLEAN :: <span class="string">"SDL.gpu.device.create.shaders.dxbc"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_DEVICE_CREATE_SHADERS_DXIL_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_SHADERS_DXIL_BOOLEAN">PROP_GPU_DEVICE_CREATE_SHADERS_DXIL_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L760"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_DEVICE_CREATE_SHADERS_DXIL_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_SHADERS_DXIL_BOOLEAN">PROP_GPU_DEVICE_CREATE_SHADERS_DXIL_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L774"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_DEVICE_CREATE_SHADERS_DXIL_BOOLEAN :: <span class="string">"SDL.gpu.device.create.shaders.dxil"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_DEVICE_CREATE_SHADERS_METALLIB_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_SHADERS_METALLIB_BOOLEAN">PROP_GPU_DEVICE_CREATE_SHADERS_METALLIB_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L762"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_DEVICE_CREATE_SHADERS_METALLIB_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_SHADERS_METALLIB_BOOLEAN">PROP_GPU_DEVICE_CREATE_SHADERS_METALLIB_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L776"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_DEVICE_CREATE_SHADERS_METALLIB_BOOLEAN :: <span class="string">"SDL.gpu.device.create.shaders.metallib"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_DEVICE_CREATE_SHADERS_MSL_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_SHADERS_MSL_BOOLEAN">PROP_GPU_DEVICE_CREATE_SHADERS_MSL_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L761"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_DEVICE_CREATE_SHADERS_MSL_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_SHADERS_MSL_BOOLEAN">PROP_GPU_DEVICE_CREATE_SHADERS_MSL_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L775"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_DEVICE_CREATE_SHADERS_MSL_BOOLEAN :: <span class="string">"SDL.gpu.device.create.shaders.msl"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_DEVICE_CREATE_SHADERS_PRIVATE_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_SHADERS_PRIVATE_BOOLEAN">PROP_GPU_DEVICE_CREATE_SHADERS_PRIVATE_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L757"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_DEVICE_CREATE_SHADERS_PRIVATE_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_SHADERS_PRIVATE_BOOLEAN">PROP_GPU_DEVICE_CREATE_SHADERS_PRIVATE_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L771"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_DEVICE_CREATE_SHADERS_PRIVATE_BOOLEAN :: <span class="string">"SDL.gpu.device.create.shaders.private"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_DEVICE_CREATE_SHADERS_SPIRV_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_SHADERS_SPIRV_BOOLEAN">PROP_GPU_DEVICE_CREATE_SHADERS_SPIRV_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L758"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_DEVICE_CREATE_SHADERS_SPIRV_BOOLEAN"><span><a class="doc-id-link" href="#PROP_GPU_DEVICE_CREATE_SHADERS_SPIRV_BOOLEAN">PROP_GPU_DEVICE_CREATE_SHADERS_SPIRV_BOOLEAN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L772"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_DEVICE_CREATE_SHADERS_SPIRV_BOOLEAN :: <span class="string">"SDL.gpu.device.create.shaders.spirv"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_GRAPHICSPIPELINE_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_GRAPHICSPIPELINE_CREATE_NAME_STRING">PROP_GPU_GRAPHICSPIPELINE_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L766"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_GRAPHICSPIPELINE_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_GRAPHICSPIPELINE_CREATE_NAME_STRING">PROP_GPU_GRAPHICSPIPELINE_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L780"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_GRAPHICSPIPELINE_CREATE_NAME_STRING :: <span class="string">"SDL.gpu.graphicspipeline.create.name"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_SAMPLER_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_SAMPLER_CREATE_NAME_STRING">PROP_GPU_SAMPLER_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L767"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_SAMPLER_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_SAMPLER_CREATE_NAME_STRING">PROP_GPU_SAMPLER_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L781"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_SAMPLER_CREATE_NAME_STRING :: <span class="string">"SDL.gpu.sampler.create.name"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_SHADER_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_SHADER_CREATE_NAME_STRING">PROP_GPU_SHADER_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L768"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_SHADER_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_SHADER_CREATE_NAME_STRING">PROP_GPU_SHADER_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L782"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_SHADER_CREATE_NAME_STRING :: <span class="string">"SDL.gpu.shader.create.name"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_A_FLOAT"><span><a class="doc-id-link" href="#PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_A_FLOAT">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_A_FLOAT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L772"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_A_FLOAT"><span><a class="doc-id-link" href="#PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_A_FLOAT">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_A_FLOAT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L786"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_A_FLOAT :: <span class="string">"SDL.gpu.texture.create.d3d12.clear.a"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_B_FLOAT"><span><a class="doc-id-link" href="#PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_B_FLOAT">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_B_FLOAT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L771"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_B_FLOAT"><span><a class="doc-id-link" href="#PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_B_FLOAT">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_B_FLOAT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L785"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_B_FLOAT :: <span class="string">"SDL.gpu.texture.create.d3d12.clear.b"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_DEPTH_FLOAT"><span><a class="doc-id-link" href="#PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_DEPTH_FLOAT">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_DEPTH_FLOAT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L773"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_DEPTH_FLOAT"><span><a class="doc-id-link" href="#PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_DEPTH_FLOAT">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_DEPTH_FLOAT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L787"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_DEPTH_FLOAT :: <span class="string">"SDL.gpu.texture.create.d3d12.clear.depth"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_G_FLOAT"><span><a class="doc-id-link" href="#PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_G_FLOAT">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_G_FLOAT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L770"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_G_FLOAT"><span><a class="doc-id-link" href="#PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_G_FLOAT">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_G_FLOAT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L784"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_G_FLOAT :: <span class="string">"SDL.gpu.texture.create.d3d12.clear.g"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_R_FLOAT"><span><a class="doc-id-link" href="#PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_R_FLOAT">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_R_FLOAT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L769"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_R_FLOAT"><span><a class="doc-id-link" href="#PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_R_FLOAT">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_R_FLOAT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L783"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_R_FLOAT :: <span class="string">"SDL.gpu.texture.create.d3d12.clear.r"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_STENCIL_UINT8"><span><a class="doc-id-link" href="#PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_STENCIL_UINT8">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_STENCIL_UINT8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L774"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_STENCIL_UINT8"><span><a class="doc-id-link" href="#PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_STENCIL_UINT8">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_STENCIL_UINT8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L788"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_TEXTURE_CREATE_D3D12_CLEAR_STENCIL_UINT8 :: <span class="string">"SDL.gpu.texture.create.d3d12.clear.stencil"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_TEXTURE_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_TEXTURE_CREATE_NAME_STRING">PROP_GPU_TEXTURE_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L775"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_TEXTURE_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_TEXTURE_CREATE_NAME_STRING">PROP_GPU_TEXTURE_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L789"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_TEXTURE_CREATE_NAME_STRING :: <span class="string">"SDL.gpu.texture.create.name"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROP_GPU_TRANSFERBUFFER_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_TRANSFERBUFFER_CREATE_NAME_STRING">PROP_GPU_TRANSFERBUFFER_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L777"><em>Source</em></a></div></h3>
+<h3 id="PROP_GPU_TRANSFERBUFFER_CREATE_NAME_STRING"><span><a class="doc-id-link" href="#PROP_GPU_TRANSFERBUFFER_CREATE_NAME_STRING">PROP_GPU_TRANSFERBUFFER_CREATE_NAME_STRING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L791"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROP_GPU_TRANSFERBUFFER_CREATE_NAME_STRING :: <span class="string">"SDL.gpu.transferbuffer.create.name"</span></pre>
 </div>
@@ -17419,13 +17470,13 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="AcquireGPUCommandBuffer"><span><a class="doc-id-link" href="#AcquireGPUCommandBuffer">AcquireGPUCommandBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L809"><em>Source</em></a></div></h3>
+<h3 id="AcquireGPUCommandBuffer"><span><a class="doc-id-link" href="#AcquireGPUCommandBuffer">AcquireGPUCommandBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L823"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AcquireGPUCommandBuffer :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>) -> ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="AcquireGPUSwapchainTexture"><span><a class="doc-id-link" href="#AcquireGPUSwapchainTexture">AcquireGPUSwapchainTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L859"><em>Source</em></a></div></h3>
+<h3 id="AcquireGPUSwapchainTexture"><span><a class="doc-id-link" href="#AcquireGPUSwapchainTexture">AcquireGPUSwapchainTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L873"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AcquireGPUSwapchainTexture :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>, window: ^<a class="code-typename" href="/vendor/sdl3/#Window">Window</a>, swapchain_texture: ^^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a>, swapchain_texture_width, swapchain_texture_height: ^<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
@@ -17551,19 +17602,19 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BeginGPUComputePass"><span><a class="doc-id-link" href="#BeginGPUComputePass">BeginGPUComputePass<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L832"><em>Source</em></a></div></h3>
+<h3 id="BeginGPUComputePass"><span><a class="doc-id-link" href="#BeginGPUComputePass">BeginGPUComputePass<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L846"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BeginGPUComputePass :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>, storage_texture_bindings: [^]<a class="code-typename" href="/vendor/sdl3/#GPUStorageTextureReadWriteBinding">GPUStorageTextureReadWriteBinding</a>, num_storage_texture_bindings: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, storage_buffer_bindings: [^]<a class="code-typename" href="/vendor/sdl3/#GPUStorageBufferReadWriteBinding">GPUStorageBufferReadWriteBinding</a>, num_storage_buffer_bindings: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^<a class="code-typename" href="/vendor/sdl3/#GPUComputePass">GPUComputePass</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BeginGPUCopyPass"><span><a class="doc-id-link" href="#BeginGPUCopyPass">BeginGPUCopyPass<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L842"><em>Source</em></a></div></h3>
+<h3 id="BeginGPUCopyPass"><span><a class="doc-id-link" href="#BeginGPUCopyPass">BeginGPUCopyPass<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L856"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BeginGPUCopyPass :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>) -> ^<a class="code-typename" href="/vendor/sdl3/#GPUCopyPass">GPUCopyPass</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BeginGPURenderPass"><span><a class="doc-id-link" href="#BeginGPURenderPass">BeginGPURenderPass<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L813"><em>Source</em></a></div></h3>
+<h3 id="BeginGPURenderPass"><span><a class="doc-id-link" href="#BeginGPURenderPass">BeginGPURenderPass<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L827"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BeginGPURenderPass :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>, color_target_infos: [^]<a class="code-typename" href="/vendor/sdl3/#GPUColorTargetInfo">GPUColorTargetInfo</a>, num_color_targets: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, depth_stencil_target_info: runtime.<a class="code-typename" href="//#Maybe">Maybe</a>($T=^GPUDepthStencilTargetInfo)) -> ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a> ---</pre>
 </div>
@@ -17587,85 +17638,85 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BindGPUComputePipeline"><span><a class="doc-id-link" href="#BindGPUComputePipeline">BindGPUComputePipeline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L833"><em>Source</em></a></div></h3>
+<h3 id="BindGPUComputePipeline"><span><a class="doc-id-link" href="#BindGPUComputePipeline">BindGPUComputePipeline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L847"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BindGPUComputePipeline :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (compute_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPUComputePass">GPUComputePass</a>, compute_pipeline: ^<a class="code-typename" href="/vendor/sdl3/#GPUComputePipeline">GPUComputePipeline</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BindGPUComputeSamplers"><span><a class="doc-id-link" href="#BindGPUComputeSamplers">BindGPUComputeSamplers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L834"><em>Source</em></a></div></h3>
+<h3 id="BindGPUComputeSamplers"><span><a class="doc-id-link" href="#BindGPUComputeSamplers">BindGPUComputeSamplers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L848"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BindGPUComputeSamplers :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (compute_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPUComputePass">GPUComputePass</a>, first_slot: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, texture_sampler_bindings: [^]<a class="code-typename" href="/vendor/sdl3/#GPUTextureSamplerBinding">GPUTextureSamplerBinding</a>, num_bindings: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BindGPUComputeStorageBuffers"><span><a class="doc-id-link" href="#BindGPUComputeStorageBuffers">BindGPUComputeStorageBuffers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L836"><em>Source</em></a></div></h3>
+<h3 id="BindGPUComputeStorageBuffers"><span><a class="doc-id-link" href="#BindGPUComputeStorageBuffers">BindGPUComputeStorageBuffers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L850"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BindGPUComputeStorageBuffers :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (compute_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPUComputePass">GPUComputePass</a>, first_slot: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, storage_buffers: [^]^<a class="code-typename" href="/vendor/sdl3/#GPUBuffer">GPUBuffer</a>, num_bindings: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BindGPUComputeStorageTextures"><span><a class="doc-id-link" href="#BindGPUComputeStorageTextures">BindGPUComputeStorageTextures<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L835"><em>Source</em></a></div></h3>
+<h3 id="BindGPUComputeStorageTextures"><span><a class="doc-id-link" href="#BindGPUComputeStorageTextures">BindGPUComputeStorageTextures<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L849"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BindGPUComputeStorageTextures :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (compute_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPUComputePass">GPUComputePass</a>, first_slot: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, storage_textures: [^]^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a>, num_bindings: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BindGPUFragmentSamplers"><span><a class="doc-id-link" href="#BindGPUFragmentSamplers">BindGPUFragmentSamplers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L824"><em>Source</em></a></div></h3>
+<h3 id="BindGPUFragmentSamplers"><span><a class="doc-id-link" href="#BindGPUFragmentSamplers">BindGPUFragmentSamplers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L838"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BindGPUFragmentSamplers :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, first_slot: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, texture_sampler_bindings: [^]<a class="code-typename" href="/vendor/sdl3/#GPUTextureSamplerBinding">GPUTextureSamplerBinding</a>, num_bindings: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BindGPUFragmentStorageBuffers"><span><a class="doc-id-link" href="#BindGPUFragmentStorageBuffers">BindGPUFragmentStorageBuffers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L826"><em>Source</em></a></div></h3>
+<h3 id="BindGPUFragmentStorageBuffers"><span><a class="doc-id-link" href="#BindGPUFragmentStorageBuffers">BindGPUFragmentStorageBuffers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L840"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BindGPUFragmentStorageBuffers :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, first_slot: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, storage_buffers: [^]^<a class="code-typename" href="/vendor/sdl3/#GPUBuffer">GPUBuffer</a>, num_bindings: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BindGPUFragmentStorageTextures"><span><a class="doc-id-link" href="#BindGPUFragmentStorageTextures">BindGPUFragmentStorageTextures<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L825"><em>Source</em></a></div></h3>
+<h3 id="BindGPUFragmentStorageTextures"><span><a class="doc-id-link" href="#BindGPUFragmentStorageTextures">BindGPUFragmentStorageTextures<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L839"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BindGPUFragmentStorageTextures :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, first_slot: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, storage_textures: [^]^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a>, num_bindings: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BindGPUGraphicsPipeline"><span><a class="doc-id-link" href="#BindGPUGraphicsPipeline">BindGPUGraphicsPipeline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L814"><em>Source</em></a></div></h3>
+<h3 id="BindGPUGraphicsPipeline"><span><a class="doc-id-link" href="#BindGPUGraphicsPipeline">BindGPUGraphicsPipeline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L828"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BindGPUGraphicsPipeline :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, graphics_pipeline: ^<a class="code-typename" href="/vendor/sdl3/#GPUGraphicsPipeline">GPUGraphicsPipeline</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BindGPUIndexBuffer"><span><a class="doc-id-link" href="#BindGPUIndexBuffer">BindGPUIndexBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L820"><em>Source</em></a></div></h3>
+<h3 id="BindGPUIndexBuffer"><span><a class="doc-id-link" href="#BindGPUIndexBuffer">BindGPUIndexBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L834"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BindGPUIndexBuffer :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, <span class="keyword-type">#by_ptr</span> binding: <a class="code-typename" href="/vendor/sdl3/#GPUBufferBinding">GPUBufferBinding</a>, index_element_size: <a class="code-typename" href="/vendor/sdl3/#GPUIndexElementSize">GPUIndexElementSize</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BindGPUVertexBuffers"><span><a class="doc-id-link" href="#BindGPUVertexBuffers">BindGPUVertexBuffers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L819"><em>Source</em></a></div></h3>
+<h3 id="BindGPUVertexBuffers"><span><a class="doc-id-link" href="#BindGPUVertexBuffers">BindGPUVertexBuffers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L833"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BindGPUVertexBuffers :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, first_slot: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, bindings: [^]<a class="code-typename" href="/vendor/sdl3/#GPUBufferBinding">GPUBufferBinding</a>, num_bindings: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BindGPUVertexSamplers"><span><a class="doc-id-link" href="#BindGPUVertexSamplers">BindGPUVertexSamplers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L821"><em>Source</em></a></div></h3>
+<h3 id="BindGPUVertexSamplers"><span><a class="doc-id-link" href="#BindGPUVertexSamplers">BindGPUVertexSamplers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L835"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BindGPUVertexSamplers :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, first_slot: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, texture_sampler_bindings: [^]<a class="code-typename" href="/vendor/sdl3/#GPUTextureSamplerBinding">GPUTextureSamplerBinding</a>, num_bindings: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BindGPUVertexStorageBuffers"><span><a class="doc-id-link" href="#BindGPUVertexStorageBuffers">BindGPUVertexStorageBuffers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L823"><em>Source</em></a></div></h3>
+<h3 id="BindGPUVertexStorageBuffers"><span><a class="doc-id-link" href="#BindGPUVertexStorageBuffers">BindGPUVertexStorageBuffers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L837"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BindGPUVertexStorageBuffers :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, first_slot: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, storage_buffers: [^]^<a class="code-typename" href="/vendor/sdl3/#GPUBuffer">GPUBuffer</a>, num_bindings: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BindGPUVertexStorageTextures"><span><a class="doc-id-link" href="#BindGPUVertexStorageTextures">BindGPUVertexStorageTextures<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L822"><em>Source</em></a></div></h3>
+<h3 id="BindGPUVertexStorageTextures"><span><a class="doc-id-link" href="#BindGPUVertexStorageTextures">BindGPUVertexStorageTextures<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L836"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BindGPUVertexStorageTextures :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, first_slot: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, storage_textures: [^]^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a>, num_bindings: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BlitGPUTexture"><span><a class="doc-id-link" href="#BlitGPUTexture">BlitGPUTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L851"><em>Source</em></a></div></h3>
+<h3 id="BlitGPUTexture"><span><a class="doc-id-link" href="#BlitGPUTexture">BlitGPUTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L865"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BlitGPUTexture :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>, <span class="keyword-type">#by_ptr</span> info: <a class="code-typename" href="/vendor/sdl3/#GPUBlitInfo">GPUBlitInfo</a>) ---</pre>
 </div>
@@ -17770,13 +17821,13 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CalculateGPUTextureFormatSize"><span><a class="doc-id-link" href="#CalculateGPUTextureFormatSize">CalculateGPUTextureFormatSize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L872"><em>Source</em></a></div></h3>
+<h3 id="CalculateGPUTextureFormatSize"><span><a class="doc-id-link" href="#CalculateGPUTextureFormatSize">CalculateGPUTextureFormatSize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L886"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CalculateGPUTextureFormatSize :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (format: <a class="code-typename" href="/vendor/sdl3/#GPUTextureFormat">GPUTextureFormat</a>, width, height: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, depth_or_layer_count: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CancelGPUCommandBuffer"><span><a class="doc-id-link" href="#CancelGPUCommandBuffer">CancelGPUCommandBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L864"><em>Source</em></a></div></h3>
+<h3 id="CancelGPUCommandBuffer"><span><a class="doc-id-link" href="#CancelGPUCommandBuffer">CancelGPUCommandBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L878"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CancelGPUCommandBuffer :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
@@ -17788,7 +17839,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ClaimWindowForGPUDevice"><span><a class="doc-id-link" href="#ClaimWindowForGPUDevice">ClaimWindowForGPUDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L854"><em>Source</em></a></div></h3>
+<h3 id="ClaimWindowForGPUDevice"><span><a class="doc-id-link" href="#ClaimWindowForGPUDevice">ClaimWindowForGPUDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L868"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ClaimWindowForGPUDevice :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, window: ^<a class="code-typename" href="/vendor/sdl3/#Window">Window</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
@@ -17996,13 +18047,13 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CopyGPUBufferToBuffer"><span><a class="doc-id-link" href="#CopyGPUBufferToBuffer">CopyGPUBufferToBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L846"><em>Source</em></a></div></h3>
+<h3 id="CopyGPUBufferToBuffer"><span><a class="doc-id-link" href="#CopyGPUBufferToBuffer">CopyGPUBufferToBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L860"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CopyGPUBufferToBuffer :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (copy_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPUCopyPass">GPUCopyPass</a>, <span class="keyword-type">#by_ptr</span> source: <a class="code-typename" href="/vendor/sdl3/#GPUBufferLocation">GPUBufferLocation</a>, <span class="keyword-type">#by_ptr</span> destination: <a class="code-typename" href="/vendor/sdl3/#GPUBufferLocation">GPUBufferLocation</a>, size: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, cycle: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CopyGPUTextureToTexture"><span><a class="doc-id-link" href="#CopyGPUTextureToTexture">CopyGPUTextureToTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L845"><em>Source</em></a></div></h3>
+<h3 id="CopyGPUTextureToTexture"><span><a class="doc-id-link" href="#CopyGPUTextureToTexture">CopyGPUTextureToTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L859"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CopyGPUTextureToTexture :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
 	copy_pass:   ^<a class="code-typename" href="/vendor/sdl3/#GPUCopyPass">GPUCopyPass</a>, 
@@ -18067,55 +18118,55 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CreateGPUBuffer"><span><a class="doc-id-link" href="#CreateGPUBuffer">CreateGPUBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L795"><em>Source</em></a></div></h3>
+<h3 id="CreateGPUBuffer"><span><a class="doc-id-link" href="#CreateGPUBuffer">CreateGPUBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L809"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CreateGPUBuffer :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, <span class="keyword-type">#by_ptr</span> createinfo: <a class="code-typename" href="/vendor/sdl3/#GPUBufferCreateInfo">GPUBufferCreateInfo</a>) -> ^<a class="code-typename" href="/vendor/sdl3/#GPUBuffer">GPUBuffer</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CreateGPUComputePipeline"><span><a class="doc-id-link" href="#CreateGPUComputePipeline">CreateGPUComputePipeline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L790"><em>Source</em></a></div></h3>
+<h3 id="CreateGPUComputePipeline"><span><a class="doc-id-link" href="#CreateGPUComputePipeline">CreateGPUComputePipeline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L804"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CreateGPUComputePipeline :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, <span class="keyword-type">#by_ptr</span> createinfo: <a class="code-typename" href="/vendor/sdl3/#GPUComputePipelineCreateInfo">GPUComputePipelineCreateInfo</a>) -> ^<a class="code-typename" href="/vendor/sdl3/#GPUComputePipeline">GPUComputePipeline</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CreateGPUDevice"><span><a class="doc-id-link" href="#CreateGPUDevice">CreateGPUDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L783"><em>Source</em></a></div></h3>
+<h3 id="CreateGPUDevice"><span><a class="doc-id-link" href="#CreateGPUDevice">CreateGPUDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L797"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CreateGPUDevice :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (format_flags: <a class="code-typename" href="/vendor/sdl3/#GPUShaderFormat">GPUShaderFormat</a>, debug_mode: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, name: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CreateGPUDeviceWithProperties"><span><a class="doc-id-link" href="#CreateGPUDeviceWithProperties">CreateGPUDeviceWithProperties<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L784"><em>Source</em></a></div></h3>
+<h3 id="CreateGPUDeviceWithProperties"><span><a class="doc-id-link" href="#CreateGPUDeviceWithProperties">CreateGPUDeviceWithProperties<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L798"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CreateGPUDeviceWithProperties :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (props: <a class="code-typename" href="/vendor/sdl3/#PropertiesID">PropertiesID</a>) -> ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CreateGPUGraphicsPipeline"><span><a class="doc-id-link" href="#CreateGPUGraphicsPipeline">CreateGPUGraphicsPipeline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L791"><em>Source</em></a></div></h3>
+<h3 id="CreateGPUGraphicsPipeline"><span><a class="doc-id-link" href="#CreateGPUGraphicsPipeline">CreateGPUGraphicsPipeline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L805"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CreateGPUGraphicsPipeline :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, <span class="keyword-type">#by_ptr</span> createinfo: <a class="code-typename" href="/vendor/sdl3/#GPUGraphicsPipelineCreateInfo">GPUGraphicsPipelineCreateInfo</a>) -> ^<a class="code-typename" href="/vendor/sdl3/#GPUGraphicsPipeline">GPUGraphicsPipeline</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CreateGPUSampler"><span><a class="doc-id-link" href="#CreateGPUSampler">CreateGPUSampler<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L792"><em>Source</em></a></div></h3>
+<h3 id="CreateGPUSampler"><span><a class="doc-id-link" href="#CreateGPUSampler">CreateGPUSampler<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L806"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CreateGPUSampler :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, <span class="keyword-type">#by_ptr</span> createinfo: <a class="code-typename" href="/vendor/sdl3/#GPUSamplerCreateInfo">GPUSamplerCreateInfo</a>) -> ^<a class="code-typename" href="/vendor/sdl3/#GPUSampler">GPUSampler</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CreateGPUShader"><span><a class="doc-id-link" href="#CreateGPUShader">CreateGPUShader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L793"><em>Source</em></a></div></h3>
+<h3 id="CreateGPUShader"><span><a class="doc-id-link" href="#CreateGPUShader">CreateGPUShader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L807"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CreateGPUShader :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, <span class="keyword-type">#by_ptr</span> createinfo: <a class="code-typename" href="/vendor/sdl3/#GPUShaderCreateInfo">GPUShaderCreateInfo</a>) -> ^<a class="code-typename" href="/vendor/sdl3/#GPUShader">GPUShader</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CreateGPUTexture"><span><a class="doc-id-link" href="#CreateGPUTexture">CreateGPUTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L794"><em>Source</em></a></div></h3>
+<h3 id="CreateGPUTexture"><span><a class="doc-id-link" href="#CreateGPUTexture">CreateGPUTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L808"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CreateGPUTexture :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, <span class="keyword-type">#by_ptr</span> createinfo: <a class="code-typename" href="/vendor/sdl3/#GPUTextureCreateInfo">GPUTextureCreateInfo</a>) -> ^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CreateGPUTransferBuffer"><span><a class="doc-id-link" href="#CreateGPUTransferBuffer">CreateGPUTransferBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L796"><em>Source</em></a></div></h3>
+<h3 id="CreateGPUTransferBuffer"><span><a class="doc-id-link" href="#CreateGPUTransferBuffer">CreateGPUTransferBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L810"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CreateGPUTransferBuffer :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, <span class="keyword-type">#by_ptr</span> createinfo: <a class="code-typename" href="/vendor/sdl3/#GPUTransferBufferCreateInfo">GPUTransferBufferCreateInfo</a>) -> ^<a class="code-typename" href="/vendor/sdl3/#GPUTransferBuffer">GPUTransferBuffer</a> ---</pre>
 </div>
@@ -18183,6 +18234,12 @@ Procedure Groups (0)</summary>
 <h3 id="CreateRendererWithProperties"><span><a class="doc-id-link" href="#CreateRendererWithProperties">CreateRendererWithProperties<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_render.odin#L136"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CreateRendererWithProperties :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (props: <a class="code-typename" href="/vendor/sdl3/#PropertiesID">PropertiesID</a>) -> ^<a class="code-typename" href="/vendor/sdl3/#Renderer">Renderer</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="CreateSemaphore"><span><a class="doc-id-link" href="#CreateSemaphore">CreateSemaphore<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_mutex.odin#L23"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CreateSemaphore :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (initial_value: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^<a class="code-typename" href="/vendor/sdl3/#Semaphore">Semaphore</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -18391,7 +18448,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DestroyGPUDevice"><span><a class="doc-id-link" href="#DestroyGPUDevice">DestroyGPUDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L785"><em>Source</em></a></div></h3>
+<h3 id="DestroyGPUDevice"><span><a class="doc-id-link" href="#DestroyGPUDevice">DestroyGPUDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L799"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DestroyGPUDevice :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>) ---</pre>
 </div>
@@ -18436,6 +18493,12 @@ Procedure Groups (0)</summary>
 <h3 id="DestroyRenderer"><span><a class="doc-id-link" href="#DestroyRenderer">DestroyRenderer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_render.odin#L219"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DestroyRenderer :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (renderer: ^<a class="code-typename" href="/vendor/sdl3/#Renderer">Renderer</a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DestroySemaphore"><span><a class="doc-id-link" href="#DestroySemaphore">DestroySemaphore<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_mutex.odin#L24"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DestroySemaphore :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (sem: ^<a class="code-typename" href="/vendor/sdl3/#Semaphore">Semaphore</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -18487,31 +18550,31 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DispatchGPUCompute"><span><a class="doc-id-link" href="#DispatchGPUCompute">DispatchGPUCompute<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L837"><em>Source</em></a></div></h3>
+<h3 id="DispatchGPUCompute"><span><a class="doc-id-link" href="#DispatchGPUCompute">DispatchGPUCompute<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L851"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DispatchGPUCompute :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (compute_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPUComputePass">GPUComputePass</a>, groupcount_x, groupcount_y, groupcount_z: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DispatchGPUComputeIndirect"><span><a class="doc-id-link" href="#DispatchGPUComputeIndirect">DispatchGPUComputeIndirect<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L838"><em>Source</em></a></div></h3>
+<h3 id="DispatchGPUComputeIndirect"><span><a class="doc-id-link" href="#DispatchGPUComputeIndirect">DispatchGPUComputeIndirect<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L852"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DispatchGPUComputeIndirect :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (compute_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPUComputePass">GPUComputePass</a>, buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUBuffer">GPUBuffer</a>, offset: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DownloadFromGPUBuffer"><span><a class="doc-id-link" href="#DownloadFromGPUBuffer">DownloadFromGPUBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L848"><em>Source</em></a></div></h3>
+<h3 id="DownloadFromGPUBuffer"><span><a class="doc-id-link" href="#DownloadFromGPUBuffer">DownloadFromGPUBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L862"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DownloadFromGPUBuffer :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (copy_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPUCopyPass">GPUCopyPass</a>, <span class="keyword-type">#by_ptr</span> source: <a class="code-typename" href="/vendor/sdl3/#GPUBufferRegion">GPUBufferRegion</a>, <span class="keyword-type">#by_ptr</span> destination: <a class="code-typename" href="/vendor/sdl3/#GPUTransferBufferLocation">GPUTransferBufferLocation</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DownloadFromGPUTexture"><span><a class="doc-id-link" href="#DownloadFromGPUTexture">DownloadFromGPUTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L847"><em>Source</em></a></div></h3>
+<h3 id="DownloadFromGPUTexture"><span><a class="doc-id-link" href="#DownloadFromGPUTexture">DownloadFromGPUTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L861"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DownloadFromGPUTexture :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (copy_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPUCopyPass">GPUCopyPass</a>, <span class="keyword-type">#by_ptr</span> source: <a class="code-typename" href="/vendor/sdl3/#GPUTextureRegion">GPUTextureRegion</a>, <span class="keyword-type">#by_ptr</span> destination: <a class="code-typename" href="/vendor/sdl3/#GPUTextureTransferInfo">GPUTextureTransferInfo</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DrawGPUIndexedPrimitives"><span><a class="doc-id-link" href="#DrawGPUIndexedPrimitives">DrawGPUIndexedPrimitives<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L827"><em>Source</em></a></div></h3>
+<h3 id="DrawGPUIndexedPrimitives"><span><a class="doc-id-link" href="#DrawGPUIndexedPrimitives">DrawGPUIndexedPrimitives<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L841"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DrawGPUIndexedPrimitives :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
 	render_pass:    ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, 
@@ -18524,19 +18587,19 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DrawGPUIndexedPrimitivesIndirect"><span><a class="doc-id-link" href="#DrawGPUIndexedPrimitivesIndirect">DrawGPUIndexedPrimitivesIndirect<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L830"><em>Source</em></a></div></h3>
+<h3 id="DrawGPUIndexedPrimitivesIndirect"><span><a class="doc-id-link" href="#DrawGPUIndexedPrimitivesIndirect">DrawGPUIndexedPrimitivesIndirect<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L844"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DrawGPUIndexedPrimitivesIndirect :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUBuffer">GPUBuffer</a>, offset: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, draw_count: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DrawGPUPrimitives"><span><a class="doc-id-link" href="#DrawGPUPrimitives">DrawGPUPrimitives<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L828"><em>Source</em></a></div></h3>
+<h3 id="DrawGPUPrimitives"><span><a class="doc-id-link" href="#DrawGPUPrimitives">DrawGPUPrimitives<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L842"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DrawGPUPrimitives :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, num_vertices: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, num_instances: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, first_vertex: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, first_instance: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DrawGPUPrimitivesIndirect"><span><a class="doc-id-link" href="#DrawGPUPrimitivesIndirect">DrawGPUPrimitivesIndirect<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L829"><em>Source</em></a></div></h3>
+<h3 id="DrawGPUPrimitivesIndirect"><span><a class="doc-id-link" href="#DrawGPUPrimitivesIndirect">DrawGPUPrimitivesIndirect<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L843"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DrawGPUPrimitivesIndirect :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUBuffer">GPUBuffer</a>, offset: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, draw_count: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
@@ -18584,19 +18647,19 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="EndGPUComputePass"><span><a class="doc-id-link" href="#EndGPUComputePass">EndGPUComputePass<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L839"><em>Source</em></a></div></h3>
+<h3 id="EndGPUComputePass"><span><a class="doc-id-link" href="#EndGPUComputePass">EndGPUComputePass<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L853"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">EndGPUComputePass :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (compute_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPUComputePass">GPUComputePass</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="EndGPUCopyPass"><span><a class="doc-id-link" href="#EndGPUCopyPass">EndGPUCopyPass<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L849"><em>Source</em></a></div></h3>
+<h3 id="EndGPUCopyPass"><span><a class="doc-id-link" href="#EndGPUCopyPass">EndGPUCopyPass<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L863"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">EndGPUCopyPass :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (copy_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPUCopyPass">GPUCopyPass</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="EndGPURenderPass"><span><a class="doc-id-link" href="#EndGPURenderPass">EndGPURenderPass<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L831"><em>Source</em></a></div></h3>
+<h3 id="EndGPURenderPass"><span><a class="doc-id-link" href="#EndGPURenderPass">EndGPURenderPass<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L845"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">EndGPURenderPass :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>) ---</pre>
 </div>
@@ -18711,7 +18774,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GDKResumeGPU"><span><a class="doc-id-link" href="#GDKResumeGPU">GDKResumeGPU<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L882"><em>Source</em></a></div></h3>
+<h3 id="GDKResumeGPU"><span><a class="doc-id-link" href="#GDKResumeGPU">GDKResumeGPU<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L896"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GDKResumeGPU :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>) ---</pre>
 </div>
@@ -18723,7 +18786,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GDKSuspendGPU"><span><a class="doc-id-link" href="#GDKSuspendGPU">GDKSuspendGPU<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L881"><em>Source</em></a></div></h3>
+<h3 id="GDKSuspendGPU"><span><a class="doc-id-link" href="#GDKSuspendGPU">GDKSuspendGPU<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L895"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GDKSuspendGPU :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>) ---</pre>
 </div>
@@ -18819,31 +18882,31 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUSupportsProperties"><span><a class="doc-id-link" href="#GPUSupportsProperties">GPUSupportsProperties<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L782"><em>Source</em></a></div></h3>
+<h3 id="GPUSupportsProperties"><span><a class="doc-id-link" href="#GPUSupportsProperties">GPUSupportsProperties<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L796"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUSupportsProperties :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (props: <a class="code-typename" href="/vendor/sdl3/#PropertiesID">PropertiesID</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUSupportsShaderFormats"><span><a class="doc-id-link" href="#GPUSupportsShaderFormats">GPUSupportsShaderFormats<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L781"><em>Source</em></a></div></h3>
+<h3 id="GPUSupportsShaderFormats"><span><a class="doc-id-link" href="#GPUSupportsShaderFormats">GPUSupportsShaderFormats<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L795"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUSupportsShaderFormats :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (format_flags: <a class="code-typename" href="/vendor/sdl3/#GPUShaderFormat">GPUShaderFormat</a>, name: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUTextureFormatTexelBlockSize"><span><a class="doc-id-link" href="#GPUTextureFormatTexelBlockSize">GPUTextureFormatTexelBlockSize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L869"><em>Source</em></a></div></h3>
+<h3 id="GPUTextureFormatTexelBlockSize"><span><a class="doc-id-link" href="#GPUTextureFormatTexelBlockSize">GPUTextureFormatTexelBlockSize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L883"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUTextureFormatTexelBlockSize :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (format: <a class="code-typename" href="/vendor/sdl3/#GPUTextureFormat">GPUTextureFormat</a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUTextureSupportsFormat"><span><a class="doc-id-link" href="#GPUTextureSupportsFormat">GPUTextureSupportsFormat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L870"><em>Source</em></a></div></h3>
+<h3 id="GPUTextureSupportsFormat"><span><a class="doc-id-link" href="#GPUTextureSupportsFormat">GPUTextureSupportsFormat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L884"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUTextureSupportsFormat :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, format: <a class="code-typename" href="/vendor/sdl3/#GPUTextureFormat">GPUTextureFormat</a>, type: <a class="code-typename" href="/vendor/sdl3/#GPUTextureType">GPUTextureType</a>, usage: <a class="code-typename" href="/vendor/sdl3/#GPUTextureUsageFlags">GPUTextureUsageFlags</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GPUTextureSupportsSampleCount"><span><a class="doc-id-link" href="#GPUTextureSupportsSampleCount">GPUTextureSupportsSampleCount<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L871"><em>Source</em></a></div></h3>
+<h3 id="GPUTextureSupportsSampleCount"><span><a class="doc-id-link" href="#GPUTextureSupportsSampleCount">GPUTextureSupportsSampleCount<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L885"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GPUTextureSupportsSampleCount :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, format: <a class="code-typename" href="/vendor/sdl3/#GPUTextureFormat">GPUTextureFormat</a>, sample_count: <a class="code-typename" href="/vendor/sdl3/#GPUSampleCount">GPUSampleCount</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
@@ -18891,7 +18954,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GenerateMipmapsForGPUTexture"><span><a class="doc-id-link" href="#GenerateMipmapsForGPUTexture">GenerateMipmapsForGPUTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L850"><em>Source</em></a></div></h3>
+<h3 id="GenerateMipmapsForGPUTexture"><span><a class="doc-id-link" href="#GenerateMipmapsForGPUTexture">GenerateMipmapsForGPUTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L864"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GenerateMipmapsForGPUTexture :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>, texture: ^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a>) ---</pre>
 </div>
@@ -19419,25 +19482,25 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GetGPUDeviceDriver"><span><a class="doc-id-link" href="#GetGPUDeviceDriver">GetGPUDeviceDriver<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L788"><em>Source</em></a></div></h3>
+<h3 id="GetGPUDeviceDriver"><span><a class="doc-id-link" href="#GetGPUDeviceDriver">GetGPUDeviceDriver<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L802"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GetGPUDeviceDriver :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>) -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GetGPUDriver"><span><a class="doc-id-link" href="#GetGPUDriver">GetGPUDriver<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L787"><em>Source</em></a></div></h3>
+<h3 id="GetGPUDriver"><span><a class="doc-id-link" href="#GetGPUDriver">GetGPUDriver<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L801"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GetGPUDriver :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (index: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GetGPUShaderFormats"><span><a class="doc-id-link" href="#GetGPUShaderFormats">GetGPUShaderFormats<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L789"><em>Source</em></a></div></h3>
+<h3 id="GetGPUShaderFormats"><span><a class="doc-id-link" href="#GetGPUShaderFormats">GetGPUShaderFormats<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L803"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GetGPUShaderFormats :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>) -> <a class="code-typename" href="/vendor/sdl3/#GPUShaderFormat">GPUShaderFormat</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GetGPUSwapchainTextureFormat"><span><a class="doc-id-link" href="#GetGPUSwapchainTextureFormat">GetGPUSwapchainTextureFormat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L858"><em>Source</em></a></div></h3>
+<h3 id="GetGPUSwapchainTextureFormat"><span><a class="doc-id-link" href="#GetGPUSwapchainTextureFormat">GetGPUSwapchainTextureFormat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L872"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GetGPUSwapchainTextureFormat :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, window: ^<a class="code-typename" href="/vendor/sdl3/#Window">Window</a>) -> <a class="code-typename" href="/vendor/sdl3/#GPUTextureFormat">GPUTextureFormat</a> ---</pre>
 </div>
@@ -20139,7 +20202,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GetNumGPUDrivers"><span><a class="doc-id-link" href="#GetNumGPUDrivers">GetNumGPUDrivers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L786"><em>Source</em></a></div></h3>
+<h3 id="GetNumGPUDrivers"><span><a class="doc-id-link" href="#GetNumGPUDrivers">GetNumGPUDrivers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L800"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GetNumGPUDrivers :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
@@ -20568,6 +20631,12 @@ Procedure Groups (0)</summary>
 <h3 id="GetScancodeName"><span><a class="doc-id-link" href="#GetScancodeName">GetScancodeName<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_keyboard.odin#L46"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GetScancodeName :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (scancode: <a class="code-typename" href="/vendor/sdl3/#Scancode">Scancode</a>) -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetSemaphoreValue"><span><a class="doc-id-link" href="#GetSemaphoreValue">GetSemaphoreValue<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_mutex.odin#L25"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetSemaphoreValue :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (sem: ^<a class="code-typename" href="/vendor/sdl3/#Semaphore">Semaphore</a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -21423,7 +21492,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="InsertGPUDebugLabel"><span><a class="doc-id-link" href="#InsertGPUDebugLabel">InsertGPUDebugLabel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L799"><em>Source</em></a></div></h3>
+<h3 id="InsertGPUDebugLabel"><span><a class="doc-id-link" href="#InsertGPUDebugLabel">InsertGPUDebugLabel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L813"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">InsertGPUDebugLabel :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
@@ -21711,7 +21780,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="MapGPUTransferBuffer"><span><a class="doc-id-link" href="#MapGPUTransferBuffer">MapGPUTransferBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L840"><em>Source</em></a></div></h3>
+<h3 id="MapGPUTransferBuffer"><span><a class="doc-id-link" href="#MapGPUTransferBuffer">MapGPUTransferBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L854"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MapGPUTransferBuffer :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, transfer_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUTransferBuffer">GPUTransferBuffer</a>, cycle: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> ---</pre>
 </div>
@@ -22040,7 +22109,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PopGPUDebugGroup"><span><a class="doc-id-link" href="#PopGPUDebugGroup">PopGPUDebugGroup<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L801"><em>Source</em></a></div></h3>
+<h3 id="PopGPUDebugGroup"><span><a class="doc-id-link" href="#PopGPUDebugGroup">PopGPUDebugGroup<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L815"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PopGPUDebugGroup :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>) ---</pre>
 </div>
@@ -22079,25 +22148,25 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PushGPUComputeUniformData"><span><a class="doc-id-link" href="#PushGPUComputeUniformData">PushGPUComputeUniformData<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L812"><em>Source</em></a></div></h3>
+<h3 id="PushGPUComputeUniformData"><span><a class="doc-id-link" href="#PushGPUComputeUniformData">PushGPUComputeUniformData<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L826"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PushGPUComputeUniformData :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>, slot_index: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, length: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PushGPUDebugGroup"><span><a class="doc-id-link" href="#PushGPUDebugGroup">PushGPUDebugGroup<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L800"><em>Source</em></a></div></h3>
+<h3 id="PushGPUDebugGroup"><span><a class="doc-id-link" href="#PushGPUDebugGroup">PushGPUDebugGroup<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L814"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PushGPUDebugGroup :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>, name: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PushGPUFragmentUniformData"><span><a class="doc-id-link" href="#PushGPUFragmentUniformData">PushGPUFragmentUniformData<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L811"><em>Source</em></a></div></h3>
+<h3 id="PushGPUFragmentUniformData"><span><a class="doc-id-link" href="#PushGPUFragmentUniformData">PushGPUFragmentUniformData<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L825"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PushGPUFragmentUniformData :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>, slot_index: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, length: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PushGPUVertexUniformData"><span><a class="doc-id-link" href="#PushGPUVertexUniformData">PushGPUVertexUniformData<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L810"><em>Source</em></a></div></h3>
+<h3 id="PushGPUVertexUniformData"><span><a class="doc-id-link" href="#PushGPUVertexUniformData">PushGPUVertexUniformData<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L824"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PushGPUVertexUniformData :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>, slot_index: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, length: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) ---</pre>
 </div>
@@ -22109,7 +22178,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="QueryGPUFence"><span><a class="doc-id-link" href="#QueryGPUFence">QueryGPUFence<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L867"><em>Source</em></a></div></h3>
+<h3 id="QueryGPUFence"><span><a class="doc-id-link" href="#QueryGPUFence">QueryGPUFence<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L881"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">QueryGPUFence :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, fence: ^<a class="code-typename" href="/vendor/sdl3/#GPUFence">GPUFence</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
@@ -22305,55 +22374,55 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ReleaseGPUBuffer"><span><a class="doc-id-link" href="#ReleaseGPUBuffer">ReleaseGPUBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L804"><em>Source</em></a></div></h3>
+<h3 id="ReleaseGPUBuffer"><span><a class="doc-id-link" href="#ReleaseGPUBuffer">ReleaseGPUBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L818"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ReleaseGPUBuffer :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUBuffer">GPUBuffer</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ReleaseGPUComputePipeline"><span><a class="doc-id-link" href="#ReleaseGPUComputePipeline">ReleaseGPUComputePipeline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L806"><em>Source</em></a></div></h3>
+<h3 id="ReleaseGPUComputePipeline"><span><a class="doc-id-link" href="#ReleaseGPUComputePipeline">ReleaseGPUComputePipeline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L820"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ReleaseGPUComputePipeline :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, compute_pipeline: ^<a class="code-typename" href="/vendor/sdl3/#GPUComputePipeline">GPUComputePipeline</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ReleaseGPUFence"><span><a class="doc-id-link" href="#ReleaseGPUFence">ReleaseGPUFence<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L868"><em>Source</em></a></div></h3>
+<h3 id="ReleaseGPUFence"><span><a class="doc-id-link" href="#ReleaseGPUFence">ReleaseGPUFence<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L882"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ReleaseGPUFence :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, fence: ^<a class="code-typename" href="/vendor/sdl3/#GPUFence">GPUFence</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ReleaseGPUGraphicsPipeline"><span><a class="doc-id-link" href="#ReleaseGPUGraphicsPipeline">ReleaseGPUGraphicsPipeline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L808"><em>Source</em></a></div></h3>
+<h3 id="ReleaseGPUGraphicsPipeline"><span><a class="doc-id-link" href="#ReleaseGPUGraphicsPipeline">ReleaseGPUGraphicsPipeline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L822"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ReleaseGPUGraphicsPipeline :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, graphics_pipeline: ^<a class="code-typename" href="/vendor/sdl3/#GPUGraphicsPipeline">GPUGraphicsPipeline</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ReleaseGPUSampler"><span><a class="doc-id-link" href="#ReleaseGPUSampler">ReleaseGPUSampler<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L803"><em>Source</em></a></div></h3>
+<h3 id="ReleaseGPUSampler"><span><a class="doc-id-link" href="#ReleaseGPUSampler">ReleaseGPUSampler<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L817"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ReleaseGPUSampler :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, sampler: ^<a class="code-typename" href="/vendor/sdl3/#GPUSampler">GPUSampler</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ReleaseGPUShader"><span><a class="doc-id-link" href="#ReleaseGPUShader">ReleaseGPUShader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L807"><em>Source</em></a></div></h3>
+<h3 id="ReleaseGPUShader"><span><a class="doc-id-link" href="#ReleaseGPUShader">ReleaseGPUShader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L821"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ReleaseGPUShader :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, shader: ^<a class="code-typename" href="/vendor/sdl3/#GPUShader">GPUShader</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ReleaseGPUTexture"><span><a class="doc-id-link" href="#ReleaseGPUTexture">ReleaseGPUTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L802"><em>Source</em></a></div></h3>
+<h3 id="ReleaseGPUTexture"><span><a class="doc-id-link" href="#ReleaseGPUTexture">ReleaseGPUTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L816"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ReleaseGPUTexture :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, texture: ^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ReleaseGPUTransferBuffer"><span><a class="doc-id-link" href="#ReleaseGPUTransferBuffer">ReleaseGPUTransferBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L805"><em>Source</em></a></div></h3>
+<h3 id="ReleaseGPUTransferBuffer"><span><a class="doc-id-link" href="#ReleaseGPUTransferBuffer">ReleaseGPUTransferBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L819"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ReleaseGPUTransferBuffer :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, transfer_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUTransferBuffer">GPUTransferBuffer</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ReleaseWindowFromGPUDevice"><span><a class="doc-id-link" href="#ReleaseWindowFromGPUDevice">ReleaseWindowFromGPUDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L855"><em>Source</em></a></div></h3>
+<h3 id="ReleaseWindowFromGPUDevice"><span><a class="doc-id-link" href="#ReleaseWindowFromGPUDevice">ReleaseWindowFromGPUDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L869"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ReleaseWindowFromGPUDevice :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, window: ^<a class="code-typename" href="/vendor/sdl3/#Window">Window</a>) ---</pre>
 </div>
@@ -22963,49 +23032,49 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SetGPUAllowedFramesInFlight"><span><a class="doc-id-link" href="#SetGPUAllowedFramesInFlight">SetGPUAllowedFramesInFlight<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L857"><em>Source</em></a></div></h3>
+<h3 id="SetGPUAllowedFramesInFlight"><span><a class="doc-id-link" href="#SetGPUAllowedFramesInFlight">SetGPUAllowedFramesInFlight<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L871"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SetGPUAllowedFramesInFlight :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, allowed_frames_in_flight: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SetGPUBlendConstants"><span><a class="doc-id-link" href="#SetGPUBlendConstants">SetGPUBlendConstants<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L817"><em>Source</em></a></div></h3>
+<h3 id="SetGPUBlendConstants"><span><a class="doc-id-link" href="#SetGPUBlendConstants">SetGPUBlendConstants<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L831"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SetGPUBlendConstants :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, blend_constants: <a class="code-typename" href="/vendor/sdl3/#FColor">FColor</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SetGPUBufferName"><span><a class="doc-id-link" href="#SetGPUBufferName">SetGPUBufferName<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L797"><em>Source</em></a></div></h3>
+<h3 id="SetGPUBufferName"><span><a class="doc-id-link" href="#SetGPUBufferName">SetGPUBufferName<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L811"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SetGPUBufferName :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUBuffer">GPUBuffer</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SetGPUScissor"><span><a class="doc-id-link" href="#SetGPUScissor">SetGPUScissor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L816"><em>Source</em></a></div></h3>
+<h3 id="SetGPUScissor"><span><a class="doc-id-link" href="#SetGPUScissor">SetGPUScissor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L830"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SetGPUScissor :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, <span class="keyword-type">#by_ptr</span> scissor: <a class="code-typename" href="/vendor/sdl3/#Rect">Rect</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SetGPUStencilReference"><span><a class="doc-id-link" href="#SetGPUStencilReference">SetGPUStencilReference<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L818"><em>Source</em></a></div></h3>
+<h3 id="SetGPUStencilReference"><span><a class="doc-id-link" href="#SetGPUStencilReference">SetGPUStencilReference<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L832"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SetGPUStencilReference :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, reference: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SetGPUSwapchainParameters"><span><a class="doc-id-link" href="#SetGPUSwapchainParameters">SetGPUSwapchainParameters<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L856"><em>Source</em></a></div></h3>
+<h3 id="SetGPUSwapchainParameters"><span><a class="doc-id-link" href="#SetGPUSwapchainParameters">SetGPUSwapchainParameters<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L870"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SetGPUSwapchainParameters :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, window: ^<a class="code-typename" href="/vendor/sdl3/#Window">Window</a>, swapchain_composition: <a class="code-typename" href="/vendor/sdl3/#GPUSwapchainComposition">GPUSwapchainComposition</a>, present_mode: <a class="code-typename" href="/vendor/sdl3/#GPUPresentMode">GPUPresentMode</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SetGPUTextureName"><span><a class="doc-id-link" href="#SetGPUTextureName">SetGPUTextureName<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L798"><em>Source</em></a></div></h3>
+<h3 id="SetGPUTextureName"><span><a class="doc-id-link" href="#SetGPUTextureName">SetGPUTextureName<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L812"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SetGPUTextureName :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, texture: ^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SetGPUViewport"><span><a class="doc-id-link" href="#SetGPUViewport">SetGPUViewport<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L815"><em>Source</em></a></div></h3>
+<h3 id="SetGPUViewport"><span><a class="doc-id-link" href="#SetGPUViewport">SetGPUViewport<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L829"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SetGPUViewport :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (render_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPURenderPass">GPURenderPass</a>, <span class="keyword-type">#by_ptr</span> viewport: <a class="code-typename" href="/vendor/sdl3/#GPUViewport">GPUViewport</a>) ---</pre>
 </div>
@@ -23651,6 +23720,12 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
+<h3 id="SignalSemaphore"><span><a class="doc-id-link" href="#SignalSemaphore">SignalSemaphore<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_mutex.odin#L26"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SignalSemaphore :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (sem: ^<a class="code-typename" href="/vendor/sdl3/#Semaphore">Semaphore</a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
 <h3 id="StartTextInput"><span><a class="doc-id-link" href="#StartTextInput">StartTextInput<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_keyboard.odin#L50"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">StartTextInput :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (window: ^<a class="code-typename" href="/vendor/sdl3/#Window">Window</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
@@ -23717,13 +23792,13 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SubmitGPUCommandBuffer"><span><a class="doc-id-link" href="#SubmitGPUCommandBuffer">SubmitGPUCommandBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L862"><em>Source</em></a></div></h3>
+<h3 id="SubmitGPUCommandBuffer"><span><a class="doc-id-link" href="#SubmitGPUCommandBuffer">SubmitGPUCommandBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L876"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SubmitGPUCommandBuffer :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SubmitGPUCommandBufferAndAcquireFence"><span><a class="doc-id-link" href="#SubmitGPUCommandBufferAndAcquireFence">SubmitGPUCommandBufferAndAcquireFence<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L863"><em>Source</em></a></div></h3>
+<h3 id="SubmitGPUCommandBufferAndAcquireFence"><span><a class="doc-id-link" href="#SubmitGPUCommandBufferAndAcquireFence">SubmitGPUCommandBufferAndAcquireFence<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L877"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SubmitGPUCommandBufferAndAcquireFence :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>) -> ^<a class="code-typename" href="/vendor/sdl3/#GPUFence">GPUFence</a> ---</pre>
 </div>
@@ -23885,6 +23960,12 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
+<h3 id="TryWaitSemaphore"><span><a class="doc-id-link" href="#TryWaitSemaphore">TryWaitSemaphore<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_mutex.odin#L27"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TryWaitSemaphore :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (sem: ^<a class="code-typename" href="/vendor/sdl3/#Semaphore">Semaphore</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
 <h3 id="UCS4ToUTF8"><span><a class="doc-id-link" href="#UCS4ToUTF8">UCS4ToUTF8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_stdinc.odin#L250"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">UCS4ToUTF8 :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (codepoint: untyped rune, dst: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> ---</pre>
@@ -23963,7 +24044,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="UnmapGPUTransferBuffer"><span><a class="doc-id-link" href="#UnmapGPUTransferBuffer">UnmapGPUTransferBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L841"><em>Source</em></a></div></h3>
+<h3 id="UnmapGPUTransferBuffer"><span><a class="doc-id-link" href="#UnmapGPUTransferBuffer">UnmapGPUTransferBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L855"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">UnmapGPUTransferBuffer :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, transfer_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUTransferBuffer">GPUTransferBuffer</a>) ---</pre>
 </div>
@@ -24063,13 +24144,13 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="UploadToGPUBuffer"><span><a class="doc-id-link" href="#UploadToGPUBuffer">UploadToGPUBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L844"><em>Source</em></a></div></h3>
+<h3 id="UploadToGPUBuffer"><span><a class="doc-id-link" href="#UploadToGPUBuffer">UploadToGPUBuffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L858"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">UploadToGPUBuffer :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (copy_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPUCopyPass">GPUCopyPass</a>, <span class="keyword-type">#by_ptr</span> source: <a class="code-typename" href="/vendor/sdl3/#GPUTransferBufferLocation">GPUTransferBufferLocation</a>, <span class="keyword-type">#by_ptr</span> destination: <a class="code-typename" href="/vendor/sdl3/#GPUBufferRegion">GPUBufferRegion</a>, cycle: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="UploadToGPUTexture"><span><a class="doc-id-link" href="#UploadToGPUTexture">UploadToGPUTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L843"><em>Source</em></a></div></h3>
+<h3 id="UploadToGPUTexture"><span><a class="doc-id-link" href="#UploadToGPUTexture">UploadToGPUTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L857"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">UploadToGPUTexture :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (copy_pass: ^<a class="code-typename" href="/vendor/sdl3/#GPUCopyPass">GPUCopyPass</a>, <span class="keyword-type">#by_ptr</span> source: <a class="code-typename" href="/vendor/sdl3/#GPUTextureTransferInfo">GPUTextureTransferInfo</a>, <span class="keyword-type">#by_ptr</span> destination: <a class="code-typename" href="/vendor/sdl3/#GPUTextureRegion">GPUTextureRegion</a>, cycle: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) ---</pre>
 </div>
@@ -24171,7 +24252,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="WaitAndAcquireGPUSwapchainTexture"><span><a class="doc-id-link" href="#WaitAndAcquireGPUSwapchainTexture">WaitAndAcquireGPUSwapchainTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L861"><em>Source</em></a></div></h3>
+<h3 id="WaitAndAcquireGPUSwapchainTexture"><span><a class="doc-id-link" href="#WaitAndAcquireGPUSwapchainTexture">WaitAndAcquireGPUSwapchainTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L875"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">WaitAndAcquireGPUSwapchainTexture :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command_buffer: ^<a class="code-typename" href="/vendor/sdl3/#GPUCommandBuffer">GPUCommandBuffer</a>, window: ^<a class="code-typename" href="/vendor/sdl3/#Window">Window</a>, swapchain_texture: ^^<a class="code-typename" href="/vendor/sdl3/#GPUTexture">GPUTexture</a>, swapchain_texture_width, swapchain_texture_height: ^<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
@@ -24195,19 +24276,19 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="WaitForGPUFences"><span><a class="doc-id-link" href="#WaitForGPUFences">WaitForGPUFences<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L866"><em>Source</em></a></div></h3>
+<h3 id="WaitForGPUFences"><span><a class="doc-id-link" href="#WaitForGPUFences">WaitForGPUFences<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L880"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">WaitForGPUFences :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, wait_all: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, fences: [^]^<a class="code-typename" href="/vendor/sdl3/#GPUFence">GPUFence</a>, num_fences: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="WaitForGPUIdle"><span><a class="doc-id-link" href="#WaitForGPUIdle">WaitForGPUIdle<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L865"><em>Source</em></a></div></h3>
+<h3 id="WaitForGPUIdle"><span><a class="doc-id-link" href="#WaitForGPUIdle">WaitForGPUIdle<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L879"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">WaitForGPUIdle :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="WaitForGPUSwapchain"><span><a class="doc-id-link" href="#WaitForGPUSwapchain">WaitForGPUSwapchain<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L860"><em>Source</em></a></div></h3>
+<h3 id="WaitForGPUSwapchain"><span><a class="doc-id-link" href="#WaitForGPUSwapchain">WaitForGPUSwapchain<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L874"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">WaitForGPUSwapchain :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, window: ^<a class="code-typename" href="/vendor/sdl3/#Window">Window</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
@@ -24216,6 +24297,18 @@ Procedure Groups (0)</summary>
 <h3 id="WaitProcess"><span><a class="doc-id-link" href="#WaitProcess">WaitProcess<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_process.odin#L40"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">WaitProcess :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (process: ^<a class="code-typename" href="/vendor/sdl3/#Process">Process</a>, block: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, exitcode: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="WaitSemaphore"><span><a class="doc-id-link" href="#WaitSemaphore">WaitSemaphore<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_mutex.odin#L28"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">WaitSemaphore :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (sem: ^<a class="code-typename" href="/vendor/sdl3/#Semaphore">Semaphore</a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="WaitSemaphoreTimeout"><span><a class="doc-id-link" href="#WaitSemaphoreTimeout">WaitSemaphoreTimeout<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_mutex.odin#L29"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">WaitSemaphoreTimeout :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (sem: ^<a class="code-typename" href="/vendor/sdl3/#Semaphore">Semaphore</a>, timeout_ms: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -24249,13 +24342,13 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="WindowSupportsGPUPresentMode"><span><a class="doc-id-link" href="#WindowSupportsGPUPresentMode">WindowSupportsGPUPresentMode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L853"><em>Source</em></a></div></h3>
+<h3 id="WindowSupportsGPUPresentMode"><span><a class="doc-id-link" href="#WindowSupportsGPUPresentMode">WindowSupportsGPUPresentMode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L867"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">WindowSupportsGPUPresentMode :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, window: ^<a class="code-typename" href="/vendor/sdl3/#Window">Window</a>, present_mode: <a class="code-typename" href="/vendor/sdl3/#GPUPresentMode">GPUPresentMode</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="WindowSupportsGPUSwapchainComposition"><span><a class="doc-id-link" href="#WindowSupportsGPUSwapchainComposition">WindowSupportsGPUSwapchainComposition<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L852"><em>Source</em></a></div></h3>
+<h3 id="WindowSupportsGPUSwapchainComposition"><span><a class="doc-id-link" href="#WindowSupportsGPUSwapchainComposition">WindowSupportsGPUSwapchainComposition<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_gpu.odin#L866"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">WindowSupportsGPUSwapchainComposition :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: ^<a class="code-typename" href="/vendor/sdl3/#GPUDevice">GPUDevice</a>, window: ^<a class="code-typename" href="/vendor/sdl3/#Window">Window</a>, swapchain_composition: <a class="code-typename" href="/vendor/sdl3/#GPUSwapchainComposition">GPUSwapchainComposition</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> ---</pre>
 </div>
@@ -25629,7 +25722,7 @@ Procedure Groups (0)</summary>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/sdl3_vulkan.odin">sdl3_vulkan.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-05 (vendor "odin") Windows_amd64 @ 2025-05-08 21:13:02.323693000 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 16:14:00.233654600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -25921,6 +26014,7 @@ Procedure Groups (0)</summary>
 <li><a href="#Sandbox">Sandbox</a></li>
 <li><a href="#ScaleMode">ScaleMode</a></li>
 <li><a href="#Scancode">Scancode</a></li>
+<li><a href="#Semaphore">Semaphore</a></li>
 <li><a href="#Sensor">Sensor</a></li>
 <li><a href="#SensorEvent">SensorEvent</a></li>
 <li><a href="#SensorID">SensorID</a></li>
@@ -27068,6 +27162,7 @@ Procedure Groups (0)</summary>
 <li><a href="#CreateRWLock">CreateRWLock</a></li>
 <li><a href="#CreateRenderer">CreateRenderer</a></li>
 <li><a href="#CreateRendererWithProperties">CreateRendererWithProperties</a></li>
+<li><a href="#CreateSemaphore">CreateSemaphore</a></li>
 <li><a href="#CreateSoftwareRenderer">CreateSoftwareRenderer</a></li>
 <li><a href="#CreateStorageDirectory">CreateStorageDirectory</a></li>
 <li><a href="#CreateSurface">CreateSurface</a></li>
@@ -27108,6 +27203,7 @@ Procedure Groups (0)</summary>
 <li><a href="#DestroyProperties">DestroyProperties</a></li>
 <li><a href="#DestroyRWLock">DestroyRWLock</a></li>
 <li><a href="#DestroyRenderer">DestroyRenderer</a></li>
+<li><a href="#DestroySemaphore">DestroySemaphore</a></li>
 <li><a href="#DestroySurface">DestroySurface</a></li>
 <li><a href="#DestroyTexture">DestroyTexture</a></li>
 <li><a href="#DestroyTray">DestroyTray</a></li>
@@ -27456,6 +27552,7 @@ Procedure Groups (0)</summary>
 <li><a href="#GetScancodeFromKey">GetScancodeFromKey</a></li>
 <li><a href="#GetScancodeFromName">GetScancodeFromName</a></li>
 <li><a href="#GetScancodeName">GetScancodeName</a></li>
+<li><a href="#GetSemaphoreValue">GetSemaphoreValue</a></li>
 <li><a href="#GetSensorData">GetSensorData</a></li>
 <li><a href="#GetSensorFromID">GetSensorFromID</a></li>
 <li><a href="#GetSensorID">GetSensorID</a></li>
@@ -27954,6 +28051,7 @@ Procedure Groups (0)</summary>
 <li><a href="#ShowWindow">ShowWindow</a></li>
 <li><a href="#ShowWindowSystemMenu">ShowWindowSystemMenu</a></li>
 <li><a href="#SignalAsyncIOQueue">SignalAsyncIOQueue</a></li>
+<li><a href="#SignalSemaphore">SignalSemaphore</a></li>
 <li><a href="#StartTextInput">StartTextInput</a></li>
 <li><a href="#StartTextInputWithProperties">StartTextInputWithProperties</a></li>
 <li><a href="#StepBackUTF8">StepBackUTF8</a></li>
@@ -27993,6 +28091,7 @@ Procedure Groups (0)</summary>
 <li><a href="#TryLockRWLockForReading">TryLockRWLockForReading</a></li>
 <li><a href="#TryLockRWLockForWriting">TryLockRWLockForWriting</a></li>
 <li><a href="#TryLockSpinlock">TryLockSpinlock</a></li>
+<li><a href="#TryWaitSemaphore">TryWaitSemaphore</a></li>
 <li><a href="#UCS4ToUTF8">UCS4ToUTF8</a></li>
 <li><a href="#US_TO_NS">US_TO_NS</a></li>
 <li><a href="#UnbindAudioStream">UnbindAudioStream</a></li>
@@ -28046,6 +28145,8 @@ Procedure Groups (0)</summary>
 <li><a href="#WaitForGPUIdle">WaitForGPUIdle</a></li>
 <li><a href="#WaitForGPUSwapchain">WaitForGPUSwapchain</a></li>
 <li><a href="#WaitProcess">WaitProcess</a></li>
+<li><a href="#WaitSemaphore">WaitSemaphore</a></li>
+<li><a href="#WaitSemaphoreTimeout">WaitSemaphoreTimeout</a></li>
 <li><a href="#WaitThread">WaitThread</a></li>
 <li><a href="#WarpMouseGlobal">WarpMouseGlobal</a></li>
 <li><a href="#WarpMouseInWindow">WarpMouseInWindow</a></li>

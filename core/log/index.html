@@ -11,13 +11,28 @@
 	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
 	<script>hljs.highlightAll()</script>
 	<script>
-		function toggleDarkMode() {
-			if (document.body.classList.toggle("dark-mode")) {
-				window.localStorage.setItem("theme", "dark");
-			} else {
-				window.localStorage.setItem("theme", "light");
-			}
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
 		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
 	</script>
 	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
 
@@ -27,10 +42,14 @@
 </head>
 <body>
 <script>
-	if (window.localStorage.getItem("theme") === "dark")
-		document.body.classList.add("dark-mode");
-	else
-		document.body.classList.remove("dark-mode");
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
 </script>
 <header class="sticky-top">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
@@ -139,7 +158,6 @@
 </li>
 <li class="nav-item"><a href="/core/dynlib">dynlib</a></li>
 <li class="nav-item">encoding<ul>
-<li><a href="/core/encoding/ansi">ansi</a></li>
 <li><a href="/core/encoding/base32">base32</a></li>
 <li><a href="/core/encoding/base64">base64</a></li>
 <li><a href="/core/encoding/cbor">cbor</a></li>
@@ -258,6 +276,11 @@
 </ul>
 
 </li>
+<li class="nav-item"><a href="/core/terminal">terminal</a><ul>
+<li><a href="/core/terminal/ansi">ansi</a></li>
+</ul>
+
+</li>
 <li class="nav-item"><a href="/core/testing">testing</a></li>
 <li class="nav-item">text<ul>
 <li><a href="/core/text/edit">edit</a></li>
@@ -365,10 +388,11 @@ Variables (1)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (33)</summary>
+Procedures (34)</summary>
 <ul>
 <li><a href="#assert">assert</a></li>
 <li><a href="#assertf">assertf</a></li>
+<li><a href="#console_logger_proc">console_logger_proc</a></li>
 <li><a href="#create_console_logger">create_console_logger</a></li>
 <li><a href="#create_file_logger">create_file_logger</a></li>
 <li><a href="#create_multi_logger">create_multi_logger</a></li>
@@ -386,7 +410,7 @@ Procedures (33)</summary>
 <li><a href="#errorf">errorf</a></li>
 <li><a href="#fatal">fatal</a></li>
 <li><a href="#fatalf">fatalf</a></li>
-<li><a href="#file_console_logger_proc">file_console_logger_proc</a></li>
+<li><a href="#file_logger_proc">file_logger_proc</a></li>
 <li><a href="#info">info</a></li>
 <li><a href="#infof">infof</a></li>
 <li><a href="#log">log</a></li>
@@ -415,7 +439,7 @@ Procedure Groups (0)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="File_Console_Logger_Data"><span><a class="doc-id-link" href="#File_Console_Logger_Data">File_Console_Logger_Data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L35"><em>Source</em></a></div></h3>
+<h3 id="File_Console_Logger_Data"><span><a class="doc-id-link" href="#File_Console_Logger_Data">File_Console_Logger_Data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L37"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">File_Console_Logger_Data :: <span class="keyword-type">struct</span> {
 	file_handle: os.<a class="code-typename" href="/core/os/#Handle">Handle</a>,
@@ -544,13 +568,13 @@ Terminal_Color
 </div>
 <h2 id="pkg-Constants" class="pkg-header">Constants</h2>
 <div class="pkg-entity">
-<h3 id="Default_Console_Logger_Opts"><span><a class="doc-id-link" href="#Default_Console_Logger_Opts">Default_Console_Logger_Opts<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L19"><em>Source</em></a></div></h3>
+<h3 id="Default_Console_Logger_Opts"><span><a class="doc-id-link" href="#Default_Console_Logger_Opts">Default_Console_Logger_Opts<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L21"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Default_Console_Logger_Opts: <span class="keyword-type">bit_set</span>[runtime.<a class="code-typename" href="/base/runtime/#Logger_Option">Logger_Option</a>] : Options{.Level, .Terminal_Color, .Short_File_Path, .Line, .Procedure} | Full_Timestamp_Opts</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Default_File_Logger_Opts"><span><a class="doc-id-link" href="#Default_File_Logger_Opts">Default_File_Logger_Opts<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L27"><em>Source</em></a></div></h3>
+<h3 id="Default_File_Logger_Opts"><span><a class="doc-id-link" href="#Default_File_Logger_Opts">Default_File_Logger_Opts<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L29"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Default_File_Logger_Opts: <span class="keyword-type">bit_set</span>[runtime.<a class="code-typename" href="/base/runtime/#Logger_Option">Logger_Option</a>] : Options{.Level, .Short_File_Path, .Line, .Procedure} | Full_Timestamp_Opts</pre>
 </div>
@@ -575,7 +599,7 @@ Terminal_Color
 </div>
 <h2 id="pkg-Variables" class="pkg-header">Variables</h2>
 <div class="pkg-entity">
-<h3 id="Level_Headers"><span><a class="doc-id-link" href="#Level_Headers">Level_Headers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L11"><em>Source</em></a></div></h3>
+<h3 id="Level_Headers"><span><a class="doc-id-link" href="#Level_Headers">Level_Headers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L13"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Level_Headers: [50]<a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = …</pre>
 </div>
@@ -594,13 +618,19 @@ Terminal_Color
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="create_console_logger"><span><a class="doc-id-link" href="#create_console_logger">create_console_logger<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L55"><em>Source</em></a></div></h3>
+<h3 id="console_logger_proc"><span><a class="doc-id-link" href="#console_logger_proc">console_logger_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L124"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">console_logger_proc :: <span class="keyword-type">proc</span>(logger_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, level: runtime.<a class="code-typename" href="/base/runtime/#Logger_Level">Logger_Level</a>, text: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, options: <span class="keyword-type">bit_set</span>[runtime.<a class="code-typename" href="/base/runtime/#Logger_Option">Logger_Option</a>], location := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="create_console_logger"><span><a class="doc-id-link" href="#create_console_logger">create_console_logger<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L82"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_console_logger :: <span class="keyword-type">proc</span>(lowest: runtime.<a class="code-typename" href="/base/runtime/#Logger_Level">Logger_Level</a> = Level.Debug, opt: <span class="keyword-type">bit_set</span>[runtime.<a class="code-typename" href="/base/runtime/#Logger_Option">Logger_Option</a>] = Default_Console_Logger_Opts, ident: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = "", allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Logger">Logger</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="create_file_logger"><span><a class="doc-id-link" href="#create_file_logger">create_file_logger<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L40"><em>Source</em></a></div></h3>
+<h3 id="create_file_logger"><span><a class="doc-id-link" href="#create_file_logger">create_file_logger<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L67"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_file_logger :: <span class="keyword-type">proc</span>(h: os.<a class="code-typename" href="/core/os/#Handle">Handle</a>, lowest: runtime.<a class="code-typename" href="/base/runtime/#Logger_Level">Logger_Level</a> = Level.Debug, opt: <span class="keyword-type">bit_set</span>[runtime.<a class="code-typename" href="/base/runtime/#Logger_Option">Logger_Option</a>] = Default_File_Logger_Opts, ident: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = "", allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Logger">Logger</a> {…}</pre>
 </div>
@@ -624,13 +654,13 @@ Terminal_Color
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="destroy_console_logger"><span><a class="doc-id-link" href="#destroy_console_logger">destroy_console_logger<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L62"><em>Source</em></a></div></h3>
+<h3 id="destroy_console_logger"><span><a class="doc-id-link" href="#destroy_console_logger">destroy_console_logger<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L89"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy_console_logger :: <span class="keyword-type">proc</span>(log: runtime.<a class="code-typename" href="/base/runtime/#Logger">Logger</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="destroy_file_logger"><span><a class="doc-id-link" href="#destroy_file_logger">destroy_file_logger<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L47"><em>Source</em></a></div></h3>
+<h3 id="destroy_file_logger"><span><a class="doc-id-link" href="#destroy_file_logger">destroy_file_logger<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L74"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy_file_logger :: <span class="keyword-type">proc</span>(log: runtime.<a class="code-typename" href="/base/runtime/#Logger">Logger</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
@@ -642,19 +672,19 @@ Terminal_Color
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="do_level_header"><span><a class="doc-id-link" href="#do_level_header">do_level_header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L96"><em>Source</em></a></div></h3>
+<h3 id="do_level_header"><span><a class="doc-id-link" href="#do_level_header">do_level_header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L138"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">do_level_header :: <span class="keyword-type">proc</span>(opts: <span class="keyword-type">bit_set</span>[runtime.<a class="code-typename" href="/base/runtime/#Logger_Option">Logger_Option</a>], str: ^strings.<a class="code-typename" href="/core/strings/#Builder">Builder</a>, level: runtime.<a class="code-typename" href="/base/runtime/#Logger_Level">Logger_Level</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="do_location_header"><span><a class="doc-id-link" href="#do_location_header">do_location_header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L140"><em>Source</em></a></div></h3>
+<h3 id="do_location_header"><span><a class="doc-id-link" href="#do_location_header">do_location_header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L182"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">do_location_header :: <span class="keyword-type">proc</span>(opts: <span class="keyword-type">bit_set</span>[runtime.<a class="code-typename" href="/base/runtime/#Logger_Option">Logger_Option</a>], buf: ^strings.<a class="code-typename" href="/core/strings/#Builder">Builder</a>, location := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="do_time_header"><span><a class="doc-id-link" href="#do_time_header">do_time_header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L122"><em>Source</em></a></div></h3>
+<h3 id="do_time_header"><span><a class="doc-id-link" href="#do_time_header">do_time_header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L164"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">do_time_header :: <span class="keyword-type">proc</span>(opts: <span class="keyword-type">bit_set</span>[runtime.<a class="code-typename" href="/base/runtime/#Logger_Option">Logger_Option</a>], buf: ^strings.<a class="code-typename" href="/core/strings/#Builder">Builder</a>, t: time.<a class="code-typename" href="/core/time/#Time">Time</a>) {…}</pre>
 </div>
@@ -696,9 +726,9 @@ Terminal_Color
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="file_console_logger_proc"><span><a class="doc-id-link" href="#file_console_logger_proc">file_console_logger_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L66"><em>Source</em></a></div></h3>
+<h3 id="file_logger_proc"><span><a class="doc-id-link" href="#file_logger_proc">file_logger_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/file_console_logger.odin#L119"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">file_console_logger_proc :: <span class="keyword-type">proc</span>(logger_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, level: runtime.<a class="code-typename" href="/base/runtime/#Logger_Level">Logger_Level</a>, text: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, options: <span class="keyword-type">bit_set</span>[runtime.<a class="code-typename" href="/base/runtime/#Logger_Option">Logger_Option</a>], location := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
+<pre class="doc-code">file_logger_proc :: <span class="keyword-type">proc</span>(logger_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, level: runtime.<a class="code-typename" href="/base/runtime/#Logger_Level">Logger_Level</a>, text: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, options: <span class="keyword-type">bit_set</span>[runtime.<a class="code-typename" href="/base/runtime/#Logger_Option">Logger_Option</a>], location := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -797,7 +827,7 @@ Terminal_Color
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/log/multi_logger.odin">multi_logger.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-05 (vendor "odin") Windows_amd64 @ 2025-05-08 21:12:59.724663900 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 16:13:57.147326700 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -829,6 +859,7 @@ Terminal_Color
 <li><a href="#pkg-Procedures">Procedures</a><ul>
 <li><a href="#assert">assert</a></li>
 <li><a href="#assertf">assertf</a></li>
+<li><a href="#console_logger_proc">console_logger_proc</a></li>
 <li><a href="#create_console_logger">create_console_logger</a></li>
 <li><a href="#create_file_logger">create_file_logger</a></li>
 <li><a href="#create_multi_logger">create_multi_logger</a></li>
@@ -846,7 +877,7 @@ Terminal_Color
 <li><a href="#errorf">errorf</a></li>
 <li><a href="#fatal">fatal</a></li>
 <li><a href="#fatalf">fatalf</a></li>
-<li><a href="#file_console_logger_proc">file_console_logger_proc</a></li>
+<li><a href="#file_logger_proc">file_logger_proc</a></li>
 <li><a href="#info">info</a></li>
 <li><a href="#infof">infof</a></li>
 <li><a href="#log">log</a></li>

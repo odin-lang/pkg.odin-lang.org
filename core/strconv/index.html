@@ -11,13 +11,28 @@
 	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
 	<script>hljs.highlightAll()</script>
 	<script>
-		function toggleDarkMode() {
-			if (document.body.classList.toggle("dark-mode")) {
-				window.localStorage.setItem("theme", "dark");
-			} else {
-				window.localStorage.setItem("theme", "light");
-			}
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
 		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
 	</script>
 	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
 
@@ -27,10 +42,14 @@
 </head>
 <body>
 <script>
-	if (window.localStorage.getItem("theme") === "dark")
-		document.body.classList.add("dark-mode");
-	else
-		document.body.classList.remove("dark-mode");
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
 </script>
 <header class="sticky-top">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
@@ -139,7 +158,6 @@
 </li>
 <li class="nav-item"><a href="/core/dynlib">dynlib</a></li>
 <li class="nav-item">encoding<ul>
-<li><a href="/core/encoding/ansi">ansi</a></li>
 <li><a href="/core/encoding/base32">base32</a></li>
 <li><a href="/core/encoding/base64">base64</a></li>
 <li><a href="/core/encoding/cbor">cbor</a></li>
@@ -255,6 +273,11 @@
 <li><a href="/core/sys/unix">unix</a></li>
 <li><a href="/core/sys/valgrind">valgrind</a></li>
 <li><a href="/core/sys/windows">windows</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/terminal">terminal</a><ul>
+<li><a href="/core/terminal/ansi">ansi</a></li>
 </ul>
 
 </li>
@@ -536,7 +559,7 @@ Procedure Groups (4)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="append_bool"><span><a class="doc-id-link" href="#append_bool">append_bool<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1444"><em>Source</em></a></div></h3>
+<h3 id="append_bool"><span><a class="doc-id-link" href="#append_bool">append_bool<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1477"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_bool :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, b: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
@@ -565,7 +588,7 @@ append_bool_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="append_float"><span><a class="doc-id-link" href="#append_float">append_float<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1622"><em>Source</em></a></div></h3>
+<h3 id="append_float"><span><a class="doc-id-link" href="#append_float">append_float<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1655"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_float :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, f: <a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a>, fmt: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, prec, bit_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
@@ -597,7 +620,7 @@ append_float_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="append_int"><span><a class="doc-id-link" href="#append_int">append_int<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1506"><em>Source</em></a></div></h3>
+<h3 id="append_int"><span><a class="doc-id-link" href="#append_int">append_int<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1539"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_int :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, i: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, base: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
@@ -627,13 +650,13 @@ append_int_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="append_u128"><span><a class="doc-id-link" href="#append_u128">append_u128<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1512"><em>Source</em></a></div></h3>
+<h3 id="append_u128"><span><a class="doc-id-link" href="#append_u128">append_u128<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1545"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_u128 :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, u: <a href="/base/builtin#u128"><span class="doc-builtin">u128</span></a>, base: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="append_uint"><span><a class="doc-id-link" href="#append_uint">append_uint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1478"><em>Source</em></a></div></h3>
+<h3 id="append_uint"><span><a class="doc-id-link" href="#append_uint">append_uint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1511"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_uint :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, u: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>, base: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
@@ -663,7 +686,7 @@ append_uint_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="atof"><span><a class="doc-id-link" href="#atof">atof<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1589"><em>Source</em></a></div></h3>
+<h3 id="atof"><span><a class="doc-id-link" href="#atof">atof<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1622"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">atof :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> <a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a> {…}</pre>
 </div>
@@ -689,7 +712,7 @@ atof_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="atoi"><span><a class="doc-id-link" href="#atoi">atoi<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1564"><em>Source</em></a></div></h3>
+<h3 id="atoi"><span><a class="doc-id-link" href="#atoi">atoi<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1597"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">atoi :: <span class="keyword-type">proc</span>(s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
@@ -757,7 +780,7 @@ atoi_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ftoa"><span><a class="doc-id-link" href="#ftoa">ftoa<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1622"><em>Source</em></a></div></h3>
+<h3 id="ftoa"><span><a class="doc-id-link" href="#ftoa">ftoa<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1655"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ftoa :: <a class="code-procedure" href="/core/strconv/#append_float">append_float</a></pre>
 </div>
@@ -851,7 +874,7 @@ result := strconv.generic_ftoa(buf[:], val, fmt, precision, bit_size) -&gt; "3.1
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="itoa"><span><a class="doc-id-link" href="#itoa">itoa<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1540"><em>Source</em></a></div></h3>
+<h3 id="itoa"><span><a class="doc-id-link" href="#itoa">itoa<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1573"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">itoa :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, i: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
@@ -899,7 +922,7 @@ itoa_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="parse_complex128"><span><a class="doc-id-link" href="#parse_complex128">parse_complex128<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1180"><em>Source</em></a></div></h3>
+<h3 id="parse_complex128"><span><a class="doc-id-link" href="#parse_complex128">parse_complex128<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1213"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parse_complex128 :: <span class="keyword-type">proc</span>(str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, n: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> (value: <a href="/base/builtin#complex128"><span class="doc-builtin">complex128</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -933,7 +956,7 @@ parse_complex128_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="parse_complex32"><span><a class="doc-id-link" href="#parse_complex32">parse_complex32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1267"><em>Source</em></a></div></h3>
+<h3 id="parse_complex32"><span><a class="doc-id-link" href="#parse_complex32">parse_complex32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1300"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parse_complex32 :: <span class="keyword-type">proc</span>(str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, n: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> (value: <a href="/base/builtin#complex32"><span class="doc-builtin">complex32</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -967,7 +990,7 @@ parse_complex32_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="parse_complex64"><span><a class="doc-id-link" href="#parse_complex64">parse_complex64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1233"><em>Source</em></a></div></h3>
+<h3 id="parse_complex64"><span><a class="doc-id-link" href="#parse_complex64">parse_complex64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1266"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parse_complex64 :: <span class="keyword-type">proc</span>(str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, n: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> (value: <a href="/base/builtin#complex64"><span class="doc-builtin">complex64</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1304,7 +1327,7 @@ parse_int_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="parse_quaternion128"><span><a class="doc-id-link" href="#parse_quaternion128">parse_quaternion128<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1381"><em>Source</em></a></div></h3>
+<h3 id="parse_quaternion128"><span><a class="doc-id-link" href="#parse_quaternion128">parse_quaternion128<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1414"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parse_quaternion128 :: <span class="keyword-type">proc</span>(str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, n: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> (value: <a href="/base/builtin#quaternion128"><span class="doc-builtin">quaternion128</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1338,7 +1361,7 @@ parse_quaternion128_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="parse_quaternion256"><span><a class="doc-id-link" href="#parse_quaternion256">parse_quaternion256<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1301"><em>Source</em></a></div></h3>
+<h3 id="parse_quaternion256"><span><a class="doc-id-link" href="#parse_quaternion256">parse_quaternion256<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1334"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parse_quaternion256 :: <span class="keyword-type">proc</span>(str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, n: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> (value: <a href="/base/builtin#quaternion256"><span class="doc-builtin">quaternion256</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1372,7 +1395,7 @@ parse_quaternion256_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="parse_quaternion64"><span><a class="doc-id-link" href="#parse_quaternion64">parse_quaternion64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1415"><em>Source</em></a></div></h3>
+<h3 id="parse_quaternion64"><span><a class="doc-id-link" href="#parse_quaternion64">parse_quaternion64<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1448"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parse_quaternion64 :: <span class="keyword-type">proc</span>(str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, n: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> (value: <a href="/base/builtin#quaternion64"><span class="doc-builtin">quaternion64</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1587,7 +1610,7 @@ ok: <code>false</code> if no appropriate value could be found; the value was neg
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="quote"><span><a class="doc-id-link" href="#quote">quote<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1651"><em>Source</em></a></div></h3>
+<h3 id="quote"><span><a class="doc-id-link" href="#quote">quote<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1684"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">quote :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
@@ -1617,7 +1640,7 @@ quote_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="quote_rune"><span><a class="doc-id-link" href="#quote_rune">quote_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1712"><em>Source</em></a></div></h3>
+<h3 id="quote_rune"><span><a class="doc-id-link" href="#quote_rune">quote_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1745"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">quote_rune :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, r: untyped rune) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
@@ -1661,7 +1684,7 @@ quote_rune_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="unquote_char"><span><a class="doc-id-link" href="#unquote_char">unquote_char<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1796"><em>Source</em></a></div></h3>
+<h3 id="unquote_char"><span><a class="doc-id-link" href="#unquote_char">unquote_char<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1829"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">unquote_char :: <span class="keyword-type">proc</span>(str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, quote: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (r: untyped rune, multiple_bytes: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, tail_string: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, success: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1695,7 +1718,7 @@ r: &lt;'&gt;, multiple_bytes:false, tail_string:&lt;The' raven&gt;, success:true
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="unquote_string"><span><a class="doc-id-link" href="#unquote_string">unquote_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1938"><em>Source</em></a></div></h3>
+<h3 id="unquote_string"><span><a class="doc-id-link" href="#unquote_string">unquote_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1971"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">unquote_string :: <span class="keyword-type">proc</span>(lit: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocated, success: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1794,7 +1817,7 @@ Unquoted: &lt;he raven 'Huginn' is black&gt;, alloc:false, ok:true
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin">strconv.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-05 (vendor "odin") Windows_amd64 @ 2025-05-08 21:12:59.950667600 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 16:13:57.408898300 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

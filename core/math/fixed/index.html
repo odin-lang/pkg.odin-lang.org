@@ -11,13 +11,28 @@
 	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
 	<script>hljs.highlightAll()</script>
 	<script>
-		function toggleDarkMode() {
-			if (document.body.classList.toggle("dark-mode")) {
-				window.localStorage.setItem("theme", "dark");
-			} else {
-				window.localStorage.setItem("theme", "light");
-			}
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
 		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
 	</script>
 	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
 
@@ -27,10 +42,14 @@
 </head>
 <body>
 <script>
-	if (window.localStorage.getItem("theme") === "dark")
-		document.body.classList.add("dark-mode");
-	else
-		document.body.classList.remove("dark-mode");
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
 </script>
 <header class="sticky-top">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
@@ -139,7 +158,6 @@
 </li>
 <li class="nav-item"><a href="/core/dynlib">dynlib</a></li>
 <li class="nav-item">encoding<ul>
-<li><a href="/core/encoding/ansi">ansi</a></li>
 <li><a href="/core/encoding/base32">base32</a></li>
 <li><a href="/core/encoding/base64">base64</a></li>
 <li><a href="/core/encoding/cbor">cbor</a></li>
@@ -255,6 +273,11 @@
 <li><a href="/core/sys/unix">unix</a></li>
 <li><a href="/core/sys/valgrind">valgrind</a></li>
 <li><a href="/core/sys/windows">windows</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/terminal">terminal</a><ul>
+<li><a href="/core/terminal/ansi">ansi</a></li>
 </ul>
 
 </li>
@@ -399,6 +422,7 @@ Procedure Groups (0)</summary>
 </div>
 <h5>Related Procedures With Parameters</h5>
 <ul>
+<li><a href="/core/math/fixed/#add">add</a></li>
 <li><a href="/core/math/fixed/#append">append</a></li>
 <li><a href="/core/math/fixed/#ceil">ceil</a></li>
 <li><a href="/core/math/fixed/#div">div</a></li>
@@ -409,6 +433,7 @@ Procedure Groups (0)</summary>
 <li><a href="/core/math/fixed/#mul">mul</a></li>
 <li><a href="/core/math/fixed/#mul_sat">mul_sat</a></li>
 <li><a href="/core/math/fixed/#round">round</a></li>
+<li><a href="/core/math/fixed/#sub">sub</a></li>
 <li><a href="/core/math/fixed/#to_f64">to_f64</a></li>
 <li><a href="/core/math/fixed/#to_string">to_string</a></li>
 </ul>
@@ -501,7 +526,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="add"><span><a class="doc-id-link" href="#add">add<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/math/fixed/fixed.odin#L57"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">add :: <span class="keyword-type">proc</span>(x, y: $T/<a class="code-typename" href="/core/math/fixed/#Fixed">Fixed</a>) -> $T/<a class="code-typename" href="/core/math/fixed/#Fixed">Fixed</a> {…}</pre>
+<pre class="doc-code">add :: <span class="keyword-type">proc</span>(x, y: <a class="code-typename" href="/core/math/fixed/#Fixed">Fixed</a>) -> <a class="code-typename" href="/core/math/fixed/#Fixed">Fixed</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -567,7 +592,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="sub"><span><a class="doc-id-link" href="#sub">sub<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/math/fixed/fixed.odin#L61"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">sub :: <span class="keyword-type">proc</span>(x, y: $T/<a class="code-typename" href="/core/math/fixed/#Fixed">Fixed</a>) -> $T/<a class="code-typename" href="/core/math/fixed/#Fixed">Fixed</a> {…}</pre>
+<pre class="doc-code">sub :: <span class="keyword-type">proc</span>(x, y: <a class="code-typename" href="/core/math/fixed/#Fixed">Fixed</a>) -> <a class="code-typename" href="/core/math/fixed/#Fixed">Fixed</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -590,7 +615,7 @@ Procedure Groups (0)</summary>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/math/fixed/fixed.odin">fixed.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-05 (vendor "odin") Windows_amd64 @ 2025-05-08 21:12:59.760660600 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 16:13:57.186255400 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

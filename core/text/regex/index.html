@@ -11,13 +11,28 @@
 	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
 	<script>hljs.highlightAll()</script>
 	<script>
-		function toggleDarkMode() {
-			if (document.body.classList.toggle("dark-mode")) {
-				window.localStorage.setItem("theme", "dark");
-			} else {
-				window.localStorage.setItem("theme", "light");
-			}
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
 		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
 	</script>
 	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
 
@@ -27,10 +42,14 @@
 </head>
 <body>
 <script>
-	if (window.localStorage.getItem("theme") === "dark")
-		document.body.classList.add("dark-mode");
-	else
-		document.body.classList.remove("dark-mode");
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
 </script>
 <header class="sticky-top">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
@@ -139,7 +158,6 @@
 </li>
 <li class="nav-item"><a href="/core/dynlib">dynlib</a></li>
 <li class="nav-item">encoding<ul>
-<li><a href="/core/encoding/ansi">ansi</a></li>
 <li><a href="/core/encoding/base32">base32</a></li>
 <li><a href="/core/encoding/base64">base64</a></li>
 <li><a href="/core/encoding/cbor">cbor</a></li>
@@ -255,6 +273,11 @@
 <li><a href="/core/sys/unix">unix</a></li>
 <li><a href="/core/sys/valgrind">valgrind</a></li>
 <li><a href="/core/sys/windows">windows</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/terminal">terminal</a><ul>
+<li><a href="/core/terminal/ansi">ansi</a></li>
 </ul>
 
 </li>
@@ -559,6 +582,8 @@ such that <code>str[pos[0][0]:pos[0][1]] == groups[0]</code>.</p>
 	vm:      regex_vm.<a class="code-typename" href="/core/text/regex/virtual_machine/#Machine">Machine</a>,
 	idx:     <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
 	temp:    runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>,
+	threads: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	done:    <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
 }</pre>
 </div>
 <details class="odin-doc-toggle" open>
@@ -618,7 +643,7 @@ Note: Does not handle <code>.Multiline</code> properly.</p>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="create"><span><a class="doc-id-link" href="#create">create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L98"><em>Source</em></a></div></h3>
+<h3 id="create"><span><a class="doc-id-link" href="#create">create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L100"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create :: <span class="keyword-type">proc</span>(pattern: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, flags: <span class="keyword-type">bit_set</span>[regex_common.<a class="code-typename" href="/core/text/regex/common/#Flag">Flag</a>; <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>] = {}, permanent_allocator := <a href="/base/runtime/#Context">context.allocator</a>, temporary_allocator := <a href="/base/runtime/#Context">context.temp_allocator</a>) -> (result: <a class="code-typename" href="/core/text/regex/#Regular_Expression">Regular_Expression</a>, err: <a class="code-typename" href="/core/text/regex/#Error">Error</a>) {…}</pre>
 </div>
@@ -658,8 +683,7 @@ provided by users of a program or those found in a configuration file.</p>
 The only restriction is that the delimiter cannot be <code>\</code>, as that rune is used
 to escape the delimiter if found in the middle of the string.</p>
 <p>All runes after the closing delimiter will be parsed as flags:</p>
-<p><span class="doc-list">'g': Global</span>
-<span class="doc-list">'m': Multiline</span>
+<p><span class="doc-list">'m': Multiline</span>
 <span class="doc-list">'i': Case_Insensitive</span>
 <span class="doc-list">'x': Ignore_Whitespace</span>
 <span class="doc-list">'u': Unicode</span>
@@ -675,7 +699,7 @@ to escape the delimiter if found in the middle of the string.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_iterator"><span><a class="doc-id-link" href="#create_iterator">create_iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L278"><em>Source</em></a></div></h3>
+<h3 id="create_iterator"><span><a class="doc-id-link" href="#create_iterator">create_iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L277"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_iterator :: <span class="keyword-type">proc</span>(str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, pattern: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, flags: <span class="keyword-type">bit_set</span>[regex_common.<a class="code-typename" href="/core/text/regex/common/#Flag">Flag</a>; <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>] = {}, permanent_allocator := <a href="/base/runtime/#Context">context.allocator</a>, temporary_allocator := <a href="/base/runtime/#Context">context.temp_allocator</a>) -> (result: <a class="code-typename" href="/core/text/regex/#Match_Iterator">Match_Iterator</a>, err: <a class="code-typename" href="/core/text/regex/#Error">Error</a>) {…}</pre>
 </div>
@@ -693,7 +717,7 @@ to escape the delimiter if found in the middle of the string.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="destroy_capture"><span><a class="doc-id-link" href="#destroy_capture">destroy_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L558"><em>Source</em></a></div></h3>
+<h3 id="destroy_capture"><span><a class="doc-id-link" href="#destroy_capture">destroy_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L608"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy_capture :: <span class="keyword-type">proc</span>(capture: <a class="code-typename" href="/core/text/regex/#Capture">Capture</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
@@ -706,7 +730,7 @@ to escape the delimiter if found in the middle of the string.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="destroy_iterator"><span><a class="doc-id-link" href="#destroy_iterator">destroy_iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L573"><em>Source</em></a></div></h3>
+<h3 id="destroy_iterator"><span><a class="doc-id-link" href="#destroy_iterator">destroy_iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L623"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy_iterator :: <span class="keyword-type">proc</span>(it: <a class="code-typename" href="/core/text/regex/#Match_Iterator">Match_Iterator</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
@@ -719,7 +743,7 @@ to escape the delimiter if found in the middle of the string.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="destroy_regex"><span><a class="doc-id-link" href="#destroy_regex">destroy_regex<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L539"><em>Source</em></a></div></h3>
+<h3 id="destroy_regex"><span><a class="doc-id-link" href="#destroy_regex">destroy_regex<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L589"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy_regex :: <span class="keyword-type">proc</span>(regex: <a class="code-typename" href="/core/text/regex/#Regular_Expression">Regular_Expression</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
@@ -732,7 +756,7 @@ to escape the delimiter if found in the middle of the string.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="match_and_allocate_capture"><span><a class="doc-id-link" href="#match_and_allocate_capture">match_and_allocate_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L321"><em>Source</em></a></div></h3>
+<h3 id="match_and_allocate_capture"><span><a class="doc-id-link" href="#match_and_allocate_capture">match_and_allocate_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L315"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">match_and_allocate_capture :: <span class="keyword-type">proc</span>(regex: <a class="code-typename" href="/core/text/regex/#Regular_Expression">Regular_Expression</a>, str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, permanent_allocator := <a href="/base/runtime/#Context">context.allocator</a>, temporary_allocator := <a href="/base/runtime/#Context">context.temp_allocator</a>) -> (capture: <a class="code-typename" href="/core/text/regex/#Capture">Capture</a>, success: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -752,7 +776,7 @@ copied strings, so they won't need to be individually deleted.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="match_iterator"><span><a class="doc-id-link" href="#match_iterator">match_iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L454"><em>Source</em></a></div></h3>
+<h3 id="match_iterator"><span><a class="doc-id-link" href="#match_iterator">match_iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L448"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">match_iterator :: <span class="keyword-type">proc</span>(it: ^<a class="code-typename" href="/core/text/regex/#Match_Iterator">Match_Iterator</a>) -> (result: <a class="code-typename" href="/core/text/regex/#Capture">Capture</a>, index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -766,7 +790,7 @@ Note: Does not handle <code>.Multiline</code> properly.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="match_with_preallocated_capture"><span><a class="doc-id-link" href="#match_with_preallocated_capture">match_with_preallocated_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L396"><em>Source</em></a></div></h3>
+<h3 id="match_with_preallocated_capture"><span><a class="doc-id-link" href="#match_with_preallocated_capture">match_with_preallocated_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L390"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">match_with_preallocated_capture :: <span class="keyword-type">proc</span>(regex: <a class="code-typename" href="/core/text/regex/#Regular_Expression">Regular_Expression</a>, str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, capture: ^<a class="code-typename" href="/core/text/regex/#Capture">Capture</a>, temporary_allocator := <a href="/base/runtime/#Context">context.temp_allocator</a>) -> (num_groups: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, success: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -786,7 +810,7 @@ copied strings, so they won't need to be individually deleted.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="preallocate_capture"><span><a class="doc-id-link" href="#preallocate_capture">preallocate_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L523"><em>Source</em></a></div></h3>
+<h3 id="preallocate_capture"><span><a class="doc-id-link" href="#preallocate_capture">preallocate_capture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L573"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">preallocate_capture :: <span class="keyword-type">proc</span>(allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (result: <a class="code-typename" href="/core/text/regex/#Capture">Capture</a>) {…}</pre>
 </div>
@@ -800,14 +824,19 @@ between matches.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="reset"><span><a class="doc-id-link" href="#reset">reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L507"><em>Source</em></a></div></h3>
+<h3 id="reset"><span><a class="doc-id-link" href="#reset">reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L546"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">reset :: <span class="keyword-type">proc</span>(it: ^<a class="code-typename" href="/core/text/regex/#Match_Iterator">Match_Iterator</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reset an iterator, allowing it to be run again as if new.</p>
+<p><b>Inputs:</b><br><span class="doc-list">it: The iterator to reset.</span></p>
+</details>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L580"><em>Source</em></a></div></h3>
+<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L630"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/text/regex/#destroy_regex">destroy_regex</a>,
@@ -818,7 +847,7 @@ between matches.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="match"><span><a class="doc-id-link" href="#match">match<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L501"><em>Source</em></a></div></h3>
+<h3 id="match"><span><a class="doc-id-link" href="#match">match<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin#L534"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">match :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/text/regex/#match_and_allocate_capture">match_and_allocate_capture</a>,
@@ -835,7 +864,7 @@ between matches.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/text/regex/regex.odin">regex.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-05 (vendor "odin") Windows_amd64 @ 2025-05-08 21:13:01.114739100 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 16:13:58.806251100 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

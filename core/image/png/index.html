@@ -11,13 +11,28 @@
 	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
 	<script>hljs.highlightAll()</script>
 	<script>
-		function toggleDarkMode() {
-			if (document.body.classList.toggle("dark-mode")) {
-				window.localStorage.setItem("theme", "dark");
-			} else {
-				window.localStorage.setItem("theme", "light");
-			}
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
 		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
 	</script>
 	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
 
@@ -27,10 +42,14 @@
 </head>
 <body>
 <script>
-	if (window.localStorage.getItem("theme") === "dark")
-		document.body.classList.add("dark-mode");
-	else
-		document.body.classList.remove("dark-mode");
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
 </script>
 <header class="sticky-top">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
@@ -139,7 +158,6 @@
 </li>
 <li class="nav-item"><a href="/core/dynlib">dynlib</a></li>
 <li class="nav-item">encoding<ul>
-<li><a href="/core/encoding/ansi">ansi</a></li>
 <li><a href="/core/encoding/base32">base32</a></li>
 <li><a href="/core/encoding/base64">base64</a></li>
 <li><a href="/core/encoding/cbor">cbor</a></li>
@@ -255,6 +273,11 @@
 <li><a href="/core/sys/unix">unix</a></li>
 <li><a href="/core/sys/valgrind">valgrind</a></li>
 <li><a href="/core/sys/windows">windows</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/terminal">terminal</a><ul>
+<li><a href="/core/terminal/ansi">ansi</a></li>
 </ul>
 
 </li>
@@ -1171,25 +1194,25 @@ limit their size to 16 MiB each by default. Max of 256 MiB each.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="defilter"><span><a class="doc-id-link" href="#defilter">defilter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/png/png.odin#L1500"><em>Source</em></a></div></h3>
+<h3 id="defilter"><span><a class="doc-id-link" href="#defilter">defilter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/png/png.odin#L1497"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">defilter :: <span class="keyword-type">proc</span>(img: ^image.<a class="code-typename" href="/core/image/#Image">Image</a>, filter_bytes: ^bytes.<a class="code-typename" href="/core/bytes/#Buffer">Buffer</a>, header: ^image.<a class="code-typename" href="/core/image/#PNG_IHDR">PNG_IHDR</a>, options: image.<a class="code-typename" href="/core/image/#Options">Options</a>) -> (err: image.<a class="code-typename" href="/core/image/#Error">Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="defilter_16"><span><a class="doc-id-link" href="#defilter_16">defilter_16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/png/png.odin#L1440"><em>Source</em></a></div></h3>
+<h3 id="defilter_16"><span><a class="doc-id-link" href="#defilter_16">defilter_16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/png/png.odin#L1437"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">defilter_16 :: <span class="keyword-type">proc</span>(params: ^<a class="code-typename" href="/core/image/png/#Filter_Params">Filter_Params</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="defilter_8"><span><a class="doc-id-link" href="#defilter_8">defilter_8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/png/png.odin#L1216"><em>Source</em></a></div></h3>
+<h3 id="defilter_8"><span><a class="doc-id-link" href="#defilter_8">defilter_8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/png/png.odin#L1215"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">defilter_8 :: <span class="keyword-type">proc</span>(params: ^<a class="code-typename" href="/core/image/png/#Filter_Params">Filter_Params</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="defilter_less_than_8"><span><a class="doc-id-link" href="#defilter_less_than_8">defilter_less_than_8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/png/png.odin#L1277"><em>Source</em></a></div></h3>
+<h3 id="defilter_less_than_8"><span><a class="doc-id-link" href="#defilter_less_than_8">defilter_less_than_8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/png/png.odin#L1275"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">defilter_less_than_8 :: <span class="keyword-type">proc</span>(params: ^<a class="code-typename" href="/core/image/png/#Filter_Params">Filter_Params</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -1347,7 +1370,7 @@ limit their size to 16 MiB each by default. Max of 256 MiB each.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/image/png/png_os.odin">png_os.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-05 (vendor "odin") Windows_amd64 @ 2025-05-08 21:12:59.717721100 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 16:13:57.139922900 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

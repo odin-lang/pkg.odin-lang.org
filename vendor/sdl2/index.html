@@ -11,13 +11,28 @@
 	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
 	<script>hljs.highlightAll()</script>
 	<script>
-		function toggleDarkMode() {
-			if (document.body.classList.toggle("dark-mode")) {
-				window.localStorage.setItem("theme", "dark");
-			} else {
-				window.localStorage.setItem("theme", "light");
-			}
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
 		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
 	</script>
 	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
 
@@ -27,10 +42,14 @@
 </head>
 <body>
 <script>
-	if (window.localStorage.getItem("theme") === "dark")
-		document.body.classList.add("dark-mode");
-	else
-		document.body.classList.remove("dark-mode");
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
 </script>
 <header class="sticky-top">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
@@ -125,7 +144,12 @@
 </ul>
 
 </li>
-<li class="nav-item"><a href="/vendor/sdl3">sdl3</a></li>
+<li class="nav-item"><a href="/vendor/sdl3">sdl3</a><ul>
+<li><a href="/vendor/sdl3/image">image</a></li>
+<li><a href="/vendor/sdl3/ttf">ttf</a></li>
+</ul>
+
+</li>
 <li class="nav-item">stb<ul>
 <li><a href="/vendor/stb/easy_font">easy_font</a></li>
 <li><a href="/vendor/stb/image">image</a></li>
@@ -13260,7 +13284,7 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 <div class="pkg-entity">
 <h3 id="RWwrite"><span><a class="doc-id-link" href="#RWwrite">RWwrite<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_rwops.odin#L90"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">RWwrite :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (ctx: ^<a class="code-typename" href="/vendor/sdl2/#RWops">RWops</a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, num: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
+<pre class="doc-code">RWwrite :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (ctx: ^<a class="code-typename" href="/vendor/sdl2/#RWops">RWops</a>, ptr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, num: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -14986,7 +15010,7 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_vulkan.odin">sdl_vulkan.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-05 (vendor "odin") Windows_amd64 @ 2025-05-08 21:13:02.037060600 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 16:13:59.884967500 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

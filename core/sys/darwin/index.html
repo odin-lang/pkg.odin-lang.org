@@ -11,13 +11,28 @@
 	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
 	<script>hljs.highlightAll()</script>
 	<script>
-		function toggleDarkMode() {
-			if (document.body.classList.toggle("dark-mode")) {
-				window.localStorage.setItem("theme", "dark");
-			} else {
-				window.localStorage.setItem("theme", "light");
-			}
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
 		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
 	</script>
 	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
 
@@ -27,10 +42,14 @@
 </head>
 <body>
 <script>
-	if (window.localStorage.getItem("theme") === "dark")
-		document.body.classList.add("dark-mode");
-	else
-		document.body.classList.remove("dark-mode");
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
 </script>
 <header class="sticky-top">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
@@ -139,7 +158,6 @@
 </li>
 <li class="nav-item"><a href="/core/dynlib">dynlib</a></li>
 <li class="nav-item">encoding<ul>
-<li><a href="/core/encoding/ansi">ansi</a></li>
 <li><a href="/core/encoding/base32">base32</a></li>
 <li><a href="/core/encoding/base64">base64</a></li>
 <li><a href="/core/encoding/cbor">cbor</a></li>
@@ -258,6 +276,11 @@
 </ul>
 
 </li>
+<li class="nav-item"><a href="/core/terminal">terminal</a><ul>
+<li><a href="/core/terminal/ansi">ansi</a></li>
+</ul>
+
+</li>
 <li class="nav-item"><a href="/core/testing">testing</a></li>
 <li class="nav-item">text<ul>
 <li><a href="/core/text/edit">edit</a></li>
@@ -327,7 +350,7 @@
 <div>
 <details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
 <summary id="#doc-index-Types-header">
-Types (62)</summary>
+Types (65)</summary>
 <ul>
 <li><a href="#Bool">Bool</a></li>
 <li><a href="#Kern_Return">Kern_Return</a></li>
@@ -351,6 +374,9 @@ Types (62)</summary>
 <li><a href="#blkcnt_t">blkcnt_t</a></li>
 <li><a href="#blksize_t">blksize_t</a></li>
 <li><a href="#boolean_t">boolean_t</a></li>
+<li><a href="#copyfile_flags">copyfile_flags</a></li>
+<li><a href="#copyfile_state_flag">copyfile_state_flag</a></li>
+<li><a href="#copyfile_state_t">copyfile_state_t</a></li>
 <li><a href="#dev_t">dev_t</a></li>
 <li><a href="#fsid_t">fsid_t</a></li>
 <li><a href="#gid_t">gid_t</a></li>
@@ -397,15 +423,12 @@ Types (62)</summary>
 <div>
 <details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
 <summary id="#doc-index-Constants-header">
-Constants (105)</summary>
+Constants (102)</summary>
 <ul>
-<li><a href="#COPYFILE_ACL">COPYFILE_ACL</a></li>
 <li><a href="#COPYFILE_ALL">COPYFILE_ALL</a></li>
-<li><a href="#COPYFILE_DATA">COPYFILE_DATA</a></li>
 <li><a href="#COPYFILE_METADATA">COPYFILE_METADATA</a></li>
+<li><a href="#COPYFILE_NOFOLLOW">COPYFILE_NOFOLLOW</a></li>
 <li><a href="#COPYFILE_SECURITY">COPYFILE_SECURITY</a></li>
-<li><a href="#COPYFILE_STAT">COPYFILE_STAT</a></li>
-<li><a href="#COPYFILE_XATTR">COPYFILE_XATTR</a></li>
 <li><a href="#DARWIN_MAXCOMLEN">DARWIN_MAXCOMLEN</a></li>
 <li><a href="#DARWIN_PROC_ALL_PIDS">DARWIN_PROC_ALL_PIDS</a></li>
 <li><a href="#DARWIN_PROC_INFO_CALL_CANUSEFGHW">DARWIN_PROC_INFO_CALL_CANUSEFGHW</a></li>
@@ -519,10 +542,16 @@ Variables (1)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (85)</summary>
+Procedures (91)</summary>
 <ul>
 <li><a href="#VM_GET_FLAGS_ALIAS">VM_GET_FLAGS_ALIAS</a></li>
+<li><a href="#copyfile">copyfile</a></li>
+<li><a href="#copyfile_state_alloc">copyfile_state_alloc</a></li>
+<li><a href="#copyfile_state_free">copyfile_state_free</a></li>
+<li><a href="#copyfile_state_get">copyfile_state_get</a></li>
+<li><a href="#copyfile_state_set">copyfile_state_set</a></li>
 <li><a href="#errno">errno</a></li>
+<li><a href="#fcopyfile">fcopyfile</a></li>
 <li><a href="#mach_make_memory_entry">mach_make_memory_entry</a></li>
 <li><a href="#mach_port_deallocate">mach_port_deallocate</a></li>
 <li><a href="#mach_task_self">mach_task_self</a></li>
@@ -621,7 +650,7 @@ Procedure Groups (0)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Bool"><span><a class="doc-id-link" href="#Bool">Bool<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/darwin.odin#L8"><em>Source</em></a></div></h3>
+<h3 id="Bool"><span><a class="doc-id-link" href="#Bool">Bool<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/darwin.odin#L9"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Bool :: <a href="/base/builtin#b8"><span class="doc-builtin">b8</span></a></pre>
 </div>
@@ -964,7 +993,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="RUsage"><span><a class="doc-id-link" href="#RUsage">RUsage<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/darwin.odin#L10"><em>Source</em></a></div></h3>
+<h3 id="RUsage"><span><a class="doc-id-link" href="#RUsage">RUsage<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/darwin.odin#L11"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">RUsage :: <span class="keyword-type">struct</span> {
 	ru_utime:    <a class="code-typename" href="/core/sys/darwin/#_STRUCT_TIMEVAL">_STRUCT_TIMEVAL</a>,
@@ -1664,13 +1693,13 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="blkcnt_t"><span><a class="doc-id-link" href="#blkcnt_t">blkcnt_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L148"><em>Source</em></a></div></h3>
+<h3 id="blkcnt_t"><span><a class="doc-id-link" href="#blkcnt_t">blkcnt_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L138"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">blkcnt_t :: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="blksize_t"><span><a class="doc-id-link" href="#blksize_t">blksize_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L149"><em>Source</em></a></div></h3>
+<h3 id="blksize_t"><span><a class="doc-id-link" href="#blksize_t">blksize_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L139"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">blksize_t :: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a></pre>
 </div>
@@ -1686,7 +1715,88 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dev_t"><span><a class="doc-id-link" href="#dev_t">dev_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L142"><em>Source</em></a></div></h3>
+<h3 id="copyfile_flags"><span><a class="doc-id-link" href="#copyfile_flags">copyfile_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/copyfile.odin#L7"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">copyfile_flags :: <span class="keyword-type">bit_set</span>[<span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
+	ACL, 
+	STAT, 
+	XATTR, 
+	DATA, 
+	RECURSIVE            = 15, 
+	CHECK, 
+	EXCL, 
+	NOFOLLOW_SRC, 
+	NOFOLLOW_DST, 
+	MOVE, 
+	UNLINK, 
+	PACK, 
+	UNPACK, 
+	CLONE, 
+	CLONE_FORCE, 
+	RUN_IN_PLACE, 
+	DATA_SPARSE, 
+	PRESERVE_DST_TRACKED, 
+	VERBOSE              = 30, 
+}; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
+</div>
+<h5>Related Constants</h5>
+<ul>
+<li><a href="/core/sys/darwin/#COPYFILE_ALL">COPYFILE_ALL</a></li>
+<li><a href="/core/sys/darwin/#COPYFILE_METADATA">COPYFILE_METADATA</a></li>
+<li><a href="/core/sys/darwin/#COPYFILE_NOFOLLOW">COPYFILE_NOFOLLOW</a></li>
+<li><a href="/core/sys/darwin/#COPYFILE_SECURITY">COPYFILE_SECURITY</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="copyfile_state_flag"><span><a class="doc-id-link" href="#copyfile_state_flag">copyfile_state_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/copyfile.odin#L38"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">copyfile_state_flag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+	SRC_FD                       = 1, 
+	SRC_FILENAME, 
+	DST_FD, 
+	DST_FILENAME, 
+	QUARANTINE, 
+	STATUS_CB, 
+	STATUS_CTX, 
+	COPIED, 
+	XATTRNAME, 
+	WAS_CLONED, 
+	SRC_BSIZE, 
+	DST_BSIZE, 
+	BSIZE, 
+	FORBID_CROSS_MOUNT, 
+	NOCPROTECT, 
+	PRESERVE_SUID, 
+	RECURSIVE_SRC_FTSENT, 
+	FORBID_DST_EXISTING_SYMLINKS, 
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/core/sys/darwin/#copyfile_state_get">copyfile_state_get</a></li>
+<li><a href="/core/sys/darwin/#copyfile_state_set">copyfile_state_set</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="copyfile_state_t"><span><a class="doc-id-link" href="#copyfile_state_t">copyfile_state_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/copyfile.odin#L5"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">copyfile_state_t :: <span class="keyword-type">distinct</span> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a></pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/core/sys/darwin/#copyfile">copyfile</a></li>
+<li><a href="/core/sys/darwin/#copyfile_state_free">copyfile_state_free</a></li>
+<li><a href="/core/sys/darwin/#copyfile_state_get">copyfile_state_get</a></li>
+<li><a href="/core/sys/darwin/#copyfile_state_set">copyfile_state_set</a></li>
+<li><a href="/core/sys/darwin/#fcopyfile">fcopyfile</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/sys/darwin/#copyfile_state_alloc">copyfile_state_alloc</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="dev_t"><span><a class="doc-id-link" href="#dev_t">dev_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L132"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dev_t :: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a></pre>
 </div>
@@ -1698,7 +1808,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="gid_t"><span><a class="doc-id-link" href="#gid_t">gid_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L146"><em>Source</em></a></div></h3>
+<h3 id="gid_t"><span><a class="doc-id-link" href="#gid_t">gid_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L136"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">gid_t :: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a></pre>
 </div>
@@ -1756,25 +1866,25 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="mode_t"><span><a class="doc-id-link" href="#mode_t">mode_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L143"><em>Source</em></a></div></h3>
+<h3 id="mode_t"><span><a class="doc-id-link" href="#mode_t">mode_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L133"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">mode_t :: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="nlink_t"><span><a class="doc-id-link" href="#nlink_t">nlink_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L144"><em>Source</em></a></div></h3>
+<h3 id="nlink_t"><span><a class="doc-id-link" href="#nlink_t">nlink_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L134"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">nlink_t :: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="off_t"><span><a class="doc-id-link" href="#off_t">off_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L147"><em>Source</em></a></div></h3>
+<h3 id="off_t"><span><a class="doc-id-link" href="#off_t">off_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L137"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">off_t :: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="os_clockid"><span><a class="doc-id-link" href="#os_clockid">os_clockid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L64"><em>Source</em></a></div></h3>
+<h3 id="os_clockid"><span><a class="doc-id-link" href="#os_clockid">os_clockid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L62"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">os_clockid :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	MACH_ABSOLUTE_TIME = 32, 
@@ -1787,7 +1897,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="os_sync_wait_on_address_flag"><span><a class="doc-id-link" href="#os_sync_wait_on_address_flag">os_sync_wait_on_address_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L30"><em>Source</em></a></div></h3>
+<h3 id="os_sync_wait_on_address_flag"><span><a class="doc-id-link" href="#os_sync_wait_on_address_flag">os_sync_wait_on_address_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L28"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">os_sync_wait_on_address_flag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	<span class="comment">// This flag should be used when synchronizing among multiple processes by</span>
@@ -1806,7 +1916,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="os_sync_wait_on_address_flags"><span><a class="doc-id-link" href="#os_sync_wait_on_address_flags">os_sync_wait_on_address_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L45"><em>Source</em></a></div></h3>
+<h3 id="os_sync_wait_on_address_flags"><span><a class="doc-id-link" href="#os_sync_wait_on_address_flags">os_sync_wait_on_address_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L43"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">os_sync_wait_on_address_flags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/core/sys/darwin/#os_sync_wait_on_address_flag">os_sync_wait_on_address_flag</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
 </div>
@@ -1818,7 +1928,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="os_sync_wake_by_address_flag"><span><a class="doc-id-link" href="#os_sync_wake_by_address_flag">os_sync_wake_by_address_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L47"><em>Source</em></a></div></h3>
+<h3 id="os_sync_wake_by_address_flag"><span><a class="doc-id-link" href="#os_sync_wake_by_address_flag">os_sync_wake_by_address_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L45"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">os_sync_wake_by_address_flag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	<span class="comment">// This flag should be used when synchronizing among multiple processes by</span>
@@ -1837,7 +1947,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="os_sync_wake_by_address_flags"><span><a class="doc-id-link" href="#os_sync_wake_by_address_flags">os_sync_wake_by_address_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L62"><em>Source</em></a></div></h3>
+<h3 id="os_sync_wake_by_address_flags"><span><a class="doc-id-link" href="#os_sync_wake_by_address_flags">os_sync_wake_by_address_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L60"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">os_sync_wake_by_address_flags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/core/sys/darwin/#os_sync_wake_by_address_flag">os_sync_wake_by_address_flag</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
 </div>
@@ -1848,7 +1958,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="pid_t"><span><a class="doc-id-link" href="#pid_t">pid_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L150"><em>Source</em></a></div></h3>
+<h3 id="pid_t"><span><a class="doc-id-link" href="#pid_t">pid_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L140"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pid_t :: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a></pre>
 </div>
@@ -1970,7 +2080,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="stat"><span><a class="doc-id-link" href="#stat">stat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L152"><em>Source</em></a></div></h3>
+<h3 id="stat"><span><a class="doc-id-link" href="#stat">stat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L142"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stat :: <a class="code-typename" href="/core/sys/darwin/#__DARWIN_STRUCT_STAT64">__DARWIN_STRUCT_STAT64</a></pre>
 </div>
@@ -1994,19 +2104,19 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="time_t"><span><a class="doc-id-link" href="#time_t">time_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L141"><em>Source</em></a></div></h3>
+<h3 id="time_t"><span><a class="doc-id-link" href="#time_t">time_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L131"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">time_t :: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="timeval"><span><a class="doc-id-link" href="#timeval">timeval<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L153"><em>Source</em></a></div></h3>
+<h3 id="timeval"><span><a class="doc-id-link" href="#timeval">timeval<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L143"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">timeval :: <a class="code-typename" href="/core/sys/darwin/#_STRUCT_TIMEVAL">_STRUCT_TIMEVAL</a></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="uid_t"><span><a class="doc-id-link" href="#uid_t">uid_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L145"><em>Source</em></a></div></h3>
+<h3 id="uid_t"><span><a class="doc-id-link" href="#uid_t">uid_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L135"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">uid_t :: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a></pre>
 </div>
@@ -2111,53 +2221,111 @@ Procedure Groups (0)</summary>
 </div>
 <h2 id="pkg-Constants" class="pkg-header">Constants</h2>
 <div class="pkg-entity">
-<h3 id="COPYFILE_ACL"><span><a class="doc-id-link" href="#COPYFILE_ACL">COPYFILE_ACL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L23"><em>Source</em></a></div></h3>
+<h3 id="COPYFILE_ALL"><span><a class="doc-id-link" href="#COPYFILE_ALL">COPYFILE_ALL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/copyfile.odin#L34"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">COPYFILE_ACL: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1 &lt;&lt; 0</pre>
-</div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>copyfile flags</p>
-</details>
-</div>
-<div class="pkg-entity">
-<h3 id="COPYFILE_ALL"><span><a class="doc-id-link" href="#COPYFILE_ALL">COPYFILE_ALL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L30"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">COPYFILE_ALL: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : COPYFILE_METADATA | COPYFILE_DATA</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="COPYFILE_DATA"><span><a class="doc-id-link" href="#COPYFILE_DATA">COPYFILE_DATA<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L26"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">COPYFILE_DATA: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1 &lt;&lt; 3</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="COPYFILE_METADATA"><span><a class="doc-id-link" href="#COPYFILE_METADATA">COPYFILE_METADATA<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L29"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">COPYFILE_METADATA: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : COPYFILE_SECURITY | COPYFILE_XATTR</pre>
+<pre class="doc-code">COPYFILE_ALL: <span class="keyword-type">bit_set</span>[<span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
+	ACL, 
+	STAT, 
+	XATTR, 
+	DATA, 
+	RECURSIVE            = 15, 
+	CHECK, 
+	EXCL, 
+	NOFOLLOW_SRC, 
+	NOFOLLOW_DST, 
+	MOVE, 
+	UNLINK, 
+	PACK, 
+	UNPACK, 
+	CLONE, 
+	CLONE_FORCE, 
+	RUN_IN_PLACE, 
+	DATA_SPARSE, 
+	PRESERVE_DST_TRACKED, 
+	VERBOSE              = 30, 
+}; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>] : COPYFILE_METADATA + copyfile_flags{.DATA}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="COPYFILE_SECURITY"><span><a class="doc-id-link" href="#COPYFILE_SECURITY">COPYFILE_SECURITY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L28"><em>Source</em></a></div></h3>
+<h3 id="COPYFILE_METADATA"><span><a class="doc-id-link" href="#COPYFILE_METADATA">COPYFILE_METADATA<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/copyfile.odin#L33"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">COPYFILE_SECURITY: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : COPYFILE_STAT | COPYFILE_ACL</pre>
+<pre class="doc-code">COPYFILE_METADATA: <span class="keyword-type">bit_set</span>[<span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
+	ACL, 
+	STAT, 
+	XATTR, 
+	DATA, 
+	RECURSIVE            = 15, 
+	CHECK, 
+	EXCL, 
+	NOFOLLOW_SRC, 
+	NOFOLLOW_DST, 
+	MOVE, 
+	UNLINK, 
+	PACK, 
+	UNPACK, 
+	CLONE, 
+	CLONE_FORCE, 
+	RUN_IN_PLACE, 
+	DATA_SPARSE, 
+	PRESERVE_DST_TRACKED, 
+	VERBOSE              = 30, 
+}; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>] : COPYFILE_SECURITY + copyfile_flags{.XATTR}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="COPYFILE_STAT"><span><a class="doc-id-link" href="#COPYFILE_STAT">COPYFILE_STAT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L24"><em>Source</em></a></div></h3>
+<h3 id="COPYFILE_NOFOLLOW"><span><a class="doc-id-link" href="#COPYFILE_NOFOLLOW">COPYFILE_NOFOLLOW<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/copyfile.odin#L36"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">COPYFILE_STAT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1 &lt;&lt; 1</pre>
+<pre class="doc-code">COPYFILE_NOFOLLOW: <span class="keyword-type">bit_set</span>[<span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
+	ACL, 
+	STAT, 
+	XATTR, 
+	DATA, 
+	RECURSIVE            = 15, 
+	CHECK, 
+	EXCL, 
+	NOFOLLOW_SRC, 
+	NOFOLLOW_DST, 
+	MOVE, 
+	UNLINK, 
+	PACK, 
+	UNPACK, 
+	CLONE, 
+	CLONE_FORCE, 
+	RUN_IN_PLACE, 
+	DATA_SPARSE, 
+	PRESERVE_DST_TRACKED, 
+	VERBOSE              = 30, 
+}; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>] : copyfile_flags{.NOFOLLOW_SRC, .NOFOLLOW_DST}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="COPYFILE_XATTR"><span><a class="doc-id-link" href="#COPYFILE_XATTR">COPYFILE_XATTR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L25"><em>Source</em></a></div></h3>
+<h3 id="COPYFILE_SECURITY"><span><a class="doc-id-link" href="#COPYFILE_SECURITY">COPYFILE_SECURITY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/copyfile.odin#L32"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">COPYFILE_XATTR: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1 &lt;&lt; 2</pre>
+<pre class="doc-code">COPYFILE_SECURITY: <span class="keyword-type">bit_set</span>[<span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
+	ACL, 
+	STAT, 
+	XATTR, 
+	DATA, 
+	RECURSIVE            = 15, 
+	CHECK, 
+	EXCL, 
+	NOFOLLOW_SRC, 
+	NOFOLLOW_DST, 
+	MOVE, 
+	UNLINK, 
+	PACK, 
+	UNPACK, 
+	CLONE, 
+	CLONE_FORCE, 
+	RUN_IN_PLACE, 
+	DATA_SPARSE, 
+	PRESERVE_DST_TRACKED, 
+	VERBOSE              = 30, 
+}; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>] : copyfile_flags{.STAT, .ACL}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_MAXCOMLEN"><span><a class="doc-id-link" href="#DARWIN_MAXCOMLEN">DARWIN_MAXCOMLEN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L127"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_MAXCOMLEN"><span><a class="doc-id-link" href="#DARWIN_MAXCOMLEN">DARWIN_MAXCOMLEN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L117"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_MAXCOMLEN: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 16</pre>
 </div>
@@ -2167,115 +2335,115 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_ALL_PIDS"><span><a class="doc-id-link" href="#DARWIN_PROC_ALL_PIDS">DARWIN_PROC_ALL_PIDS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L42"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_ALL_PIDS"><span><a class="doc-id-link" href="#DARWIN_PROC_ALL_PIDS">DARWIN_PROC_ALL_PIDS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L32"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_ALL_PIDS: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(1)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_INFO_CALL_CANUSEFGHW"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_CANUSEFGHW">DARWIN_PROC_INFO_CALL_CANUSEFGHW<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L61"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_INFO_CALL_CANUSEFGHW"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_CANUSEFGHW">DARWIN_PROC_INFO_CALL_CANUSEFGHW<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L51"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_INFO_CALL_CANUSEFGHW: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(0xc)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_INFO_CALL_DIRTYCONTROL"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_DIRTYCONTROL">DARWIN_PROC_INFO_CALL_DIRTYCONTROL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L57"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_INFO_CALL_DIRTYCONTROL"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_DIRTYCONTROL">DARWIN_PROC_INFO_CALL_DIRTYCONTROL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L47"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_INFO_CALL_DIRTYCONTROL: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(0x8)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_INFO_CALL_KERNMSGBUF"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_KERNMSGBUF">DARWIN_PROC_INFO_CALL_KERNMSGBUF<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L53"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_INFO_CALL_KERNMSGBUF"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_KERNMSGBUF">DARWIN_PROC_INFO_CALL_KERNMSGBUF<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L43"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_INFO_CALL_KERNMSGBUF: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(0x4)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_INFO_CALL_LISTCOALITIONS"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_LISTCOALITIONS">DARWIN_PROC_INFO_CALL_LISTCOALITIONS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L60"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_INFO_CALL_LISTCOALITIONS"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_LISTCOALITIONS">DARWIN_PROC_INFO_CALL_LISTCOALITIONS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L50"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_INFO_CALL_LISTCOALITIONS: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(0xb)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_INFO_CALL_LISTPIDS"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_LISTPIDS">DARWIN_PROC_INFO_CALL_LISTPIDS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L50"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_INFO_CALL_LISTPIDS"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_LISTPIDS">DARWIN_PROC_INFO_CALL_LISTPIDS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L40"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_INFO_CALL_LISTPIDS: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(0x1)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_INFO_CALL_PIDDYNKQUEUEINFO"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_PIDDYNKQUEUEINFO">DARWIN_PROC_INFO_CALL_PIDDYNKQUEUEINFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L62"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_INFO_CALL_PIDDYNKQUEUEINFO"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_PIDDYNKQUEUEINFO">DARWIN_PROC_INFO_CALL_PIDDYNKQUEUEINFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L52"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_INFO_CALL_PIDDYNKQUEUEINFO: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(0xd)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_INFO_CALL_PIDFDINFO"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_PIDFDINFO">DARWIN_PROC_INFO_CALL_PIDFDINFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L52"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_INFO_CALL_PIDFDINFO"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_PIDFDINFO">DARWIN_PROC_INFO_CALL_PIDFDINFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L42"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_INFO_CALL_PIDFDINFO: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(0x3)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_INFO_CALL_PIDFILEPORTINFO"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_PIDFILEPORTINFO">DARWIN_PROC_INFO_CALL_PIDFILEPORTINFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L55"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_INFO_CALL_PIDFILEPORTINFO"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_PIDFILEPORTINFO">DARWIN_PROC_INFO_CALL_PIDFILEPORTINFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L45"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_INFO_CALL_PIDFILEPORTINFO: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(0x6)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_INFO_CALL_PIDINFO"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_PIDINFO">DARWIN_PROC_INFO_CALL_PIDINFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L51"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_INFO_CALL_PIDINFO"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_PIDINFO">DARWIN_PROC_INFO_CALL_PIDINFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L41"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_INFO_CALL_PIDINFO: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(0x2)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_INFO_CALL_PIDORIGINATORINFO"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_PIDORIGINATORINFO">DARWIN_PROC_INFO_CALL_PIDORIGINATORINFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L59"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_INFO_CALL_PIDORIGINATORINFO"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_PIDORIGINATORINFO">DARWIN_PROC_INFO_CALL_PIDORIGINATORINFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L49"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_INFO_CALL_PIDORIGINATORINFO: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(0xa)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_INFO_CALL_PIDRUSAGE"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_PIDRUSAGE">DARWIN_PROC_INFO_CALL_PIDRUSAGE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L58"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_INFO_CALL_PIDRUSAGE"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_PIDRUSAGE">DARWIN_PROC_INFO_CALL_PIDRUSAGE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L48"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_INFO_CALL_PIDRUSAGE: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(0x9)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_INFO_CALL_SETCONTROL"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_SETCONTROL">DARWIN_PROC_INFO_CALL_SETCONTROL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L54"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_INFO_CALL_SETCONTROL"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_SETCONTROL">DARWIN_PROC_INFO_CALL_SETCONTROL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L44"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_INFO_CALL_SETCONTROL: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(0x5)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_INFO_CALL_TERMINATE"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_TERMINATE">DARWIN_PROC_INFO_CALL_TERMINATE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L56"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_INFO_CALL_TERMINATE"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_TERMINATE">DARWIN_PROC_INFO_CALL_TERMINATE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L46"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_INFO_CALL_TERMINATE: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(0x7)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_INFO_CALL_UDATA_INFO"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_UDATA_INFO">DARWIN_PROC_INFO_CALL_UDATA_INFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L63"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_INFO_CALL_UDATA_INFO"><span><a class="doc-id-link" href="#DARWIN_PROC_INFO_CALL_UDATA_INFO">DARWIN_PROC_INFO_CALL_UDATA_INFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L53"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_INFO_CALL_UDATA_INFO: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(0xe)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_KDBG_ONLY"><span><a class="doc-id-link" href="#DARWIN_PROC_KDBG_ONLY">DARWIN_PROC_KDBG_ONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L48"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_KDBG_ONLY"><span><a class="doc-id-link" href="#DARWIN_PROC_KDBG_ONLY">DARWIN_PROC_KDBG_ONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L38"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_KDBG_ONLY: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(7)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_PGRP_ONLY"><span><a class="doc-id-link" href="#DARWIN_PROC_PGRP_ONLY">DARWIN_PROC_PGRP_ONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L43"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_PGRP_ONLY"><span><a class="doc-id-link" href="#DARWIN_PROC_PGRP_ONLY">DARWIN_PROC_PGRP_ONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L33"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_PGRP_ONLY: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(2)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_PIDPATHINFO"><span><a class="doc-id-link" href="#DARWIN_PROC_PIDPATHINFO">DARWIN_PROC_PIDPATHINFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L40"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_PIDPATHINFO"><span><a class="doc-id-link" href="#DARWIN_PROC_PIDPATHINFO">DARWIN_PROC_PIDPATHINFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L30"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_PIDPATHINFO: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 11</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_PIDPATHINFO_SIZE"><span><a class="doc-id-link" href="#DARWIN_PROC_PIDPATHINFO_SIZE">DARWIN_PROC_PIDPATHINFO_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L39"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_PIDPATHINFO_SIZE"><span><a class="doc-id-link" href="#DARWIN_PROC_PIDPATHINFO_SIZE">DARWIN_PROC_PIDPATHINFO_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L29"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_PIDPATHINFO_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : MAXPATHLEN</pre>
 </div>
@@ -2285,25 +2453,25 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_PPID_ONLY"><span><a class="doc-id-link" href="#DARWIN_PROC_PPID_ONLY">DARWIN_PROC_PPID_ONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L47"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_PPID_ONLY"><span><a class="doc-id-link" href="#DARWIN_PROC_PPID_ONLY">DARWIN_PROC_PPID_ONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L37"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_PPID_ONLY: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(6)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_RUID_ONLY"><span><a class="doc-id-link" href="#DARWIN_PROC_RUID_ONLY">DARWIN_PROC_RUID_ONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L46"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_RUID_ONLY"><span><a class="doc-id-link" href="#DARWIN_PROC_RUID_ONLY">DARWIN_PROC_RUID_ONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L36"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_RUID_ONLY: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(5)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_TTY_ONLY"><span><a class="doc-id-link" href="#DARWIN_PROC_TTY_ONLY">DARWIN_PROC_TTY_ONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L44"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_TTY_ONLY"><span><a class="doc-id-link" href="#DARWIN_PROC_TTY_ONLY">DARWIN_PROC_TTY_ONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L34"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_TTY_ONLY: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(3)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DARWIN_PROC_UID_ONLY"><span><a class="doc-id-link" href="#DARWIN_PROC_UID_ONLY">DARWIN_PROC_UID_ONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L45"><em>Source</em></a></div></h3>
+<h3 id="DARWIN_PROC_UID_ONLY"><span><a class="doc-id-link" href="#DARWIN_PROC_UID_ONLY">DARWIN_PROC_UID_ONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L35"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DARWIN_PROC_UID_ONLY: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> : c.int(4)</pre>
 </div>
@@ -2359,7 +2527,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="MAP_32BIT"><span><a class="doc-id-link" href="#MAP_32BIT">MAP_32BIT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L74"><em>Source</em></a></div></h3>
+<h3 id="MAP_32BIT"><span><a class="doc-id-link" href="#MAP_32BIT">MAP_32BIT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L64"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MAP_32BIT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x8000</pre>
 </div>
@@ -2369,7 +2537,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="MAP_ANONYMOUS"><span><a class="doc-id-link" href="#MAP_ANONYMOUS">MAP_ANONYMOUS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L66"><em>Source</em></a></div></h3>
+<h3 id="MAP_ANONYMOUS"><span><a class="doc-id-link" href="#MAP_ANONYMOUS">MAP_ANONYMOUS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L56"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MAP_ANONYMOUS: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x1000</pre>
 </div>
@@ -2379,7 +2547,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="MAP_FILE"><span><a class="doc-id-link" href="#MAP_FILE">MAP_FILE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L67"><em>Source</em></a></div></h3>
+<h3 id="MAP_FILE"><span><a class="doc-id-link" href="#MAP_FILE">MAP_FILE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L57"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MAP_FILE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0000</pre>
 </div>
@@ -2389,7 +2557,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="MAP_FIXED"><span><a class="doc-id-link" href="#MAP_FIXED">MAP_FIXED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L68"><em>Source</em></a></div></h3>
+<h3 id="MAP_FIXED"><span><a class="doc-id-link" href="#MAP_FIXED">MAP_FIXED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L58"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MAP_FIXED: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0010</pre>
 </div>
@@ -2399,7 +2567,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="MAP_HASSEMAPHORE"><span><a class="doc-id-link" href="#MAP_HASSEMAPHORE">MAP_HASSEMAPHORE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L69"><em>Source</em></a></div></h3>
+<h3 id="MAP_HASSEMAPHORE"><span><a class="doc-id-link" href="#MAP_HASSEMAPHORE">MAP_HASSEMAPHORE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L59"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MAP_HASSEMAPHORE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0200</pre>
 </div>
@@ -2409,7 +2577,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="MAP_JIT"><span><a class="doc-id-link" href="#MAP_JIT">MAP_JIT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L73"><em>Source</em></a></div></h3>
+<h3 id="MAP_JIT"><span><a class="doc-id-link" href="#MAP_JIT">MAP_JIT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L63"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MAP_JIT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0800</pre>
 </div>
@@ -2419,7 +2587,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="MAP_NOCACHE"><span><a class="doc-id-link" href="#MAP_NOCACHE">MAP_NOCACHE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L72"><em>Source</em></a></div></h3>
+<h3 id="MAP_NOCACHE"><span><a class="doc-id-link" href="#MAP_NOCACHE">MAP_NOCACHE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L62"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MAP_NOCACHE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0400</pre>
 </div>
@@ -2429,7 +2597,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="MAP_PRIVATE"><span><a class="doc-id-link" href="#MAP_PRIVATE">MAP_PRIVATE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L70"><em>Source</em></a></div></h3>
+<h3 id="MAP_PRIVATE"><span><a class="doc-id-link" href="#MAP_PRIVATE">MAP_PRIVATE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L60"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MAP_PRIVATE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0002</pre>
 </div>
@@ -2439,7 +2607,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="MAP_SHARED"><span><a class="doc-id-link" href="#MAP_SHARED">MAP_SHARED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L71"><em>Source</em></a></div></h3>
+<h3 id="MAP_SHARED"><span><a class="doc-id-link" href="#MAP_SHARED">MAP_SHARED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L61"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MAP_SHARED: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0001</pre>
 </div>
@@ -2449,7 +2617,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="MASK_ACCMODE"><span><a class="doc-id-link" href="#MASK_ACCMODE">MASK_ACCMODE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L110"><em>Source</em></a></div></h3>
+<h3 id="MASK_ACCMODE"><span><a class="doc-id-link" href="#MASK_ACCMODE">MASK_ACCMODE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L100"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MASK_ACCMODE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0003</pre>
 </div>
@@ -2465,7 +2633,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="MAXPATHLEN"><span><a class="doc-id-link" href="#MAXPATHLEN">MAXPATHLEN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L36"><em>Source</em></a></div></h3>
+<h3 id="MAXPATHLEN"><span><a class="doc-id-link" href="#MAXPATHLEN">MAXPATHLEN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L26"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MAXPATHLEN: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : PATH_MAX</pre>
 </div>
@@ -2475,7 +2643,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_APPEND"><span><a class="doc-id-link" href="#OPEN_FLAG_APPEND">OPEN_FLAG_APPEND<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L113"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_APPEND"><span><a class="doc-id-link" href="#OPEN_FLAG_APPEND">OPEN_FLAG_APPEND<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L103"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_APPEND: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00000008</pre>
 </div>
@@ -2485,7 +2653,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_CLOEXEC"><span><a class="doc-id-link" href="#OPEN_FLAG_CLOEXEC">OPEN_FLAG_CLOEXEC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L123"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_CLOEXEC"><span><a class="doc-id-link" href="#OPEN_FLAG_CLOEXEC">OPEN_FLAG_CLOEXEC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L113"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_CLOEXEC: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x01000000</pre>
 </div>
@@ -2495,7 +2663,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_CREAT"><span><a class="doc-id-link" href="#OPEN_FLAG_CREAT">OPEN_FLAG_CREAT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L114"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_CREAT"><span><a class="doc-id-link" href="#OPEN_FLAG_CREAT">OPEN_FLAG_CREAT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L104"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_CREAT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00000200</pre>
 </div>
@@ -2505,7 +2673,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_DIRECTORY"><span><a class="doc-id-link" href="#OPEN_FLAG_DIRECTORY">OPEN_FLAG_DIRECTORY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L119"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_DIRECTORY"><span><a class="doc-id-link" href="#OPEN_FLAG_DIRECTORY">OPEN_FLAG_DIRECTORY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L109"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_DIRECTORY: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00100000</pre>
 </div>
@@ -2515,7 +2683,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_EVTONLY"><span><a class="doc-id-link" href="#OPEN_FLAG_EVTONLY">OPEN_FLAG_EVTONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L122"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_EVTONLY"><span><a class="doc-id-link" href="#OPEN_FLAG_EVTONLY">OPEN_FLAG_EVTONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L112"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_EVTONLY: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00008000</pre>
 </div>
@@ -2525,7 +2693,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_EXCL"><span><a class="doc-id-link" href="#OPEN_FLAG_EXCL">OPEN_FLAG_EXCL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L116"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_EXCL"><span><a class="doc-id-link" href="#OPEN_FLAG_EXCL">OPEN_FLAG_EXCL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L106"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_EXCL: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00000800</pre>
 </div>
@@ -2535,7 +2703,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_EXLOCK"><span><a class="doc-id-link" href="#OPEN_FLAG_EXLOCK">OPEN_FLAG_EXLOCK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L118"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_EXLOCK"><span><a class="doc-id-link" href="#OPEN_FLAG_EXLOCK">OPEN_FLAG_EXLOCK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L108"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_EXLOCK: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00000020</pre>
 </div>
@@ -2545,7 +2713,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_NOFOLLOW"><span><a class="doc-id-link" href="#OPEN_FLAG_NOFOLLOW">OPEN_FLAG_NOFOLLOW<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L120"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_NOFOLLOW"><span><a class="doc-id-link" href="#OPEN_FLAG_NOFOLLOW">OPEN_FLAG_NOFOLLOW<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L110"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_NOFOLLOW: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00000100</pre>
 </div>
@@ -2555,7 +2723,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_NOFOLLOW_ANY"><span><a class="doc-id-link" href="#OPEN_FLAG_NOFOLLOW_ANY">OPEN_FLAG_NOFOLLOW_ANY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L124"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_NOFOLLOW_ANY"><span><a class="doc-id-link" href="#OPEN_FLAG_NOFOLLOW_ANY">OPEN_FLAG_NOFOLLOW_ANY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L114"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_NOFOLLOW_ANY: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x20000000</pre>
 </div>
@@ -2565,7 +2733,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_NONBLOCK"><span><a class="doc-id-link" href="#OPEN_FLAG_NONBLOCK">OPEN_FLAG_NONBLOCK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L112"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_NONBLOCK"><span><a class="doc-id-link" href="#OPEN_FLAG_NONBLOCK">OPEN_FLAG_NONBLOCK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L102"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_NONBLOCK: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00000004</pre>
 </div>
@@ -2575,7 +2743,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_RDONLY"><span><a class="doc-id-link" href="#OPEN_FLAG_RDONLY">OPEN_FLAG_RDONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L105"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_RDONLY"><span><a class="doc-id-link" href="#OPEN_FLAG_RDONLY">OPEN_FLAG_RDONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L95"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_RDONLY: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0000</pre>
 </div>
@@ -2585,7 +2753,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_RDWR"><span><a class="doc-id-link" href="#OPEN_FLAG_RDWR">OPEN_FLAG_RDWR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L107"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_RDWR"><span><a class="doc-id-link" href="#OPEN_FLAG_RDWR">OPEN_FLAG_RDWR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L97"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_RDWR: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0002</pre>
 </div>
@@ -2595,7 +2763,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_SHLOCK"><span><a class="doc-id-link" href="#OPEN_FLAG_SHLOCK">OPEN_FLAG_SHLOCK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L117"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_SHLOCK"><span><a class="doc-id-link" href="#OPEN_FLAG_SHLOCK">OPEN_FLAG_SHLOCK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L107"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_SHLOCK: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00000010</pre>
 </div>
@@ -2605,7 +2773,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_SYMLINK"><span><a class="doc-id-link" href="#OPEN_FLAG_SYMLINK">OPEN_FLAG_SYMLINK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L121"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_SYMLINK"><span><a class="doc-id-link" href="#OPEN_FLAG_SYMLINK">OPEN_FLAG_SYMLINK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L111"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_SYMLINK: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00200000</pre>
 </div>
@@ -2615,7 +2783,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_TRUNC"><span><a class="doc-id-link" href="#OPEN_FLAG_TRUNC">OPEN_FLAG_TRUNC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L115"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_TRUNC"><span><a class="doc-id-link" href="#OPEN_FLAG_TRUNC">OPEN_FLAG_TRUNC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L105"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_TRUNC: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00000400</pre>
 </div>
@@ -2625,7 +2793,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OPEN_FLAG_WRONLY"><span><a class="doc-id-link" href="#OPEN_FLAG_WRONLY">OPEN_FLAG_WRONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L106"><em>Source</em></a></div></h3>
+<h3 id="OPEN_FLAG_WRONLY"><span><a class="doc-id-link" href="#OPEN_FLAG_WRONLY">OPEN_FLAG_WRONLY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L96"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OPEN_FLAG_WRONLY: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0001</pre>
 </div>
@@ -2635,7 +2803,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PATH_MAX"><span><a class="doc-id-link" href="#PATH_MAX">PATH_MAX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L33"><em>Source</em></a></div></h3>
+<h3 id="PATH_MAX"><span><a class="doc-id-link" href="#PATH_MAX">PATH_MAX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L23"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PATH_MAX: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1024</pre>
 </div>
@@ -2657,7 +2825,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PERMISSION_MASK_IRGRP"><span><a class="doc-id-link" href="#PERMISSION_MASK_IRGRP">PERMISSION_MASK_IRGRP<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L90"><em>Source</em></a></div></h3>
+<h3 id="PERMISSION_MASK_IRGRP"><span><a class="doc-id-link" href="#PERMISSION_MASK_IRGRP">PERMISSION_MASK_IRGRP<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L80"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PERMISSION_MASK_IRGRP: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o000040</pre>
 </div>
@@ -2667,7 +2835,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PERMISSION_MASK_IROTH"><span><a class="doc-id-link" href="#PERMISSION_MASK_IROTH">PERMISSION_MASK_IROTH<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L96"><em>Source</em></a></div></h3>
+<h3 id="PERMISSION_MASK_IROTH"><span><a class="doc-id-link" href="#PERMISSION_MASK_IROTH">PERMISSION_MASK_IROTH<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L86"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PERMISSION_MASK_IROTH: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o000004</pre>
 </div>
@@ -2677,7 +2845,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PERMISSION_MASK_IRUSR"><span><a class="doc-id-link" href="#PERMISSION_MASK_IRUSR">PERMISSION_MASK_IRUSR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L84"><em>Source</em></a></div></h3>
+<h3 id="PERMISSION_MASK_IRUSR"><span><a class="doc-id-link" href="#PERMISSION_MASK_IRUSR">PERMISSION_MASK_IRUSR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L74"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PERMISSION_MASK_IRUSR: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o000400</pre>
 </div>
@@ -2687,7 +2855,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PERMISSION_MASK_IRWXG"><span><a class="doc-id-link" href="#PERMISSION_MASK_IRWXG">PERMISSION_MASK_IRWXG<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L89"><em>Source</em></a></div></h3>
+<h3 id="PERMISSION_MASK_IRWXG"><span><a class="doc-id-link" href="#PERMISSION_MASK_IRWXG">PERMISSION_MASK_IRWXG<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L79"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PERMISSION_MASK_IRWXG: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o000070</pre>
 </div>
@@ -2697,7 +2865,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PERMISSION_MASK_IRWXO"><span><a class="doc-id-link" href="#PERMISSION_MASK_IRWXO">PERMISSION_MASK_IRWXO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L95"><em>Source</em></a></div></h3>
+<h3 id="PERMISSION_MASK_IRWXO"><span><a class="doc-id-link" href="#PERMISSION_MASK_IRWXO">PERMISSION_MASK_IRWXO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L85"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PERMISSION_MASK_IRWXO: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o000007</pre>
 </div>
@@ -2707,7 +2875,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PERMISSION_MASK_IRWXU"><span><a class="doc-id-link" href="#PERMISSION_MASK_IRWXU">PERMISSION_MASK_IRWXU<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L83"><em>Source</em></a></div></h3>
+<h3 id="PERMISSION_MASK_IRWXU"><span><a class="doc-id-link" href="#PERMISSION_MASK_IRWXU">PERMISSION_MASK_IRWXU<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L73"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PERMISSION_MASK_IRWXU: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o000700</pre>
 </div>
@@ -2717,7 +2885,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PERMISSION_MASK_ISGID"><span><a class="doc-id-link" href="#PERMISSION_MASK_ISGID">PERMISSION_MASK_ISGID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L102"><em>Source</em></a></div></h3>
+<h3 id="PERMISSION_MASK_ISGID"><span><a class="doc-id-link" href="#PERMISSION_MASK_ISGID">PERMISSION_MASK_ISGID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L92"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PERMISSION_MASK_ISGID: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o002000</pre>
 </div>
@@ -2727,7 +2895,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PERMISSION_MASK_ISUID"><span><a class="doc-id-link" href="#PERMISSION_MASK_ISUID">PERMISSION_MASK_ISUID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L101"><em>Source</em></a></div></h3>
+<h3 id="PERMISSION_MASK_ISUID"><span><a class="doc-id-link" href="#PERMISSION_MASK_ISUID">PERMISSION_MASK_ISUID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L91"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PERMISSION_MASK_ISUID: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o004000</pre>
 </div>
@@ -2737,7 +2905,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PERMISSION_MASK_ISVTX"><span><a class="doc-id-link" href="#PERMISSION_MASK_ISVTX">PERMISSION_MASK_ISVTX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L103"><em>Source</em></a></div></h3>
+<h3 id="PERMISSION_MASK_ISVTX"><span><a class="doc-id-link" href="#PERMISSION_MASK_ISVTX">PERMISSION_MASK_ISVTX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L93"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PERMISSION_MASK_ISVTX: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o001000</pre>
 </div>
@@ -2747,7 +2915,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PERMISSION_MASK_IWGRP"><span><a class="doc-id-link" href="#PERMISSION_MASK_IWGRP">PERMISSION_MASK_IWGRP<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L91"><em>Source</em></a></div></h3>
+<h3 id="PERMISSION_MASK_IWGRP"><span><a class="doc-id-link" href="#PERMISSION_MASK_IWGRP">PERMISSION_MASK_IWGRP<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L81"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PERMISSION_MASK_IWGRP: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o000020</pre>
 </div>
@@ -2757,7 +2925,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PERMISSION_MASK_IWOTH"><span><a class="doc-id-link" href="#PERMISSION_MASK_IWOTH">PERMISSION_MASK_IWOTH<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L97"><em>Source</em></a></div></h3>
+<h3 id="PERMISSION_MASK_IWOTH"><span><a class="doc-id-link" href="#PERMISSION_MASK_IWOTH">PERMISSION_MASK_IWOTH<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L87"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PERMISSION_MASK_IWOTH: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o000002</pre>
 </div>
@@ -2767,7 +2935,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PERMISSION_MASK_IWUSR"><span><a class="doc-id-link" href="#PERMISSION_MASK_IWUSR">PERMISSION_MASK_IWUSR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L85"><em>Source</em></a></div></h3>
+<h3 id="PERMISSION_MASK_IWUSR"><span><a class="doc-id-link" href="#PERMISSION_MASK_IWUSR">PERMISSION_MASK_IWUSR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L75"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PERMISSION_MASK_IWUSR: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o000200</pre>
 </div>
@@ -2777,7 +2945,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PERMISSION_MASK_IXGRP"><span><a class="doc-id-link" href="#PERMISSION_MASK_IXGRP">PERMISSION_MASK_IXGRP<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L92"><em>Source</em></a></div></h3>
+<h3 id="PERMISSION_MASK_IXGRP"><span><a class="doc-id-link" href="#PERMISSION_MASK_IXGRP">PERMISSION_MASK_IXGRP<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L82"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PERMISSION_MASK_IXGRP: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o000010</pre>
 </div>
@@ -2787,7 +2955,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PERMISSION_MASK_IXOTH"><span><a class="doc-id-link" href="#PERMISSION_MASK_IXOTH">PERMISSION_MASK_IXOTH<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L98"><em>Source</em></a></div></h3>
+<h3 id="PERMISSION_MASK_IXOTH"><span><a class="doc-id-link" href="#PERMISSION_MASK_IXOTH">PERMISSION_MASK_IXOTH<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L88"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PERMISSION_MASK_IXOTH: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o000001</pre>
 </div>
@@ -2797,7 +2965,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PERMISSION_MASK_IXUSR"><span><a class="doc-id-link" href="#PERMISSION_MASK_IXUSR">PERMISSION_MASK_IXUSR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L86"><em>Source</em></a></div></h3>
+<h3 id="PERMISSION_MASK_IXUSR"><span><a class="doc-id-link" href="#PERMISSION_MASK_IXUSR">PERMISSION_MASK_IXUSR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L76"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PERMISSION_MASK_IXUSR: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o000100</pre>
 </div>
@@ -2831,7 +2999,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PROT_EXEC"><span><a class="doc-id-link" href="#PROT_EXEC">PROT_EXEC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L80"><em>Source</em></a></div></h3>
+<h3 id="PROT_EXEC"><span><a class="doc-id-link" href="#PROT_EXEC">PROT_EXEC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L70"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROT_EXEC: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x04</pre>
 </div>
@@ -2841,7 +3009,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PROT_NONE"><span><a class="doc-id-link" href="#PROT_NONE">PROT_NONE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L77"><em>Source</em></a></div></h3>
+<h3 id="PROT_NONE"><span><a class="doc-id-link" href="#PROT_NONE">PROT_NONE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L67"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROT_NONE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00</pre>
 </div>
@@ -2851,7 +3019,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PROT_READ"><span><a class="doc-id-link" href="#PROT_READ">PROT_READ<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L78"><em>Source</em></a></div></h3>
+<h3 id="PROT_READ"><span><a class="doc-id-link" href="#PROT_READ">PROT_READ<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L68"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROT_READ: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x01</pre>
 </div>
@@ -2861,7 +3029,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PROT_WRITE"><span><a class="doc-id-link" href="#PROT_WRITE">PROT_WRITE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L79"><em>Source</em></a></div></h3>
+<h3 id="PROT_WRITE"><span><a class="doc-id-link" href="#PROT_WRITE">PROT_WRITE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L69"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PROT_WRITE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x02</pre>
 </div>
@@ -2881,7 +3049,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ULOCK_WAIT_2_AVAILABLE"><span><a class="doc-id-link" href="#ULOCK_WAIT_2_AVAILABLE">ULOCK_WAIT_2_AVAILABLE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L20"><em>Source</em></a></div></h3>
+<h3 id="ULOCK_WAIT_2_AVAILABLE"><span><a class="doc-id-link" href="#ULOCK_WAIT_2_AVAILABLE">ULOCK_WAIT_2_AVAILABLE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L18"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ULOCK_WAIT_2_AVAILABLE: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : true</pre>
 </div>
@@ -2965,7 +3133,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="WAIT_ON_ADDRESS_AVAILABLE"><span><a class="doc-id-link" href="#WAIT_ON_ADDRESS_AVAILABLE">WAIT_ON_ADDRESS_AVAILABLE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L14"><em>Source</em></a></div></h3>
+<h3 id="WAIT_ON_ADDRESS_AVAILABLE"><span><a class="doc-id-link" href="#WAIT_ON_ADDRESS_AVAILABLE">WAIT_ON_ADDRESS_AVAILABLE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L12"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">WAIT_ON_ADDRESS_AVAILABLE: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : false</pre>
 </div>
@@ -3005,9 +3173,45 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="errno"><span><a class="doc-id-link" href="#errno">errno<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/darwin.odin#L33"><em>Source</em></a></div></h3>
+<h3 id="copyfile"><span><a class="doc-id-link" href="#copyfile">copyfile<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/copyfile.odin#L60"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">copyfile :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (from, to: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, state: <a class="code-typename" href="/core/sys/darwin/#copyfile_state_t">copyfile_state_t</a>, flags: <span class="keyword-type">bit_set</span>[<span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {ACL, STAT, XATTR, DATA, RECURSIVE            = 15, CHECK, EXCL, NOFOLLOW_SRC, NOFOLLOW_DST, MOVE, UNLINK, PACK, UNPACK, CLONE, CLONE_FORCE, RUN_IN_PLACE, DATA_SPARSE, PRESERVE_DST_TRACKED, VERBOSE              = 30, }; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="copyfile_state_alloc"><span><a class="doc-id-link" href="#copyfile_state_alloc">copyfile_state_alloc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/copyfile.odin#L63"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">copyfile_state_alloc :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a class="code-typename" href="/core/sys/darwin/#copyfile_state_t">copyfile_state_t</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="copyfile_state_free"><span><a class="doc-id-link" href="#copyfile_state_free">copyfile_state_free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/copyfile.odin#L64"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">copyfile_state_free :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (state: <a class="code-typename" href="/core/sys/darwin/#copyfile_state_t">copyfile_state_t</a>) -> posix.<a class="code-typename" href="/core/sys/posix/#result">result</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="copyfile_state_get"><span><a class="doc-id-link" href="#copyfile_state_get">copyfile_state_get<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/copyfile.odin#L65"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">copyfile_state_get :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (state: <a class="code-typename" href="/core/sys/darwin/#copyfile_state_t">copyfile_state_t</a>, flag: <a class="code-typename" href="/core/sys/darwin/#copyfile_state_flag">copyfile_state_flag</a>, dst: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> posix.<a class="code-typename" href="/core/sys/posix/#result">result</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="copyfile_state_set"><span><a class="doc-id-link" href="#copyfile_state_set">copyfile_state_set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/copyfile.odin#L66"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">copyfile_state_set :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (state: <a class="code-typename" href="/core/sys/darwin/#copyfile_state_t">copyfile_state_t</a>, flag: <a class="code-typename" href="/core/sys/darwin/#copyfile_state_flag">copyfile_state_flag</a>, src: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> posix.<a class="code-typename" href="/core/sys/posix/#result">result</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="errno"><span><a class="doc-id-link" href="#errno">errno<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/darwin.odin#L34"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">errno :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="fcopyfile"><span><a class="doc-id-link" href="#fcopyfile">fcopyfile<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/copyfile.odin#L61"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">fcopyfile :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (from, to: posix.<a class="code-typename" href="/core/sys/posix/#FD">FD</a>, state: <a class="code-typename" href="/core/sys/darwin/#copyfile_state_t">copyfile_state_t</a>, flags: <span class="keyword-type">bit_set</span>[<span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {ACL, STAT, XATTR, DATA, RECURSIVE            = 15, CHECK, EXCL, NOFOLLOW_SRC, NOFOLLOW_DST, MOVE, UNLINK, PACK, UNPACK, CLONE, CLONE_FORCE, RUN_IN_PLACE, DATA_SPARSE, PRESERVE_DST_TRACKED, VERBOSE              = 30, }; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -3036,7 +3240,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="os_sync_wait_on_address"><span><a class="doc-id-link" href="#os_sync_wait_on_address">os_sync_wait_on_address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L148"><em>Source</em></a></div></h3>
+<h3 id="os_sync_wait_on_address"><span><a class="doc-id-link" href="#os_sync_wait_on_address">os_sync_wait_on_address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L146"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">os_sync_wait_on_address :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, value: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, flags: <a class="code-typename" href="/core/sys/darwin/#os_sync_wait_on_address_flags">os_sync_wait_on_address_flags</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
@@ -3119,7 +3323,7 @@ if (current != expected) {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="os_sync_wait_on_address_with_deadline"><span><a class="doc-id-link" href="#os_sync_wait_on_address_with_deadline">os_sync_wait_on_address_with_deadline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L199"><em>Source</em></a></div></h3>
+<h3 id="os_sync_wait_on_address_with_deadline"><span><a class="doc-id-link" href="#os_sync_wait_on_address_with_deadline">os_sync_wait_on_address_with_deadline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L197"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">os_sync_wait_on_address_with_deadline :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
 	addr:     <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
@@ -3170,7 +3374,7 @@ ETIMEDOUT	:	Deadline expired.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="os_sync_wait_on_address_with_timeout"><span><a class="doc-id-link" href="#os_sync_wait_on_address_with_timeout">os_sync_wait_on_address_with_timeout<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L252"><em>Source</em></a></div></h3>
+<h3 id="os_sync_wait_on_address_with_timeout"><span><a class="doc-id-link" href="#os_sync_wait_on_address_with_timeout">os_sync_wait_on_address_with_timeout<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L250"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">os_sync_wait_on_address_with_timeout :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
 	addr:       <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
@@ -3221,7 +3425,7 @@ ETIMEDOUT	:	Timeout expired.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="os_sync_wake_by_address_all"><span><a class="doc-id-link" href="#os_sync_wake_by_address_all">os_sync_wake_by_address_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L313"><em>Source</em></a></div></h3>
+<h3 id="os_sync_wake_by_address_all"><span><a class="doc-id-link" href="#os_sync_wake_by_address_all">os_sync_wake_by_address_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L311"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">os_sync_wake_by_address_all :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, flags: <a class="code-typename" href="/core/sys/darwin/#os_sync_wake_by_address_flags">os_sync_wake_by_address_flags</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
@@ -3245,7 +3449,7 @@ In the event of an error, returns -1 with errno set to indicate the error.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="os_sync_wake_by_address_any"><span><a class="doc-id-link" href="#os_sync_wake_by_address_any">os_sync_wake_by_address_any<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L291"><em>Source</em></a></div></h3>
+<h3 id="os_sync_wake_by_address_any"><span><a class="doc-id-link" href="#os_sync_wake_by_address_any">os_sync_wake_by_address_any<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin#L289"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">os_sync_wake_by_address_any :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, flags: <a class="code-typename" href="/core/sys/darwin/#os_sync_wake_by_address_flags">os_sync_wake_by_address_flags</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
@@ -3410,79 +3614,79 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_access"><span><a class="doc-id-link" href="#syscall_access">syscall_access<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L324"><em>Source</em></a></div></h3>
+<h3 id="syscall_access"><span><a class="doc-id-link" href="#syscall_access">syscall_access<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L314"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_access :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, mode: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_adjtime"><span><a class="doc-id-link" href="#syscall_adjtime">syscall_adjtime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L393"><em>Source</em></a></div></h3>
+<h3 id="syscall_adjtime"><span><a class="doc-id-link" href="#syscall_adjtime">syscall_adjtime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L383"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_adjtime :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (delta: ^<a class="code-typename" href="/core/sys/darwin/#_STRUCT_TIMEVAL">_STRUCT_TIMEVAL</a>, old_delta: ^<a class="code-typename" href="/core/sys/darwin/#_STRUCT_TIMEVAL">_STRUCT_TIMEVAL</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_chdir"><span><a class="doc-id-link" href="#syscall_chdir">syscall_chdir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L417"><em>Source</em></a></div></h3>
+<h3 id="syscall_chdir"><span><a class="doc-id-link" href="#syscall_chdir">syscall_chdir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L407"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_chdir :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_chmod"><span><a class="doc-id-link" href="#syscall_chmod">syscall_chmod<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L260"><em>Source</em></a></div></h3>
+<h3 id="syscall_chmod"><span><a class="doc-id-link" href="#syscall_chmod">syscall_chmod<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L250"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_chmod :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, mode: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_close"><span><a class="doc-id-link" href="#syscall_close">syscall_close<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L252"><em>Source</em></a></div></h3>
+<h3 id="syscall_close"><span><a class="doc-id-link" href="#syscall_close">syscall_close<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L242"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_close :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_copyfile"><span><a class="doc-id-link" href="#syscall_copyfile">syscall_copyfile<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L348"><em>Source</em></a></div></h3>
+<h3 id="syscall_copyfile"><span><a class="doc-id-link" href="#syscall_copyfile">syscall_copyfile<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L338"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_copyfile :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (from: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, to: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, state: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, flags: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_dup"><span><a class="doc-id-link" href="#syscall_dup">syscall_dup<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L365"><em>Source</em></a></div></h3>
+<h3 id="syscall_dup"><span><a class="doc-id-link" href="#syscall_dup">syscall_dup<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L355"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_dup :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_execve"><span><a class="doc-id-link" href="#syscall_execve">syscall_execve<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L369"><em>Source</em></a></div></h3>
+<h3 id="syscall_execve"><span><a class="doc-id-link" href="#syscall_execve">syscall_execve<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L359"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_execve :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, argv: [^]<a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, env: [^]<a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_exit"><span><a class="doc-id-link" href="#syscall_exit">syscall_exit<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L357"><em>Source</em></a></div></h3>
+<h3 id="syscall_exit"><span><a class="doc-id-link" href="#syscall_exit">syscall_exit<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L347"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_exit :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (code: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_faccessat"><span><a class="doc-id-link" href="#syscall_faccessat">syscall_faccessat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L328"><em>Source</em></a></div></h3>
+<h3 id="syscall_faccessat"><span><a class="doc-id-link" href="#syscall_faccessat">syscall_faccessat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L318"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_faccessat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, mode: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, flag: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_fchdir"><span><a class="doc-id-link" href="#syscall_fchdir">syscall_fchdir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L421"><em>Source</em></a></div></h3>
+<h3 id="syscall_fchdir"><span><a class="doc-id-link" href="#syscall_fchdir">syscall_fchdir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L411"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_fchdir :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_fchmod"><span><a class="doc-id-link" href="#syscall_fchmod">syscall_fchmod<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L256"><em>Source</em></a></div></h3>
+<h3 id="syscall_fchmod"><span><a class="doc-id-link" href="#syscall_fchmod">syscall_fchmod<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L246"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_fchmod :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fildes: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, mode: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_fcntl"><span><a class="doc-id-link" href="#syscall_fcntl">syscall_fcntl<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L353"><em>Source</em></a></div></h3>
+<h3 id="syscall_fcntl"><span><a class="doc-id-link" href="#syscall_fcntl">syscall_fcntl<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L343"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_fcntl :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, cmd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, other: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
@@ -3492,109 +3696,109 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_flock"><span><a class="doc-id-link" href="#syscall_flock">syscall_flock<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L381"><em>Source</em></a></div></h3>
+<h3 id="syscall_flock"><span><a class="doc-id-link" href="#syscall_flock">syscall_flock<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L371"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_flock :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, operation: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_fstat"><span><a class="doc-id-link" href="#syscall_fstat">syscall_fstat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L292"><em>Source</em></a></div></h3>
+<h3 id="syscall_fstat"><span><a class="doc-id-link" href="#syscall_fstat">syscall_fstat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L282"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_fstat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, status: ^<a class="code-typename" href="/core/sys/darwin/#__DARWIN_STRUCT_STAT64">__DARWIN_STRUCT_STAT64</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_fstatat"><span><a class="doc-id-link" href="#syscall_fstatat">syscall_fstatat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L304"><em>Source</em></a></div></h3>
+<h3 id="syscall_fstatat"><span><a class="doc-id-link" href="#syscall_fstatat">syscall_fstatat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L294"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_fstatat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, status: ^<a class="code-typename" href="/core/sys/darwin/#__DARWIN_STRUCT_STAT64">__DARWIN_STRUCT_STAT64</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_fsync"><span><a class="doc-id-link" href="#syscall_fsync">syscall_fsync<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L236"><em>Source</em></a></div></h3>
+<h3 id="syscall_fsync"><span><a class="doc-id-link" href="#syscall_fsync">syscall_fsync<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L226"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_fsync :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fildes: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_ftruncate"><span><a class="doc-id-link" href="#syscall_ftruncate">syscall_ftruncate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L340"><em>Source</em></a></div></h3>
+<h3 id="syscall_ftruncate"><span><a class="doc-id-link" href="#syscall_ftruncate">syscall_ftruncate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L330"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_ftruncate :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, length: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_futimes"><span><a class="doc-id-link" href="#syscall_futimes">syscall_futimes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L389"><em>Source</em></a></div></h3>
+<h3 id="syscall_futimes"><span><a class="doc-id-link" href="#syscall_futimes">syscall_futimes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L379"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_futimes :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, times: ^<a class="code-typename" href="/core/sys/darwin/#_STRUCT_TIMEVAL">_STRUCT_TIMEVAL</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_getdirentries"><span><a class="doc-id-link" href="#syscall_getdirentries">syscall_getdirentries<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L332"><em>Source</em></a></div></h3>
+<h3 id="syscall_getdirentries"><span><a class="doc-id-link" href="#syscall_getdirentries">syscall_getdirentries<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L322"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_getdirentries :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, buf: ^<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, nbytes: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, base_pointer: ^<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_getentropy"><span><a class="doc-id-link" href="#syscall_getentropy">syscall_getentropy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L409"><em>Source</em></a></div></h3>
+<h3 id="syscall_getentropy"><span><a class="doc-id-link" href="#syscall_getentropy">syscall_getentropy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L399"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_getentropy :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (buf: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, buflen: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_getrusage"><span><a class="doc-id-link" href="#syscall_getrusage">syscall_getrusage<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L425"><em>Source</em></a></div></h3>
+<h3 id="syscall_getrusage"><span><a class="doc-id-link" href="#syscall_getrusage">syscall_getrusage<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L415"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_getrusage :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (who: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, rusage: ^<a class="code-typename" href="/core/sys/darwin/#RUsage">RUsage</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_gettid"><span><a class="doc-id-link" href="#syscall_gettid">syscall_gettid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L288"><em>Source</em></a></div></h3>
+<h3 id="syscall_gettid"><span><a class="doc-id-link" href="#syscall_gettid">syscall_gettid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L278"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_gettid :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_kill"><span><a class="doc-id-link" href="#syscall_kill">syscall_kill<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L361"><em>Source</em></a></div></h3>
+<h3 id="syscall_kill"><span><a class="doc-id-link" href="#syscall_kill">syscall_kill<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L351"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_kill :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (pid: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, sig: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_link"><span><a class="doc-id-link" href="#syscall_link">syscall_link<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L308"><em>Source</em></a></div></h3>
+<h3 id="syscall_link"><span><a class="doc-id-link" href="#syscall_link">syscall_link<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L298"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_link :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, to_link: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_linkat"><span><a class="doc-id-link" href="#syscall_linkat">syscall_linkat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L312"><em>Source</em></a></div></h3>
+<h3 id="syscall_linkat"><span><a class="doc-id-link" href="#syscall_linkat">syscall_linkat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L302"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_linkat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fd2: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, to_link: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_lseek"><span><a class="doc-id-link" href="#syscall_lseek">syscall_lseek<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L284"><em>Source</em></a></div></h3>
+<h3 id="syscall_lseek"><span><a class="doc-id-link" href="#syscall_lseek">syscall_lseek<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L274"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_lseek :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, offset: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, whence: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_lstat"><span><a class="doc-id-link" href="#syscall_lstat">syscall_lstat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L296"><em>Source</em></a></div></h3>
+<h3 id="syscall_lstat"><span><a class="doc-id-link" href="#syscall_lstat">syscall_lstat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L286"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_lstat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, status: ^<a class="code-typename" href="/core/sys/darwin/#__DARWIN_STRUCT_STAT64">__DARWIN_STRUCT_STAT64</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_mkdir"><span><a class="doc-id-link" href="#syscall_mkdir">syscall_mkdir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L264"><em>Source</em></a></div></h3>
+<h3 id="syscall_mkdir"><span><a class="doc-id-link" href="#syscall_mkdir">syscall_mkdir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L254"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_mkdir :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, mode: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_mkdir_at"><span><a class="doc-id-link" href="#syscall_mkdir_at">syscall_mkdir_at<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L268"><em>Source</em></a></div></h3>
+<h3 id="syscall_mkdir_at"><span><a class="doc-id-link" href="#syscall_mkdir_at">syscall_mkdir_at<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L258"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_mkdir_at :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, mode: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_mmap"><span><a class="doc-id-link" href="#syscall_mmap">syscall_mmap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L377"><em>Source</em></a></div></h3>
+<h3 id="syscall_mmap"><span><a class="doc-id-link" href="#syscall_mmap">syscall_mmap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L367"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_mmap :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (
 	addr:   ^<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
@@ -3607,31 +3811,31 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_munmap"><span><a class="doc-id-link" href="#syscall_munmap">syscall_munmap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L373"><em>Source</em></a></div></h3>
+<h3 id="syscall_munmap"><span><a class="doc-id-link" href="#syscall_munmap">syscall_munmap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L363"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_munmap :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_open"><span><a class="doc-id-link" href="#syscall_open">syscall_open<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L248"><em>Source</em></a></div></h3>
+<h3 id="syscall_open"><span><a class="doc-id-link" href="#syscall_open">syscall_open<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L238"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_open :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, oflag: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, mode: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_openat"><span><a class="doc-id-link" href="#syscall_openat">syscall_openat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L405"><em>Source</em></a></div></h3>
+<h3 id="syscall_openat"><span><a class="doc-id-link" href="#syscall_openat">syscall_openat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L395"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_openat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, oflag: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, mode: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_pipe"><span><a class="doc-id-link" href="#syscall_pipe">syscall_pipe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L413"><em>Source</em></a></div></h3>
+<h3 id="syscall_pipe"><span><a class="doc-id-link" href="#syscall_pipe">syscall_pipe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L403"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_pipe :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fds: [^]<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_proc_info"><span><a class="doc-id-link" href="#syscall_proc_info">syscall_proc_info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L401"><em>Source</em></a></div></h3>
+<h3 id="syscall_proc_info"><span><a class="doc-id-link" href="#syscall_proc_info">syscall_proc_info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L391"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_proc_info :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (
 	num:         <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
@@ -3644,61 +3848,61 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_read"><span><a class="doc-id-link" href="#syscall_read">syscall_read<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L244"><em>Source</em></a></div></h3>
+<h3 id="syscall_read"><span><a class="doc-id-link" href="#syscall_read">syscall_read<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L234"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_read :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fildes: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, buf: ^<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, nbyte: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) -> <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_readlink"><span><a class="doc-id-link" href="#syscall_readlink">syscall_readlink<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L316"><em>Source</em></a></div></h3>
+<h3 id="syscall_readlink"><span><a class="doc-id-link" href="#syscall_readlink">syscall_readlink<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L306"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_readlink :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, buf: ^<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, buf_size: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) -> <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_readlinkat"><span><a class="doc-id-link" href="#syscall_readlinkat">syscall_readlinkat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L320"><em>Source</em></a></div></h3>
+<h3 id="syscall_readlinkat"><span><a class="doc-id-link" href="#syscall_readlinkat">syscall_readlinkat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L310"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_readlinkat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, buf: ^<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, buf_size: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) -> <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_rename"><span><a class="doc-id-link" href="#syscall_rename">syscall_rename<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L276"><em>Source</em></a></div></h3>
+<h3 id="syscall_rename"><span><a class="doc-id-link" href="#syscall_rename">syscall_rename<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L266"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_rename :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path_old: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, path_new: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_rename_at"><span><a class="doc-id-link" href="#syscall_rename_at">syscall_rename_at<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L280"><em>Source</em></a></div></h3>
+<h3 id="syscall_rename_at"><span><a class="doc-id-link" href="#syscall_rename_at">syscall_rename_at<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L270"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_rename_at :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (from_fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, from: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, to_fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, to: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_rmdir"><span><a class="doc-id-link" href="#syscall_rmdir">syscall_rmdir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L272"><em>Source</em></a></div></h3>
+<h3 id="syscall_rmdir"><span><a class="doc-id-link" href="#syscall_rmdir">syscall_rmdir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L262"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_rmdir :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, mode: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_shm_open"><span><a class="doc-id-link" href="#syscall_shm_open">syscall_shm_open<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L429"><em>Source</em></a></div></h3>
+<h3 id="syscall_shm_open"><span><a class="doc-id-link" href="#syscall_shm_open">syscall_shm_open<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L419"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_shm_open :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (name: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, oflag: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, mode: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_shm_unlink"><span><a class="doc-id-link" href="#syscall_shm_unlink">syscall_shm_unlink<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L433"><em>Source</em></a></div></h3>
+<h3 id="syscall_shm_unlink"><span><a class="doc-id-link" href="#syscall_shm_unlink">syscall_shm_unlink<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L423"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_shm_unlink :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (name: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_stat"><span><a class="doc-id-link" href="#syscall_stat">syscall_stat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L300"><em>Source</em></a></div></h3>
+<h3 id="syscall_stat"><span><a class="doc-id-link" href="#syscall_stat">syscall_stat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L290"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_stat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, status: ^<a class="code-typename" href="/core/sys/darwin/#__DARWIN_STRUCT_STAT64">__DARWIN_STRUCT_STAT64</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_sysctl"><span><a class="doc-id-link" href="#syscall_sysctl">syscall_sysctl<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L344"><em>Source</em></a></div></h3>
+<h3 id="syscall_sysctl"><span><a class="doc-id-link" href="#syscall_sysctl">syscall_sysctl<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L334"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_sysctl :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (
 	name:    [^]<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
@@ -3711,25 +3915,25 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_sysctlbyname"><span><a class="doc-id-link" href="#syscall_sysctlbyname">syscall_sysctlbyname<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L397"><em>Source</em></a></div></h3>
+<h3 id="syscall_sysctlbyname"><span><a class="doc-id-link" href="#syscall_sysctlbyname">syscall_sysctlbyname<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L387"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_sysctlbyname :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (name: untyped string, oldp: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, oldlenp: ^<a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, newp: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, newlen: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_truncate"><span><a class="doc-id-link" href="#syscall_truncate">syscall_truncate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L336"><em>Source</em></a></div></h3>
+<h3 id="syscall_truncate"><span><a class="doc-id-link" href="#syscall_truncate">syscall_truncate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L326"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_truncate :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, length: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_utimes"><span><a class="doc-id-link" href="#syscall_utimes">syscall_utimes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L385"><em>Source</em></a></div></h3>
+<h3 id="syscall_utimes"><span><a class="doc-id-link" href="#syscall_utimes">syscall_utimes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L375"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_utimes :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, times: ^<a class="code-typename" href="/core/sys/darwin/#_STRUCT_TIMEVAL">_STRUCT_TIMEVAL</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_write"><span><a class="doc-id-link" href="#syscall_write">syscall_write<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L240"><em>Source</em></a></div></h3>
+<h3 id="syscall_write"><span><a class="doc-id-link" href="#syscall_write">syscall_write<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L230"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_write :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fildes: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, buf: ^<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, nbyte: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -3774,6 +3978,7 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </section>
 <h2 id="pkg-source-files">Source Files</h2>
 <ul>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/copyfile.odin">copyfile.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/darwin.odin">darwin.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/proc.odin">proc.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/sync.odin">sync.odin</a></li>
@@ -3783,7 +3988,7 @@ EINVAL	:	The operation associated with existing kernel state</p>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-05 (vendor "odin") Windows_amd64 @ 2025-05-08 21:12:59.977927600 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 16:13:57.438482600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -3811,6 +4016,9 @@ EINVAL	:	The operation associated with existing kernel state</p>
 <li><a href="#blkcnt_t">blkcnt_t</a></li>
 <li><a href="#blksize_t">blksize_t</a></li>
 <li><a href="#boolean_t">boolean_t</a></li>
+<li><a href="#copyfile_flags">copyfile_flags</a></li>
+<li><a href="#copyfile_state_flag">copyfile_state_flag</a></li>
+<li><a href="#copyfile_state_t">copyfile_state_t</a></li>
 <li><a href="#dev_t">dev_t</a></li>
 <li><a href="#fsid_t">fsid_t</a></li>
 <li><a href="#gid_t">gid_t</a></li>
@@ -3854,13 +4062,10 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </ul>
 </li>
 <li><a href="#pkg-Constants">Constants</a><ul>
-<li><a href="#COPYFILE_ACL">COPYFILE_ACL</a></li>
 <li><a href="#COPYFILE_ALL">COPYFILE_ALL</a></li>
-<li><a href="#COPYFILE_DATA">COPYFILE_DATA</a></li>
 <li><a href="#COPYFILE_METADATA">COPYFILE_METADATA</a></li>
+<li><a href="#COPYFILE_NOFOLLOW">COPYFILE_NOFOLLOW</a></li>
 <li><a href="#COPYFILE_SECURITY">COPYFILE_SECURITY</a></li>
-<li><a href="#COPYFILE_STAT">COPYFILE_STAT</a></li>
-<li><a href="#COPYFILE_XATTR">COPYFILE_XATTR</a></li>
 <li><a href="#DARWIN_MAXCOMLEN">DARWIN_MAXCOMLEN</a></li>
 <li><a href="#DARWIN_PROC_ALL_PIDS">DARWIN_PROC_ALL_PIDS</a></li>
 <li><a href="#DARWIN_PROC_INFO_CALL_CANUSEFGHW">DARWIN_PROC_INFO_CALL_CANUSEFGHW</a></li>
@@ -3967,7 +4172,13 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </li>
 <li><a href="#pkg-Procedures">Procedures</a><ul>
 <li><a href="#VM_GET_FLAGS_ALIAS">VM_GET_FLAGS_ALIAS</a></li>
+<li><a href="#copyfile">copyfile</a></li>
+<li><a href="#copyfile_state_alloc">copyfile_state_alloc</a></li>
+<li><a href="#copyfile_state_free">copyfile_state_free</a></li>
+<li><a href="#copyfile_state_get">copyfile_state_get</a></li>
+<li><a href="#copyfile_state_set">copyfile_state_set</a></li>
 <li><a href="#errno">errno</a></li>
+<li><a href="#fcopyfile">fcopyfile</a></li>
 <li><a href="#mach_make_memory_entry">mach_make_memory_entry</a></li>
 <li><a href="#mach_port_deallocate">mach_port_deallocate</a></li>
 <li><a href="#mach_task_self">mach_task_self</a></li>

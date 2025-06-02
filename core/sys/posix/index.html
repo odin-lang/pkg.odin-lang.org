@@ -11,13 +11,28 @@
 	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
 	<script>hljs.highlightAll()</script>
 	<script>
-		function toggleDarkMode() {
-			if (document.body.classList.toggle("dark-mode")) {
-				window.localStorage.setItem("theme", "dark");
-			} else {
-				window.localStorage.setItem("theme", "light");
-			}
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
 		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
 	</script>
 	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
 
@@ -27,10 +42,14 @@
 </head>
 <body>
 <script>
-	if (window.localStorage.getItem("theme") === "dark")
-		document.body.classList.add("dark-mode");
-	else
-		document.body.classList.remove("dark-mode");
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
 </script>
 <header class="sticky-top">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
@@ -139,7 +158,6 @@
 </li>
 <li class="nav-item"><a href="/core/dynlib">dynlib</a></li>
 <li class="nav-item">encoding<ul>
-<li><a href="/core/encoding/ansi">ansi</a></li>
 <li><a href="/core/encoding/base32">base32</a></li>
 <li><a href="/core/encoding/base64">base64</a></li>
 <li><a href="/core/encoding/cbor">cbor</a></li>
@@ -255,6 +273,11 @@
 <li><a href="/core/sys/unix">unix</a></li>
 <li><a href="/core/sys/valgrind">valgrind</a></li>
 <li><a href="/core/sys/windows">windows</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/terminal">terminal</a><ul>
+<li><a href="/core/terminal/ansi">ansi</a></li>
 </ul>
 
 </li>
@@ -578,7 +601,7 @@ Types (200)</summary>
 <div>
 <details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
 <summary id="#doc-index-Constants-header">
-Constants (637)</summary>
+Constants (638)</summary>
 <ul>
 <li><a href="#ABDAY_1">ABDAY_1</a></li>
 <li><a href="#ABDAY_2">ABDAY_2</a></li>
@@ -1106,6 +1129,7 @@ Constants (637)</summary>
 <li><a href="#SIGUSR1">SIGUSR1</a></li>
 <li><a href="#SIGUSR2">SIGUSR2</a></li>
 <li><a href="#SIGVTALRM">SIGVTALRM</a></li>
+<li><a href="#SIGWINCH">SIGWINCH</a></li>
 <li><a href="#SIGXCPU">SIGXCPU</a></li>
 <li><a href="#SIGXFSZ">SIGXFSZ</a></li>
 <li><a href="#SIG_BLOCK">SIG_BLOCK</a></li>
@@ -3245,7 +3269,7 @@ Procedure Groups (1)</summary>
 <h3 id="Sig"><span><a class="doc-id-link" href="#Sig">Sig<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L335"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Sig :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
-	<span class="comment">// Resulting set is the union of the current set and the signal set and the complement of </span>
+	<span class="comment">// Resulting set is the union of the current set and the signal set and the complement of</span>
 	<span class="comment">// the signal set pointed to by the argument.</span>
 	BLOCK   = 1, 
 	<span class="comment">// Resulting set is the intersection of the current set and the complement of the signal set</span>
@@ -4916,7 +4940,7 @@ Procedure Groups (1)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="sigaction_t"><span><a class="doc-id-link" href="#sigaction_t">sigaction_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L404"><em>Source</em></a></div></h3>
+<h3 id="sigaction_t"><span><a class="doc-id-link" href="#sigaction_t">sigaction_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L405"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sigaction_t :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> _:  <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
@@ -4935,7 +4959,7 @@ Procedure Groups (1)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="siginfo_t"><span><a class="doc-id-link" href="#siginfo_t">siginfo_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L437"><em>Source</em></a></div></h3>
+<h3 id="siginfo_t"><span><a class="doc-id-link" href="#siginfo_t">siginfo_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L438"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">siginfo_t :: <span class="keyword-type">struct</span> {
 	si_signo:  <a class="code-typename" href="/core/sys/posix/#Signal">Signal</a>,
@@ -5153,7 +5177,7 @@ Procedure Groups (1)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="stack_t"><span><a class="doc-id-link" href="#stack_t">stack_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L431"><em>Source</em></a></div></h3>
+<h3 id="stack_t"><span><a class="doc-id-link" href="#stack_t">stack_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L432"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stack_t :: <span class="keyword-type">struct</span> {
 	ss_sp:    <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
@@ -5806,19 +5830,19 @@ AIO_PRIO_DELTA_MAX         :: sysconf(._AIO_PRIO_DELTA_MAX)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BUS_ADRALN"><span><a class="doc-id-link" href="#BUS_ADRALN">BUS_ADRALN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L480"><em>Source</em></a></div></h3>
+<h3 id="BUS_ADRALN"><span><a class="doc-id-link" href="#BUS_ADRALN">BUS_ADRALN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L481"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BUS_ADRALN: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BUS_ADRERR"><span><a class="doc-id-link" href="#BUS_ADRERR">BUS_ADRERR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L481"><em>Source</em></a></div></h3>
+<h3 id="BUS_ADRERR"><span><a class="doc-id-link" href="#BUS_ADRERR">BUS_ADRERR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L482"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BUS_ADRERR: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 2</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BUS_OBJERR"><span><a class="doc-id-link" href="#BUS_OBJERR">BUS_OBJERR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L482"><em>Source</em></a></div></h3>
+<h3 id="BUS_OBJERR"><span><a class="doc-id-link" href="#BUS_OBJERR">BUS_OBJERR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L483"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BUS_OBJERR: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 3</pre>
 </div>
@@ -5840,37 +5864,37 @@ AIO_PRIO_DELTA_MAX         :: sysconf(._AIO_PRIO_DELTA_MAX)</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="CLD_CONTINUED"><span><a class="doc-id-link" href="#CLD_CONTINUED">CLD_CONTINUED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L492"><em>Source</em></a></div></h3>
+<h3 id="CLD_CONTINUED"><span><a class="doc-id-link" href="#CLD_CONTINUED">CLD_CONTINUED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L493"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CLD_CONTINUED: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 6</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CLD_DUMPED"><span><a class="doc-id-link" href="#CLD_DUMPED">CLD_DUMPED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L489"><em>Source</em></a></div></h3>
+<h3 id="CLD_DUMPED"><span><a class="doc-id-link" href="#CLD_DUMPED">CLD_DUMPED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L490"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CLD_DUMPED: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 3</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CLD_EXITED"><span><a class="doc-id-link" href="#CLD_EXITED">CLD_EXITED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L487"><em>Source</em></a></div></h3>
+<h3 id="CLD_EXITED"><span><a class="doc-id-link" href="#CLD_EXITED">CLD_EXITED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L488"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CLD_EXITED: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CLD_KILLED"><span><a class="doc-id-link" href="#CLD_KILLED">CLD_KILLED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L488"><em>Source</em></a></div></h3>
+<h3 id="CLD_KILLED"><span><a class="doc-id-link" href="#CLD_KILLED">CLD_KILLED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L489"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CLD_KILLED: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 2</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CLD_STOPPED"><span><a class="doc-id-link" href="#CLD_STOPPED">CLD_STOPPED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L491"><em>Source</em></a></div></h3>
+<h3 id="CLD_STOPPED"><span><a class="doc-id-link" href="#CLD_STOPPED">CLD_STOPPED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L492"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CLD_STOPPED: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 5</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CLD_TRAPPED"><span><a class="doc-id-link" href="#CLD_TRAPPED">CLD_TRAPPED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L490"><em>Source</em></a></div></h3>
+<h3 id="CLD_TRAPPED"><span><a class="doc-id-link" href="#CLD_TRAPPED">CLD_TRAPPED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L491"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CLD_TRAPPED: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 4</pre>
 </div>
@@ -6756,49 +6780,49 @@ AIO_PRIO_DELTA_MAX         :: sysconf(._AIO_PRIO_DELTA_MAX)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="FPE_FLTDIV"><span><a class="doc-id-link" href="#FPE_FLTDIV">FPE_FLTDIV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L470"><em>Source</em></a></div></h3>
+<h3 id="FPE_FLTDIV"><span><a class="doc-id-link" href="#FPE_FLTDIV">FPE_FLTDIV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L471"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">FPE_FLTDIV: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="FPE_FLTINV"><span><a class="doc-id-link" href="#FPE_FLTINV">FPE_FLTINV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L474"><em>Source</em></a></div></h3>
+<h3 id="FPE_FLTINV"><span><a class="doc-id-link" href="#FPE_FLTINV">FPE_FLTINV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L475"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">FPE_FLTINV: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 5</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="FPE_FLTOVF"><span><a class="doc-id-link" href="#FPE_FLTOVF">FPE_FLTOVF<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L471"><em>Source</em></a></div></h3>
+<h3 id="FPE_FLTOVF"><span><a class="doc-id-link" href="#FPE_FLTOVF">FPE_FLTOVF<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L472"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">FPE_FLTOVF: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 2</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="FPE_FLTRES"><span><a class="doc-id-link" href="#FPE_FLTRES">FPE_FLTRES<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L473"><em>Source</em></a></div></h3>
+<h3 id="FPE_FLTRES"><span><a class="doc-id-link" href="#FPE_FLTRES">FPE_FLTRES<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L474"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">FPE_FLTRES: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 4</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="FPE_FLTSUB"><span><a class="doc-id-link" href="#FPE_FLTSUB">FPE_FLTSUB<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L475"><em>Source</em></a></div></h3>
+<h3 id="FPE_FLTSUB"><span><a class="doc-id-link" href="#FPE_FLTSUB">FPE_FLTSUB<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L476"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">FPE_FLTSUB: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 6</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="FPE_FLTUND"><span><a class="doc-id-link" href="#FPE_FLTUND">FPE_FLTUND<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L472"><em>Source</em></a></div></h3>
+<h3 id="FPE_FLTUND"><span><a class="doc-id-link" href="#FPE_FLTUND">FPE_FLTUND<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L473"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">FPE_FLTUND: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 3</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="FPE_INTDIV"><span><a class="doc-id-link" href="#FPE_INTDIV">FPE_INTDIV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L468"><em>Source</em></a></div></h3>
+<h3 id="FPE_INTDIV"><span><a class="doc-id-link" href="#FPE_INTDIV">FPE_INTDIV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L469"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">FPE_INTDIV: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 7</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="FPE_INTOVF"><span><a class="doc-id-link" href="#FPE_INTOVF">FPE_INTOVF<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L469"><em>Source</em></a></div></h3>
+<h3 id="FPE_INTOVF"><span><a class="doc-id-link" href="#FPE_INTOVF">FPE_INTOVF<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L470"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">FPE_INTOVF: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 8</pre>
 </div>
@@ -7056,49 +7080,49 @@ AIO_PRIO_DELTA_MAX         :: sysconf(._AIO_PRIO_DELTA_MAX)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ILL_BADSTK"><span><a class="doc-id-link" href="#ILL_BADSTK">ILL_BADSTK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L466"><em>Source</em></a></div></h3>
+<h3 id="ILL_BADSTK"><span><a class="doc-id-link" href="#ILL_BADSTK">ILL_BADSTK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L467"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ILL_BADSTK: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 8</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ILL_COPROC"><span><a class="doc-id-link" href="#ILL_COPROC">ILL_COPROC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L465"><em>Source</em></a></div></h3>
+<h3 id="ILL_COPROC"><span><a class="doc-id-link" href="#ILL_COPROC">ILL_COPROC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L466"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ILL_COPROC: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 7</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ILL_ILLADR"><span><a class="doc-id-link" href="#ILL_ILLADR">ILL_ILLADR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L461"><em>Source</em></a></div></h3>
+<h3 id="ILL_ILLADR"><span><a class="doc-id-link" href="#ILL_ILLADR">ILL_ILLADR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L462"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ILL_ILLADR: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 5</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ILL_ILLOPC"><span><a class="doc-id-link" href="#ILL_ILLOPC">ILL_ILLOPC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L459"><em>Source</em></a></div></h3>
+<h3 id="ILL_ILLOPC"><span><a class="doc-id-link" href="#ILL_ILLOPC">ILL_ILLOPC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L460"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ILL_ILLOPC: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ILL_ILLOPN"><span><a class="doc-id-link" href="#ILL_ILLOPN">ILL_ILLOPN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L460"><em>Source</em></a></div></h3>
+<h3 id="ILL_ILLOPN"><span><a class="doc-id-link" href="#ILL_ILLOPN">ILL_ILLOPN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L461"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ILL_ILLOPN: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 4</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ILL_ILLTRP"><span><a class="doc-id-link" href="#ILL_ILLTRP">ILL_ILLTRP<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L462"><em>Source</em></a></div></h3>
+<h3 id="ILL_ILLTRP"><span><a class="doc-id-link" href="#ILL_ILLTRP">ILL_ILLTRP<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L463"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ILL_ILLTRP: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 2</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ILL_PRVOPC"><span><a class="doc-id-link" href="#ILL_PRVOPC">ILL_PRVOPC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L463"><em>Source</em></a></div></h3>
+<h3 id="ILL_PRVOPC"><span><a class="doc-id-link" href="#ILL_PRVOPC">ILL_PRVOPC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L464"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ILL_PRVOPC: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 3</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ILL_PRVREG"><span><a class="doc-id-link" href="#ILL_PRVREG">ILL_PRVREG<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L464"><em>Source</em></a></div></h3>
+<h3 id="ILL_PRVREG"><span><a class="doc-id-link" href="#ILL_PRVREG">ILL_PRVREG<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L465"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ILL_PRVREG: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 6</pre>
 </div>
@@ -7423,7 +7447,7 @@ HOST_NAME_MAX              :: sysconf(._HOST_NAME_MAX)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="MINSIGSTKSZ"><span><a class="doc-id-link" href="#MINSIGSTKSZ">MINSIGSTKSZ<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L428"><em>Source</em></a></div></h3>
+<h3 id="MINSIGSTKSZ"><span><a class="doc-id-link" href="#MINSIGSTKSZ">MINSIGSTKSZ<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L429"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MINSIGSTKSZ: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 32768</pre>
 </div>
@@ -7967,37 +7991,37 @@ MQ_PRIO_MAX                :: sysconf(._MQ_PRIO_MAX)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="POLL_ERR"><span><a class="doc-id-link" href="#POLL_ERR">POLL_ERR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L497"><em>Source</em></a></div></h3>
+<h3 id="POLL_ERR"><span><a class="doc-id-link" href="#POLL_ERR">POLL_ERR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L498"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">POLL_ERR: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 4</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="POLL_HUP"><span><a class="doc-id-link" href="#POLL_HUP">POLL_HUP<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L499"><em>Source</em></a></div></h3>
+<h3 id="POLL_HUP"><span><a class="doc-id-link" href="#POLL_HUP">POLL_HUP<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L500"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">POLL_HUP: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 6</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="POLL_IN"><span><a class="doc-id-link" href="#POLL_IN">POLL_IN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L494"><em>Source</em></a></div></h3>
+<h3 id="POLL_IN"><span><a class="doc-id-link" href="#POLL_IN">POLL_IN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L495"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">POLL_IN: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="POLL_MSG"><span><a class="doc-id-link" href="#POLL_MSG">POLL_MSG<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L496"><em>Source</em></a></div></h3>
+<h3 id="POLL_MSG"><span><a class="doc-id-link" href="#POLL_MSG">POLL_MSG<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L497"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">POLL_MSG: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 3</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="POLL_OUT"><span><a class="doc-id-link" href="#POLL_OUT">POLL_OUT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L495"><em>Source</em></a></div></h3>
+<h3 id="POLL_OUT"><span><a class="doc-id-link" href="#POLL_OUT">POLL_OUT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L496"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">POLL_OUT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 2</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="POLL_PRI"><span><a class="doc-id-link" href="#POLL_PRI">POLL_PRI<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L498"><em>Source</em></a></div></h3>
+<h3 id="POLL_PRI"><span><a class="doc-id-link" href="#POLL_PRI">POLL_PRI<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L499"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">POLL_PRI: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 5</pre>
 </div>
@@ -8315,43 +8339,43 @@ MQ_PRIO_MAX                :: sysconf(._MQ_PRIO_MAX)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SA_NOCLDSTOP"><span><a class="doc-id-link" href="#SA_NOCLDSTOP">SA_NOCLDSTOP<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L417"><em>Source</em></a></div></h3>
+<h3 id="SA_NOCLDSTOP"><span><a class="doc-id-link" href="#SA_NOCLDSTOP">SA_NOCLDSTOP<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L418"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SA_NOCLDSTOP: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0008</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SA_NOCLDWAIT"><span><a class="doc-id-link" href="#SA_NOCLDWAIT">SA_NOCLDWAIT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L422"><em>Source</em></a></div></h3>
+<h3 id="SA_NOCLDWAIT"><span><a class="doc-id-link" href="#SA_NOCLDWAIT">SA_NOCLDWAIT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L423"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SA_NOCLDWAIT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0020</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SA_NODEFER"><span><a class="doc-id-link" href="#SA_NODEFER">SA_NODEFER<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L423"><em>Source</em></a></div></h3>
+<h3 id="SA_NODEFER"><span><a class="doc-id-link" href="#SA_NODEFER">SA_NODEFER<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L424"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SA_NODEFER: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0010</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SA_ONSTACK"><span><a class="doc-id-link" href="#SA_ONSTACK">SA_ONSTACK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L418"><em>Source</em></a></div></h3>
+<h3 id="SA_ONSTACK"><span><a class="doc-id-link" href="#SA_ONSTACK">SA_ONSTACK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L419"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SA_ONSTACK: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0001</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SA_RESETHAND"><span><a class="doc-id-link" href="#SA_RESETHAND">SA_RESETHAND<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L419"><em>Source</em></a></div></h3>
+<h3 id="SA_RESETHAND"><span><a class="doc-id-link" href="#SA_RESETHAND">SA_RESETHAND<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L420"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SA_RESETHAND: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0004</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SA_RESTART"><span><a class="doc-id-link" href="#SA_RESTART">SA_RESTART<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L420"><em>Source</em></a></div></h3>
+<h3 id="SA_RESTART"><span><a class="doc-id-link" href="#SA_RESTART">SA_RESTART<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L421"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SA_RESTART: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0002</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SA_SIGINFO"><span><a class="doc-id-link" href="#SA_SIGINFO">SA_SIGINFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L421"><em>Source</em></a></div></h3>
+<h3 id="SA_SIGINFO"><span><a class="doc-id-link" href="#SA_SIGINFO">SA_SIGINFO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L422"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SA_SIGINFO: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0040</pre>
 </div>
@@ -8403,13 +8427,13 @@ MQ_PRIO_MAX                :: sysconf(._MQ_PRIO_MAX)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SEGV_ACCERR"><span><a class="doc-id-link" href="#SEGV_ACCERR">SEGV_ACCERR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L478"><em>Source</em></a></div></h3>
+<h3 id="SEGV_ACCERR"><span><a class="doc-id-link" href="#SEGV_ACCERR">SEGV_ACCERR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L479"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SEGV_ACCERR: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 2</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SEGV_MAPERR"><span><a class="doc-id-link" href="#SEGV_MAPERR">SEGV_MAPERR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L477"><em>Source</em></a></div></h3>
+<h3 id="SEGV_MAPERR"><span><a class="doc-id-link" href="#SEGV_MAPERR">SEGV_MAPERR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L478"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SEGV_MAPERR: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1</pre>
 </div>
@@ -8559,7 +8583,7 @@ MQ_PRIO_MAX                :: sysconf(._MQ_PRIO_MAX)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SIGSTKSZ"><span><a class="doc-id-link" href="#SIGSTKSZ">SIGSTKSZ<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L429"><em>Source</em></a></div></h3>
+<h3 id="SIGSTKSZ"><span><a class="doc-id-link" href="#SIGSTKSZ">SIGSTKSZ<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L430"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SIGSTKSZ: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 131072</pre>
 </div>
@@ -8613,13 +8637,13 @@ MQ_PRIO_MAX                :: sysconf(._MQ_PRIO_MAX)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SIGUSR1"><span><a class="doc-id-link" href="#SIGUSR1">SIGUSR1<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L398"><em>Source</em></a></div></h3>
+<h3 id="SIGUSR1"><span><a class="doc-id-link" href="#SIGUSR1">SIGUSR1<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L399"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SIGUSR1: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 30</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SIGUSR2"><span><a class="doc-id-link" href="#SIGUSR2">SIGUSR2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L399"><em>Source</em></a></div></h3>
+<h3 id="SIGUSR2"><span><a class="doc-id-link" href="#SIGUSR2">SIGUSR2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L400"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SIGUSR2: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 31</pre>
 </div>
@@ -8628,6 +8652,12 @@ MQ_PRIO_MAX                :: sysconf(._MQ_PRIO_MAX)</p>
 <h3 id="SIGVTALRM"><span><a class="doc-id-link" href="#SIGVTALRM">SIGVTALRM<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L396"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SIGVTALRM: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 26</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SIGWINCH"><span><a class="doc-id-link" href="#SIGWINCH">SIGWINCH<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L398"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SIGWINCH: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 28</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -8643,7 +8673,7 @@ MQ_PRIO_MAX                :: sysconf(._MQ_PRIO_MAX)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SIG_BLOCK"><span><a class="doc-id-link" href="#SIG_BLOCK">SIG_BLOCK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L413"><em>Source</em></a></div></h3>
+<h3 id="SIG_BLOCK"><span><a class="doc-id-link" href="#SIG_BLOCK">SIG_BLOCK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L414"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SIG_BLOCK: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1</pre>
 </div>
@@ -8689,43 +8719,43 @@ MQ_PRIO_MAX                :: sysconf(._MQ_PRIO_MAX)</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="SIG_SETMASK"><span><a class="doc-id-link" href="#SIG_SETMASK">SIG_SETMASK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L415"><em>Source</em></a></div></h3>
+<h3 id="SIG_SETMASK"><span><a class="doc-id-link" href="#SIG_SETMASK">SIG_SETMASK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L416"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SIG_SETMASK: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 3</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SIG_UNBLOCK"><span><a class="doc-id-link" href="#SIG_UNBLOCK">SIG_UNBLOCK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L414"><em>Source</em></a></div></h3>
+<h3 id="SIG_UNBLOCK"><span><a class="doc-id-link" href="#SIG_UNBLOCK">SIG_UNBLOCK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L415"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SIG_UNBLOCK: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 2</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SI_ASYNCIO"><span><a class="doc-id-link" href="#SI_ASYNCIO">SI_ASYNCIO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L504"><em>Source</em></a></div></h3>
+<h3 id="SI_ASYNCIO"><span><a class="doc-id-link" href="#SI_ASYNCIO">SI_ASYNCIO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L505"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SI_ASYNCIO: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x10004</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SI_MESGQ"><span><a class="doc-id-link" href="#SI_MESGQ">SI_MESGQ<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L505"><em>Source</em></a></div></h3>
+<h3 id="SI_MESGQ"><span><a class="doc-id-link" href="#SI_MESGQ">SI_MESGQ<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L506"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SI_MESGQ: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x10005</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SI_QUEUE"><span><a class="doc-id-link" href="#SI_QUEUE">SI_QUEUE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L502"><em>Source</em></a></div></h3>
+<h3 id="SI_QUEUE"><span><a class="doc-id-link" href="#SI_QUEUE">SI_QUEUE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L503"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SI_QUEUE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x10002</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SI_TIMER"><span><a class="doc-id-link" href="#SI_TIMER">SI_TIMER<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L503"><em>Source</em></a></div></h3>
+<h3 id="SI_TIMER"><span><a class="doc-id-link" href="#SI_TIMER">SI_TIMER<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L504"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SI_TIMER: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x10003</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SI_USER"><span><a class="doc-id-link" href="#SI_USER">SI_USER<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L501"><em>Source</em></a></div></h3>
+<h3 id="SI_USER"><span><a class="doc-id-link" href="#SI_USER">SI_USER<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L502"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SI_USER: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x10001</pre>
 </div>
@@ -8863,13 +8893,13 @@ MQ_PRIO_MAX                :: sysconf(._MQ_PRIO_MAX)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SS_DISABLE"><span><a class="doc-id-link" href="#SS_DISABLE">SS_DISABLE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L426"><em>Source</em></a></div></h3>
+<h3 id="SS_DISABLE"><span><a class="doc-id-link" href="#SS_DISABLE">SS_DISABLE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L427"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SS_DISABLE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0004</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SS_ONSTACK"><span><a class="doc-id-link" href="#SS_ONSTACK">SS_ONSTACK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L425"><em>Source</em></a></div></h3>
+<h3 id="SS_ONSTACK"><span><a class="doc-id-link" href="#SS_ONSTACK">SS_ONSTACK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L426"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SS_ONSTACK: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x0001</pre>
 </div>
@@ -9077,13 +9107,13 @@ MQ_PRIO_MAX                :: sysconf(._MQ_PRIO_MAX)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="TRAP_BRKPT"><span><a class="doc-id-link" href="#TRAP_BRKPT">TRAP_BRKPT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L484"><em>Source</em></a></div></h3>
+<h3 id="TRAP_BRKPT"><span><a class="doc-id-link" href="#TRAP_BRKPT">TRAP_BRKPT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L485"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">TRAP_BRKPT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="TRAP_TRACE"><span><a class="doc-id-link" href="#TRAP_TRACE">TRAP_TRACE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L485"><em>Source</em></a></div></h3>
+<h3 id="TRAP_TRACE"><span><a class="doc-id-link" href="#TRAP_TRACE">TRAP_TRACE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin#L486"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">TRAP_TRACE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 2</pre>
 </div>
@@ -14365,7 +14395,7 @@ if posix.sigaltstack(&sigstk, nil) != .OK {
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Removes sig from the signal mask of the calling process and suspend the calling process until 
+<p>Removes sig from the signal mask of the calling process and suspend the calling process until
 a signal is received.</p>
 <p><a href="https://pubs.opengroup.org/onlinepubs/9699919799/functions/sighold.html">More</a></p>
 </details>
@@ -15203,7 +15233,7 @@ case:
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/wordexp.odin">wordexp.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-05 (vendor "odin") Windows_amd64 @ 2025-05-08 21:13:00.238913800 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 16:13:57.766659500 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -15938,6 +15968,7 @@ case:
 <li><a href="#SIGUSR1">SIGUSR1</a></li>
 <li><a href="#SIGUSR2">SIGUSR2</a></li>
 <li><a href="#SIGVTALRM">SIGVTALRM</a></li>
+<li><a href="#SIGWINCH">SIGWINCH</a></li>
 <li><a href="#SIGXCPU">SIGXCPU</a></li>
 <li><a href="#SIGXFSZ">SIGXFSZ</a></li>
 <li><a href="#SIG_BLOCK">SIG_BLOCK</a></li>
