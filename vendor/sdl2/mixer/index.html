@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>package sdl2/mixer - pkg.odin-lang.org</title>	<link rel="icon" href="/favicon.svg">
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/scss/custom.min.css">
+	<link rel=stylesheet href="//odin-lang.org/lib/highlight/styles/github-dark.min.css">
+	<script src="//odin-lang.org/lib/highlight/highlight.min.js"></script>
+
+	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
+	<script>hljs.highlightAll()</script>
+	<script>
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
+		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
+	</script>
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
+
+	<link rel="stylesheet" type="text/css" href="/style.css">
+
+	</style>
+</head>
+<body>
+<script>
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
+</script>
+<header class="sticky-top">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
+		<div class="container">
+			<a class="navbar-brand" href="https://odin-lang.org/">
+			<img src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#odin-navbar-content" aria-controls="odin-navbar-content" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+			<div class="collapse navbar-collapse" id="odin-navbar-content">
+			<ul class="navbar-nav ms-md-auto">
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/">Home</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/docs">Docs</a></li>
+				<li class="nav-item"><a class="nav-link active" href="/">Packages</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/news">News</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/showcase">Showcase</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://forum.odin-lang.org">Forum</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/community">Community</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://github.com/odin-lang/Odin" target="_blank">GitHub</a></li>
+				<li class="nav-item">
+					<a
+						class="nav-link btn-dark-mode"
+						onclick="toggleDarkMode();"
+						title="Toggle Light/Dark Mode"
+					>
+						<span class="dark-mode-appearance">Appearance:</span>
+						<svg fill="white" id="dark-mode-icon" viewBox="0 0 384 512"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"/></svg>
+						<svg fill="white" id="light-mode-icon" viewBox="0 0 16 16">
+						  <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+						</svg>
+					</button>
+					</a>
+				</li>
+			</ul>
+		</div>
+		</div>
+	</nav>
+</header>
+<main>
+<div class="container full-width">
+<div class="row odin-main my-4" id="pkg">
+<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">
+<div class="py-3">
+<h4><a style="text-transform: capitalize; color: inherit;" href="/vendor">vendor Library</a></h4>
+<ul>
+<li class="nav-item"><a href="/vendor/box2d">box2d</a></li>
+<li class="nav-item"><a href="/vendor/cgltf">cgltf</a></li>
+<li class="nav-item"><a href="/vendor/commonmark">commonmark</a></li>
+<li class="nav-item">darwin<ul>
+<li><a href="/vendor/darwin/Metal">Metal</a></li>
+<li><a href="/vendor/darwin/MetalKit">MetalKit</a></li>
+<li><a href="/vendor/darwin/QuartzCore">QuartzCore</a></li>
+</ul>
+
+</li>
+<li class="nav-item">directx<ul>
+<li><a href="/vendor/directx/d3d11">d3d11</a></li>
+<li><a href="/vendor/directx/d3d12">d3d12</a></li>
+<li><a href="/vendor/directx/d3d_compiler">d3d_compiler</a></li>
+<li><a href="/vendor/directx/dxc">dxc</a></li>
+<li><a href="/vendor/directx/dxgi">dxgi</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/ENet">ENet</a></li>
+<li class="nav-item"><a href="/vendor/fontstash">fontstash</a></li>
+<li class="nav-item"><a href="/vendor/ggpo">ggpo</a></li>
+<li class="nav-item"><a href="/vendor/glfw">glfw</a><ul>
+<li><a href="/vendor/glfw/bindings">bindings</a></li>
+</ul>
+
+</li>
+<li class="nav-item">lua<ul>
+<li><a href="/vendor/lua/5.4">5.4</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/microui">microui</a></li>
+<li class="nav-item"><a href="/vendor/miniaudio">miniaudio</a></li>
+<li class="nav-item"><a href="/vendor/nanovg">nanovg</a></li>
+<li class="nav-item"><a href="/vendor/OpenEXRCore">OpenEXRCore</a></li>
+<li class="nav-item"><a href="/vendor/OpenGL">OpenGL</a></li>
+<li class="nav-item"><a href="/vendor/portmidi">portmidi</a></li>
+<li class="nav-item"><a href="/vendor/raylib">raylib</a></li>
+<li class="nav-item"><a href="/vendor/sdl2">sdl2</a><ul>
+<li><a href="/vendor/sdl2/image">image</a></li>
+<li><a class="active" href="/vendor/sdl2/mixer">mixer</a></li>
+<li><a href="/vendor/sdl2/net">net</a></li>
+<li><a href="/vendor/sdl2/ttf">ttf</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/sdl3">sdl3</a><ul>
+<li><a href="/vendor/sdl3/image">image</a></li>
+<li><a href="/vendor/sdl3/ttf">ttf</a></li>
+</ul>
+
+</li>
+<li class="nav-item">stb<ul>
+<li><a href="/vendor/stb/easy_font">easy_font</a></li>
+<li><a href="/vendor/stb/image">image</a></li>
+<li><a href="/vendor/stb/rect_pack">rect_pack</a></li>
+<li><a href="/vendor/stb/truetype">truetype</a></li>
+<li><a href="/vendor/stb/vorbis">vorbis</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/vulkan">vulkan</a></li>
+<li class="nav-item"><a href="/vendor/wgpu">wgpu</a></li>
+<li class="nav-item">windows<ul>
+<li><a href="/vendor/windows/GameInput">GameInput</a></li>
+<li><a href="/vendor/windows/XAudio2">XAudio2</a></li>
+</ul>
+
+</li>
+<li class="nav-item">x11<ul>
+<li><a href="/vendor/x11/xlib">xlib</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/zlib">zlib</a></li>
+</ul>
+</div>
+</nav>
+<article class="col-lg-8 p-4 documentation odin-article">
+<nav class="pkg-breadcrumb" aria-label="breadcrumb">
+<ol class="breadcrumb">
+<li class="breadcrumb-item"><a href="/vendor">vendor</a></li>
+<li class="breadcrumb-item"><a href="/vendor/sdl2">sdl2</a></li>
+<li class="breadcrumb-item active" aria-current="page"><a href="/vendor/sdl2/mixer">mixer</a></li>
+</ol>
+</nav>
+<h1>package vendor:sdl2/mixer<div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer"><em>Source</em></a></div></h1>
+
+		<div class="odin-search-wrapper">
+			<input type="search" id="odin-search" class="odin-search-package" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">
+			<div class="odin-search-shortcut">
+				<div class="odin-search-key key-macos">⌘K</div>
+				<div class="odin-search-key key-windows">Ctrl+K</div>
+				<span class="odin-search-or">or</span>
+				<div class="odin-search-key">/</div>
+			</div>
+		</div>
+	
+<div id="odin-search-info">
+<div id="odin-search-time"></div>
+
+		<div id="odin-search-options">
+			<input type="checkbox" id="odin-search-filter" name="odin-search-filter">
+			<label for="odin-search-filter">Filter Results</label>
+		</div>
+</div>
+<ul id="odin-search-results"></ul>
+<div id="pkg-top">
+<div id="pkg-index">
+<h2>Index</h2>
+<div>
+<details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
+<summary id="#doc-index-Types-header">
+Types (10)</summary>
+<ul>
+<li><a href="#Chunk">Chunk</a></li>
+<li><a href="#EffectDone_t">EffectDone_t</a></li>
+<li><a href="#EffectFunc_t">EffectFunc_t</a></li>
+<li><a href="#Fading">Fading</a></li>
+<li><a href="#InitFlag">InitFlag</a></li>
+<li><a href="#InitFlags">InitFlags</a></li>
+<li><a href="#MixFunc">MixFunc</a></li>
+<li><a href="#Music">Music</a></li>
+<li><a href="#MusicType">MusicType</a></li>
+<li><a href="#bool">bool</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
+<summary id="#doc-index-Constants-header">
+Constants (30)</summary>
+<ul>
+<li><a href="#CHANNELS">CHANNELS</a></li>
+<li><a href="#CHANNEL_POST">CHANNEL_POST</a></li>
+<li><a href="#DEFAULT_CHANNELS">DEFAULT_CHANNELS</a></li>
+<li><a href="#DEFAULT_FORMAT">DEFAULT_FORMAT</a></li>
+<li><a href="#DEFAULT_FREQUENCY">DEFAULT_FREQUENCY</a></li>
+<li><a href="#EFFECTSMAXSPEED">EFFECTSMAXSPEED</a></li>
+<li><a href="#FADING_IN">FADING_IN</a></li>
+<li><a href="#FADING_OUT">FADING_OUT</a></li>
+<li><a href="#INIT_FLAC">INIT_FLAC</a></li>
+<li><a href="#INIT_MID">INIT_MID</a></li>
+<li><a href="#INIT_MOD">INIT_MOD</a></li>
+<li><a href="#INIT_MP3">INIT_MP3</a></li>
+<li><a href="#INIT_OGG">INIT_OGG</a></li>
+<li><a href="#INIT_OPUS">INIT_OPUS</a></li>
+<li><a href="#MAJOR_VERSION">MAJOR_VERSION</a></li>
+<li><a href="#MAX_VOLUME">MAX_VOLUME</a></li>
+<li><a href="#MINOR_VERSION">MINOR_VERSION</a></li>
+<li><a href="#MUS_CMD">MUS_CMD</a></li>
+<li><a href="#MUS_FLAC">MUS_FLAC</a></li>
+<li><a href="#MUS_MID">MUS_MID</a></li>
+<li><a href="#MUS_MOD">MUS_MOD</a></li>
+<li><a href="#MUS_MODPLUG_UNUSED">MUS_MODPLUG_UNUSED</a></li>
+<li><a href="#MUS_MP3">MUS_MP3</a></li>
+<li><a href="#MUS_MP3_MAD_UNUSED">MUS_MP3_MAD_UNUSED</a></li>
+<li><a href="#MUS_NONE">MUS_NONE</a></li>
+<li><a href="#MUS_OGG">MUS_OGG</a></li>
+<li><a href="#MUS_OPUS">MUS_OPUS</a></li>
+<li><a href="#MUS_WAV">MUS_WAV</a></li>
+<li><a href="#NO_FADING">NO_FADING</a></li>
+<li><a href="#PATCHLEVEL">PATCHLEVEL</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Variables" aria-labelledby="#doc-index-Variables-header">
+<summary id="#doc-index-Variables-header">
+Variables (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
+<summary id="#doc-index-Procedures-header">
+Procedures (93)</summary>
+<ul>
+<li><a href="#AllocateChannels">AllocateChannels</a></li>
+<li><a href="#ChannelFinished">ChannelFinished</a></li>
+<li><a href="#CloseAudio">CloseAudio</a></li>
+<li><a href="#EachSoundFont">EachSoundFont</a></li>
+<li><a href="#ExpireChannel">ExpireChannel</a></li>
+<li><a href="#FadeInChannel">FadeInChannel</a></li>
+<li><a href="#FadeInChannelTimed">FadeInChannelTimed</a></li>
+<li><a href="#FadeInMusic">FadeInMusic</a></li>
+<li><a href="#FadeInMusicPos">FadeInMusicPos</a></li>
+<li><a href="#FadeOutChannel">FadeOutChannel</a></li>
+<li><a href="#FadeOutGroup">FadeOutGroup</a></li>
+<li><a href="#FadeOutMusic">FadeOutMusic</a></li>
+<li><a href="#FadingChannel">FadingChannel</a></li>
+<li><a href="#FadingMusic">FadingMusic</a></li>
+<li><a href="#FreeChunk">FreeChunk</a></li>
+<li><a href="#FreeMusic">FreeMusic</a></li>
+<li><a href="#GetChunk">GetChunk</a></li>
+<li><a href="#GetChunkDecoder">GetChunkDecoder</a></li>
+<li><a href="#GetMusicAlbumTag">GetMusicAlbumTag</a></li>
+<li><a href="#GetMusicArtistTag">GetMusicArtistTag</a></li>
+<li><a href="#GetMusicCopyrightTag">GetMusicCopyrightTag</a></li>
+<li><a href="#GetMusicDecoder">GetMusicDecoder</a></li>
+<li><a href="#GetMusicHookData">GetMusicHookData</a></li>
+<li><a href="#GetMusicLoopEndTime">GetMusicLoopEndTime</a></li>
+<li><a href="#GetMusicLoopLengthTime">GetMusicLoopLengthTime</a></li>
+<li><a href="#GetMusicLoopStartTime">GetMusicLoopStartTime</a></li>
+<li><a href="#GetMusicPosition">GetMusicPosition</a></li>
+<li><a href="#GetMusicTitle">GetMusicTitle</a></li>
+<li><a href="#GetMusicTitleTag">GetMusicTitleTag</a></li>
+<li><a href="#GetMusicType">GetMusicType</a></li>
+<li><a href="#GetMusicVolume">GetMusicVolume</a></li>
+<li><a href="#GetNumChunkDecoders">GetNumChunkDecoders</a></li>
+<li><a href="#GetNumMusicDecoders">GetNumMusicDecoders</a></li>
+<li><a href="#GetSoundFonts">GetSoundFonts</a></li>
+<li><a href="#GetSynchroValue">GetSynchroValue</a></li>
+<li><a href="#GetTimidityCfg">GetTimidityCfg</a></li>
+<li><a href="#GroupAvailable">GroupAvailable</a></li>
+<li><a href="#GroupChannel">GroupChannel</a></li>
+<li><a href="#GroupChannels">GroupChannels</a></li>
+<li><a href="#GroupCount">GroupCount</a></li>
+<li><a href="#GroupNewer">GroupNewer</a></li>
+<li><a href="#GroupOldest">GroupOldest</a></li>
+<li><a href="#HaltChannel">HaltChannel</a></li>
+<li><a href="#HaltGroup">HaltGroup</a></li>
+<li><a href="#HaltMusic">HaltMusic</a></li>
+<li><a href="#HasChunkDecoder">HasChunkDecoder</a></li>
+<li><a href="#HasMusicDecoder">HasMusicDecoder</a></li>
+<li><a href="#HookMusic">HookMusic</a></li>
+<li><a href="#HookMusicFinished">HookMusicFinished</a></li>
+<li><a href="#Init">Init</a></li>
+<li><a href="#Linked_Version">Linked_Version</a></li>
+<li><a href="#LoadMUS">LoadMUS</a></li>
+<li><a href="#LoadMUSType_RW">LoadMUSType_RW</a></li>
+<li><a href="#LoadMUS_RW">LoadMUS_RW</a></li>
+<li><a href="#LoadWAV">LoadWAV</a></li>
+<li><a href="#LoadWAV_RW">LoadWAV_RW</a></li>
+<li><a href="#ModMusicJumpToOrder">ModMusicJumpToOrder</a></li>
+<li><a href="#MusicDuration">MusicDuration</a></li>
+<li><a href="#OpenAudio">OpenAudio</a></li>
+<li><a href="#OpenAudioDevice">OpenAudioDevice</a></li>
+<li><a href="#Pause">Pause</a></li>
+<li><a href="#PauseMusic">PauseMusic</a></li>
+<li><a href="#Paused">Paused</a></li>
+<li><a href="#PausedMusic">PausedMusic</a></li>
+<li><a href="#PlayChannel">PlayChannel</a></li>
+<li><a href="#PlayChannelTimed">PlayChannelTimed</a></li>
+<li><a href="#PlayMusic">PlayMusic</a></li>
+<li><a href="#Playing">Playing</a></li>
+<li><a href="#PlayingMusic">PlayingMusic</a></li>
+<li><a href="#QuerySpec">QuerySpec</a></li>
+<li><a href="#QuickLoad_RAW">QuickLoad_RAW</a></li>
+<li><a href="#QuickLoad_WAV">QuickLoad_WAV</a></li>
+<li><a href="#Quit">Quit</a></li>
+<li><a href="#RegisterEffect">RegisterEffect</a></li>
+<li><a href="#ReserveChannels">ReserveChannels</a></li>
+<li><a href="#Resume">Resume</a></li>
+<li><a href="#ResumeMusic">ResumeMusic</a></li>
+<li><a href="#RewindMusic">RewindMusic</a></li>
+<li><a href="#SetDistance">SetDistance</a></li>
+<li><a href="#SetMusicCMD">SetMusicCMD</a></li>
+<li><a href="#SetMusicPosition">SetMusicPosition</a></li>
+<li><a href="#SetPanning">SetPanning</a></li>
+<li><a href="#SetPosition">SetPosition</a></li>
+<li><a href="#SetPostMix">SetPostMix</a></li>
+<li><a href="#SetReverseStereo">SetReverseStereo</a></li>
+<li><a href="#SetSoundFonts">SetSoundFonts</a></li>
+<li><a href="#SetSynchroValue">SetSynchroValue</a></li>
+<li><a href="#SetTimidityCfg">SetTimidityCfg</a></li>
+<li><a href="#UnregisterAllEffects">UnregisterAllEffects</a></li>
+<li><a href="#UnregisterEffect">UnregisterEffect</a></li>
+<li><a href="#Volume">Volume</a></li>
+<li><a href="#VolumeChunk">VolumeChunk</a></li>
+<li><a href="#VolumeMusic">VolumeMusic</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedure Groups" aria-labelledby="#doc-index-Procedure Groups-header">
+<summary id="#doc-index-Procedure Groups-header">
+Procedure Groups (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+</div>
+</div>
+<section class="documentation">
+<h2 id="pkg-Types" class="pkg-header">Types</h2>
+<div class="pkg-entity">
+<h3 id="Chunk"><span><a class="doc-id-link" href="#Chunk">Chunk<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L45"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Chunk :: <span class="keyword-type">struct</span> {
+	allocated: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	abuf:      [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	alen:      <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	volume:    <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/sdl2/mixer/#FadeInChannel">FadeInChannel</a></li>
+<li><a href="/vendor/sdl2/mixer/#FadeInChannelTimed">FadeInChannelTimed</a></li>
+<li><a href="/vendor/sdl2/mixer/#FreeChunk">FreeChunk</a></li>
+<li><a href="/vendor/sdl2/mixer/#PlayChannel">PlayChannel</a></li>
+<li><a href="/vendor/sdl2/mixer/#PlayChannelTimed">PlayChannelTimed</a></li>
+<li><a href="/vendor/sdl2/mixer/#VolumeChunk">VolumeChunk</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/sdl2/mixer/#GetChunk">GetChunk</a></li>
+<li><a href="/vendor/sdl2/mixer/#LoadWAV">LoadWAV</a></li>
+<li><a href="/vendor/sdl2/mixer/#LoadWAV_RW">LoadWAV_RW</a></li>
+<li><a href="/vendor/sdl2/mixer/#QuickLoad_RAW">QuickLoad_RAW</a></li>
+<li><a href="/vendor/sdl2/mixer/#QuickLoad_WAV">QuickLoad_WAV</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="EffectDone_t"><span><a class="doc-id-link" href="#EffectDone_t">EffectDone_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L147"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">EffectDone_t :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (chan: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, udata: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>)</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/sdl2/mixer/#RegisterEffect">RegisterEffect</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="EffectFunc_t"><span><a class="doc-id-link" href="#EffectFunc_t">EffectFunc_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L146"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">EffectFunc_t :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (chan: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, stream: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, udata: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>)</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/sdl2/mixer/#RegisterEffect">RegisterEffect</a></li>
+<li><a href="/vendor/sdl2/mixer/#UnregisterEffect">UnregisterEffect</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Fading"><span><a class="doc-id-link" href="#Fading">Fading<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L52"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Fading :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	NO_FADING, 
+	FADING_OUT, 
+	FADING_IN, 
+}</pre>
+</div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/sdl2/mixer/#FadingChannel">FadingChannel</a></li>
+<li><a href="/vendor/sdl2/mixer/#FadingMusic">FadingMusic</a></li>
+</ul>
+<h5>Related Constants</h5>
+<ul>
+<li><a href="/vendor/sdl2/mixer/#FADING_IN">FADING_IN</a></li>
+<li><a href="/vendor/sdl2/mixer/#FADING_OUT">FADING_OUT</a></li>
+<li><a href="/vendor/sdl2/mixer/#NO_FADING">NO_FADING</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="InitFlag"><span><a class="doc-id-link" href="#InitFlag">InitFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L22"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">InitFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	FLAC = 0, 
+	MOD  = 1, 
+	MP3  = 3, 
+	OGG  = 4, 
+	MID  = 5, 
+	OPUS = 6, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="InitFlags"><span><a class="doc-id-link" href="#InitFlags">InitFlags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L31"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">InitFlags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/sdl2/mixer/#InitFlag">InitFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/sdl2/mixer/#Init">Init</a></li>
+</ul>
+<h5>Related Constants</h5>
+<ul>
+<li><a href="/vendor/sdl2/mixer/#INIT_FLAC">INIT_FLAC</a></li>
+<li><a href="/vendor/sdl2/mixer/#INIT_MID">INIT_MID</a></li>
+<li><a href="/vendor/sdl2/mixer/#INIT_MOD">INIT_MOD</a></li>
+<li><a href="/vendor/sdl2/mixer/#INIT_MP3">INIT_MP3</a></li>
+<li><a href="/vendor/sdl2/mixer/#INIT_OGG">INIT_OGG</a></li>
+<li><a href="/vendor/sdl2/mixer/#INIT_OPUS">INIT_OPUS</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="MixFunc"><span><a class="doc-id-link" href="#MixFunc">MixFunc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L102"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MixFunc :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (udata: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, stream: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, len: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>)</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/sdl2/mixer/#HookMusic">HookMusic</a></li>
+<li><a href="/vendor/sdl2/mixer/#SetPostMix">SetPostMix</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Music"><span><a class="doc-id-link" href="#Music">Music<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L88"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Music :: <span class="keyword-type">struct</span> {}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/sdl2/mixer/#FadeInMusic">FadeInMusic</a></li>
+<li><a href="/vendor/sdl2/mixer/#FadeInMusicPos">FadeInMusicPos</a></li>
+<li><a href="/vendor/sdl2/mixer/#FreeMusic">FreeMusic</a></li>
+<li><a href="/vendor/sdl2/mixer/#GetMusicAlbumTag">GetMusicAlbumTag</a></li>
+<li><a href="/vendor/sdl2/mixer/#GetMusicArtistTag">GetMusicArtistTag</a></li>
+<li><a href="/vendor/sdl2/mixer/#GetMusicCopyrightTag">GetMusicCopyrightTag</a></li>
+<li><a href="/vendor/sdl2/mixer/#GetMusicLoopEndTime">GetMusicLoopEndTime</a></li>
+<li><a href="/vendor/sdl2/mixer/#GetMusicLoopLengthTime">GetMusicLoopLengthTime</a></li>
+<li><a href="/vendor/sdl2/mixer/#GetMusicLoopStartTime">GetMusicLoopStartTime</a></li>
+<li><a href="/vendor/sdl2/mixer/#GetMusicPosition">GetMusicPosition</a></li>
+<li><a href="/vendor/sdl2/mixer/#GetMusicTitle">GetMusicTitle</a></li>
+<li><a href="/vendor/sdl2/mixer/#GetMusicTitleTag">GetMusicTitleTag</a></li>
+<li><a href="/vendor/sdl2/mixer/#GetMusicType">GetMusicType</a></li>
+<li><a href="/vendor/sdl2/mixer/#GetMusicVolume">GetMusicVolume</a></li>
+<li><a href="/vendor/sdl2/mixer/#MusicDuration">MusicDuration</a></li>
+<li><a href="/vendor/sdl2/mixer/#PlayMusic">PlayMusic</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/sdl2/mixer/#LoadMUS">LoadMUS</a></li>
+<li><a href="/vendor/sdl2/mixer/#LoadMUSType_RW">LoadMUSType_RW</a></li>
+<li><a href="/vendor/sdl2/mixer/#LoadMUS_RW">LoadMUS_RW</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="MusicType"><span><a class="doc-id-link" href="#MusicType">MusicType<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L62"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MusicType :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	NONE, 
+	CMD, 
+	WAV, 
+	MOD, 
+	MID, 
+	OGG, 
+	MP3, 
+	MP3_MAD_UNUSED, 
+	FLAC, 
+	MODPLUG_UNUSED, 
+	OPUS, 
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/sdl2/mixer/#LoadMUSType_RW">LoadMUSType_RW</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/sdl2/mixer/#GetMusicType">GetMusicType</a></li>
+</ul>
+<h5>Related Constants</h5>
+<ul>
+<li><a href="/vendor/sdl2/mixer/#MUS_CMD">MUS_CMD</a></li>
+<li><a href="/vendor/sdl2/mixer/#MUS_FLAC">MUS_FLAC</a></li>
+<li><a href="/vendor/sdl2/mixer/#MUS_MID">MUS_MID</a></li>
+<li><a href="/vendor/sdl2/mixer/#MUS_MOD">MUS_MOD</a></li>
+<li><a href="/vendor/sdl2/mixer/#MUS_MODPLUG_UNUSED">MUS_MODPLUG_UNUSED</a></li>
+<li><a href="/vendor/sdl2/mixer/#MUS_MP3">MUS_MP3</a></li>
+<li><a href="/vendor/sdl2/mixer/#MUS_MP3_MAD_UNUSED">MUS_MP3_MAD_UNUSED</a></li>
+<li><a href="/vendor/sdl2/mixer/#MUS_NONE">MUS_NONE</a></li>
+<li><a href="/vendor/sdl2/mixer/#MUS_OGG">MUS_OGG</a></li>
+<li><a href="/vendor/sdl2/mixer/#MUS_OPUS">MUS_OPUS</a></li>
+<li><a href="/vendor/sdl2/mixer/#MUS_WAV">MUS_WAV</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="bool"><span><a class="doc-id-link" href="#bool">bool<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L19"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">bool :: sdl2.<a class="code-typename" href="/vendor/sdl2/#bool">bool</a></pre>
+</div>
+</div>
+<h2 id="pkg-Constants" class="pkg-header">Constants</h2>
+<div class="pkg-entity">
+<h3 id="CHANNELS"><span><a class="doc-id-link" href="#CHANNELS">CHANNELS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L16"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CHANNELS: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 8</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="CHANNEL_POST"><span><a class="doc-id-link" href="#CHANNEL_POST">CHANNEL_POST<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L144"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CHANNEL_POST: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : -2</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DEFAULT_CHANNELS"><span><a class="doc-id-link" href="#DEFAULT_CHANNELS">DEFAULT_CHANNELS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L42"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DEFAULT_CHANNELS: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 2</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DEFAULT_FORMAT"><span><a class="doc-id-link" href="#DEFAULT_FORMAT">DEFAULT_FORMAT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L41"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DEFAULT_FORMAT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : SDL.AUDIO_S16SYS</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DEFAULT_FREQUENCY"><span><a class="doc-id-link" href="#DEFAULT_FREQUENCY">DEFAULT_FREQUENCY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L40"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DEFAULT_FREQUENCY: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 44100</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="EFFECTSMAXSPEED"><span><a class="doc-id-link" href="#EFFECTSMAXSPEED">EFFECTSMAXSPEED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L149"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">EFFECTSMAXSPEED: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> : <span class="string">"MIX_EFFECTSMAXSPEED"</span></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FADING_IN"><span><a class="doc-id-link" href="#FADING_IN">FADING_IN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L60"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FADING_IN :: Fading.FADING_IN</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FADING_OUT"><span><a class="doc-id-link" href="#FADING_OUT">FADING_OUT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L59"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FADING_OUT :: Fading.FADING_OUT</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="INIT_FLAC"><span><a class="doc-id-link" href="#INIT_FLAC">INIT_FLAC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L33"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">INIT_FLAC :: InitFlags{.FLAC}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="INIT_MID"><span><a class="doc-id-link" href="#INIT_MID">INIT_MID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L37"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">INIT_MID :: InitFlags{.MID}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="INIT_MOD"><span><a class="doc-id-link" href="#INIT_MOD">INIT_MOD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L34"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">INIT_MOD :: InitFlags{.MOD}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="INIT_MP3"><span><a class="doc-id-link" href="#INIT_MP3">INIT_MP3<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L35"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">INIT_MP3 :: InitFlags{.MP3}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="INIT_OGG"><span><a class="doc-id-link" href="#INIT_OGG">INIT_OGG<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L36"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">INIT_OGG :: InitFlags{.OGG}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="INIT_OPUS"><span><a class="doc-id-link" href="#INIT_OPUS">INIT_OPUS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L38"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">INIT_OPUS :: InitFlags{.OPUS}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MAJOR_VERSION"><span><a class="doc-id-link" href="#MAJOR_VERSION">MAJOR_VERSION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L12"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MAJOR_VERSION: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 2</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MAX_VOLUME"><span><a class="doc-id-link" href="#MAX_VOLUME">MAX_VOLUME<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L43"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MAX_VOLUME: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : SDL.MIX_MAXVOLUME</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MINOR_VERSION"><span><a class="doc-id-link" href="#MINOR_VERSION">MINOR_VERSION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L13"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MINOR_VERSION: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MUS_CMD"><span><a class="doc-id-link" href="#MUS_CMD">MUS_CMD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L77"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MUS_CMD :: MusicType.CMD</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MUS_FLAC"><span><a class="doc-id-link" href="#MUS_FLAC">MUS_FLAC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L84"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MUS_FLAC :: MusicType.FLAC</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MUS_MID"><span><a class="doc-id-link" href="#MUS_MID">MUS_MID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L80"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MUS_MID :: MusicType.MID</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MUS_MOD"><span><a class="doc-id-link" href="#MUS_MOD">MUS_MOD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L79"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MUS_MOD :: MusicType.MOD</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MUS_MODPLUG_UNUSED"><span><a class="doc-id-link" href="#MUS_MODPLUG_UNUSED">MUS_MODPLUG_UNUSED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L85"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MUS_MODPLUG_UNUSED :: MusicType.MODPLUG_UNUSED</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MUS_MP3"><span><a class="doc-id-link" href="#MUS_MP3">MUS_MP3<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L82"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MUS_MP3 :: MusicType.MP3</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MUS_MP3_MAD_UNUSED"><span><a class="doc-id-link" href="#MUS_MP3_MAD_UNUSED">MUS_MP3_MAD_UNUSED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L83"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MUS_MP3_MAD_UNUSED :: MusicType.MP3_MAD_UNUSED</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MUS_NONE"><span><a class="doc-id-link" href="#MUS_NONE">MUS_NONE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L76"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MUS_NONE :: MusicType.NONE</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MUS_OGG"><span><a class="doc-id-link" href="#MUS_OGG">MUS_OGG<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L81"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MUS_OGG :: MusicType.OGG</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MUS_OPUS"><span><a class="doc-id-link" href="#MUS_OPUS">MUS_OPUS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L86"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MUS_OPUS :: MusicType.OPUS</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MUS_WAV"><span><a class="doc-id-link" href="#MUS_WAV">MUS_WAV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L78"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MUS_WAV :: MusicType.WAV</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="NO_FADING"><span><a class="doc-id-link" href="#NO_FADING">NO_FADING<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L58"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">NO_FADING :: Fading.NO_FADING</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="PATCHLEVEL"><span><a class="doc-id-link" href="#PATCHLEVEL">PATCHLEVEL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L14"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">PATCHLEVEL: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 4</pre>
+</div>
+</div>
+<h2 id="pkg-Variables" class="pkg-header">Variables</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+<h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
+<div class="pkg-entity">
+<h3 id="AllocateChannels"><span><a class="doc-id-link" href="#AllocateChannels">AllocateChannels<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L113"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">AllocateChannels :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (numchans: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ChannelFinished"><span><a class="doc-id-link" href="#ChannelFinished">ChannelFinished<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L141"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ChannelFinished :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel_finished: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>)) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="CloseAudio"><span><a class="doc-id-link" href="#CloseAudio">CloseAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L219"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CloseAudio :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="EachSoundFont"><span><a class="doc-id-link" href="#EachSoundFont">EachSoundFont<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L215"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">EachSoundFont :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (function: <span class="keyword-type">proc</span> <span class="string">"c"</span> (<a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ExpireChannel"><span><a class="doc-id-link" href="#ExpireChannel">ExpireChannel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L188"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ExpireChannel :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, ticks: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FadeInChannel"><span><a class="doc-id-link" href="#FadeInChannel">FadeInChannel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L154"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FadeInChannel :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, chunk: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Chunk">Chunk</a>, loops: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, ms: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FadeInChannelTimed"><span><a class="doc-id-link" href="#FadeInChannelTimed">FadeInChannelTimed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L180"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FadeInChannelTimed :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, chunk: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Chunk">Chunk</a>, loops: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, ms: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, ticks: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FadeInMusic"><span><a class="doc-id-link" href="#FadeInMusic">FadeInMusic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L178"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FadeInMusic :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>, loops: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, ms: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FadeInMusicPos"><span><a class="doc-id-link" href="#FadeInMusicPos">FadeInMusicPos<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L179"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FadeInMusicPos :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>, loops: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, ms: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, position: <a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FadeOutChannel"><span><a class="doc-id-link" href="#FadeOutChannel">FadeOutChannel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L189"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FadeOutChannel :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (which: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, ms: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FadeOutGroup"><span><a class="doc-id-link" href="#FadeOutGroup">FadeOutGroup<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L190"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FadeOutGroup :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (tag: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, ms: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FadeOutMusic"><span><a class="doc-id-link" href="#FadeOutMusic">FadeOutMusic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L191"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FadeOutMusic :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (ms: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FadingChannel"><span><a class="doc-id-link" href="#FadingChannel">FadingChannel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L193"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FadingChannel :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (which: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a class="code-typename" href="/vendor/sdl2/mixer/#Fading">Fading</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FadingMusic"><span><a class="doc-id-link" href="#FadingMusic">FadingMusic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L192"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FadingMusic :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a class="code-typename" href="/vendor/sdl2/mixer/#Fading">Fading</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FreeChunk"><span><a class="doc-id-link" href="#FreeChunk">FreeChunk<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L121"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FreeChunk :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (chunk: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Chunk">Chunk</a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FreeMusic"><span><a class="doc-id-link" href="#FreeMusic">FreeMusic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L122"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FreeMusic :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetChunk"><span><a class="doc-id-link" href="#GetChunk">GetChunk<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L218"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetChunk :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> ^<a class="code-typename" href="/vendor/sdl2/mixer/#Chunk">Chunk</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetChunkDecoder"><span><a class="doc-id-link" href="#GetChunkDecoder">GetChunkDecoder<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L124"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetChunkDecoder :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (index: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetMusicAlbumTag"><span><a class="doc-id-link" href="#GetMusicAlbumTag">GetMusicAlbumTag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L133"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetMusicAlbumTag :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>) -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetMusicArtistTag"><span><a class="doc-id-link" href="#GetMusicArtistTag">GetMusicArtistTag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L132"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetMusicArtistTag :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>) -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetMusicCopyrightTag"><span><a class="doc-id-link" href="#GetMusicCopyrightTag">GetMusicCopyrightTag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L134"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetMusicCopyrightTag :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>) -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetMusicDecoder"><span><a class="doc-id-link" href="#GetMusicDecoder">GetMusicDecoder<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L127"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetMusicDecoder :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (index: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetMusicHookData"><span><a class="doc-id-link" href="#GetMusicHookData">GetMusicHookData<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L139"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetMusicHookData :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetMusicLoopEndTime"><span><a class="doc-id-link" href="#GetMusicLoopEndTime">GetMusicLoopEndTime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L206"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetMusicLoopEndTime :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>) -> <a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetMusicLoopLengthTime"><span><a class="doc-id-link" href="#GetMusicLoopLengthTime">GetMusicLoopLengthTime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L207"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetMusicLoopLengthTime :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>) -> <a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetMusicLoopStartTime"><span><a class="doc-id-link" href="#GetMusicLoopStartTime">GetMusicLoopStartTime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L205"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetMusicLoopStartTime :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>) -> <a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetMusicPosition"><span><a class="doc-id-link" href="#GetMusicPosition">GetMusicPosition<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L203"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetMusicPosition :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>) -> <a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetMusicTitle"><span><a class="doc-id-link" href="#GetMusicTitle">GetMusicTitle<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L130"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetMusicTitle :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>) -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetMusicTitleTag"><span><a class="doc-id-link" href="#GetMusicTitleTag">GetMusicTitleTag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L131"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetMusicTitleTag :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>) -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetMusicType"><span><a class="doc-id-link" href="#GetMusicType">GetMusicType<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L129"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetMusicType :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>) -> <a class="code-typename" href="/vendor/sdl2/mixer/#MusicType">MusicType</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetMusicVolume"><span><a class="doc-id-link" href="#GetMusicVolume">GetMusicVolume<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L184"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetMusicVolume :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetNumChunkDecoders"><span><a class="doc-id-link" href="#GetNumChunkDecoders">GetNumChunkDecoders<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L123"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetNumChunkDecoders :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetNumMusicDecoders"><span><a class="doc-id-link" href="#GetNumMusicDecoders">GetNumMusicDecoders<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L126"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetNumMusicDecoders :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetSoundFonts"><span><a class="doc-id-link" href="#GetSoundFonts">GetSoundFonts<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L214"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetSoundFonts :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetSynchroValue"><span><a class="doc-id-link" href="#GetSynchroValue">GetSynchroValue<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L212"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetSynchroValue :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetTimidityCfg"><span><a class="doc-id-link" href="#GetTimidityCfg">GetTimidityCfg<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L217"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetTimidityCfg :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GroupAvailable"><span><a class="doc-id-link" href="#GroupAvailable">GroupAvailable<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L172"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GroupAvailable :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (tag: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GroupChannel"><span><a class="doc-id-link" href="#GroupChannel">GroupChannel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L170"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GroupChannel :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (which: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, tag: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GroupChannels"><span><a class="doc-id-link" href="#GroupChannels">GroupChannels<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L171"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GroupChannels :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (from, to: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, tag: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GroupCount"><span><a class="doc-id-link" href="#GroupCount">GroupCount<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L173"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GroupCount :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (tag: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GroupNewer"><span><a class="doc-id-link" href="#GroupNewer">GroupNewer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L175"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GroupNewer :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (tag: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GroupOldest"><span><a class="doc-id-link" href="#GroupOldest">GroupOldest<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L174"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GroupOldest :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (tag: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HaltChannel"><span><a class="doc-id-link" href="#HaltChannel">HaltChannel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L185"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HaltChannel :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HaltGroup"><span><a class="doc-id-link" href="#HaltGroup">HaltGroup<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L186"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HaltGroup :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (tag: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HaltMusic"><span><a class="doc-id-link" href="#HaltMusic">HaltMusic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L187"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HaltMusic :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HasChunkDecoder"><span><a class="doc-id-link" href="#HasChunkDecoder">HasChunkDecoder<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L125"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HasChunkDecoder :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (name: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> sdl2.<a class="code-typename" href="/vendor/sdl2/#bool">bool</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HasMusicDecoder"><span><a class="doc-id-link" href="#HasMusicDecoder">HasMusicDecoder<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L128"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HasMusicDecoder :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (name: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> sdl2.<a class="code-typename" href="/vendor/sdl2/#bool">bool</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HookMusic"><span><a class="doc-id-link" href="#HookMusic">HookMusic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L137"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HookMusic :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (mix_func: <a class="code-typename" href="/vendor/sdl2/mixer/#MixFunc">MixFunc</a>, arg: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HookMusicFinished"><span><a class="doc-id-link" href="#HookMusicFinished">HookMusicFinished<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L138"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HookMusicFinished :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music_finished: <span class="keyword-type">proc</span> <span class="string">"c"</span> ()) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Init"><span><a class="doc-id-link" href="#Init">Init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L108"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Init :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (flags: <a class="code-typename" href="/vendor/sdl2/mixer/#InitFlags">InitFlags</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Linked_Version"><span><a class="doc-id-link" href="#Linked_Version">Linked_Version<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L106"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Linked_Version :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#version">version</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="LoadMUS"><span><a class="doc-id-link" href="#LoadMUS">LoadMUS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L116"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">LoadMUS :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (file: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="LoadMUSType_RW"><span><a class="doc-id-link" href="#LoadMUSType_RW">LoadMUSType_RW<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L118"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">LoadMUSType_RW :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^sdl2.<a class="code-typename" href="/vendor/sdl2/#RWops">RWops</a>, type: <a class="code-typename" href="/vendor/sdl2/mixer/#MusicType">MusicType</a>, freesrc: sdl2.<a class="code-typename" href="/vendor/sdl2/#bool">bool</a>) -> ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="LoadMUS_RW"><span><a class="doc-id-link" href="#LoadMUS_RW">LoadMUS_RW<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L117"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">LoadMUS_RW :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^sdl2.<a class="code-typename" href="/vendor/sdl2/#RWops">RWops</a>, freesrc: sdl2.<a class="code-typename" href="/vendor/sdl2/#bool">bool</a>) -> ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="LoadWAV"><span><a class="doc-id-link" href="#LoadWAV">LoadWAV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L97"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">LoadWAV :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (file: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> ^<a class="code-typename" href="/vendor/sdl2/mixer/#Chunk">Chunk</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="LoadWAV_RW"><span><a class="doc-id-link" href="#LoadWAV_RW">LoadWAV_RW<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L115"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">LoadWAV_RW :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^sdl2.<a class="code-typename" href="/vendor/sdl2/#RWops">RWops</a>, freesrc: sdl2.<a class="code-typename" href="/vendor/sdl2/#bool">bool</a>) -> ^<a class="code-typename" href="/vendor/sdl2/mixer/#Chunk">Chunk</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ModMusicJumpToOrder"><span><a class="doc-id-link" href="#ModMusicJumpToOrder">ModMusicJumpToOrder<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L201"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ModMusicJumpToOrder :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (order: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MusicDuration"><span><a class="doc-id-link" href="#MusicDuration">MusicDuration<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L204"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MusicDuration :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>) -> <a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="OpenAudio"><span><a class="doc-id-link" href="#OpenAudio">OpenAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L111"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">OpenAudio :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (frequency: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, format: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, channels: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, chunksize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="OpenAudioDevice"><span><a class="doc-id-link" href="#OpenAudioDevice">OpenAudioDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L112"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">OpenAudioDevice :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
+	frequency:       <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+	format:          <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, 
+	channels:        <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+	chunksize:       <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+	device:          <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, 
+	allowed_changed: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Pause"><span><a class="doc-id-link" href="#Pause">Pause<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L194"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Pause :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="PauseMusic"><span><a class="doc-id-link" href="#PauseMusic">PauseMusic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L197"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">PauseMusic :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Paused"><span><a class="doc-id-link" href="#Paused">Paused<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L196"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Paused :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="PausedMusic"><span><a class="doc-id-link" href="#PausedMusic">PausedMusic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L200"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">PausedMusic :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="PlayChannel"><span><a class="doc-id-link" href="#PlayChannel">PlayChannel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L151"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">PlayChannel :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, chunk: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Chunk">Chunk</a>, loops: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="PlayChannelTimed"><span><a class="doc-id-link" href="#PlayChannelTimed">PlayChannelTimed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L176"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">PlayChannelTimed :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, chunk: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Chunk">Chunk</a>, loops: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, ticks: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="PlayMusic"><span><a class="doc-id-link" href="#PlayMusic">PlayMusic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L177"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">PlayMusic :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (music: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Music">Music</a>, loops: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Playing"><span><a class="doc-id-link" href="#Playing">Playing<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L208"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Playing :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="PlayingMusic"><span><a class="doc-id-link" href="#PlayingMusic">PlayingMusic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L209"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">PlayingMusic :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="QuerySpec"><span><a class="doc-id-link" href="#QuerySpec">QuerySpec<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L114"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">QuerySpec :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (frequency: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, format: ^<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, channels: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="QuickLoad_RAW"><span><a class="doc-id-link" href="#QuickLoad_RAW">QuickLoad_RAW<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L120"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">QuickLoad_RAW :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (mem: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, len: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^<a class="code-typename" href="/vendor/sdl2/mixer/#Chunk">Chunk</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="QuickLoad_WAV"><span><a class="doc-id-link" href="#QuickLoad_WAV">QuickLoad_WAV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L119"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">QuickLoad_WAV :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (mem: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> ^<a class="code-typename" href="/vendor/sdl2/mixer/#Chunk">Chunk</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Quit"><span><a class="doc-id-link" href="#Quit">Quit<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L109"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Quit :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RegisterEffect"><span><a class="doc-id-link" href="#RegisterEffect">RegisterEffect<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L161"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RegisterEffect :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (chan: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, f: <a class="code-typename" href="/vendor/sdl2/mixer/#EffectFunc_t">EffectFunc_t</a>, d: <a class="code-typename" href="/vendor/sdl2/mixer/#EffectDone_t">EffectDone_t</a>, arg: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ReserveChannels"><span><a class="doc-id-link" href="#ReserveChannels">ReserveChannels<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L169"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ReserveChannels :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (num: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Resume"><span><a class="doc-id-link" href="#Resume">Resume<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L195"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Resume :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ResumeMusic"><span><a class="doc-id-link" href="#ResumeMusic">ResumeMusic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L198"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ResumeMusic :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RewindMusic"><span><a class="doc-id-link" href="#RewindMusic">RewindMusic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L199"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RewindMusic :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetDistance"><span><a class="doc-id-link" href="#SetDistance">SetDistance<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L167"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetDistance :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, distance: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetMusicCMD"><span><a class="doc-id-link" href="#SetMusicCMD">SetMusicCMD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L210"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetMusicCMD :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (command: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetMusicPosition"><span><a class="doc-id-link" href="#SetMusicPosition">SetMusicPosition<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L202"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetMusicPosition :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (position: <a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetPanning"><span><a class="doc-id-link" href="#SetPanning">SetPanning<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L165"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetPanning :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, left, right: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetPosition"><span><a class="doc-id-link" href="#SetPosition">SetPosition<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L166"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetPosition :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, angle: <a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>, distance: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetPostMix"><span><a class="doc-id-link" href="#SetPostMix">SetPostMix<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L136"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetPostMix :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (mix_func: <a class="code-typename" href="/vendor/sdl2/mixer/#MixFunc">MixFunc</a>, arg: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetReverseStereo"><span><a class="doc-id-link" href="#SetReverseStereo">SetReverseStereo<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L168"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetReverseStereo :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, flip: sdl2.<a class="code-typename" href="/vendor/sdl2/#bool">bool</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetSoundFonts"><span><a class="doc-id-link" href="#SetSoundFonts">SetSoundFonts<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L213"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetSoundFonts :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (paths: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetSynchroValue"><span><a class="doc-id-link" href="#SetSynchroValue">SetSynchroValue<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L211"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetSynchroValue :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (value: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetTimidityCfg"><span><a class="doc-id-link" href="#SetTimidityCfg">SetTimidityCfg<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L216"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetTimidityCfg :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="UnregisterAllEffects"><span><a class="doc-id-link" href="#UnregisterAllEffects">UnregisterAllEffects<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L163"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">UnregisterAllEffects :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="UnregisterEffect"><span><a class="doc-id-link" href="#UnregisterEffect">UnregisterEffect<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L162"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">UnregisterEffect :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, f: <a class="code-typename" href="/vendor/sdl2/mixer/#EffectFunc_t">EffectFunc_t</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Volume"><span><a class="doc-id-link" href="#Volume">Volume<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L181"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Volume :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (channel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, volume: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="VolumeChunk"><span><a class="doc-id-link" href="#VolumeChunk">VolumeChunk<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L182"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">VolumeChunk :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (chunk: ^<a class="code-typename" href="/vendor/sdl2/mixer/#Chunk">Chunk</a>, volume: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="VolumeMusic"><span><a class="doc-id-link" href="#VolumeMusic">VolumeMusic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin#L183"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">VolumeMusic :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (volume: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+</section>
+<h2 id="pkg-source-files">Source Files</h2>
+<ul>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/mixer/sdl_mixer.odin">sdl_mixer.odin</a></li>
+</ul>
+<h2 id="pkg-generation-information">Generation Information</h2>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 21:12:38.795079500 +0000 UTC</code></p>
+</article>
+<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
+<nav id="TableOfContents">
+<ul>
+<li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#Chunk">Chunk</a></li>
+<li><a href="#EffectDone_t">EffectDone_t</a></li>
+<li><a href="#EffectFunc_t">EffectFunc_t</a></li>
+<li><a href="#Fading">Fading</a></li>
+<li><a href="#InitFlag">InitFlag</a></li>
+<li><a href="#InitFlags">InitFlags</a></li>
+<li><a href="#MixFunc">MixFunc</a></li>
+<li><a href="#Music">Music</a></li>
+<li><a href="#MusicType">MusicType</a></li>
+<li><a href="#bool">bool</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Constants">Constants</a><ul>
+<li><a href="#CHANNELS">CHANNELS</a></li>
+<li><a href="#CHANNEL_POST">CHANNEL_POST</a></li>
+<li><a href="#DEFAULT_CHANNELS">DEFAULT_CHANNELS</a></li>
+<li><a href="#DEFAULT_FORMAT">DEFAULT_FORMAT</a></li>
+<li><a href="#DEFAULT_FREQUENCY">DEFAULT_FREQUENCY</a></li>
+<li><a href="#EFFECTSMAXSPEED">EFFECTSMAXSPEED</a></li>
+<li><a href="#FADING_IN">FADING_IN</a></li>
+<li><a href="#FADING_OUT">FADING_OUT</a></li>
+<li><a href="#INIT_FLAC">INIT_FLAC</a></li>
+<li><a href="#INIT_MID">INIT_MID</a></li>
+<li><a href="#INIT_MOD">INIT_MOD</a></li>
+<li><a href="#INIT_MP3">INIT_MP3</a></li>
+<li><a href="#INIT_OGG">INIT_OGG</a></li>
+<li><a href="#INIT_OPUS">INIT_OPUS</a></li>
+<li><a href="#MAJOR_VERSION">MAJOR_VERSION</a></li>
+<li><a href="#MAX_VOLUME">MAX_VOLUME</a></li>
+<li><a href="#MINOR_VERSION">MINOR_VERSION</a></li>
+<li><a href="#MUS_CMD">MUS_CMD</a></li>
+<li><a href="#MUS_FLAC">MUS_FLAC</a></li>
+<li><a href="#MUS_MID">MUS_MID</a></li>
+<li><a href="#MUS_MOD">MUS_MOD</a></li>
+<li><a href="#MUS_MODPLUG_UNUSED">MUS_MODPLUG_UNUSED</a></li>
+<li><a href="#MUS_MP3">MUS_MP3</a></li>
+<li><a href="#MUS_MP3_MAD_UNUSED">MUS_MP3_MAD_UNUSED</a></li>
+<li><a href="#MUS_NONE">MUS_NONE</a></li>
+<li><a href="#MUS_OGG">MUS_OGG</a></li>
+<li><a href="#MUS_OPUS">MUS_OPUS</a></li>
+<li><a href="#MUS_WAV">MUS_WAV</a></li>
+<li><a href="#NO_FADING">NO_FADING</a></li>
+<li><a href="#PATCHLEVEL">PATCHLEVEL</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Procedures">Procedures</a><ul>
+<li><a href="#AllocateChannels">AllocateChannels</a></li>
+<li><a href="#ChannelFinished">ChannelFinished</a></li>
+<li><a href="#CloseAudio">CloseAudio</a></li>
+<li><a href="#EachSoundFont">EachSoundFont</a></li>
+<li><a href="#ExpireChannel">ExpireChannel</a></li>
+<li><a href="#FadeInChannel">FadeInChannel</a></li>
+<li><a href="#FadeInChannelTimed">FadeInChannelTimed</a></li>
+<li><a href="#FadeInMusic">FadeInMusic</a></li>
+<li><a href="#FadeInMusicPos">FadeInMusicPos</a></li>
+<li><a href="#FadeOutChannel">FadeOutChannel</a></li>
+<li><a href="#FadeOutGroup">FadeOutGroup</a></li>
+<li><a href="#FadeOutMusic">FadeOutMusic</a></li>
+<li><a href="#FadingChannel">FadingChannel</a></li>
+<li><a href="#FadingMusic">FadingMusic</a></li>
+<li><a href="#FreeChunk">FreeChunk</a></li>
+<li><a href="#FreeMusic">FreeMusic</a></li>
+<li><a href="#GetChunk">GetChunk</a></li>
+<li><a href="#GetChunkDecoder">GetChunkDecoder</a></li>
+<li><a href="#GetMusicAlbumTag">GetMusicAlbumTag</a></li>
+<li><a href="#GetMusicArtistTag">GetMusicArtistTag</a></li>
+<li><a href="#GetMusicCopyrightTag">GetMusicCopyrightTag</a></li>
+<li><a href="#GetMusicDecoder">GetMusicDecoder</a></li>
+<li><a href="#GetMusicHookData">GetMusicHookData</a></li>
+<li><a href="#GetMusicLoopEndTime">GetMusicLoopEndTime</a></li>
+<li><a href="#GetMusicLoopLengthTime">GetMusicLoopLengthTime</a></li>
+<li><a href="#GetMusicLoopStartTime">GetMusicLoopStartTime</a></li>
+<li><a href="#GetMusicPosition">GetMusicPosition</a></li>
+<li><a href="#GetMusicTitle">GetMusicTitle</a></li>
+<li><a href="#GetMusicTitleTag">GetMusicTitleTag</a></li>
+<li><a href="#GetMusicType">GetMusicType</a></li>
+<li><a href="#GetMusicVolume">GetMusicVolume</a></li>
+<li><a href="#GetNumChunkDecoders">GetNumChunkDecoders</a></li>
+<li><a href="#GetNumMusicDecoders">GetNumMusicDecoders</a></li>
+<li><a href="#GetSoundFonts">GetSoundFonts</a></li>
+<li><a href="#GetSynchroValue">GetSynchroValue</a></li>
+<li><a href="#GetTimidityCfg">GetTimidityCfg</a></li>
+<li><a href="#GroupAvailable">GroupAvailable</a></li>
+<li><a href="#GroupChannel">GroupChannel</a></li>
+<li><a href="#GroupChannels">GroupChannels</a></li>
+<li><a href="#GroupCount">GroupCount</a></li>
+<li><a href="#GroupNewer">GroupNewer</a></li>
+<li><a href="#GroupOldest">GroupOldest</a></li>
+<li><a href="#HaltChannel">HaltChannel</a></li>
+<li><a href="#HaltGroup">HaltGroup</a></li>
+<li><a href="#HaltMusic">HaltMusic</a></li>
+<li><a href="#HasChunkDecoder">HasChunkDecoder</a></li>
+<li><a href="#HasMusicDecoder">HasMusicDecoder</a></li>
+<li><a href="#HookMusic">HookMusic</a></li>
+<li><a href="#HookMusicFinished">HookMusicFinished</a></li>
+<li><a href="#Init">Init</a></li>
+<li><a href="#Linked_Version">Linked_Version</a></li>
+<li><a href="#LoadMUS">LoadMUS</a></li>
+<li><a href="#LoadMUSType_RW">LoadMUSType_RW</a></li>
+<li><a href="#LoadMUS_RW">LoadMUS_RW</a></li>
+<li><a href="#LoadWAV">LoadWAV</a></li>
+<li><a href="#LoadWAV_RW">LoadWAV_RW</a></li>
+<li><a href="#ModMusicJumpToOrder">ModMusicJumpToOrder</a></li>
+<li><a href="#MusicDuration">MusicDuration</a></li>
+<li><a href="#OpenAudio">OpenAudio</a></li>
+<li><a href="#OpenAudioDevice">OpenAudioDevice</a></li>
+<li><a href="#Pause">Pause</a></li>
+<li><a href="#PauseMusic">PauseMusic</a></li>
+<li><a href="#Paused">Paused</a></li>
+<li><a href="#PausedMusic">PausedMusic</a></li>
+<li><a href="#PlayChannel">PlayChannel</a></li>
+<li><a href="#PlayChannelTimed">PlayChannelTimed</a></li>
+<li><a href="#PlayMusic">PlayMusic</a></li>
+<li><a href="#Playing">Playing</a></li>
+<li><a href="#PlayingMusic">PlayingMusic</a></li>
+<li><a href="#QuerySpec">QuerySpec</a></li>
+<li><a href="#QuickLoad_RAW">QuickLoad_RAW</a></li>
+<li><a href="#QuickLoad_WAV">QuickLoad_WAV</a></li>
+<li><a href="#Quit">Quit</a></li>
+<li><a href="#RegisterEffect">RegisterEffect</a></li>
+<li><a href="#ReserveChannels">ReserveChannels</a></li>
+<li><a href="#Resume">Resume</a></li>
+<li><a href="#ResumeMusic">ResumeMusic</a></li>
+<li><a href="#RewindMusic">RewindMusic</a></li>
+<li><a href="#SetDistance">SetDistance</a></li>
+<li><a href="#SetMusicCMD">SetMusicCMD</a></li>
+<li><a href="#SetMusicPosition">SetMusicPosition</a></li>
+<li><a href="#SetPanning">SetPanning</a></li>
+<li><a href="#SetPosition">SetPosition</a></li>
+<li><a href="#SetPostMix">SetPostMix</a></li>
+<li><a href="#SetReverseStereo">SetReverseStereo</a></li>
+<li><a href="#SetSoundFonts">SetSoundFonts</a></li>
+<li><a href="#SetSynchroValue">SetSynchroValue</a></li>
+<li><a href="#SetTimidityCfg">SetTimidityCfg</a></li>
+<li><a href="#UnregisterAllEffects">UnregisterAllEffects</a></li>
+<li><a href="#UnregisterEffect">UnregisterEffect</a></li>
+<li><a href="#Volume">Volume</a></li>
+<li><a href="#VolumeChunk">VolumeChunk</a></li>
+<li><a href="#VolumeMusic">VolumeMusic</a></li>
+</ul>
+</li>
+<li><a href="#pkg-source-files">Source Files</a></ul>
+</nav>
+</div></div>
+<script type="text/javascript">var odin_pkg_name = "sdl2_mixer";</script>
+</div>
+
+</div>
+</main>
+
+<footer class="odin-footer">
+	<div class="container pb-5 pt-5">
+		<div class="row g-4">
+		<div class="col">
+		<a class="navbar-brand" href="https://odin-lang.org">
+		<img class="mb-3" src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+		<p>
+		The Data-Oriented Language for Sane Software Development.
+		</p>
+		</div>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Resources</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://odin-lang.org/docs" class="link-light">Docs</a></li>
+			<li><a href="https://pkg.odin-lang.org/" class="link-light">Packages</a></li>
+			<li><a href="https://odin-lang.org/news" class="link-light">News</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Community</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin" target="_blank" class="link-light">GitHub</a></li>
+			<li><a href="https://forum.odin-lang.org" target="_blank" class="link-light">Forum</a></li>
+			<li><a href="https://discord.com/invite/sVBPHEv" target="_blank" class="link-light">Discord</a></li>
+			<li><a href="https://www.twitch.tv/ginger_bill" target="_blank" class="link-light">Twitch</a></li>
+			<li><a href="https://www.youtube.com/channel/UCUSck1dOH7VKmG4lRW7tZXg" target="_blank" class="link-light">YouTube</a></li>
+			<li><a href="https://odin-lang.org/showcase" target="_blank" class="link-light">Showcase</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Contribute</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin/issues" target="_blank" class="link-light">Issues</a></li>
+			<li><a href="https://www.patreon.com/gingerbill" target="_blank" class="link-light">Donate</a></li>
+			</ul>
+			</nav>
+		</div>
+		<div class="mt-4 text-muted">© 2016–2023 Ginger Bill</div>
+	</div>
+</footer>
+
+<script src="https://odin-lang.org/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://odin-lang.org/js/script.js"></script>
+<script src="/pkg-data.js"></script>
+<script src="/search.js"></script>
+</body>
+</html>

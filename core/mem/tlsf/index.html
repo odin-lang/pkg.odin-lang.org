@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>package mem/tlsf - pkg.odin-lang.org</title>	<link rel="icon" href="/favicon.svg">
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/scss/custom.min.css">
+	<link rel=stylesheet href="//odin-lang.org/lib/highlight/styles/github-dark.min.css">
+	<script src="//odin-lang.org/lib/highlight/highlight.min.js"></script>
+
+	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
+	<script>hljs.highlightAll()</script>
+	<script>
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
+		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
+	</script>
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
+
+	<link rel="stylesheet" type="text/css" href="/style.css">
+
+	</style>
+</head>
+<body>
+<script>
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
+</script>
+<header class="sticky-top">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
+		<div class="container">
+			<a class="navbar-brand" href="https://odin-lang.org/">
+			<img src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#odin-navbar-content" aria-controls="odin-navbar-content" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+			<div class="collapse navbar-collapse" id="odin-navbar-content">
+			<ul class="navbar-nav ms-md-auto">
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/">Home</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/docs">Docs</a></li>
+				<li class="nav-item"><a class="nav-link active" href="/">Packages</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/news">News</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/showcase">Showcase</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://forum.odin-lang.org">Forum</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/community">Community</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://github.com/odin-lang/Odin" target="_blank">GitHub</a></li>
+				<li class="nav-item">
+					<a
+						class="nav-link btn-dark-mode"
+						onclick="toggleDarkMode();"
+						title="Toggle Light/Dark Mode"
+					>
+						<span class="dark-mode-appearance">Appearance:</span>
+						<svg fill="white" id="dark-mode-icon" viewBox="0 0 384 512"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"/></svg>
+						<svg fill="white" id="light-mode-icon" viewBox="0 0 16 16">
+						  <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+						</svg>
+					</button>
+					</a>
+				</li>
+			</ul>
+		</div>
+		</div>
+	</nav>
+</header>
+<main>
+<div class="container full-width">
+<div class="row odin-main my-4" id="pkg">
+<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">
+<div class="py-3">
+<h4><a style="text-transform: capitalize; color: inherit;" href="/core">core Library</a></h4>
+<ul>
+<li class="nav-item"><a href="/core/bufio">bufio</a></li>
+<li class="nav-item"><a href="/core/bytes">bytes</a></li>
+<li class="nav-item"><a href="/core/c">c</a></li>
+<li class="nav-item"><a href="/core/compress">compress</a><ul>
+<li><a href="/core/compress/gzip">gzip</a></li>
+<li><a href="/core/compress/shoco">shoco</a></li>
+<li><a href="/core/compress/zlib">zlib</a></li>
+</ul>
+
+</li>
+<li class="nav-item">container<ul>
+<li><a href="/core/container/avl">avl</a></li>
+<li><a href="/core/container/bit_array">bit_array</a></li>
+<li><a href="/core/container/intrusive/list">intrusive/list</a></li>
+<li><a href="/core/container/lru">lru</a></li>
+<li><a href="/core/container/priority_queue">priority_queue</a></li>
+<li><a href="/core/container/queue">queue</a></li>
+<li><a href="/core/container/rbtree">rbtree</a></li>
+<li><a href="/core/container/small_array">small_array</a></li>
+<li><a href="/core/container/topological_sort">topological_sort</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/crypto">crypto</a><ul>
+<li><a href="/core/crypto/aead">aead</a></li>
+<li><a href="/core/crypto/aegis">aegis</a></li>
+<li><a href="/core/crypto/aes">aes</a></li>
+<li><a href="/core/crypto/blake2b">blake2b</a></li>
+<li><a href="/core/crypto/blake2s">blake2s</a></li>
+<li><a href="/core/crypto/chacha20">chacha20</a></li>
+<li><a href="/core/crypto/chacha20poly1305">chacha20poly1305</a></li>
+<li><a href="/core/crypto/deoxysii">deoxysii</a></li>
+<li><a href="/core/crypto/ed25519">ed25519</a></li>
+<li><a href="/core/crypto/hash">hash</a></li>
+<li><a href="/core/crypto/hkdf">hkdf</a></li>
+<li><a href="/core/crypto/hmac">hmac</a></li>
+<li><a href="/core/crypto/kmac">kmac</a></li>
+<li><a href="/core/crypto/legacy/keccak">legacy/keccak</a></li>
+<li><a href="/core/crypto/legacy/md5">legacy/md5</a></li>
+<li><a href="/core/crypto/legacy/sha1">legacy/sha1</a></li>
+<li><a href="/core/crypto/pbkdf2">pbkdf2</a></li>
+<li><a href="/core/crypto/poly1305">poly1305</a></li>
+<li><a href="/core/crypto/ristretto255">ristretto255</a></li>
+<li><a href="/core/crypto/sha2">sha2</a></li>
+<li><a href="/core/crypto/sha3">sha3</a></li>
+<li><a href="/core/crypto/shake">shake</a></li>
+<li><a href="/core/crypto/sm3">sm3</a></li>
+<li><a href="/core/crypto/tuplehash">tuplehash</a></li>
+<li><a href="/core/crypto/x25519">x25519</a></li>
+<li><a href="/core/crypto/x448">x448</a></li>
+</ul>
+
+</li>
+<li class="nav-item">debug<ul>
+<li><a href="/core/debug/pe">pe</a></li>
+<li><a href="/core/debug/trace">trace</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/dynlib">dynlib</a></li>
+<li class="nav-item">encoding<ul>
+<li><a href="/core/encoding/base32">base32</a></li>
+<li><a href="/core/encoding/base64">base64</a></li>
+<li><a href="/core/encoding/cbor">cbor</a></li>
+<li><a href="/core/encoding/csv">csv</a></li>
+<li><a href="/core/encoding/endian">endian</a></li>
+<li><a href="/core/encoding/entity">entity</a></li>
+<li><a href="/core/encoding/hex">hex</a></li>
+<li><a href="/core/encoding/hxa">hxa</a></li>
+<li><a href="/core/encoding/ini">ini</a></li>
+<li><a href="/core/encoding/json">json</a></li>
+<li><a href="/core/encoding/uuid">uuid</a></li>
+<li><a href="/core/encoding/uuid/legacy">uuid/legacy</a></li>
+<li><a href="/core/encoding/varint">varint</a></li>
+<li><a href="/core/encoding/xml">xml</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/flags">flags</a></li>
+<li class="nav-item"><a href="/core/fmt">fmt</a></li>
+<li class="nav-item"><a href="/core/hash">hash</a></li>
+<li class="nav-item"><a href="/core/image">image</a><ul>
+<li><a href="/core/image/bmp">bmp</a></li>
+<li><a href="/core/image/netpbm">netpbm</a></li>
+<li><a href="/core/image/png">png</a></li>
+<li><a href="/core/image/qoi">qoi</a></li>
+<li><a href="/core/image/tga">tga</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/io">io</a></li>
+<li class="nav-item"><a href="/core/log">log</a></li>
+<li class="nav-item"><a href="/core/math">math</a></li>
+<li class="nav-item"><a href="/core/mem">mem</a><ul>
+<li><a class="active" href="/core/mem/tlsf">tlsf</a></li>
+<li><a href="/core/mem/virtual">virtual</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/net">net</a></li>
+<li class="nav-item">odin<ul>
+<li><a href="/core/odin/ast">ast</a></li>
+<li><a href="/core/odin/doc-format">doc-format</a></li>
+<li><a href="/core/odin/parser">parser</a></li>
+<li><a href="/core/odin/tokenizer">tokenizer</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/os">os</a></li>
+<li class="nav-item">path<ul>
+<li><a href="/core/path/filepath">filepath</a></li>
+<li><a href="/core/path/slashpath">slashpath</a></li>
+</ul>
+
+</li>
+<li class="nav-item">prof<ul>
+<li><a href="/core/prof/spall">spall</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/reflect">reflect</a></li>
+<li class="nav-item"><a href="/core/relative">relative</a></li>
+<li class="nav-item"><a href="/core/simd">simd</a></li>
+<li class="nav-item"><a href="/core/slice">slice</a><ul>
+<li><a href="/core/slice/heap">heap</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/sort">sort</a></li>
+<li class="nav-item"><a href="/core/strconv">strconv</a><ul>
+<li><a href="/core/strconv/decimal">decimal</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/strings">strings</a></li>
+<li class="nav-item"><a href="/core/sync">sync</a><ul>
+<li><a href="/core/sync/chan">chan</a></li>
+</ul>
+
+</li>
+<li class="nav-item">sys<ul>
+<li><a href="/core/sys/darwin">darwin</a></li>
+<li><a href="/core/sys/darwin/CoreFoundation">darwin/CoreFoundation</a></li>
+<li><a href="/core/sys/darwin/Foundation">darwin/Foundation</a></li>
+<li><a href="/core/sys/darwin/Security">darwin/Security</a></li>
+<li><a href="/core/sys/freebsd">freebsd</a></li>
+<li><a href="/core/sys/haiku">haiku</a></li>
+<li><a href="/core/sys/info">info</a></li>
+<li><a href="/core/sys/kqueue">kqueue</a></li>
+<li><a href="/core/sys/linux">linux</a></li>
+<li><a href="/core/sys/orca">orca</a></li>
+<li><a href="/core/sys/posix">posix</a></li>
+<li><a href="/core/sys/unix">unix</a></li>
+<li><a href="/core/sys/valgrind">valgrind</a></li>
+<li><a href="/core/sys/windows">windows</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/terminal">terminal</a><ul>
+<li><a href="/core/terminal/ansi">ansi</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/testing">testing</a></li>
+<li class="nav-item">text<ul>
+<li><a href="/core/text/edit">edit</a></li>
+<li><a href="/core/text/i18n">i18n</a></li>
+<li><a href="/core/text/match">match</a></li>
+<li><a href="/core/text/regex">regex</a></li>
+<li><a href="/core/text/regex/common">regex/common</a></li>
+<li><a href="/core/text/regex/compiler">regex/compiler</a></li>
+<li><a href="/core/text/regex/optimizer">regex/optimizer</a></li>
+<li><a href="/core/text/regex/parser">regex/parser</a></li>
+<li><a href="/core/text/regex/tokenizer">regex/tokenizer</a></li>
+<li><a href="/core/text/regex/virtual_machine">regex/virtual_machine</a></li>
+<li><a href="/core/text/scanner">scanner</a></li>
+<li><a href="/core/text/table">table</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/thread">thread</a></li>
+<li class="nav-item"><a href="/core/time">time</a></li>
+<li class="nav-item"><a href="/core/unicode">unicode</a></li>
+</ul>
+</div>
+</nav>
+<article class="col-lg-8 p-4 documentation odin-article">
+<nav class="pkg-breadcrumb" aria-label="breadcrumb">
+<ol class="breadcrumb">
+<li class="breadcrumb-item"><a href="/core">core</a></li>
+<li class="breadcrumb-item"><a href="/core/mem">mem</a></li>
+<li class="breadcrumb-item active" aria-current="page"><a href="/core/mem/tlsf">tlsf</a></li>
+</ol>
+</nav>
+<h1>package core:mem/tlsf<div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf"><em>Source</em></a></div></h1>
+
+		<div class="odin-search-wrapper">
+			<input type="search" id="odin-search" class="odin-search-package" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">
+			<div class="odin-search-shortcut">
+				<div class="odin-search-key key-macos">⌘K</div>
+				<div class="odin-search-key key-windows">Ctrl+K</div>
+				<span class="odin-search-or">or</span>
+				<div class="odin-search-key">/</div>
+			</div>
+		</div>
+	
+<div id="odin-search-info">
+<div id="odin-search-time"></div>
+
+		<div id="odin-search-options">
+			<input type="checkbox" id="odin-search-filter" name="odin-search-filter">
+			<label for="odin-search-filter">Filter Results</label>
+		</div>
+</div>
+<ul id="odin-search-results"></ul>
+<div id="pkg-top">
+<h2>Overview</h2>
+<div id="pkg-overview">
+<p>package mem_tlsf implements a Two Level Segregated Fit memory allocator.</p>
+<pre>Copyright 2024 Jeroen van Rijn &lt;nom@duclavier.com&gt;.
+Made available under Odin's BSD-3 license.
+
+List of contributors:
+	Matt Conte:      Original C implementation, see LICENSE file in this package
+	Jeroen van Rijn: Source port
+</pre>
+</div>
+<div id="pkg-index">
+<h2>Index</h2>
+<div>
+<details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
+<summary id="#doc-index-Types-header">
+Types (4)</summary>
+<ul>
+<li><a href="#Allocator">Allocator</a></li>
+<li><a href="#Block_Header">Block_Header</a></li>
+<li><a href="#Error">Error</a></li>
+<li><a href="#Pool">Pool</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
+<summary id="#doc-index-Constants-header">
+Constants (16)</summary>
+<ul>
+<li><a href="#ALIGN_SIZE">ALIGN_SIZE</a></li>
+<li><a href="#ALIGN_SIZE_LOG2">ALIGN_SIZE_LOG2</a></li>
+<li><a href="#BLOCK_HEADER_FREE">BLOCK_HEADER_FREE</a></li>
+<li><a href="#BLOCK_HEADER_OVERHEAD">BLOCK_HEADER_OVERHEAD</a></li>
+<li><a href="#BLOCK_HEADER_PREV_FREE">BLOCK_HEADER_PREV_FREE</a></li>
+<li><a href="#BLOCK_SIZE_MAX">BLOCK_SIZE_MAX</a></li>
+<li><a href="#BLOCK_SIZE_MIN">BLOCK_SIZE_MIN</a></li>
+<li><a href="#BLOCK_START_OFFSET">BLOCK_START_OFFSET</a></li>
+<li><a href="#FL_INDEX_COUNT">FL_INDEX_COUNT</a></li>
+<li><a href="#FL_INDEX_MAX">FL_INDEX_MAX</a></li>
+<li><a href="#FL_INDEX_SHIFT">FL_INDEX_SHIFT</a></li>
+<li><a href="#INITIAL_POOL_OVERHEAD">INITIAL_POOL_OVERHEAD</a></li>
+<li><a href="#POOL_OVERHEAD">POOL_OVERHEAD</a></li>
+<li><a href="#SL_INDEX_COUNT">SL_INDEX_COUNT</a></li>
+<li><a href="#SMALL_BLOCK_SIZE">SMALL_BLOCK_SIZE</a></li>
+<li><a href="#TLSF_SL_INDEX_COUNT_LOG2">TLSF_SL_INDEX_COUNT_LOG2</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Variables" aria-labelledby="#doc-index-Variables-header">
+<summary id="#doc-index-Variables-header">
+Variables (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
+<summary id="#doc-index-Procedures-header">
+Procedures (11)</summary>
+<ul>
+<li><a href="#allocator">allocator</a></li>
+<li><a href="#allocator_proc">allocator_proc</a></li>
+<li><a href="#destroy">destroy</a></li>
+<li><a href="#estimate_pool_from_size_alignment">estimate_pool_from_size_alignment</a></li>
+<li><a href="#estimate_pool_from_typeid">estimate_pool_from_typeid</a></li>
+<li><a href="#ffs">ffs</a></li>
+<li><a href="#fls">fls</a></li>
+<li><a href="#fls_uint">fls_uint</a></li>
+<li><a href="#free_with_size">free_with_size</a></li>
+<li><a href="#init_from_allocator">init_from_allocator</a></li>
+<li><a href="#init_from_buffer">init_from_buffer</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedure Groups" aria-labelledby="#doc-index-Procedure Groups-header">
+<summary id="#doc-index-Procedure Groups-header">
+Procedure Groups (2)</summary>
+<ul>
+<li><a href="#estimate_pool_size">estimate_pool_size</a></li>
+<li><a href="#init">init</a></li>
+</ul>
+</details>
+</div>
+</div>
+</div>
+<section class="documentation">
+<h2 id="pkg-Types" class="pkg-header">Types</h2>
+<div class="pkg-entity">
+<h3 id="Allocator"><span><a class="doc-id-link" href="#Allocator">Allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf.odin#L25"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Allocator :: <span class="keyword-type">struct</span> {
+	<span class="comment">// Empty lists point at this block to indicate they are free.</span>
+	block_null:    <a class="code-typename" href="/core/mem/tlsf/#Block_Header">Block_Header</a>,
+	<span class="comment">// Bitmaps for free lists.</span>
+	fl_bitmap:     <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> <span class="string">`fmt:"-"`</span>,
+	sl_bitmap:     [25]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> <span class="string">`fmt:"-"`</span>,
+	<span class="comment">// Head of free lists.</span>
+	blocks:        [25][32]^<a class="code-typename" href="/core/mem/tlsf/#Block_Header">Block_Header</a> <span class="string">`fmt:"-"`</span>,
+	<span class="comment">// Keep track of pools so we can deallocate them.</span>
+	<span class="comment">// If `pool.allocator` is blank, we don't do anything.</span>
+	<span class="comment">// We also use this linked list of pools to report</span>
+	<span class="comment">// statistics like how much memory is still available,</span>
+	<span class="comment">// fragmentation, etc.</span>
+	pool:          <a class="code-typename" href="/core/mem/tlsf/#Pool">Pool</a>,
+	<span class="comment">// If we're expected to grow when we run out of memory,</span>
+	<span class="comment">// how much should we ask the backing allocator for?</span>
+	new_pool_size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/core/mem/tlsf/#allocator">allocator</a></li>
+<li><a href="/core/mem/tlsf/#destroy">destroy</a></li>
+<li><a href="/core/mem/tlsf/#free_with_size">free_with_size</a></li>
+<li><a href="/core/mem/tlsf/#init_from_allocator">init_from_allocator</a></li>
+<li><a href="/core/mem/tlsf/#init_from_buffer">init_from_buffer</a></li>
+<li><a href="/core/mem/tlsf/#init">init</a>&nbsp;<em>(procedure groups)</em></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Block_Header"><span><a class="doc-id-link" href="#Block_Header">Block_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L70"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Block_Header :: <span class="keyword-type">struct</span> {
+	prev_phys_block: ^<a class="code-typename" href="/core/mem/tlsf/#Block_Header">Block_Header</a>,
+	size:            <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
+	<span class="comment">// Next and previous free blocks.</span>
+	next_free:       ^<a class="code-typename" href="/core/mem/tlsf/#Block_Header">Block_Header</a>,
+	prev_free:       ^<a class="code-typename" href="/core/mem/tlsf/#Block_Header">Block_Header</a>,
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Block header structure.</p>
+<p>There are several implementation subtleties involved:
+<span class="doc-list">The <code>prev_phys_block</code> field is only valid if the previous block is free.</span>
+<span class="doc-list">The <code>prev_phys_block</code> field is actually stored at the end of the</span></p>
+<pre>previous block. It appears at the beginning of this structure only to
+simplify the implementation.
+</pre>
+<p><span class="doc-list">The <code>next_free</code> / <code>prev_free</code> fields are only valid if the block is free.</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Error"><span><a class="doc-id-link" href="#Error">Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf.odin#L16"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+	None                      = 0, 
+	Invalid_Backing_Allocator = 1, 
+	Invalid_Alignment         = 2, 
+	Backing_Buffer_Too_Small  = 3, 
+	Backing_Buffer_Too_Large  = 4, 
+	Backing_Allocator_Error   = 5, 
+}</pre>
+</div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/mem/tlsf/#init_from_allocator">init_from_allocator</a></li>
+<li><a href="/core/mem/tlsf/#init_from_buffer">init_from_buffer</a></li>
+<li><a href="/core/mem/tlsf/#init">init</a>&nbsp;<em>(procedure groups)</em></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Pool"><span><a class="doc-id-link" href="#Pool">Pool<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L54"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Pool :: <span class="keyword-type">struct</span> {
+	data:      []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> <span class="string">`fmt:"-"`</span>,
+	allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>,
+	next:      ^<a class="code-typename" href="/core/mem/tlsf/#Pool">Pool</a>,
+}</pre>
+</div>
+</div>
+<h2 id="pkg-Constants" class="pkg-header">Constants</h2>
+<div class="pkg-entity">
+<h3 id="ALIGN_SIZE"><span><a class="doc-id-link" href="#ALIGN_SIZE">ALIGN_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L29"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ALIGN_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1 &lt;&lt; ALIGN_SIZE_LOG2</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ALIGN_SIZE_LOG2"><span><a class="doc-id-link" href="#ALIGN_SIZE_LOG2">ALIGN_SIZE_LOG2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L22"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ALIGN_SIZE_LOG2: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 3 when size_of(uintptr) == 8 else 2</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>All allocation sizes and addresses are aligned to 4/8 bytes</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="BLOCK_HEADER_FREE"><span><a class="doc-id-link" href="#BLOCK_HEADER_FREE">BLOCK_HEADER_FREE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L86"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BLOCK_HEADER_FREE :: uint(1 &lt;&lt; 0)</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Since block sizes are always at least a multiple of 4, the two least
+significant bits of the size field are used to store the block status:
+<span class="doc-list">bit 0: whether block is busy or free</span>
+<span class="doc-list">bit 1: whether previous block is busy or free</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="BLOCK_HEADER_OVERHEAD"><span><a class="doc-id-link" href="#BLOCK_HEADER_OVERHEAD">BLOCK_HEADER_OVERHEAD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L93"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BLOCK_HEADER_OVERHEAD :: uint(size_of(uint))</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>The size of the block header exposed to used blocks is the <code>size</code> field.
+The <code>prev_phys_block</code> field is stored <i>inside</i> the previous free block.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="BLOCK_HEADER_PREV_FREE"><span><a class="doc-id-link" href="#BLOCK_HEADER_PREV_FREE">BLOCK_HEADER_PREV_FREE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L87"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BLOCK_HEADER_PREV_FREE :: uint(1 &lt;&lt; 1)</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="BLOCK_SIZE_MAX"><span><a class="doc-id-link" href="#BLOCK_SIZE_MAX">BLOCK_SIZE_MAX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L107"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BLOCK_SIZE_MAX :: uint(1) &lt;&lt; FL_INDEX_MAX</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="BLOCK_SIZE_MIN"><span><a class="doc-id-link" href="#BLOCK_SIZE_MIN">BLOCK_SIZE_MIN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L106"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BLOCK_SIZE_MIN :: uint(size_of(Block_Header) - size_of(^Block_Header))</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>A free block must be large enough to store its header minus the size of
+the <code>prev_phys_block</code> field, and no larger than the number of addressable
+bits for <code>FL_INDEX</code>.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="BLOCK_START_OFFSET"><span><a class="doc-id-link" href="#BLOCK_START_OFFSET">BLOCK_START_OFFSET<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L99"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BLOCK_START_OFFSET: <a href="/base/builtin#uintptr"><span class="doc-builtin">uintptr</span></a> : offset_of(Block_Header, size) + size_of(Block_Header{}.size)</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>User data starts directly after the size field in a used block.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="FL_INDEX_COUNT"><span><a class="doc-id-link" href="#FL_INDEX_COUNT">FL_INDEX_COUNT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L32"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FL_INDEX_COUNT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : FL_INDEX_MAX - FL_INDEX_SHIFT + 1</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FL_INDEX_MAX"><span><a class="doc-id-link" href="#FL_INDEX_MAX">FL_INDEX_MAX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L26"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FL_INDEX_MAX: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 32 when size_of(uintptr) == 8 else 30</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>We can increase this to support larger allocation sizes,
+at the expense of more overhead in the TLSF structure</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="FL_INDEX_SHIFT"><span><a class="doc-id-link" href="#FL_INDEX_SHIFT">FL_INDEX_SHIFT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L31"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FL_INDEX_SHIFT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : TLSF_SL_INDEX_COUNT_LOG2 + ALIGN_SIZE_LOG2</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="INITIAL_POOL_OVERHEAD"><span><a class="doc-id-link" href="#INITIAL_POOL_OVERHEAD">INITIAL_POOL_OVERHEAD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L96"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">INITIAL_POOL_OVERHEAD: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 48</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="POOL_OVERHEAD"><span><a class="doc-id-link" href="#POOL_OVERHEAD">POOL_OVERHEAD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L95"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">POOL_OVERHEAD: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> : 2 * BLOCK_HEADER_OVERHEAD</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SL_INDEX_COUNT"><span><a class="doc-id-link" href="#SL_INDEX_COUNT">SL_INDEX_COUNT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L30"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SL_INDEX_COUNT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1 &lt;&lt; TLSF_SL_INDEX_COUNT_LOG2</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SMALL_BLOCK_SIZE"><span><a class="doc-id-link" href="#SMALL_BLOCK_SIZE">SMALL_BLOCK_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L33"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SMALL_BLOCK_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1 &lt;&lt; FL_INDEX_SHIFT</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="TLSF_SL_INDEX_COUNT_LOG2"><span><a class="doc-id-link" href="#TLSF_SL_INDEX_COUNT_LOG2">TLSF_SL_INDEX_COUNT_LOG2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L19"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TLSF_SL_INDEX_COUNT_LOG2: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : #config(TLSF_SL_INDEX_COUNT_LOG2, 5)</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>log2 of number of linear subdivisions of block sizes.
+Larger values require more memory in the control structure.
+Values of 4 or 5 are typical.</p>
+</details>
+</div>
+<h2 id="pkg-Variables" class="pkg-header">Variables</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+<h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
+<div class="pkg-entity">
+<h3 id="allocator"><span><a class="doc-id-link" href="#allocator">allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf.odin#L50"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">allocator :: <span class="keyword-type">proc</span>(t: ^<a class="code-typename" href="/core/mem/tlsf/#Allocator">Allocator</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="allocator_proc"><span><a class="doc-id-link" href="#allocator_proc">allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf.odin#L140"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">allocator_proc :: <span class="keyword-type">proc</span>(
+	allocator_data:  <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
+	mode:            runtime.<a class="code-typename" href="/base/runtime/#Allocator_Mode">Allocator_Mode</a>, 
+	size, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, 
+	old_memory:      <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
+	old_size:        <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, 
+	location := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>, 
+) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf.odin#L120"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">destroy :: <span class="keyword-type">proc</span>(control: ^<a class="code-typename" href="/core/mem/tlsf/#Allocator">Allocator</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="estimate_pool_from_size_alignment"><span><a class="doc-id-link" href="#estimate_pool_from_size_alignment">estimate_pool_from_size_alignment<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf.odin#L58"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">estimate_pool_from_size_alignment :: <span class="keyword-type">proc</span>(count: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> (pool_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Tries to estimate a pool size sufficient for <code>count</code> allocations, each of <code>size</code> and with <code>alignment</code>.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="estimate_pool_from_typeid"><span><a class="doc-id-link" href="#estimate_pool_from_typeid">estimate_pool_from_typeid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf.odin#L64"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">estimate_pool_from_typeid :: <span class="keyword-type">proc</span>(count: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, type: <a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a>) -> (pool_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Tries to estimate a pool size sufficient for <code>count</code> allocations of <code>type</code>.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="ffs"><span><a class="doc-id-link" href="#ffs">ffs<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf.odin#L185"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ffs :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (word: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> (bit: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Exported solely to facilitate testing</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="fls"><span><a class="doc-id-link" href="#fls">fls<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf.odin#L191"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">fls :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (word: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> (bit: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Exported solely to facilitate testing</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="fls_uint"><span><a class="doc-id-link" href="#fls_uint">fls_uint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf.odin#L198"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">fls_uint :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> (bit: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Exported solely to facilitate testing</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="free_with_size"><span><a class="doc-id-link" href="#free_with_size">free_with_size<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin#L270"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">free_with_size :: <span class="keyword-type">proc</span>(control: ^<a class="code-typename" href="/core/mem/tlsf/#Allocator">Allocator</a>, ptr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="init_from_allocator"><span><a class="doc-id-link" href="#init_from_allocator">init_from_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf.odin#L95"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">init_from_allocator :: <span class="keyword-type">proc</span>(control: ^<a class="code-typename" href="/core/mem/tlsf/#Allocator">Allocator</a>, backing: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>, initial_pool_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, new_pool_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = 0) -> <a class="code-typename" href="/core/mem/tlsf/#Error">Error</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="init_from_buffer"><span><a class="doc-id-link" href="#init_from_buffer">init_from_buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf.odin#L73"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">init_from_buffer :: <span class="keyword-type">proc</span>(control: ^<a class="code-typename" href="/core/mem/tlsf/#Allocator">Allocator</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> <a class="code-typename" href="/core/mem/tlsf/#Error">Error</a> {…}</pre>
+</div>
+</div>
+<h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
+<div class="pkg-entity">
+<h3 id="estimate_pool_size"><span><a class="doc-id-link" href="#estimate_pool_size">estimate_pool_size<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf.odin#L69"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">estimate_pool_size :: <span class="keyword-type">proc</span>{
+	<a class="code-procedure" href="/core/mem/tlsf/#estimate_pool_from_size_alignment">estimate_pool_from_size_alignment</a>,
+	<a class="code-procedure" href="/core/mem/tlsf/#estimate_pool_from_typeid">estimate_pool_from_typeid</a>,
+}
+</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="init"><span><a class="doc-id-link" href="#init">init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf.odin#L118"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">init :: <span class="keyword-type">proc</span>{
+	<a class="code-procedure" href="/core/mem/tlsf/#init_from_buffer">init_from_buffer</a>,
+	<a class="code-procedure" href="/core/mem/tlsf/#init_from_allocator">init_from_allocator</a>,
+}
+</pre>
+</div>
+</div>
+</section>
+<h2 id="pkg-source-files">Source Files</h2>
+<ul>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf.odin">tlsf.odin</a></li>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tlsf/tlsf_internal.odin">tlsf_internal.odin</a></li>
+</ul>
+<h2 id="pkg-generation-information">Generation Information</h2>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 21:12:36.270394600 +0000 UTC</code></p>
+</article>
+<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
+<nav id="TableOfContents">
+<ul>
+<li><a href="#pkg-overview">Overview</a><li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#Allocator">Allocator</a></li>
+<li><a href="#Block_Header">Block_Header</a></li>
+<li><a href="#Error">Error</a></li>
+<li><a href="#Pool">Pool</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Constants">Constants</a><ul>
+<li><a href="#ALIGN_SIZE">ALIGN_SIZE</a></li>
+<li><a href="#ALIGN_SIZE_LOG2">ALIGN_SIZE_LOG2</a></li>
+<li><a href="#BLOCK_HEADER_FREE">BLOCK_HEADER_FREE</a></li>
+<li><a href="#BLOCK_HEADER_OVERHEAD">BLOCK_HEADER_OVERHEAD</a></li>
+<li><a href="#BLOCK_HEADER_PREV_FREE">BLOCK_HEADER_PREV_FREE</a></li>
+<li><a href="#BLOCK_SIZE_MAX">BLOCK_SIZE_MAX</a></li>
+<li><a href="#BLOCK_SIZE_MIN">BLOCK_SIZE_MIN</a></li>
+<li><a href="#BLOCK_START_OFFSET">BLOCK_START_OFFSET</a></li>
+<li><a href="#FL_INDEX_COUNT">FL_INDEX_COUNT</a></li>
+<li><a href="#FL_INDEX_MAX">FL_INDEX_MAX</a></li>
+<li><a href="#FL_INDEX_SHIFT">FL_INDEX_SHIFT</a></li>
+<li><a href="#INITIAL_POOL_OVERHEAD">INITIAL_POOL_OVERHEAD</a></li>
+<li><a href="#POOL_OVERHEAD">POOL_OVERHEAD</a></li>
+<li><a href="#SL_INDEX_COUNT">SL_INDEX_COUNT</a></li>
+<li><a href="#SMALL_BLOCK_SIZE">SMALL_BLOCK_SIZE</a></li>
+<li><a href="#TLSF_SL_INDEX_COUNT_LOG2">TLSF_SL_INDEX_COUNT_LOG2</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Procedures">Procedures</a><ul>
+<li><a href="#allocator">allocator</a></li>
+<li><a href="#allocator_proc">allocator_proc</a></li>
+<li><a href="#destroy">destroy</a></li>
+<li><a href="#estimate_pool_from_size_alignment">estimate_pool_from_size_alignment</a></li>
+<li><a href="#estimate_pool_from_typeid">estimate_pool_from_typeid</a></li>
+<li><a href="#ffs">ffs</a></li>
+<li><a href="#fls">fls</a></li>
+<li><a href="#fls_uint">fls_uint</a></li>
+<li><a href="#free_with_size">free_with_size</a></li>
+<li><a href="#init_from_allocator">init_from_allocator</a></li>
+<li><a href="#init_from_buffer">init_from_buffer</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Procedure Groups">Procedure Groups</a><ul>
+<li><a href="#estimate_pool_size">estimate_pool_size</a></li>
+<li><a href="#init">init</a></li>
+</ul>
+</li>
+<li><a href="#pkg-source-files">Source Files</a></ul>
+</nav>
+</div></div>
+<script type="text/javascript">var odin_pkg_name = "mem_tlsf";</script>
+</div>
+
+</div>
+</main>
+
+<footer class="odin-footer">
+	<div class="container pb-5 pt-5">
+		<div class="row g-4">
+		<div class="col">
+		<a class="navbar-brand" href="https://odin-lang.org">
+		<img class="mb-3" src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+		<p>
+		The Data-Oriented Language for Sane Software Development.
+		</p>
+		</div>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Resources</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://odin-lang.org/docs" class="link-light">Docs</a></li>
+			<li><a href="https://pkg.odin-lang.org/" class="link-light">Packages</a></li>
+			<li><a href="https://odin-lang.org/news" class="link-light">News</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Community</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin" target="_blank" class="link-light">GitHub</a></li>
+			<li><a href="https://forum.odin-lang.org" target="_blank" class="link-light">Forum</a></li>
+			<li><a href="https://discord.com/invite/sVBPHEv" target="_blank" class="link-light">Discord</a></li>
+			<li><a href="https://www.twitch.tv/ginger_bill" target="_blank" class="link-light">Twitch</a></li>
+			<li><a href="https://www.youtube.com/channel/UCUSck1dOH7VKmG4lRW7tZXg" target="_blank" class="link-light">YouTube</a></li>
+			<li><a href="https://odin-lang.org/showcase" target="_blank" class="link-light">Showcase</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Contribute</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin/issues" target="_blank" class="link-light">Issues</a></li>
+			<li><a href="https://www.patreon.com/gingerbill" target="_blank" class="link-light">Donate</a></li>
+			</ul>
+			</nav>
+		</div>
+		<div class="mt-4 text-muted">© 2016–2023 Ginger Bill</div>
+	</div>
+</footer>
+
+<script src="https://odin-lang.org/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://odin-lang.org/js/script.js"></script>
+<script src="/pkg-data.js"></script>
+<script src="/search.js"></script>
+</body>
+</html>

@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>package sdl2/ttf - pkg.odin-lang.org</title>	<link rel="icon" href="/favicon.svg">
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/scss/custom.min.css">
+	<link rel=stylesheet href="//odin-lang.org/lib/highlight/styles/github-dark.min.css">
+	<script src="//odin-lang.org/lib/highlight/highlight.min.js"></script>
+
+	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
+	<script>hljs.highlightAll()</script>
+	<script>
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
+		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
+	</script>
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
+
+	<link rel="stylesheet" type="text/css" href="/style.css">
+
+	</style>
+</head>
+<body>
+<script>
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
+</script>
+<header class="sticky-top">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
+		<div class="container">
+			<a class="navbar-brand" href="https://odin-lang.org/">
+			<img src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#odin-navbar-content" aria-controls="odin-navbar-content" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+			<div class="collapse navbar-collapse" id="odin-navbar-content">
+			<ul class="navbar-nav ms-md-auto">
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/">Home</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/docs">Docs</a></li>
+				<li class="nav-item"><a class="nav-link active" href="/">Packages</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/news">News</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/showcase">Showcase</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://forum.odin-lang.org">Forum</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/community">Community</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://github.com/odin-lang/Odin" target="_blank">GitHub</a></li>
+				<li class="nav-item">
+					<a
+						class="nav-link btn-dark-mode"
+						onclick="toggleDarkMode();"
+						title="Toggle Light/Dark Mode"
+					>
+						<span class="dark-mode-appearance">Appearance:</span>
+						<svg fill="white" id="dark-mode-icon" viewBox="0 0 384 512"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"/></svg>
+						<svg fill="white" id="light-mode-icon" viewBox="0 0 16 16">
+						  <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+						</svg>
+					</button>
+					</a>
+				</li>
+			</ul>
+		</div>
+		</div>
+	</nav>
+</header>
+<main>
+<div class="container full-width">
+<div class="row odin-main my-4" id="pkg">
+<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">
+<div class="py-3">
+<h4><a style="text-transform: capitalize; color: inherit;" href="/vendor">vendor Library</a></h4>
+<ul>
+<li class="nav-item"><a href="/vendor/box2d">box2d</a></li>
+<li class="nav-item"><a href="/vendor/cgltf">cgltf</a></li>
+<li class="nav-item"><a href="/vendor/commonmark">commonmark</a></li>
+<li class="nav-item">darwin<ul>
+<li><a href="/vendor/darwin/Metal">Metal</a></li>
+<li><a href="/vendor/darwin/MetalKit">MetalKit</a></li>
+<li><a href="/vendor/darwin/QuartzCore">QuartzCore</a></li>
+</ul>
+
+</li>
+<li class="nav-item">directx<ul>
+<li><a href="/vendor/directx/d3d11">d3d11</a></li>
+<li><a href="/vendor/directx/d3d12">d3d12</a></li>
+<li><a href="/vendor/directx/d3d_compiler">d3d_compiler</a></li>
+<li><a href="/vendor/directx/dxc">dxc</a></li>
+<li><a href="/vendor/directx/dxgi">dxgi</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/ENet">ENet</a></li>
+<li class="nav-item"><a href="/vendor/fontstash">fontstash</a></li>
+<li class="nav-item"><a href="/vendor/ggpo">ggpo</a></li>
+<li class="nav-item"><a href="/vendor/glfw">glfw</a><ul>
+<li><a href="/vendor/glfw/bindings">bindings</a></li>
+</ul>
+
+</li>
+<li class="nav-item">lua<ul>
+<li><a href="/vendor/lua/5.4">5.4</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/microui">microui</a></li>
+<li class="nav-item"><a href="/vendor/miniaudio">miniaudio</a></li>
+<li class="nav-item"><a href="/vendor/nanovg">nanovg</a></li>
+<li class="nav-item"><a href="/vendor/OpenEXRCore">OpenEXRCore</a></li>
+<li class="nav-item"><a href="/vendor/OpenGL">OpenGL</a></li>
+<li class="nav-item"><a href="/vendor/portmidi">portmidi</a></li>
+<li class="nav-item"><a href="/vendor/raylib">raylib</a></li>
+<li class="nav-item"><a href="/vendor/sdl2">sdl2</a><ul>
+<li><a href="/vendor/sdl2/image">image</a></li>
+<li><a href="/vendor/sdl2/mixer">mixer</a></li>
+<li><a href="/vendor/sdl2/net">net</a></li>
+<li><a class="active" href="/vendor/sdl2/ttf">ttf</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/sdl3">sdl3</a><ul>
+<li><a href="/vendor/sdl3/image">image</a></li>
+<li><a href="/vendor/sdl3/ttf">ttf</a></li>
+</ul>
+
+</li>
+<li class="nav-item">stb<ul>
+<li><a href="/vendor/stb/easy_font">easy_font</a></li>
+<li><a href="/vendor/stb/image">image</a></li>
+<li><a href="/vendor/stb/rect_pack">rect_pack</a></li>
+<li><a href="/vendor/stb/truetype">truetype</a></li>
+<li><a href="/vendor/stb/vorbis">vorbis</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/vulkan">vulkan</a></li>
+<li class="nav-item"><a href="/vendor/wgpu">wgpu</a></li>
+<li class="nav-item">windows<ul>
+<li><a href="/vendor/windows/GameInput">GameInput</a></li>
+<li><a href="/vendor/windows/XAudio2">XAudio2</a></li>
+</ul>
+
+</li>
+<li class="nav-item">x11<ul>
+<li><a href="/vendor/x11/xlib">xlib</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/zlib">zlib</a></li>
+</ul>
+</div>
+</nav>
+<article class="col-lg-8 p-4 documentation odin-article">
+<nav class="pkg-breadcrumb" aria-label="breadcrumb">
+<ol class="breadcrumb">
+<li class="breadcrumb-item"><a href="/vendor">vendor</a></li>
+<li class="breadcrumb-item"><a href="/vendor/sdl2">sdl2</a></li>
+<li class="breadcrumb-item active" aria-current="page"><a href="/vendor/sdl2/ttf">ttf</a></li>
+</ol>
+</nav>
+<h1>package vendor:sdl2/ttf<div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf"><em>Source</em></a></div></h1>
+
+		<div class="odin-search-wrapper">
+			<input type="search" id="odin-search" class="odin-search-package" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">
+			<div class="odin-search-shortcut">
+				<div class="odin-search-key key-macos">⌘K</div>
+				<div class="odin-search-key key-windows">Ctrl+K</div>
+				<span class="odin-search-or">or</span>
+				<div class="odin-search-key">/</div>
+			</div>
+		</div>
+	
+<div id="odin-search-info">
+<div id="odin-search-time"></div>
+
+		<div id="odin-search-options">
+			<input type="checkbox" id="odin-search-filter" name="odin-search-filter">
+			<label for="odin-search-filter">Filter Results</label>
+		</div>
+</div>
+<ul id="odin-search-results"></ul>
+<div id="pkg-top">
+<div id="pkg-index">
+<h2>Index</h2>
+<div>
+<details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
+<summary id="#doc-index-Types-header">
+Types (5)</summary>
+<ul>
+<li><a href="#Font">Font</a></li>
+<li><a href="#Hinting">Hinting</a></li>
+<li><a href="#Style">Style</a></li>
+<li><a href="#StyleFlag">StyleFlag</a></li>
+<li><a href="#bool">bool</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
+<summary id="#doc-index-Constants-header">
+Constants (15)</summary>
+<ul>
+<li><a href="#HINTING_LIGHT">HINTING_LIGHT</a></li>
+<li><a href="#HINTING_LIGHT_SUBPIXEL">HINTING_LIGHT_SUBPIXEL</a></li>
+<li><a href="#HINTING_MONO">HINTING_MONO</a></li>
+<li><a href="#HINTING_NONE">HINTING_NONE</a></li>
+<li><a href="#HINTING_NORMAL">HINTING_NORMAL</a></li>
+<li><a href="#MAJOR_VERSION">MAJOR_VERSION</a></li>
+<li><a href="#MINOR_VERSION">MINOR_VERSION</a></li>
+<li><a href="#PATCHLEVEL">PATCHLEVEL</a></li>
+<li><a href="#STYLE_BOLD">STYLE_BOLD</a></li>
+<li><a href="#STYLE_ITALIC">STYLE_ITALIC</a></li>
+<li><a href="#STYLE_NORMAL">STYLE_NORMAL</a></li>
+<li><a href="#STYLE_STRIKETHROUGH">STYLE_STRIKETHROUGH</a></li>
+<li><a href="#STYLE_UNDERLINE">STYLE_UNDERLINE</a></li>
+<li><a href="#UNICODE_BOM_NATIVE">UNICODE_BOM_NATIVE</a></li>
+<li><a href="#UNICODE_BOM_SWAPPED">UNICODE_BOM_SWAPPED</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Variables" aria-labelledby="#doc-index-Variables-header">
+<summary id="#doc-index-Variables-header">
+Variables (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
+<summary id="#doc-index-Procedures-header">
+Procedures (74)</summary>
+<ul>
+<li><a href="#CloseFont">CloseFont</a></li>
+<li><a href="#FontAscent">FontAscent</a></li>
+<li><a href="#FontDescent">FontDescent</a></li>
+<li><a href="#FontFaceFamilyName">FontFaceFamilyName</a></li>
+<li><a href="#FontFaceIsFixedWidth">FontFaceIsFixedWidth</a></li>
+<li><a href="#FontFaceStyleName">FontFaceStyleName</a></li>
+<li><a href="#FontFaces">FontFaces</a></li>
+<li><a href="#FontHeight">FontHeight</a></li>
+<li><a href="#FontLineSkip">FontLineSkip</a></li>
+<li><a href="#GetFontHinting">GetFontHinting</a></li>
+<li><a href="#GetFontKerning">GetFontKerning</a></li>
+<li><a href="#GetFontKerningSizeGlyphs">GetFontKerningSizeGlyphs</a></li>
+<li><a href="#GetFontKerningSizeGlyphs32">GetFontKerningSizeGlyphs32</a></li>
+<li><a href="#GetFontOutline">GetFontOutline</a></li>
+<li><a href="#GetFontSDF">GetFontSDF</a></li>
+<li><a href="#GetFontStyle">GetFontStyle</a></li>
+<li><a href="#GlyphIsProvided">GlyphIsProvided</a></li>
+<li><a href="#GlyphIsProvided32">GlyphIsProvided32</a></li>
+<li><a href="#GlyphMetrics">GlyphMetrics</a></li>
+<li><a href="#GlyphMetrics32">GlyphMetrics32</a></li>
+<li><a href="#Init">Init</a></li>
+<li><a href="#Linked_Version">Linked_Version</a></li>
+<li><a href="#MeasureText">MeasureText</a></li>
+<li><a href="#MeasureUNICODE">MeasureUNICODE</a></li>
+<li><a href="#MeasureUTF8">MeasureUTF8</a></li>
+<li><a href="#OpenFont">OpenFont</a></li>
+<li><a href="#OpenFontDPI">OpenFontDPI</a></li>
+<li><a href="#OpenFontDPIRW">OpenFontDPIRW</a></li>
+<li><a href="#OpenFontIndex">OpenFontIndex</a></li>
+<li><a href="#OpenFontIndexDPI">OpenFontIndexDPI</a></li>
+<li><a href="#OpenFontIndexDPIRW">OpenFontIndexDPIRW</a></li>
+<li><a href="#OpenFontIndexRW">OpenFontIndexRW</a></li>
+<li><a href="#OpenFontRW">OpenFontRW</a></li>
+<li><a href="#Quit">Quit</a></li>
+<li><a href="#RenderGlyph32_Blended">RenderGlyph32_Blended</a></li>
+<li><a href="#RenderGlyph32_Shaded">RenderGlyph32_Shaded</a></li>
+<li><a href="#RenderGlyph32_Solid">RenderGlyph32_Solid</a></li>
+<li><a href="#RenderGlyph_Blended">RenderGlyph_Blended</a></li>
+<li><a href="#RenderGlyph_Shaded">RenderGlyph_Shaded</a></li>
+<li><a href="#RenderGlyph_Solid">RenderGlyph_Solid</a></li>
+<li><a href="#RenderText">RenderText</a></li>
+<li><a href="#RenderText_Blended">RenderText_Blended</a></li>
+<li><a href="#RenderText_Blended_Wrapped">RenderText_Blended_Wrapped</a></li>
+<li><a href="#RenderText_Shaded">RenderText_Shaded</a></li>
+<li><a href="#RenderText_Shaded_Wrapped">RenderText_Shaded_Wrapped</a></li>
+<li><a href="#RenderText_Solid">RenderText_Solid</a></li>
+<li><a href="#RenderText_Solid_Wrapped">RenderText_Solid_Wrapped</a></li>
+<li><a href="#RenderUNICODE">RenderUNICODE</a></li>
+<li><a href="#RenderUNICODE_Blended">RenderUNICODE_Blended</a></li>
+<li><a href="#RenderUNICODE_Blended_Wrapped">RenderUNICODE_Blended_Wrapped</a></li>
+<li><a href="#RenderUNICODE_Shaded">RenderUNICODE_Shaded</a></li>
+<li><a href="#RenderUNICODE_Shaded_Wrapped">RenderUNICODE_Shaded_Wrapped</a></li>
+<li><a href="#RenderUNICODE_Solid">RenderUNICODE_Solid</a></li>
+<li><a href="#RenderUNICODE_Solid_Wrapped">RenderUNICODE_Solid_Wrapped</a></li>
+<li><a href="#RenderUTF8">RenderUTF8</a></li>
+<li><a href="#RenderUTF8_Blended">RenderUTF8_Blended</a></li>
+<li><a href="#RenderUTF8_Blended_Wrapped">RenderUTF8_Blended_Wrapped</a></li>
+<li><a href="#RenderUTF8_Shaded">RenderUTF8_Shaded</a></li>
+<li><a href="#RenderUTF8_Shaded_Wrapped">RenderUTF8_Shaded_Wrapped</a></li>
+<li><a href="#RenderUTF8_Solid">RenderUTF8_Solid</a></li>
+<li><a href="#RenderUTF8_Solid_Wrapped">RenderUTF8_Solid_Wrapped</a></li>
+<li><a href="#SetDirection">SetDirection</a></li>
+<li><a href="#SetFontHinting">SetFontHinting</a></li>
+<li><a href="#SetFontKerning">SetFontKerning</a></li>
+<li><a href="#SetFontOutline">SetFontOutline</a></li>
+<li><a href="#SetFontSDF">SetFontSDF</a></li>
+<li><a href="#SetFontSize">SetFontSize</a></li>
+<li><a href="#SetFontSizeDPI">SetFontSizeDPI</a></li>
+<li><a href="#SetFontStyle">SetFontStyle</a></li>
+<li><a href="#SetScript">SetScript</a></li>
+<li><a href="#SizeText">SizeText</a></li>
+<li><a href="#SizeUNICODE">SizeUNICODE</a></li>
+<li><a href="#SizeUTF8">SizeUTF8</a></li>
+<li><a href="#WasInit">WasInit</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedure Groups" aria-labelledby="#doc-index-Procedure Groups-header">
+<summary id="#doc-index-Procedure Groups-header">
+Procedure Groups (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+</div>
+</div>
+<section class="documentation">
+<h2 id="pkg-Types" class="pkg-header">Types</h2>
+<div class="pkg-entity">
+<h3 id="Font"><span><a class="doc-id-link" href="#Font">Font<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L23"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Font :: <span class="keyword-type">struct</span> {}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/sdl2/ttf/#CloseFont">CloseFont</a></li>
+<li><a href="/vendor/sdl2/ttf/#FontAscent">FontAscent</a></li>
+<li><a href="/vendor/sdl2/ttf/#FontDescent">FontDescent</a></li>
+<li><a href="/vendor/sdl2/ttf/#FontFaceFamilyName">FontFaceFamilyName</a></li>
+<li><a href="/vendor/sdl2/ttf/#FontFaceIsFixedWidth">FontFaceIsFixedWidth</a></li>
+<li><a href="/vendor/sdl2/ttf/#FontFaceStyleName">FontFaceStyleName</a></li>
+<li><a href="/vendor/sdl2/ttf/#FontFaces">FontFaces</a></li>
+<li><a href="/vendor/sdl2/ttf/#FontHeight">FontHeight</a></li>
+<li><a href="/vendor/sdl2/ttf/#FontLineSkip">FontLineSkip</a></li>
+<li><a href="/vendor/sdl2/ttf/#GetFontHinting">GetFontHinting</a></li>
+<li><a href="/vendor/sdl2/ttf/#GetFontKerning">GetFontKerning</a></li>
+<li><a href="/vendor/sdl2/ttf/#GetFontKerningSizeGlyphs">GetFontKerningSizeGlyphs</a></li>
+<li><a href="/vendor/sdl2/ttf/#GetFontKerningSizeGlyphs32">GetFontKerningSizeGlyphs32</a></li>
+<li><a href="/vendor/sdl2/ttf/#GetFontOutline">GetFontOutline</a></li>
+<li><a href="/vendor/sdl2/ttf/#GetFontSDF">GetFontSDF</a></li>
+<li><a href="/vendor/sdl2/ttf/#GetFontStyle">GetFontStyle</a></li>
+<li><a href="/vendor/sdl2/ttf/#GlyphIsProvided">GlyphIsProvided</a></li>
+<li><a href="/vendor/sdl2/ttf/#GlyphIsProvided32">GlyphIsProvided32</a></li>
+<li><a href="/vendor/sdl2/ttf/#GlyphMetrics">GlyphMetrics</a></li>
+<li><a href="/vendor/sdl2/ttf/#GlyphMetrics32">GlyphMetrics32</a></li>
+<li><a href="/vendor/sdl2/ttf/#MeasureText">MeasureText</a></li>
+<li><a href="/vendor/sdl2/ttf/#MeasureUNICODE">MeasureUNICODE</a></li>
+<li><a href="/vendor/sdl2/ttf/#MeasureUTF8">MeasureUTF8</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderGlyph32_Blended">RenderGlyph32_Blended</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderGlyph32_Shaded">RenderGlyph32_Shaded</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderGlyph32_Solid">RenderGlyph32_Solid</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderGlyph_Blended">RenderGlyph_Blended</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderGlyph_Shaded">RenderGlyph_Shaded</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderGlyph_Solid">RenderGlyph_Solid</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderText">RenderText</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderText_Blended">RenderText_Blended</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderText_Blended_Wrapped">RenderText_Blended_Wrapped</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderText_Shaded">RenderText_Shaded</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderText_Shaded_Wrapped">RenderText_Shaded_Wrapped</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderText_Solid">RenderText_Solid</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderText_Solid_Wrapped">RenderText_Solid_Wrapped</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderUNICODE">RenderUNICODE</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderUNICODE_Blended">RenderUNICODE_Blended</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderUNICODE_Blended_Wrapped">RenderUNICODE_Blended_Wrapped</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderUNICODE_Shaded">RenderUNICODE_Shaded</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderUNICODE_Shaded_Wrapped">RenderUNICODE_Shaded_Wrapped</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderUNICODE_Solid">RenderUNICODE_Solid</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderUNICODE_Solid_Wrapped">RenderUNICODE_Solid_Wrapped</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderUTF8">RenderUTF8</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderUTF8_Blended">RenderUTF8_Blended</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderUTF8_Blended_Wrapped">RenderUTF8_Blended_Wrapped</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderUTF8_Shaded">RenderUTF8_Shaded</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderUTF8_Shaded_Wrapped">RenderUTF8_Shaded_Wrapped</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderUTF8_Solid">RenderUTF8_Solid</a></li>
+<li><a href="/vendor/sdl2/ttf/#RenderUTF8_Solid_Wrapped">RenderUTF8_Solid_Wrapped</a></li>
+<li><a href="/vendor/sdl2/ttf/#SetFontHinting">SetFontHinting</a></li>
+<li><a href="/vendor/sdl2/ttf/#SetFontKerning">SetFontKerning</a></li>
+<li><a href="/vendor/sdl2/ttf/#SetFontOutline">SetFontOutline</a></li>
+<li><a href="/vendor/sdl2/ttf/#SetFontSDF">SetFontSDF</a></li>
+<li><a href="/vendor/sdl2/ttf/#SetFontSize">SetFontSize</a></li>
+<li><a href="/vendor/sdl2/ttf/#SetFontSizeDPI">SetFontSizeDPI</a></li>
+<li><a href="/vendor/sdl2/ttf/#SetFontStyle">SetFontStyle</a></li>
+<li><a href="/vendor/sdl2/ttf/#SizeText">SizeText</a></li>
+<li><a href="/vendor/sdl2/ttf/#SizeUNICODE">SizeUNICODE</a></li>
+<li><a href="/vendor/sdl2/ttf/#SizeUTF8">SizeUTF8</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/sdl2/ttf/#OpenFont">OpenFont</a></li>
+<li><a href="/vendor/sdl2/ttf/#OpenFontDPI">OpenFontDPI</a></li>
+<li><a href="/vendor/sdl2/ttf/#OpenFontDPIRW">OpenFontDPIRW</a></li>
+<li><a href="/vendor/sdl2/ttf/#OpenFontIndex">OpenFontIndex</a></li>
+<li><a href="/vendor/sdl2/ttf/#OpenFontIndexDPI">OpenFontIndexDPI</a></li>
+<li><a href="/vendor/sdl2/ttf/#OpenFontIndexDPIRW">OpenFontIndexDPIRW</a></li>
+<li><a href="/vendor/sdl2/ttf/#OpenFontIndexRW">OpenFontIndexRW</a></li>
+<li><a href="/vendor/sdl2/ttf/#OpenFontRW">OpenFontRW</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Hinting"><span><a class="doc-id-link" href="#Hinting">Hinting<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L40"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Hinting :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	NORMAL         = 0, 
+	LIGHT          = 1, 
+	MONO           = 2, 
+	NONE           = 3, 
+	LIGHT_SUBPIXEL = 4, 
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/sdl2/ttf/#SetFontHinting">SetFontHinting</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/sdl2/ttf/#GetFontHinting">GetFontHinting</a></li>
+</ul>
+<h5>Related Constants</h5>
+<ul>
+<li><a href="/vendor/sdl2/ttf/#HINTING_LIGHT">HINTING_LIGHT</a></li>
+<li><a href="/vendor/sdl2/ttf/#HINTING_LIGHT_SUBPIXEL">HINTING_LIGHT_SUBPIXEL</a></li>
+<li><a href="/vendor/sdl2/ttf/#HINTING_MONO">HINTING_MONO</a></li>
+<li><a href="/vendor/sdl2/ttf/#HINTING_NONE">HINTING_NONE</a></li>
+<li><a href="/vendor/sdl2/ttf/#HINTING_NORMAL">HINTING_NORMAL</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Style"><span><a class="doc-id-link" href="#Style">Style<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L32"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Style :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/sdl2/ttf/#StyleFlag">StyleFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/sdl2/ttf/#SetFontStyle">SetFontStyle</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/sdl2/ttf/#GetFontStyle">GetFontStyle</a></li>
+</ul>
+<h5>Related Constants</h5>
+<ul>
+<li><a href="/vendor/sdl2/ttf/#STYLE_BOLD">STYLE_BOLD</a></li>
+<li><a href="/vendor/sdl2/ttf/#STYLE_ITALIC">STYLE_ITALIC</a></li>
+<li><a href="/vendor/sdl2/ttf/#STYLE_NORMAL">STYLE_NORMAL</a></li>
+<li><a href="/vendor/sdl2/ttf/#STYLE_STRIKETHROUGH">STYLE_STRIKETHROUGH</a></li>
+<li><a href="/vendor/sdl2/ttf/#STYLE_UNDERLINE">STYLE_UNDERLINE</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="StyleFlag"><span><a class="doc-id-link" href="#StyleFlag">StyleFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L25"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">StyleFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	BOLD          = 0, 
+	ITALIC        = 1, 
+	UNDERLINE     = 2, 
+	STRIKETHROUGH = 3, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="bool"><span><a class="doc-id-link" href="#bool">bool<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L12"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">bool :: sdl2.<a class="code-typename" href="/vendor/sdl2/#bool">bool</a></pre>
+</div>
+</div>
+<h2 id="pkg-Constants" class="pkg-header">Constants</h2>
+<div class="pkg-entity">
+<h3 id="HINTING_LIGHT"><span><a class="doc-id-link" href="#HINTING_LIGHT">HINTING_LIGHT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L49"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HINTING_LIGHT :: Hinting.LIGHT</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HINTING_LIGHT_SUBPIXEL"><span><a class="doc-id-link" href="#HINTING_LIGHT_SUBPIXEL">HINTING_LIGHT_SUBPIXEL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L52"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HINTING_LIGHT_SUBPIXEL :: Hinting.LIGHT_SUBPIXEL</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HINTING_MONO"><span><a class="doc-id-link" href="#HINTING_MONO">HINTING_MONO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L50"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HINTING_MONO :: Hinting.MONO</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HINTING_NONE"><span><a class="doc-id-link" href="#HINTING_NONE">HINTING_NONE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L51"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HINTING_NONE :: Hinting.NONE</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HINTING_NORMAL"><span><a class="doc-id-link" href="#HINTING_NORMAL">HINTING_NORMAL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L48"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HINTING_NORMAL :: Hinting.NORMAL</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MAJOR_VERSION"><span><a class="doc-id-link" href="#MAJOR_VERSION">MAJOR_VERSION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L16"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MAJOR_VERSION: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 2</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MINOR_VERSION"><span><a class="doc-id-link" href="#MINOR_VERSION">MINOR_VERSION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L17"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MINOR_VERSION: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="PATCHLEVEL"><span><a class="doc-id-link" href="#PATCHLEVEL">PATCHLEVEL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L18"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">PATCHLEVEL: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 18</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="STYLE_BOLD"><span><a class="doc-id-link" href="#STYLE_BOLD">STYLE_BOLD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L35"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">STYLE_BOLD :: Style{.BOLD}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="STYLE_ITALIC"><span><a class="doc-id-link" href="#STYLE_ITALIC">STYLE_ITALIC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L36"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">STYLE_ITALIC :: Style{.ITALIC}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="STYLE_NORMAL"><span><a class="doc-id-link" href="#STYLE_NORMAL">STYLE_NORMAL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L34"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">STYLE_NORMAL :: Style{}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="STYLE_STRIKETHROUGH"><span><a class="doc-id-link" href="#STYLE_STRIKETHROUGH">STYLE_STRIKETHROUGH<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L38"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">STYLE_STRIKETHROUGH :: Style{.STRIKETHROUGH}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="STYLE_UNDERLINE"><span><a class="doc-id-link" href="#STYLE_UNDERLINE">STYLE_UNDERLINE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L37"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">STYLE_UNDERLINE :: Style{.UNDERLINE}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="UNICODE_BOM_NATIVE"><span><a class="doc-id-link" href="#UNICODE_BOM_NATIVE">UNICODE_BOM_NATIVE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L20"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">UNICODE_BOM_NATIVE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0xFEFF</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="UNICODE_BOM_SWAPPED"><span><a class="doc-id-link" href="#UNICODE_BOM_SWAPPED">UNICODE_BOM_SWAPPED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L21"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">UNICODE_BOM_SWAPPED: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0xFFFE</pre>
+</div>
+</div>
+<h2 id="pkg-Variables" class="pkg-header">Variables</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+<h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
+<div class="pkg-entity">
+<h3 id="CloseFont"><span><a class="doc-id-link" href="#CloseFont">CloseFont<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L160"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CloseFont :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FontAscent"><span><a class="doc-id-link" href="#FontAscent">FontAscent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L99"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FontAscent :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FontDescent"><span><a class="doc-id-link" href="#FontDescent">FontDescent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L100"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FontDescent :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FontFaceFamilyName"><span><a class="doc-id-link" href="#FontFaceFamilyName">FontFaceFamilyName<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L106"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FontFaceFamilyName :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>) -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FontFaceIsFixedWidth"><span><a class="doc-id-link" href="#FontFaceIsFixedWidth">FontFaceIsFixedWidth<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L105"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FontFaceIsFixedWidth :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FontFaceStyleName"><span><a class="doc-id-link" href="#FontFaceStyleName">FontFaceStyleName<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L107"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FontFaceStyleName :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>) -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FontFaces"><span><a class="doc-id-link" href="#FontFaces">FontFaces<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L104"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FontFaces :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FontHeight"><span><a class="doc-id-link" href="#FontHeight">FontHeight<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L98"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FontHeight :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FontLineSkip"><span><a class="doc-id-link" href="#FontLineSkip">FontLineSkip<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L101"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FontLineSkip :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetFontHinting"><span><a class="doc-id-link" href="#GetFontHinting">GetFontHinting<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L95"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetFontHinting :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>) -> <a class="code-typename" href="/vendor/sdl2/ttf/#Hinting">Hinting</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetFontKerning"><span><a class="doc-id-link" href="#GetFontKerning">GetFontKerning<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L102"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetFontKerning :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetFontKerningSizeGlyphs"><span><a class="doc-id-link" href="#GetFontKerningSizeGlyphs">GetFontKerningSizeGlyphs<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L162"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetFontKerningSizeGlyphs :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, previous_ch, ch: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetFontKerningSizeGlyphs32"><span><a class="doc-id-link" href="#GetFontKerningSizeGlyphs32">GetFontKerningSizeGlyphs32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L163"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetFontKerningSizeGlyphs32 :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, previous_ch, ch: untyped rune) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetFontOutline"><span><a class="doc-id-link" href="#GetFontOutline">GetFontOutline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L92"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetFontOutline :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetFontSDF"><span><a class="doc-id-link" href="#GetFontSDF">GetFontSDF<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L166"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetFontSDF :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>) -> sdl2.<a class="code-typename" href="/vendor/sdl2/#bool">bool</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GetFontStyle"><span><a class="doc-id-link" href="#GetFontStyle">GetFontStyle<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L90"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GetFontStyle :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>) -> <a class="code-typename" href="/vendor/sdl2/ttf/#Style">Style</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GlyphIsProvided"><span><a class="doc-id-link" href="#GlyphIsProvided">GlyphIsProvided<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L109"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GlyphIsProvided :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, ch: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GlyphIsProvided32"><span><a class="doc-id-link" href="#GlyphIsProvided32">GlyphIsProvided32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L110"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GlyphIsProvided32 :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, ch: untyped rune) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GlyphMetrics"><span><a class="doc-id-link" href="#GlyphMetrics">GlyphMetrics<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L111"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GlyphMetrics :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
+	font:                   ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, 
+	ch:                     <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, 
+	minx, maxx, miny, maxy: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+	advance:                ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GlyphMetrics32"><span><a class="doc-id-link" href="#GlyphMetrics32">GlyphMetrics32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L112"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GlyphMetrics32 :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
+	font:                   ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, 
+	ch:                     untyped rune, 
+	minx, maxx, miny, maxy: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+	advance:                ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Init"><span><a class="doc-id-link" href="#Init">Init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L73"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Init :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Linked_Version"><span><a class="doc-id-link" href="#Linked_Version">Linked_Version<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L71"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Linked_Version :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#version">version</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MeasureText"><span><a class="doc-id-link" href="#MeasureText">MeasureText<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L118"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MeasureText :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, measure_width: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, extent: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, count: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MeasureUNICODE"><span><a class="doc-id-link" href="#MeasureUNICODE">MeasureUNICODE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L120"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MeasureUNICODE :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: [^]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, measure_width: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, extent: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, count: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MeasureUTF8"><span><a class="doc-id-link" href="#MeasureUTF8">MeasureUTF8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L119"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MeasureUTF8 :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, measure_width: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, extent: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, count: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="OpenFont"><span><a class="doc-id-link" href="#OpenFont">OpenFont<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L77"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">OpenFont :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (file: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, ptsize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="OpenFontDPI"><span><a class="doc-id-link" href="#OpenFontDPI">OpenFontDPI<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L82"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">OpenFontDPI :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (file: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, ptsize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, hdpi, vdpi: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="OpenFontDPIRW"><span><a class="doc-id-link" href="#OpenFontDPIRW">OpenFontDPIRW<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L84"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">OpenFontDPIRW :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^sdl2.<a class="code-typename" href="/vendor/sdl2/#RWops">RWops</a>, freesrc: sdl2.<a class="code-typename" href="/vendor/sdl2/#bool">bool</a>, ptsize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, hdpi, vdpi: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="OpenFontIndex"><span><a class="doc-id-link" href="#OpenFontIndex">OpenFontIndex<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L78"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">OpenFontIndex :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (file: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, ptsize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, index: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="OpenFontIndexDPI"><span><a class="doc-id-link" href="#OpenFontIndexDPI">OpenFontIndexDPI<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L83"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">OpenFontIndexDPI :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (file: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, ptsize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, index: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, hdpi, vdpi: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="OpenFontIndexDPIRW"><span><a class="doc-id-link" href="#OpenFontIndexDPIRW">OpenFontIndexDPIRW<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L85"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">OpenFontIndexDPIRW :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
+	src:     ^sdl2.<a class="code-typename" href="/vendor/sdl2/#RWops">RWops</a>, 
+	freesrc: sdl2.<a class="code-typename" href="/vendor/sdl2/#bool">bool</a>, 
+	ptsize:  <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+	index:   <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+	hdpi, 
+	vdpi:    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, 
+) -> ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="OpenFontIndexRW"><span><a class="doc-id-link" href="#OpenFontIndexRW">OpenFontIndexRW<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L80"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">OpenFontIndexRW :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^sdl2.<a class="code-typename" href="/vendor/sdl2/#RWops">RWops</a>, freesrc: sdl2.<a class="code-typename" href="/vendor/sdl2/#bool">bool</a>, ptsize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, index: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="OpenFontRW"><span><a class="doc-id-link" href="#OpenFontRW">OpenFontRW<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L79"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">OpenFontRW :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^sdl2.<a class="code-typename" href="/vendor/sdl2/#RWops">RWops</a>, freesrc: sdl2.<a class="code-typename" href="/vendor/sdl2/#bool">bool</a>, ptsize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Quit"><span><a class="doc-id-link" href="#Quit">Quit<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L74"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Quit :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderGlyph32_Blended"><span><a class="doc-id-link" href="#RenderGlyph32_Blended">RenderGlyph32_Blended<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L154"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderGlyph32_Blended :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, ch: untyped rune, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderGlyph32_Shaded"><span><a class="doc-id-link" href="#RenderGlyph32_Shaded">RenderGlyph32_Shaded<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L142"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderGlyph32_Shaded :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, ch: untyped rune, fg, bg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderGlyph32_Solid"><span><a class="doc-id-link" href="#RenderGlyph32_Solid">RenderGlyph32_Solid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L131"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderGlyph32_Solid :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, ch: untyped rune, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderGlyph_Blended"><span><a class="doc-id-link" href="#RenderGlyph_Blended">RenderGlyph_Blended<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L153"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderGlyph_Blended :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, ch: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderGlyph_Shaded"><span><a class="doc-id-link" href="#RenderGlyph_Shaded">RenderGlyph_Shaded<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L141"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderGlyph_Shaded :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, ch: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, fg, bg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderGlyph_Solid"><span><a class="doc-id-link" href="#RenderGlyph_Solid">RenderGlyph_Solid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L130"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderGlyph_Solid :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, ch: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderText"><span><a class="doc-id-link" href="#RenderText">RenderText<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L59"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderText :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fg, bg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>For compatibility with previous versions, here are the old functions</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderText_Blended"><span><a class="doc-id-link" href="#RenderText_Blended">RenderText_Blended<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L144"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderText_Blended :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderText_Blended_Wrapped"><span><a class="doc-id-link" href="#RenderText_Blended_Wrapped">RenderText_Blended_Wrapped<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L149"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderText_Blended_Wrapped :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>, wrapLength: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderText_Shaded"><span><a class="doc-id-link" href="#RenderText_Shaded">RenderText_Shaded<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L133"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderText_Shaded :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fg, bg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderText_Shaded_Wrapped"><span><a class="doc-id-link" href="#RenderText_Shaded_Wrapped">RenderText_Shaded_Wrapped<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L137"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderText_Shaded_Wrapped :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fg, bg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>, wrapLength: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderText_Solid"><span><a class="doc-id-link" href="#RenderText_Solid">RenderText_Solid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L122"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderText_Solid :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderText_Solid_Wrapped"><span><a class="doc-id-link" href="#RenderText_Solid_Wrapped">RenderText_Solid_Wrapped<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L126"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderText_Solid_Wrapped :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>, wrapLength: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderUNICODE"><span><a class="doc-id-link" href="#RenderUNICODE">RenderUNICODE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L65"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderUNICODE :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: [^]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, fg, bg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderUNICODE_Blended"><span><a class="doc-id-link" href="#RenderUNICODE_Blended">RenderUNICODE_Blended<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L146"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderUNICODE_Blended :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: [^]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderUNICODE_Blended_Wrapped"><span><a class="doc-id-link" href="#RenderUNICODE_Blended_Wrapped">RenderUNICODE_Blended_Wrapped<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L151"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderUNICODE_Blended_Wrapped :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: [^]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>, wrapLength: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderUNICODE_Shaded"><span><a class="doc-id-link" href="#RenderUNICODE_Shaded">RenderUNICODE_Shaded<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L135"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderUNICODE_Shaded :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: [^]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, fg, bg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderUNICODE_Shaded_Wrapped"><span><a class="doc-id-link" href="#RenderUNICODE_Shaded_Wrapped">RenderUNICODE_Shaded_Wrapped<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L139"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderUNICODE_Shaded_Wrapped :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: [^]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, fg, bg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>, wrapLength: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderUNICODE_Solid"><span><a class="doc-id-link" href="#RenderUNICODE_Solid">RenderUNICODE_Solid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L124"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderUNICODE_Solid :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: [^]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderUNICODE_Solid_Wrapped"><span><a class="doc-id-link" href="#RenderUNICODE_Solid_Wrapped">RenderUNICODE_Solid_Wrapped<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L128"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderUNICODE_Solid_Wrapped :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: [^]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>, wrapLength: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderUTF8"><span><a class="doc-id-link" href="#RenderUTF8">RenderUTF8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L62"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderUTF8 :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fg, bg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderUTF8_Blended"><span><a class="doc-id-link" href="#RenderUTF8_Blended">RenderUTF8_Blended<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L145"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderUTF8_Blended :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderUTF8_Blended_Wrapped"><span><a class="doc-id-link" href="#RenderUTF8_Blended_Wrapped">RenderUTF8_Blended_Wrapped<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L150"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderUTF8_Blended_Wrapped :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>, wrapLength: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderUTF8_Shaded"><span><a class="doc-id-link" href="#RenderUTF8_Shaded">RenderUTF8_Shaded<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L134"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderUTF8_Shaded :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fg, bg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderUTF8_Shaded_Wrapped"><span><a class="doc-id-link" href="#RenderUTF8_Shaded_Wrapped">RenderUTF8_Shaded_Wrapped<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L138"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderUTF8_Shaded_Wrapped :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fg, bg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>, wrapLength: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderUTF8_Solid"><span><a class="doc-id-link" href="#RenderUTF8_Solid">RenderUTF8_Solid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L123"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderUTF8_Solid :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="RenderUTF8_Solid_Wrapped"><span><a class="doc-id-link" href="#RenderUTF8_Solid_Wrapped">RenderUTF8_Solid_Wrapped<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L127"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">RenderUTF8_Solid_Wrapped :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fg: sdl2.<a class="code-typename" href="/vendor/sdl2/#Color">Color</a>, wrapLength: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^sdl2.<a class="code-typename" href="/vendor/sdl2/#Surface">Surface</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetDirection"><span><a class="doc-id-link" href="#SetDirection">SetDirection<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L157"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetDirection :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (direction: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetFontHinting"><span><a class="doc-id-link" href="#SetFontHinting">SetFontHinting<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L96"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetFontHinting :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, hinting: <a class="code-typename" href="/vendor/sdl2/ttf/#Hinting">Hinting</a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetFontKerning"><span><a class="doc-id-link" href="#SetFontKerning">SetFontKerning<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L103"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetFontKerning :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, allowed: sdl2.<a class="code-typename" href="/vendor/sdl2/#bool">bool</a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetFontOutline"><span><a class="doc-id-link" href="#SetFontOutline">SetFontOutline<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L93"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetFontOutline :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, outline: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetFontSDF"><span><a class="doc-id-link" href="#SetFontSDF">SetFontSDF<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L165"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetFontSDF :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, on_off: sdl2.<a class="code-typename" href="/vendor/sdl2/#bool">bool</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetFontSize"><span><a class="doc-id-link" href="#SetFontSize">SetFontSize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L87"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetFontSize :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, ptsize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetFontSizeDPI"><span><a class="doc-id-link" href="#SetFontSizeDPI">SetFontSizeDPI<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L88"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetFontSizeDPI :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, ptsize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, hdpi, vdpi: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetFontStyle"><span><a class="doc-id-link" href="#SetFontStyle">SetFontStyle<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L91"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetFontStyle :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, style: <a class="code-typename" href="/vendor/sdl2/ttf/#Style">Style</a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SetScript"><span><a class="doc-id-link" href="#SetScript">SetScript<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L158"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SetScript :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (script: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SizeText"><span><a class="doc-id-link" href="#SizeText">SizeText<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L114"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SizeText :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, w, h: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SizeUNICODE"><span><a class="doc-id-link" href="#SizeUNICODE">SizeUNICODE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L116"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SizeUNICODE :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: [^]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, w, h: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SizeUTF8"><span><a class="doc-id-link" href="#SizeUTF8">SizeUTF8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L115"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SizeUTF8 :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (font: ^<a class="code-typename" href="/vendor/sdl2/ttf/#Font">Font</a>, text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, w, h: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="WasInit"><span><a class="doc-id-link" href="#WasInit">WasInit<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin#L75"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">WasInit :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+</section>
+<h2 id="pkg-source-files">Source Files</h2>
+<ul>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/ttf/sdl_ttf.odin">sdl_ttf.odin</a></li>
+</ul>
+<h2 id="pkg-generation-information">Generation Information</h2>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-02 21:12:38.799582500 +0000 UTC</code></p>
+</article>
+<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
+<nav id="TableOfContents">
+<ul>
+<li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#Font">Font</a></li>
+<li><a href="#Hinting">Hinting</a></li>
+<li><a href="#Style">Style</a></li>
+<li><a href="#StyleFlag">StyleFlag</a></li>
+<li><a href="#bool">bool</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Constants">Constants</a><ul>
+<li><a href="#HINTING_LIGHT">HINTING_LIGHT</a></li>
+<li><a href="#HINTING_LIGHT_SUBPIXEL">HINTING_LIGHT_SUBPIXEL</a></li>
+<li><a href="#HINTING_MONO">HINTING_MONO</a></li>
+<li><a href="#HINTING_NONE">HINTING_NONE</a></li>
+<li><a href="#HINTING_NORMAL">HINTING_NORMAL</a></li>
+<li><a href="#MAJOR_VERSION">MAJOR_VERSION</a></li>
+<li><a href="#MINOR_VERSION">MINOR_VERSION</a></li>
+<li><a href="#PATCHLEVEL">PATCHLEVEL</a></li>
+<li><a href="#STYLE_BOLD">STYLE_BOLD</a></li>
+<li><a href="#STYLE_ITALIC">STYLE_ITALIC</a></li>
+<li><a href="#STYLE_NORMAL">STYLE_NORMAL</a></li>
+<li><a href="#STYLE_STRIKETHROUGH">STYLE_STRIKETHROUGH</a></li>
+<li><a href="#STYLE_UNDERLINE">STYLE_UNDERLINE</a></li>
+<li><a href="#UNICODE_BOM_NATIVE">UNICODE_BOM_NATIVE</a></li>
+<li><a href="#UNICODE_BOM_SWAPPED">UNICODE_BOM_SWAPPED</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Procedures">Procedures</a><ul>
+<li><a href="#CloseFont">CloseFont</a></li>
+<li><a href="#FontAscent">FontAscent</a></li>
+<li><a href="#FontDescent">FontDescent</a></li>
+<li><a href="#FontFaceFamilyName">FontFaceFamilyName</a></li>
+<li><a href="#FontFaceIsFixedWidth">FontFaceIsFixedWidth</a></li>
+<li><a href="#FontFaceStyleName">FontFaceStyleName</a></li>
+<li><a href="#FontFaces">FontFaces</a></li>
+<li><a href="#FontHeight">FontHeight</a></li>
+<li><a href="#FontLineSkip">FontLineSkip</a></li>
+<li><a href="#GetFontHinting">GetFontHinting</a></li>
+<li><a href="#GetFontKerning">GetFontKerning</a></li>
+<li><a href="#GetFontKerningSizeGlyphs">GetFontKerningSizeGlyphs</a></li>
+<li><a href="#GetFontKerningSizeGlyphs32">GetFontKerningSizeGlyphs32</a></li>
+<li><a href="#GetFontOutline">GetFontOutline</a></li>
+<li><a href="#GetFontSDF">GetFontSDF</a></li>
+<li><a href="#GetFontStyle">GetFontStyle</a></li>
+<li><a href="#GlyphIsProvided">GlyphIsProvided</a></li>
+<li><a href="#GlyphIsProvided32">GlyphIsProvided32</a></li>
+<li><a href="#GlyphMetrics">GlyphMetrics</a></li>
+<li><a href="#GlyphMetrics32">GlyphMetrics32</a></li>
+<li><a href="#Init">Init</a></li>
+<li><a href="#Linked_Version">Linked_Version</a></li>
+<li><a href="#MeasureText">MeasureText</a></li>
+<li><a href="#MeasureUNICODE">MeasureUNICODE</a></li>
+<li><a href="#MeasureUTF8">MeasureUTF8</a></li>
+<li><a href="#OpenFont">OpenFont</a></li>
+<li><a href="#OpenFontDPI">OpenFontDPI</a></li>
+<li><a href="#OpenFontDPIRW">OpenFontDPIRW</a></li>
+<li><a href="#OpenFontIndex">OpenFontIndex</a></li>
+<li><a href="#OpenFontIndexDPI">OpenFontIndexDPI</a></li>
+<li><a href="#OpenFontIndexDPIRW">OpenFontIndexDPIRW</a></li>
+<li><a href="#OpenFontIndexRW">OpenFontIndexRW</a></li>
+<li><a href="#OpenFontRW">OpenFontRW</a></li>
+<li><a href="#Quit">Quit</a></li>
+<li><a href="#RenderGlyph32_Blended">RenderGlyph32_Blended</a></li>
+<li><a href="#RenderGlyph32_Shaded">RenderGlyph32_Shaded</a></li>
+<li><a href="#RenderGlyph32_Solid">RenderGlyph32_Solid</a></li>
+<li><a href="#RenderGlyph_Blended">RenderGlyph_Blended</a></li>
+<li><a href="#RenderGlyph_Shaded">RenderGlyph_Shaded</a></li>
+<li><a href="#RenderGlyph_Solid">RenderGlyph_Solid</a></li>
+<li><a href="#RenderText">RenderText</a></li>
+<li><a href="#RenderText_Blended">RenderText_Blended</a></li>
+<li><a href="#RenderText_Blended_Wrapped">RenderText_Blended_Wrapped</a></li>
+<li><a href="#RenderText_Shaded">RenderText_Shaded</a></li>
+<li><a href="#RenderText_Shaded_Wrapped">RenderText_Shaded_Wrapped</a></li>
+<li><a href="#RenderText_Solid">RenderText_Solid</a></li>
+<li><a href="#RenderText_Solid_Wrapped">RenderText_Solid_Wrapped</a></li>
+<li><a href="#RenderUNICODE">RenderUNICODE</a></li>
+<li><a href="#RenderUNICODE_Blended">RenderUNICODE_Blended</a></li>
+<li><a href="#RenderUNICODE_Blended_Wrapped">RenderUNICODE_Blended_Wrapped</a></li>
+<li><a href="#RenderUNICODE_Shaded">RenderUNICODE_Shaded</a></li>
+<li><a href="#RenderUNICODE_Shaded_Wrapped">RenderUNICODE_Shaded_Wrapped</a></li>
+<li><a href="#RenderUNICODE_Solid">RenderUNICODE_Solid</a></li>
+<li><a href="#RenderUNICODE_Solid_Wrapped">RenderUNICODE_Solid_Wrapped</a></li>
+<li><a href="#RenderUTF8">RenderUTF8</a></li>
+<li><a href="#RenderUTF8_Blended">RenderUTF8_Blended</a></li>
+<li><a href="#RenderUTF8_Blended_Wrapped">RenderUTF8_Blended_Wrapped</a></li>
+<li><a href="#RenderUTF8_Shaded">RenderUTF8_Shaded</a></li>
+<li><a href="#RenderUTF8_Shaded_Wrapped">RenderUTF8_Shaded_Wrapped</a></li>
+<li><a href="#RenderUTF8_Solid">RenderUTF8_Solid</a></li>
+<li><a href="#RenderUTF8_Solid_Wrapped">RenderUTF8_Solid_Wrapped</a></li>
+<li><a href="#SetDirection">SetDirection</a></li>
+<li><a href="#SetFontHinting">SetFontHinting</a></li>
+<li><a href="#SetFontKerning">SetFontKerning</a></li>
+<li><a href="#SetFontOutline">SetFontOutline</a></li>
+<li><a href="#SetFontSDF">SetFontSDF</a></li>
+<li><a href="#SetFontSize">SetFontSize</a></li>
+<li><a href="#SetFontSizeDPI">SetFontSizeDPI</a></li>
+<li><a href="#SetFontStyle">SetFontStyle</a></li>
+<li><a href="#SetScript">SetScript</a></li>
+<li><a href="#SizeText">SizeText</a></li>
+<li><a href="#SizeUNICODE">SizeUNICODE</a></li>
+<li><a href="#SizeUTF8">SizeUTF8</a></li>
+<li><a href="#WasInit">WasInit</a></li>
+</ul>
+</li>
+<li><a href="#pkg-source-files">Source Files</a></ul>
+</nav>
+</div></div>
+<script type="text/javascript">var odin_pkg_name = "sdl2_ttf";</script>
+</div>
+
+</div>
+</main>
+
+<footer class="odin-footer">
+	<div class="container pb-5 pt-5">
+		<div class="row g-4">
+		<div class="col">
+		<a class="navbar-brand" href="https://odin-lang.org">
+		<img class="mb-3" src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+		<p>
+		The Data-Oriented Language for Sane Software Development.
+		</p>
+		</div>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Resources</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://odin-lang.org/docs" class="link-light">Docs</a></li>
+			<li><a href="https://pkg.odin-lang.org/" class="link-light">Packages</a></li>
+			<li><a href="https://odin-lang.org/news" class="link-light">News</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Community</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin" target="_blank" class="link-light">GitHub</a></li>
+			<li><a href="https://forum.odin-lang.org" target="_blank" class="link-light">Forum</a></li>
+			<li><a href="https://discord.com/invite/sVBPHEv" target="_blank" class="link-light">Discord</a></li>
+			<li><a href="https://www.twitch.tv/ginger_bill" target="_blank" class="link-light">Twitch</a></li>
+			<li><a href="https://www.youtube.com/channel/UCUSck1dOH7VKmG4lRW7tZXg" target="_blank" class="link-light">YouTube</a></li>
+			<li><a href="https://odin-lang.org/showcase" target="_blank" class="link-light">Showcase</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Contribute</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin/issues" target="_blank" class="link-light">Issues</a></li>
+			<li><a href="https://www.patreon.com/gingerbill" target="_blank" class="link-light">Donate</a></li>
+			</ul>
+			</nav>
+		</div>
+		<div class="mt-4 text-muted">© 2016–2023 Ginger Bill</div>
+	</div>
+</footer>
+
+<script src="https://odin-lang.org/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://odin-lang.org/js/script.js"></script>
+<script src="/pkg-data.js"></script>
+<script src="/search.js"></script>
+</body>
+</html>
