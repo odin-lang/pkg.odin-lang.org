@@ -269,16 +269,25 @@ generate_from_path :: proc(path: string, all_packages: bool) {
 			cfg.pkg_to_collection[pkg] = collection
 			cfg.pkg_to_header[pkg] = cfg.header
 		}
-	}
 
+		collection_pkgs: [dynamic]^doc.Pkg
+		defer delete(collection_pkgs)
+		for c in cfg.collections {
+			if c.root == nil {
+				assert(all_packages)
+				c.root = new(Dir_Node)
+				c.root.children = make([dynamic]^Dir_Node)
+			}
 
-	for c in cfg.collections {
-		if c.root == nil {
-			assert(all_packages)
-			c.root = new(Dir_Node)
-			c.root.children = make([dynamic]^Dir_Node)
+			clear(&collection_pkgs)
+			for pkg in pkgs {
+				if pkg in c.pkg_to_path {
+					append(&collection_pkgs, pkg)
+				}
+			}
+
+			insert_into_directory_tree(c, collection_pkgs)
 		}
-		insert_into_directory_tree(c.root, c.pkgs)
 	}
 }
 
