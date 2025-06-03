@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>package time/datetime - pkg.odin-lang.org</title>	<link rel="icon" href="/favicon.svg">
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/scss/custom.min.css">
+	<link rel=stylesheet href="//odin-lang.org/lib/highlight/styles/github-dark.min.css">
+	<script src="//odin-lang.org/lib/highlight/highlight.min.js"></script>
+
+	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
+	<script>hljs.highlightAll()</script>
+	<script>
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
+		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
+	</script>
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
+
+	<link rel="stylesheet" type="text/css" href="/style.css">
+
+	</style>
+</head>
+<body>
+<script>
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
+</script>
+<header class="sticky-top">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
+		<div class="container">
+			<a class="navbar-brand" href="https://odin-lang.org/">
+			<img src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#odin-navbar-content" aria-controls="odin-navbar-content" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+			<div class="collapse navbar-collapse" id="odin-navbar-content">
+			<ul class="navbar-nav ms-md-auto">
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/">Home</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/docs">Docs</a></li>
+				<li class="nav-item"><a class="nav-link active" href="/">Packages</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/news">News</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/showcase">Showcase</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://forum.odin-lang.org">Forum</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/community">Community</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://github.com/odin-lang/Odin" target="_blank">GitHub</a></li>
+				<li class="nav-item">
+					<a
+						class="nav-link btn-dark-mode"
+						onclick="toggleDarkMode();"
+						title="Toggle Light/Dark Mode"
+					>
+						<span class="dark-mode-appearance">Appearance:</span>
+						<svg fill="white" id="dark-mode-icon" viewBox="0 0 384 512"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"/></svg>
+						<svg fill="white" id="light-mode-icon" viewBox="0 0 16 16">
+						  <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+						</svg>
+					</button>
+					</a>
+				</li>
+			</ul>
+		</div>
+		</div>
+	</nav>
+</header>
+<main>
+<div class="container full-width">
+<div class="row odin-main my-4" id="pkg">
+<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">
+<div class="py-3">
+<h4><a style="text-transform: capitalize; color: inherit;" href="/core">core Library</a></h4>
+<ul>
+<li class="nav-item"><a href="/core/bufio">bufio</a></li>
+<li class="nav-item"><a href="/core/bytes">bytes</a></li>
+<li class="nav-item"><a href="/core/c">c</a><ul>
+<li><a href="/core/c/libc">libc</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/compress">compress</a><ul>
+<li><a href="/core/compress/gzip">gzip</a></li>
+<li><a href="/core/compress/shoco">shoco</a></li>
+<li><a href="/core/compress/zlib">zlib</a></li>
+</ul>
+
+</li>
+<li class="nav-item">container<ul>
+<li><a href="/core/container/avl">avl</a></li>
+<li><a href="/core/container/bit_array">bit_array</a></li>
+<li><a href="/core/container/intrusive/list">intrusive/list</a></li>
+<li><a href="/core/container/lru">lru</a></li>
+<li><a href="/core/container/priority_queue">priority_queue</a></li>
+<li><a href="/core/container/queue">queue</a></li>
+<li><a href="/core/container/rbtree">rbtree</a></li>
+<li><a href="/core/container/small_array">small_array</a></li>
+<li><a href="/core/container/topological_sort">topological_sort</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/crypto">crypto</a><ul>
+<li><a href="/core/crypto/aead">aead</a></li>
+<li><a href="/core/crypto/aegis">aegis</a></li>
+<li><a href="/core/crypto/aes">aes</a></li>
+<li><a href="/core/crypto/blake2b">blake2b</a></li>
+<li><a href="/core/crypto/blake2s">blake2s</a></li>
+<li><a href="/core/crypto/chacha20">chacha20</a></li>
+<li><a href="/core/crypto/chacha20poly1305">chacha20poly1305</a></li>
+<li><a href="/core/crypto/deoxysii">deoxysii</a></li>
+<li><a href="/core/crypto/ed25519">ed25519</a></li>
+<li><a href="/core/crypto/hash">hash</a></li>
+<li><a href="/core/crypto/hkdf">hkdf</a></li>
+<li><a href="/core/crypto/hmac">hmac</a></li>
+<li><a href="/core/crypto/kmac">kmac</a></li>
+<li><a href="/core/crypto/legacy/keccak">legacy/keccak</a></li>
+<li><a href="/core/crypto/legacy/md5">legacy/md5</a></li>
+<li><a href="/core/crypto/legacy/sha1">legacy/sha1</a></li>
+<li><a href="/core/crypto/pbkdf2">pbkdf2</a></li>
+<li><a href="/core/crypto/poly1305">poly1305</a></li>
+<li><a href="/core/crypto/ristretto255">ristretto255</a></li>
+<li><a href="/core/crypto/sha2">sha2</a></li>
+<li><a href="/core/crypto/sha3">sha3</a></li>
+<li><a href="/core/crypto/shake">shake</a></li>
+<li><a href="/core/crypto/sm3">sm3</a></li>
+<li><a href="/core/crypto/tuplehash">tuplehash</a></li>
+<li><a href="/core/crypto/x25519">x25519</a></li>
+<li><a href="/core/crypto/x448">x448</a></li>
+</ul>
+
+</li>
+<li class="nav-item">debug<ul>
+<li><a href="/core/debug/pe">pe</a></li>
+<li><a href="/core/debug/trace">trace</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/dynlib">dynlib</a></li>
+<li class="nav-item">encoding<ul>
+<li><a href="/core/encoding/base32">base32</a></li>
+<li><a href="/core/encoding/base64">base64</a></li>
+<li><a href="/core/encoding/cbor">cbor</a></li>
+<li><a href="/core/encoding/csv">csv</a></li>
+<li><a href="/core/encoding/endian">endian</a></li>
+<li><a href="/core/encoding/entity">entity</a></li>
+<li><a href="/core/encoding/hex">hex</a></li>
+<li><a href="/core/encoding/hxa">hxa</a></li>
+<li><a href="/core/encoding/ini">ini</a></li>
+<li><a href="/core/encoding/json">json</a></li>
+<li><a href="/core/encoding/uuid">uuid</a></li>
+<li><a href="/core/encoding/uuid/legacy">uuid/legacy</a></li>
+<li><a href="/core/encoding/varint">varint</a></li>
+<li><a href="/core/encoding/xml">xml</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/flags">flags</a></li>
+<li class="nav-item"><a href="/core/fmt">fmt</a></li>
+<li class="nav-item"><a href="/core/hash">hash</a><ul>
+<li><a href="/core/hash/xxhash">xxhash</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/image">image</a><ul>
+<li><a href="/core/image/bmp">bmp</a></li>
+<li><a href="/core/image/netpbm">netpbm</a></li>
+<li><a href="/core/image/png">png</a></li>
+<li><a href="/core/image/qoi">qoi</a></li>
+<li><a href="/core/image/tga">tga</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/io">io</a></li>
+<li class="nav-item"><a href="/core/log">log</a></li>
+<li class="nav-item"><a href="/core/math">math</a><ul>
+<li><a href="/core/math/big">big</a></li>
+<li><a href="/core/math/bits">bits</a></li>
+<li><a href="/core/math/cmplx">cmplx</a></li>
+<li><a href="/core/math/ease">ease</a></li>
+<li><a href="/core/math/fixed">fixed</a></li>
+<li><a href="/core/math/linalg">linalg</a></li>
+<li><a href="/core/math/linalg/glsl">linalg/glsl</a></li>
+<li><a href="/core/math/linalg/hlsl">linalg/hlsl</a></li>
+<li><a href="/core/math/noise">noise</a></li>
+<li><a href="/core/math/rand">rand</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/mem">mem</a><ul>
+<li><a href="/core/mem/tlsf">tlsf</a></li>
+<li><a href="/core/mem/virtual">virtual</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/net">net</a></li>
+<li class="nav-item">odin<ul>
+<li><a href="/core/odin/ast">ast</a></li>
+<li><a href="/core/odin/doc-format">doc-format</a></li>
+<li><a href="/core/odin/parser">parser</a></li>
+<li><a href="/core/odin/tokenizer">tokenizer</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/os">os</a></li>
+<li class="nav-item">path<ul>
+<li><a href="/core/path/filepath">filepath</a></li>
+<li><a href="/core/path/slashpath">slashpath</a></li>
+</ul>
+
+</li>
+<li class="nav-item">prof<ul>
+<li><a href="/core/prof/spall">spall</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/reflect">reflect</a></li>
+<li class="nav-item"><a href="/core/relative">relative</a></li>
+<li class="nav-item"><a href="/core/simd">simd</a><ul>
+<li><a href="/core/simd/x86">x86</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/slice">slice</a><ul>
+<li><a href="/core/slice/heap">heap</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/sort">sort</a></li>
+<li class="nav-item"><a href="/core/strconv">strconv</a><ul>
+<li><a href="/core/strconv/decimal">decimal</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/strings">strings</a></li>
+<li class="nav-item"><a href="/core/sync">sync</a><ul>
+<li><a href="/core/sync/chan">chan</a></li>
+</ul>
+
+</li>
+<li class="nav-item">sys<ul>
+<li><a href="/core/sys/darwin">darwin</a></li>
+<li><a href="/core/sys/darwin/CoreFoundation">darwin/CoreFoundation</a></li>
+<li><a href="/core/sys/darwin/Foundation">darwin/Foundation</a></li>
+<li><a href="/core/sys/darwin/Security">darwin/Security</a></li>
+<li><a href="/core/sys/freebsd">freebsd</a></li>
+<li><a href="/core/sys/haiku">haiku</a></li>
+<li><a href="/core/sys/info">info</a></li>
+<li><a href="/core/sys/kqueue">kqueue</a></li>
+<li><a href="/core/sys/linux">linux</a></li>
+<li><a href="/core/sys/orca">orca</a></li>
+<li><a href="/core/sys/posix">posix</a></li>
+<li><a href="/core/sys/unix">unix</a></li>
+<li><a href="/core/sys/valgrind">valgrind</a></li>
+<li><a href="/core/sys/windows">windows</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/terminal">terminal</a><ul>
+<li><a href="/core/terminal/ansi">ansi</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/testing">testing</a></li>
+<li class="nav-item">text<ul>
+<li><a href="/core/text/edit">edit</a></li>
+<li><a href="/core/text/i18n">i18n</a></li>
+<li><a href="/core/text/match">match</a></li>
+<li><a href="/core/text/regex">regex</a></li>
+<li><a href="/core/text/regex/common">regex/common</a></li>
+<li><a href="/core/text/regex/compiler">regex/compiler</a></li>
+<li><a href="/core/text/regex/optimizer">regex/optimizer</a></li>
+<li><a href="/core/text/regex/parser">regex/parser</a></li>
+<li><a href="/core/text/regex/tokenizer">regex/tokenizer</a></li>
+<li><a href="/core/text/regex/virtual_machine">regex/virtual_machine</a></li>
+<li><a href="/core/text/scanner">scanner</a></li>
+<li><a href="/core/text/table">table</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/thread">thread</a></li>
+<li class="nav-item"><a href="/core/time">time</a><ul>
+<li><a class="active" href="/core/time/datetime">datetime</a></li>
+<li><a href="/core/time/timezone">timezone</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/unicode">unicode</a><ul>
+<li><a href="/core/unicode/utf16">utf16</a></li>
+<li><a href="/core/unicode/utf8">utf8</a></li>
+<li><a href="/core/unicode/utf8/utf8string">utf8/utf8string</a></li>
+</ul>
+
+</li>
+</ul>
+</div>
+</nav>
+<article class="col-lg-8 p-4 documentation odin-article">
+<nav class="pkg-breadcrumb" aria-label="breadcrumb">
+<ol class="breadcrumb">
+<li class="breadcrumb-item"><a href="/core">core</a></li>
+<li class="breadcrumb-item"><a href="/core/time">time</a></li>
+<li class="breadcrumb-item active" aria-current="page"><a href="/core/time/datetime">datetime</a></li>
+</ol>
+</nav>
+<h1>package core:time/datetime<div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime"><em>Source</em></a></div></h1>
+
+		<div class="odin-search-wrapper">
+			<input type="search" id="odin-search" class="odin-search-package" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">
+			<div class="odin-search-shortcut">
+				<div class="odin-search-key key-macos">⌘K</div>
+				<div class="odin-search-key key-windows">Ctrl+K</div>
+				<span class="odin-search-or">or</span>
+				<div class="odin-search-key">/</div>
+			</div>
+		</div>
+	
+<div id="odin-search-info">
+<div id="odin-search-time"></div>
+
+		<div id="odin-search-options">
+			<input type="checkbox" id="odin-search-filter" name="odin-search-filter">
+			<label for="odin-search-filter">Filter Results</label>
+		</div>
+</div>
+<ul id="odin-search-results"></ul>
+<div id="pkg-top">
+<h2>Overview</h2>
+<div id="pkg-overview">
+<p>Calendrical conversions using a proleptic Gregorian calendar.</p>
+<p>Implemented using formulas from: Calendrical Calculations Ultimate Edition,
+Reingold & Dershowitz</p>
+</div>
+<div id="pkg-index">
+<h2>Index</h2>
+<div>
+<details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
+<summary id="#doc-index-Types-header">
+Types (13)</summary>
+<ul>
+<li><a href="#Date">Date</a></li>
+<li><a href="#DateTime">DateTime</a></li>
+<li><a href="#Delta">Delta</a></li>
+<li><a href="#Error">Error</a></li>
+<li><a href="#Month">Month</a></li>
+<li><a href="#Ordinal">Ordinal</a></li>
+<li><a href="#TZ_Date_Kind">TZ_Date_Kind</a></li>
+<li><a href="#TZ_RRule">TZ_RRule</a></li>
+<li><a href="#TZ_Record">TZ_Record</a></li>
+<li><a href="#TZ_Region">TZ_Region</a></li>
+<li><a href="#TZ_Transition_Date">TZ_Transition_Date</a></li>
+<li><a href="#Time">Time</a></li>
+<li><a href="#Weekday">Weekday</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
+<summary id="#doc-index-Constants-header">
+Constants (4)</summary>
+<ul>
+<li><a href="#MAX_DATE">MAX_DATE</a></li>
+<li><a href="#MAX_ORD">MAX_ORD</a></li>
+<li><a href="#MIN_DATE">MIN_DATE</a></li>
+<li><a href="#MIN_ORD">MIN_ORD</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Variables" aria-labelledby="#doc-index-Variables-header">
+<summary id="#doc-index-Variables-header">
+Variables (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
+<summary id="#doc-index-Procedures-header">
+Procedures (31)</summary>
+<ul>
+<li><a href="#add_days_to_date">add_days_to_date</a></li>
+<li><a href="#add_delta_to_date">add_delta_to_date</a></li>
+<li><a href="#add_delta_to_datetime">add_delta_to_datetime</a></li>
+<li><a href="#components_to_date">components_to_date</a></li>
+<li><a href="#components_to_datetime">components_to_datetime</a></li>
+<li><a href="#components_to_ordinal">components_to_ordinal</a></li>
+<li><a href="#components_to_time">components_to_time</a></li>
+<li><a href="#date_to_ordinal">date_to_ordinal</a></li>
+<li><a href="#day_number">day_number</a></li>
+<li><a href="#day_of_week">day_of_week</a></li>
+<li><a href="#days_remaining">days_remaining</a></li>
+<li><a href="#is_leap_year">is_leap_year</a></li>
+<li><a href="#last_day_of_month">last_day_of_month</a></li>
+<li><a href="#new_year">new_year</a></li>
+<li><a href="#normalize_delta">normalize_delta</a></li>
+<li><a href="#ordinal_to_date">ordinal_to_date</a></li>
+<li><a href="#ordinal_to_datetime">ordinal_to_datetime</a></li>
+<li><a href="#subtract_dates">subtract_dates</a></li>
+<li><a href="#subtract_datetimes">subtract_datetimes</a></li>
+<li><a href="#subtract_deltas">subtract_deltas</a></li>
+<li><a href="#unsafe_date_to_ordinal">unsafe_date_to_ordinal</a></li>
+<li><a href="#unsafe_ordinal_to_date">unsafe_ordinal_to_date</a></li>
+<li><a href="#unsafe_ordinal_to_year">unsafe_ordinal_to_year</a></li>
+<li><a href="#validate_date">validate_date</a></li>
+<li><a href="#validate_datetime">validate_datetime</a></li>
+<li><a href="#validate_hour_minute_second">validate_hour_minute_second</a></li>
+<li><a href="#validate_ordinal">validate_ordinal</a></li>
+<li><a href="#validate_time">validate_time</a></li>
+<li><a href="#validate_year_month_day">validate_year_month_day</a></li>
+<li><a href="#year_end">year_end</a></li>
+<li><a href="#year_range">year_range</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedure Groups" aria-labelledby="#doc-index-Procedure Groups-header">
+<summary id="#doc-index-Procedure Groups-header">
+Procedure Groups (3)</summary>
+<ul>
+<li><a href="#add">add</a></li>
+<li><a href="#sub">sub</a></li>
+<li><a href="#validate">validate</a></li>
+</ul>
+</details>
+</div>
+</div>
+</div>
+<section class="documentation">
+<h2 id="pkg-Types" class="pkg-header">Types</h2>
+<div class="pkg-entity">
+<h3 id="Date"><span><a class="doc-id-link" href="#Date">Date<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L62"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Date :: <span class="keyword-type">struct</span> {
+	year:  <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+	month: <a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a>,
+	day:   <a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a>,
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>A type representing a date.</p>
+<p>The minimum and maximum values for a year can be found in <code>MIN_DATE</code> and
+<code>MAX_DATE</code> constants. The <code>month</code> field can range from 1 to 12, and the day
+ranges from 1 to however many days there are in the specified month.</p>
+</details>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/core/time/datetime/#add_days_to_date">add_days_to_date</a></li>
+<li><a href="/core/time/datetime/#add_delta_to_date">add_delta_to_date</a></li>
+<li><a href="/core/time/datetime/#date_to_ordinal">date_to_ordinal</a></li>
+<li><a href="/core/time/datetime/#day_number">day_number</a></li>
+<li><a href="/core/time/datetime/#days_remaining">days_remaining</a></li>
+<li><a href="/core/time/datetime/#subtract_dates">subtract_dates</a></li>
+<li><a href="/core/time/datetime/#unsafe_date_to_ordinal">unsafe_date_to_ordinal</a></li>
+<li><a href="/core/time/datetime/#validate_date">validate_date</a></li>
+<li><a href="/core/time/datetime/#add">add</a>&nbsp;<em>(procedure groups)</em></li>
+<li><a href="/core/time/datetime/#sub">sub</a>&nbsp;<em>(procedure groups)</em></li>
+<li><a href="/core/time/datetime/#validate">validate</a>&nbsp;<em>(procedure groups)</em></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/time/datetime/#components_to_date">components_to_date</a></li>
+<li><a href="/core/time/datetime/#new_year">new_year</a></li>
+<li><a href="/core/time/datetime/#ordinal_to_date">ordinal_to_date</a></li>
+<li><a href="/core/time/datetime/#unsafe_ordinal_to_date">unsafe_ordinal_to_date</a></li>
+<li><a href="/core/time/datetime/#year_end">year_end</a></li>
+</ul>
+<h5>Related Constants</h5>
+<ul>
+<li><a href="/core/time/datetime/#MAX_DATE">MAX_DATE</a></li>
+<li><a href="/core/time/datetime/#MIN_DATE">MIN_DATE</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="DateTime"><span><a class="doc-id-link" href="#DateTime">DateTime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L123"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DateTime :: <span class="keyword-type">struct</span> {
+	<span class="keyword-type">using</span> date: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>,
+	<span class="keyword-type">using</span> time: <a class="code-typename" href="/core/time/datetime/#Time">Time</a>,
+	tz:   ^<a class="code-typename" href="/core/time/datetime/#TZ_Region">TZ_Region</a>,
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>A type representing datetime.</p>
+</details>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/core/time/datetime/#add_delta_to_datetime">add_delta_to_datetime</a></li>
+<li><a href="/core/time/datetime/#subtract_datetimes">subtract_datetimes</a></li>
+<li><a href="/core/time/datetime/#validate_datetime">validate_datetime</a></li>
+<li><a href="/core/time/datetime/#add">add</a>&nbsp;<em>(procedure groups)</em></li>
+<li><a href="/core/time/datetime/#sub">sub</a>&nbsp;<em>(procedure groups)</em></li>
+<li><a href="/core/time/datetime/#validate">validate</a>&nbsp;<em>(procedure groups)</em></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/time/datetime/#components_to_datetime">components_to_datetime</a></li>
+<li><a href="/core/time/datetime/#ordinal_to_datetime">ordinal_to_datetime</a></li>
+</ul>
+<h6>Procedures Through `using` From <a href="/core/time/datetime/#Date">Date</a></h6>
+<ul>
+<li><a href="/core/time/datetime/#add_days_to_date">add_days_to_date</a></li>
+<li><a href="/core/time/datetime/#add_delta_to_date">add_delta_to_date</a></li>
+<li><a href="/core/time/datetime/#date_to_ordinal">date_to_ordinal</a></li>
+<li><a href="/core/time/datetime/#day_number">day_number</a></li>
+<li><a href="/core/time/datetime/#days_remaining">days_remaining</a></li>
+<li><a href="/core/time/datetime/#subtract_dates">subtract_dates</a></li>
+<li><a href="/core/time/datetime/#unsafe_date_to_ordinal">unsafe_date_to_ordinal</a></li>
+<li><a href="/core/time/datetime/#validate_date">validate_date</a></li>
+</ul>
+<h6>Procedures Through `using` From <a href="/core/time/datetime/#Time">Time</a></h6>
+<ul>
+<li><a href="/core/time/datetime/#validate_time">validate_time</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Delta"><span><a class="doc-id-link" href="#Delta">Delta<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L136"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Delta :: <span class="keyword-type">struct</span> {
+	days:    <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+	seconds: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+	nanos:   <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>A type representing a difference between two instances of datetime.</p>
+<p><b>Note</b>: All fields are i64 because we can also use it to add a number of
+seconds or nanos to a moment, that are then normalized within their respective
+ranges.</p>
+</details>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/core/time/datetime/#add_delta_to_date">add_delta_to_date</a></li>
+<li><a href="/core/time/datetime/#add_delta_to_datetime">add_delta_to_datetime</a></li>
+<li><a href="/core/time/datetime/#normalize_delta">normalize_delta</a></li>
+<li><a href="/core/time/datetime/#subtract_deltas">subtract_deltas</a></li>
+<li><a href="/core/time/datetime/#add">add</a>&nbsp;<em>(procedure groups)</em></li>
+<li><a href="/core/time/datetime/#sub">sub</a>&nbsp;<em>(procedure groups)</em></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/time/datetime/#subtract_dates">subtract_dates</a></li>
+<li><a href="/core/time/datetime/#subtract_datetimes">subtract_datetimes</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Error"><span><a class="doc-id-link" href="#Error">Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L42"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
+	None, 
+	Invalid_Year, 
+	Invalid_Month, 
+	Invalid_Day, 
+	Invalid_Hour, 
+	Invalid_Minute, 
+	Invalid_Second, 
+	Invalid_Nano, 
+	Invalid_Ordinal, 
+	Invalid_Delta, 
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Possible errors returned by datetime functions.</p>
+</details>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/time/datetime/#add_days_to_date">add_days_to_date</a></li>
+<li><a href="/core/time/datetime/#add_delta_to_date">add_delta_to_date</a></li>
+<li><a href="/core/time/datetime/#add_delta_to_datetime">add_delta_to_datetime</a></li>
+<li><a href="/core/time/datetime/#components_to_date">components_to_date</a></li>
+<li><a href="/core/time/datetime/#components_to_datetime">components_to_datetime</a></li>
+<li><a href="/core/time/datetime/#components_to_ordinal">components_to_ordinal</a></li>
+<li><a href="/core/time/datetime/#components_to_time">components_to_time</a></li>
+<li><a href="/core/time/datetime/#date_to_ordinal">date_to_ordinal</a></li>
+<li><a href="/core/time/datetime/#day_number">day_number</a></li>
+<li><a href="/core/time/datetime/#days_remaining">days_remaining</a></li>
+<li><a href="/core/time/datetime/#last_day_of_month">last_day_of_month</a></li>
+<li><a href="/core/time/datetime/#new_year">new_year</a></li>
+<li><a href="/core/time/datetime/#normalize_delta">normalize_delta</a></li>
+<li><a href="/core/time/datetime/#ordinal_to_date">ordinal_to_date</a></li>
+<li><a href="/core/time/datetime/#ordinal_to_datetime">ordinal_to_datetime</a></li>
+<li><a href="/core/time/datetime/#subtract_dates">subtract_dates</a></li>
+<li><a href="/core/time/datetime/#subtract_datetimes">subtract_datetimes</a></li>
+<li><a href="/core/time/datetime/#subtract_deltas">subtract_deltas</a></li>
+<li><a href="/core/time/datetime/#validate_date">validate_date</a></li>
+<li><a href="/core/time/datetime/#validate_datetime">validate_datetime</a></li>
+<li><a href="/core/time/datetime/#validate_hour_minute_second">validate_hour_minute_second</a></li>
+<li><a href="/core/time/datetime/#validate_ordinal">validate_ordinal</a></li>
+<li><a href="/core/time/datetime/#validate_time">validate_time</a></li>
+<li><a href="/core/time/datetime/#validate_year_month_day">validate_year_month_day</a></li>
+<li><a href="/core/time/datetime/#year_end">year_end</a></li>
+<li><a href="/core/time/datetime/#add">add</a>&nbsp;<em>(procedure groups)</em></li>
+<li><a href="/core/time/datetime/#sub">sub</a>&nbsp;<em>(procedure groups)</em></li>
+<li><a href="/core/time/datetime/#validate">validate</a>&nbsp;<em>(procedure groups)</em></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Month"><span><a class="doc-id-link" href="#Month">Month<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L145"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Month :: <span class="keyword-type">enum</span> <a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a> {
+	January   = 1, 
+	February, 
+	March, 
+	April, 
+	May, 
+	June, 
+	July, 
+	August, 
+	September, 
+	October, 
+	November, 
+	December, 
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Type representing one of the months.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Ordinal"><span><a class="doc-id-link" href="#Ordinal">Ordinal<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L11"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Ordinal :: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a></pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Type representing a mononotic day number corresponding to a date.</p>
+<pre>Ordinal 1 = Midnight Monday, January 1, 1 A.D. (Gregorian)
+        |   Midnight Monday, January 3, 1 A.D. (Julian)
+
+</pre>
+<p>Every other ordinal counts days forwards, starting from the above date.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="TZ_Date_Kind"><span><a class="doc-id-link" href="#TZ_Date_Kind">TZ_Date_Kind<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L85"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TZ_Date_Kind :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
+	No_Leap, 
+	Leap, 
+	Month_Week_Day, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="TZ_RRule"><span><a class="doc-id-link" href="#TZ_RRule">TZ_RRule<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L101"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TZ_RRule :: <span class="keyword-type">struct</span> {
+	has_dst:    <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	std_name:   <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
+	std_offset: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+	std_date:   <a class="code-typename" href="/core/time/datetime/#TZ_Transition_Date">TZ_Transition_Date</a>,
+	dst_name:   <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
+	dst_offset: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+	dst_date:   <a class="code-typename" href="/core/time/datetime/#TZ_Transition_Date">TZ_Transition_Date</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="TZ_Record"><span><a class="doc-id-link" href="#TZ_Record">TZ_Record<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L78"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TZ_Record :: <span class="keyword-type">struct</span> {
+	time:       <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+	utc_offset: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+	shortname:  <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
+	dst:        <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="TZ_Region"><span><a class="doc-id-link" href="#TZ_Region">TZ_Region<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L113"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TZ_Region :: <span class="keyword-type">struct</span> {
+	name:       <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
+	records:    []<a class="code-typename" href="/core/time/datetime/#TZ_Record">TZ_Record</a>,
+	shortnames: []<a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
+	rrule:      <a class="code-typename" href="/core/time/datetime/#TZ_RRule">TZ_RRule</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="TZ_Transition_Date"><span><a class="doc-id-link" href="#TZ_Transition_Date">TZ_Transition_Date<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L91"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TZ_Transition_Date :: <span class="keyword-type">struct</span> {
+	type:  <a class="code-typename" href="/core/time/datetime/#TZ_Date_Kind">TZ_Date_Kind</a>,
+	month: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	week:  <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	day:   <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	time:  <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Time"><span><a class="doc-id-link" href="#Time">Time<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L71"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Time :: <span class="keyword-type">struct</span> {
+	hour:   <a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a>,
+	minute: <a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a>,
+	second: <a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a>,
+	nano:   <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>A type representing a time within a single day within a nanosecond precision.</p>
+</details>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/core/time/datetime/#validate_time">validate_time</a></li>
+<li><a href="/core/time/datetime/#validate">validate</a>&nbsp;<em>(procedure groups)</em></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/time/datetime/#components_to_time">components_to_time</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="Weekday"><span><a class="doc-id-link" href="#Weekday">Weekday<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L163"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Weekday :: <span class="keyword-type">enum</span> <a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a> {
+	Sunday    = 0, 
+	Monday, 
+	Tuesday, 
+	Wednesday, 
+	Thursday, 
+	Friday, 
+	Saturday, 
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Type representing one of the weekdays.</p>
+</details>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/core/time/datetime/#day_of_week">day_of_week</a></li>
+</ul>
+</div>
+<h2 id="pkg-Constants" class="pkg-header">Constants</h2>
+<div class="pkg-entity">
+<h3 id="MAX_DATE"><span><a class="doc-id-link" href="#MAX_DATE">MAX_DATE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L27"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MAX_DATE :: Date{year = 25_252_734_927_766_552, month = 12, day = 31}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Maximum valid value for date</p>
+<p>The value is chosen such that a conversion <code>date -&gt; ordinal -&gt; date</code> is always
+safe.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="MAX_ORD"><span><a class="doc-id-link" href="#MAX_ORD">MAX_ORD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L37"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MAX_ORD: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a> : Ordinal(9_223_372_036_854_774_869)</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Maximum value for an ordinal</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="MIN_DATE"><span><a class="doc-id-link" href="#MIN_DATE">MIN_DATE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L19"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MIN_DATE :: Date{year = -25_252_734_927_766_552, month = 1, day = 1}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Minimum valid value for date.</p>
+<p>The value is chosen such that a conversion <code>date -&gt; ordinal -&gt; date</code> is always
+safe.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="MIN_ORD"><span><a class="doc-id-link" href="#MIN_ORD">MIN_ORD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin#L32"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MIN_ORD: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a> : Ordinal(-9_223_372_036_854_775_234)</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Minimum value for an ordinal</p>
+</details>
+</div>
+<h2 id="pkg-Variables" class="pkg-header">Variables</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+<h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
+<div class="pkg-entity">
+<h3 id="add_days_to_date"><span><a class="doc-id-link" href="#add_days_to_date">add_days_to_date<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L164"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">add_days_to_date :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>, days: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> (date: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Add certain amount of days to a date.</p>
+<p>This procedure adds the specified amount of days to a date and returns a new
+date. The new date would have happened the specified amount of days after the
+specified date.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="add_delta_to_date"><span><a class="doc-id-link" href="#add_delta_to_date">add_delta_to_date<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L179"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">add_delta_to_date :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>, delta: <a class="code-typename" href="/core/time/datetime/#Delta">Delta</a>) -> (date: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Add delta to a date.</p>
+<p>This procedure adds a delta to a date, and returns a new date. The new date
+would have happened the time specified by <code>delta</code> after the specified date.</p>
+<p><b>Note</b>: The delta is assumed to be normalized. That is, if it contains seconds
+or milliseconds, regardless of the amount only the days will be added.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="add_delta_to_datetime"><span><a class="doc-id-link" href="#add_delta_to_datetime">add_delta_to_datetime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L193"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">add_delta_to_datetime :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: <a class="code-typename" href="/core/time/datetime/#DateTime">DateTime</a>, delta: <a class="code-typename" href="/core/time/datetime/#Delta">Delta</a>) -> (datetime: <a class="code-typename" href="/core/time/datetime/#DateTime">DateTime</a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Add delta to datetime.</p>
+<p>This procedure adds a delta to a datetime, and returns a new datetime. The new
+datetime would have happened the time specified by <code>delta</code> after the specified
+datetime.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="components_to_date"><span><a class="doc-id-link" href="#components_to_date">components_to_date<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L52"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">components_to_date :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (<span class="keyword-type">#any_int</span> year, <span class="keyword-type">#any_int</span> month, <span class="keyword-type">#any_int</span> day: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> (date: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain a date from date components.</p>
+<p>This procedure converts date components, specified by a year, a month and a day,
+into a date object. If the provided date components don't represent a valid
+date, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="components_to_datetime"><span><a class="doc-id-link" href="#components_to_datetime">components_to_datetime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L76"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">components_to_datetime :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (
+	<span class="keyword-type">#any_int</span> year, <span class="keyword-type">#any_int</span> month, <span class="keyword-type">#any_int</span> day, <span class="keyword-type">#any_int</span> hour, <span class="keyword-type">#any_int</span> minute, <span class="keyword-type">#any_int</span> second: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, 
+	<span class="keyword-type">#any_int</span> nanos:                         <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a> = i64(0), 
+) -> (datetime: <a class="code-typename" href="/core/time/datetime/#DateTime">DateTime</a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain datetime from components.</p>
+<p>This procedure converts date components and time components into a datetime object.
+If the provided date components or time components don't represent a valid
+datetime, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="components_to_ordinal"><span><a class="doc-id-link" href="#components_to_ordinal">components_to_ordinal<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L29"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">components_to_ordinal :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (<span class="keyword-type">#any_int</span> year, <span class="keyword-type">#any_int</span> month, <span class="keyword-type">#any_int</span> day: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> (ordinal: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain an ordinal from date components.</p>
+<p>This procedure converts the specified date, provided by its individual
+components, into an ordinal. If the specified date is not a valid date, an error
+is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="components_to_time"><span><a class="doc-id-link" href="#components_to_time">components_to_time<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L64"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">components_to_time :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (<span class="keyword-type">#any_int</span> hour, <span class="keyword-type">#any_int</span> minute, <span class="keyword-type">#any_int</span> second: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, <span class="keyword-type">#any_int</span> nanos: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a> = i64(0)) -> (time: <a class="code-typename" href="/core/time/datetime/#Time">Time</a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain time from time components.</p>
+<p>This procedure converts time components, specified by an hour, a minute, a second
+and nanoseconds, into a time object. If the provided time components don't
+represent a valid time, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="date_to_ordinal"><span><a class="doc-id-link" href="#date_to_ordinal">date_to_ordinal<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L17"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">date_to_ordinal :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (date: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>) -> (ordinal: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain an ordinal from a date.</p>
+<p>This procedure converts the specified date into an ordinal. If the specified
+date is not a valid date, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="day_number"><span><a class="doc-id-link" href="#day_number">day_number<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L222"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">day_number :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (date: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>) -> (day_number: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain the day number in a year</p>
+<p>This procedure returns the number of the day in a year, starting from 1. If
+the date is not a valid date, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="day_of_week"><span><a class="doc-id-link" href="#day_of_week">day_of_week<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L100"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">day_of_week :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ordinal: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> (day: <a class="code-typename" href="/core/time/datetime/#Weekday">Weekday</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Calculate the weekday from an ordinal.</p>
+<p>This procedure takes the value of an ordinal and returns the day of week for
+that ordinal.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="days_remaining"><span><a class="doc-id-link" href="#days_remaining">days_remaining<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L237"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">days_remaining :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (date: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>) -> (days_remaining: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain the remaining number of days in a year.</p>
+<p>This procedure returns the number of days between the specified date and
+December 31 of the same year. If the date is not a valid date, an error is
+returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="is_leap_year"><span><a class="doc-id-link" href="#is_leap_year">is_leap_year<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/validation.odin#L7"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">is_leap_year :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (<span class="keyword-type">#any_int</span> year: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> (leap: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Check if a year is a leap year.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="last_day_of_month"><span><a class="doc-id-link" href="#last_day_of_month">last_day_of_month<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L250"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">last_day_of_month :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (<span class="keyword-type">#any_int</span> year: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, <span class="keyword-type">#any_int</span> month: <a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a>) -> (day: <a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain the last day of a given month on a given year.</p>
+<p>This procedure returns the amount of days in a specified month on a specified
+date. If the specified year or month is not valid, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="new_year"><span><a class="doc-id-link" href="#new_year">new_year<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L269"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">new_year :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (<span class="keyword-type">#any_int</span> year: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> (new_year: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain the new year date of a given year.</p>
+<p>This procedure returns the January 1st date of the specified year. If the year
+is not valid, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="normalize_delta"><span><a class="doc-id-link" href="#normalize_delta">normalize_delta<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L320"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">normalize_delta :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (delta: <a class="code-typename" href="/core/time/datetime/#Delta">Delta</a>) -> (normalized: <a class="code-typename" href="/core/time/datetime/#Delta">Delta</a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Normalize the delta.</p>
+<p>This procedure normalizes the delta in such a way that the number of seconds
+is between 0 and the number of seconds in the day and nanoseconds is between
+0 and 10^9.</p>
+<p>If the value for <code>days</code> overflows during this operation, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="ordinal_to_date"><span><a class="doc-id-link" href="#ordinal_to_date">ordinal_to_date<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L40"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ordinal_to_date :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ordinal: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> (date: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain date using an Ordinal.</p>
+<p>This provedure converts the specified ordinal into a date. If the ordinal is not
+a valid ordinal, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="ordinal_to_datetime"><span><a class="doc-id-link" href="#ordinal_to_datetime">ordinal_to_datetime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L89"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ordinal_to_datetime :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ordinal: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> (datetime: <a class="code-typename" href="/core/time/datetime/#DateTime">DateTime</a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain an datetime from an ordinal.</p>
+<p>This procedure converts the value of an ordinal into a datetime. Since the
+ordinal only has the amount of days, the resulting time in the datetime
+object will always have the time equal to <code>00:00:00.000</code>.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="subtract_dates"><span><a class="doc-id-link" href="#subtract_dates">subtract_dates<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L111"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">subtract_dates :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a, b: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>) -> (delta: <a class="code-typename" href="/core/time/datetime/#Delta">Delta</a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Calculate the difference between two dates.</p>
+<p>This procedure calculates the difference between two dates <code>a - b</code>, and returns
+a delta between the two dates in <code>days</code>. If either <code>a</code> or <code>b</code> is not a valid
+date, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="subtract_datetimes"><span><a class="doc-id-link" href="#subtract_datetimes">subtract_datetimes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L129"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">subtract_datetimes :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a, b: <a class="code-typename" href="/core/time/datetime/#DateTime">DateTime</a>) -> (delta: <a class="code-typename" href="/core/time/datetime/#Delta">Delta</a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Calculate the difference between two datetimes.</p>
+<p>This procedure calculates the difference between two datetimes, <code>a - b</code>, and
+returns a delta between the two dates. The difference is returned in all three
+fields of the <code>Delta</code> struct: the difference in days, the difference in seconds
+and the difference in nanoseconds.</p>
+<p>If either <code>a</code> or <code>b</code> is not a valid datetime, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="subtract_deltas"><span><a class="doc-id-link" href="#subtract_deltas">subtract_deltas<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L146"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">subtract_deltas :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a, b: <a class="code-typename" href="/core/time/datetime/#Delta">Delta</a>) -> (delta: <a class="code-typename" href="/core/time/datetime/#Delta">Delta</a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Calculate a difference between two deltas.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="unsafe_date_to_ordinal"><span><a class="doc-id-link" href="#unsafe_date_to_ordinal">unsafe_date_to_ordinal<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L349"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">unsafe_date_to_ordinal :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (date: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>) -> (ordinal: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain an ordinal from a date.</p>
+<p>This procedure converts a date into an ordinal. If the date is not a valid date,
+the result is unspecified.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="unsafe_ordinal_to_date"><span><a class="doc-id-link" href="#unsafe_ordinal_to_date">unsafe_ordinal_to_date<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L419"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">unsafe_ordinal_to_date :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ordinal: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> (date: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain a date from an ordinal.</p>
+<p>This procedure converts an ordinal into a date. If the ordinal is outside of
+its valid range, the result is unspecified.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="unsafe_ordinal_to_year"><span><a class="doc-id-link" href="#unsafe_ordinal_to_year">unsafe_ordinal_to_year<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L383"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">unsafe_ordinal_to_year :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ordinal: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> (year: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, day_ordinal: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain a year and a day of the year from an ordinal.</p>
+<p>This procedure returns the year and the day of the year of a given ordinal.
+Of the ordinal is outside of its valid range, the result is unspecified.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="validate_date"><span><a class="doc-id-link" href="#validate_date">validate_date<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/validation.odin#L17"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">validate_date :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (date: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>) -> (err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Check for errors in date formation.</p>
+<p>This procedure validates all fields of a date, and if any of the fields is
+outside of allowed range, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="validate_datetime"><span><a class="doc-id-link" href="#validate_datetime">validate_datetime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/validation.odin#L98"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">validate_datetime :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (datetime: <a class="code-typename" href="/core/time/datetime/#DateTime">DateTime</a>) -> (err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Check for errors in datetime formation.</p>
+<p>This procedure checks whether all fields of date and time in the specified
+datetime are valid, and if not, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="validate_hour_minute_second"><span><a class="doc-id-link" href="#validate_hour_minute_second">validate_hour_minute_second<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/validation.odin#L76"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">validate_hour_minute_second :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (<span class="keyword-type">#any_int</span> hour, <span class="keyword-type">#any_int</span> minute, <span class="keyword-type">#any_int</span> second, <span class="keyword-type">#any_int</span> nano: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> (err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Check for errors in time formed by its components.</p>
+<p>This procedure checks whether the time formed by its components is valid, and
+if not an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="validate_ordinal"><span><a class="doc-id-link" href="#validate_ordinal">validate_ordinal<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/validation.odin#L53"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">validate_ordinal :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ordinal: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> (err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Check for errors in Ordinal</p>
+<p>This procedure checks if the ordinal is in a valid range for roundtrip
+conversions with the dates. If not, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="validate_time"><span><a class="doc-id-link" href="#validate_time">validate_time<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/validation.odin#L66"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">validate_time :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (time: <a class="code-typename" href="/core/time/datetime/#Time">Time</a>) -> (err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Check for errors in time formation</p>
+<p>This procedure checks whether time has all fields in valid ranges, and if not
+an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="validate_year_month_day"><span><a class="doc-id-link" href="#validate_year_month_day">validate_year_month_day<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/validation.odin#L27"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">validate_year_month_day :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (<span class="keyword-type">#any_int</span> year, <span class="keyword-type">#any_int</span> month, <span class="keyword-type">#any_int</span> day: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> (err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Check for errors in date formation given date components.</p>
+<p>This procedure checks whether a date formed by the specified year month and a
+day is a valid date. If not, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="year_end"><span><a class="doc-id-link" href="#year_end">year_end<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L280"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">year_end :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (<span class="keyword-type">#any_int</span> year: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> (year_end: <a class="code-typename" href="/core/time/datetime/#Date">Date</a>, err: <a class="code-typename" href="/core/time/datetime/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain the end year of a given date.</p>
+<p>This procedure returns the December 31st date of the specified year. If the year
+is not valid, an error is returned.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="year_range"><span><a class="doc-id-link" href="#year_range">year_range<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L290"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">year_range :: <span class="keyword-type">proc</span>(<span class="keyword-type">#any_int</span> year: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (range: []<a class="code-typename" href="/core/time/datetime/#Date">Date</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Obtain the range of dates for a given year.</p>
+<p>This procedure returns dates, for every day of a given year in a slice.</p>
+</details>
+</div>
+<h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
+<div class="pkg-entity">
+<h3 id="add"><span><a class="doc-id-link" href="#add">add<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L214"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">add :: <span class="keyword-type">proc</span>{
+	<a class="code-procedure" href="/core/time/datetime/#add_days_to_date">add_days_to_date</a>,
+	<a class="code-procedure" href="/core/time/datetime/#add_delta_to_date">add_delta_to_date</a>,
+	<a class="code-procedure" href="/core/time/datetime/#add_delta_to_datetime">add_delta_to_datetime</a>,
+}
+</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Add days to a date, delta to a date or delta to datetime.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="sub"><span><a class="doc-id-link" href="#sub">sub<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin#L155"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">sub :: <span class="keyword-type">proc</span>{
+	<a class="code-procedure" href="/core/time/datetime/#subtract_datetimes">subtract_datetimes</a>,
+	<a class="code-procedure" href="/core/time/datetime/#subtract_dates">subtract_dates</a>,
+	<a class="code-procedure" href="/core/time/datetime/#subtract_deltas">subtract_deltas</a>,
+}
+</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Calculate a difference between two datetimes, dates or deltas.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="validate"><span><a class="doc-id-link" href="#validate">validate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/validation.odin#L107"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">validate :: <span class="keyword-type">proc</span>{
+	<a class="code-procedure" href="/core/time/datetime/#validate_date">validate_date</a>,
+	<a class="code-procedure" href="/core/time/datetime/#validate_year_month_day">validate_year_month_day</a>,
+	<a class="code-procedure" href="/core/time/datetime/#validate_ordinal">validate_ordinal</a>,
+	<a class="code-procedure" href="/core/time/datetime/#validate_hour_minute_second">validate_hour_minute_second</a>,
+	<a class="code-procedure" href="/core/time/datetime/#validate_time">validate_time</a>,
+	<a class="code-procedure" href="/core/time/datetime/#validate_datetime">validate_datetime</a>,
+}
+</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Check for errors in date, time or datetime.</p>
+</details>
+</div>
+</section>
+<h2 id="pkg-source-files">Source Files</h2>
+<ul>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/constants.odin">constants.odin</a></li>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/datetime.odin">datetime.odin</a></li>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/internal.odin">internal.odin</a></li>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/time/datetime/validation.odin">validation.odin</a></li>
+</ul>
+<h2 id="pkg-generation-information">Generation Information</h2>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-03 16:00:58.123284500 +0000 UTC</code></p>
+</article>
+<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
+<nav id="TableOfContents">
+<ul>
+<li><a href="#pkg-overview">Overview</a><li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#Date">Date</a></li>
+<li><a href="#DateTime">DateTime</a></li>
+<li><a href="#Delta">Delta</a></li>
+<li><a href="#Error">Error</a></li>
+<li><a href="#Month">Month</a></li>
+<li><a href="#Ordinal">Ordinal</a></li>
+<li><a href="#TZ_Date_Kind">TZ_Date_Kind</a></li>
+<li><a href="#TZ_RRule">TZ_RRule</a></li>
+<li><a href="#TZ_Record">TZ_Record</a></li>
+<li><a href="#TZ_Region">TZ_Region</a></li>
+<li><a href="#TZ_Transition_Date">TZ_Transition_Date</a></li>
+<li><a href="#Time">Time</a></li>
+<li><a href="#Weekday">Weekday</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Constants">Constants</a><ul>
+<li><a href="#MAX_DATE">MAX_DATE</a></li>
+<li><a href="#MAX_ORD">MAX_ORD</a></li>
+<li><a href="#MIN_DATE">MIN_DATE</a></li>
+<li><a href="#MIN_ORD">MIN_ORD</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Procedures">Procedures</a><ul>
+<li><a href="#add_days_to_date">add_days_to_date</a></li>
+<li><a href="#add_delta_to_date">add_delta_to_date</a></li>
+<li><a href="#add_delta_to_datetime">add_delta_to_datetime</a></li>
+<li><a href="#components_to_date">components_to_date</a></li>
+<li><a href="#components_to_datetime">components_to_datetime</a></li>
+<li><a href="#components_to_ordinal">components_to_ordinal</a></li>
+<li><a href="#components_to_time">components_to_time</a></li>
+<li><a href="#date_to_ordinal">date_to_ordinal</a></li>
+<li><a href="#day_number">day_number</a></li>
+<li><a href="#day_of_week">day_of_week</a></li>
+<li><a href="#days_remaining">days_remaining</a></li>
+<li><a href="#is_leap_year">is_leap_year</a></li>
+<li><a href="#last_day_of_month">last_day_of_month</a></li>
+<li><a href="#new_year">new_year</a></li>
+<li><a href="#normalize_delta">normalize_delta</a></li>
+<li><a href="#ordinal_to_date">ordinal_to_date</a></li>
+<li><a href="#ordinal_to_datetime">ordinal_to_datetime</a></li>
+<li><a href="#subtract_dates">subtract_dates</a></li>
+<li><a href="#subtract_datetimes">subtract_datetimes</a></li>
+<li><a href="#subtract_deltas">subtract_deltas</a></li>
+<li><a href="#unsafe_date_to_ordinal">unsafe_date_to_ordinal</a></li>
+<li><a href="#unsafe_ordinal_to_date">unsafe_ordinal_to_date</a></li>
+<li><a href="#unsafe_ordinal_to_year">unsafe_ordinal_to_year</a></li>
+<li><a href="#validate_date">validate_date</a></li>
+<li><a href="#validate_datetime">validate_datetime</a></li>
+<li><a href="#validate_hour_minute_second">validate_hour_minute_second</a></li>
+<li><a href="#validate_ordinal">validate_ordinal</a></li>
+<li><a href="#validate_time">validate_time</a></li>
+<li><a href="#validate_year_month_day">validate_year_month_day</a></li>
+<li><a href="#year_end">year_end</a></li>
+<li><a href="#year_range">year_range</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Procedure Groups">Procedure Groups</a><ul>
+<li><a href="#add">add</a></li>
+<li><a href="#sub">sub</a></li>
+<li><a href="#validate">validate</a></li>
+</ul>
+</li>
+<li><a href="#pkg-source-files">Source Files</a></ul>
+</nav>
+</div></div>
+<script type="text/javascript">var odin_pkg_name = "datetime";</script>
+</div>
+
+</div>
+</main>
+
+<footer class="odin-footer">
+	<div class="container pb-5 pt-5">
+		<div class="row g-4">
+		<div class="col">
+		<a class="navbar-brand" href="https://odin-lang.org">
+		<img class="mb-3" src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+		<p>
+		The Data-Oriented Language for Sane Software Development.
+		</p>
+		</div>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Resources</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://odin-lang.org/docs" class="link-light">Docs</a></li>
+			<li><a href="https://pkg.odin-lang.org/" class="link-light">Packages</a></li>
+			<li><a href="https://odin-lang.org/news" class="link-light">News</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Community</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin" target="_blank" class="link-light">GitHub</a></li>
+			<li><a href="https://forum.odin-lang.org" target="_blank" class="link-light">Forum</a></li>
+			<li><a href="https://discord.com/invite/sVBPHEv" target="_blank" class="link-light">Discord</a></li>
+			<li><a href="https://www.twitch.tv/ginger_bill" target="_blank" class="link-light">Twitch</a></li>
+			<li><a href="https://www.youtube.com/channel/UCUSck1dOH7VKmG4lRW7tZXg" target="_blank" class="link-light">YouTube</a></li>
+			<li><a href="https://odin-lang.org/showcase" target="_blank" class="link-light">Showcase</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Contribute</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin/issues" target="_blank" class="link-light">Issues</a></li>
+			<li><a href="https://www.patreon.com/gingerbill" target="_blank" class="link-light">Donate</a></li>
+			</ul>
+			</nav>
+		</div>
+		<div class="mt-4 text-muted">© 2016–2023 Ginger Bill</div>
+	</div>
+</footer>
+
+<script src="https://odin-lang.org/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://odin-lang.org/js/script.js"></script>
+<script src="/pkg-data.js"></script>
+<script src="/search.js"></script>
+</body>
+</html>

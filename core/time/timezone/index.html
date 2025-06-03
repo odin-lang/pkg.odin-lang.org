@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>package time/timezone - pkg.odin-lang.org</title>	<link rel="icon" href="/favicon.svg">
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/scss/custom.min.css">
+	<link rel=stylesheet href="//odin-lang.org/lib/highlight/styles/github-dark.min.css">
+	<script src="//odin-lang.org/lib/highlight/highlight.min.js"></script>
+
+	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
+	<script>hljs.highlightAll()</script>
+	<script>
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
+		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
+	</script>
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
+
+	<link rel="stylesheet" type="text/css" href="/style.css">
+
+	</style>
+</head>
+<body>
+<script>
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
+</script>
+<header class="sticky-top">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
+		<div class="container">
+			<a class="navbar-brand" href="https://odin-lang.org/">
+			<img src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#odin-navbar-content" aria-controls="odin-navbar-content" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+			<div class="collapse navbar-collapse" id="odin-navbar-content">
+			<ul class="navbar-nav ms-md-auto">
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/">Home</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/docs">Docs</a></li>
+				<li class="nav-item"><a class="nav-link active" href="/">Packages</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/news">News</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/showcase">Showcase</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://forum.odin-lang.org">Forum</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/community">Community</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://github.com/odin-lang/Odin" target="_blank">GitHub</a></li>
+				<li class="nav-item">
+					<a
+						class="nav-link btn-dark-mode"
+						onclick="toggleDarkMode();"
+						title="Toggle Light/Dark Mode"
+					>
+						<span class="dark-mode-appearance">Appearance:</span>
+						<svg fill="white" id="dark-mode-icon" viewBox="0 0 384 512"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"/></svg>
+						<svg fill="white" id="light-mode-icon" viewBox="0 0 16 16">
+						  <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+						</svg>
+					</button>
+					</a>
+				</li>
+			</ul>
+		</div>
+		</div>
+	</nav>
+</header>
+<main>
+<div class="container full-width">
+<div class="row odin-main my-4" id="pkg">
+<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">
+<div class="py-3">
+<h4><a style="text-transform: capitalize; color: inherit;" href="/core">core Library</a></h4>
+<ul>
+<li class="nav-item"><a href="/core/bufio">bufio</a></li>
+<li class="nav-item"><a href="/core/bytes">bytes</a></li>
+<li class="nav-item"><a href="/core/c">c</a><ul>
+<li><a href="/core/c/libc">libc</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/compress">compress</a><ul>
+<li><a href="/core/compress/gzip">gzip</a></li>
+<li><a href="/core/compress/shoco">shoco</a></li>
+<li><a href="/core/compress/zlib">zlib</a></li>
+</ul>
+
+</li>
+<li class="nav-item">container<ul>
+<li><a href="/core/container/avl">avl</a></li>
+<li><a href="/core/container/bit_array">bit_array</a></li>
+<li><a href="/core/container/intrusive/list">intrusive/list</a></li>
+<li><a href="/core/container/lru">lru</a></li>
+<li><a href="/core/container/priority_queue">priority_queue</a></li>
+<li><a href="/core/container/queue">queue</a></li>
+<li><a href="/core/container/rbtree">rbtree</a></li>
+<li><a href="/core/container/small_array">small_array</a></li>
+<li><a href="/core/container/topological_sort">topological_sort</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/crypto">crypto</a><ul>
+<li><a href="/core/crypto/aead">aead</a></li>
+<li><a href="/core/crypto/aegis">aegis</a></li>
+<li><a href="/core/crypto/aes">aes</a></li>
+<li><a href="/core/crypto/blake2b">blake2b</a></li>
+<li><a href="/core/crypto/blake2s">blake2s</a></li>
+<li><a href="/core/crypto/chacha20">chacha20</a></li>
+<li><a href="/core/crypto/chacha20poly1305">chacha20poly1305</a></li>
+<li><a href="/core/crypto/deoxysii">deoxysii</a></li>
+<li><a href="/core/crypto/ed25519">ed25519</a></li>
+<li><a href="/core/crypto/hash">hash</a></li>
+<li><a href="/core/crypto/hkdf">hkdf</a></li>
+<li><a href="/core/crypto/hmac">hmac</a></li>
+<li><a href="/core/crypto/kmac">kmac</a></li>
+<li><a href="/core/crypto/legacy/keccak">legacy/keccak</a></li>
+<li><a href="/core/crypto/legacy/md5">legacy/md5</a></li>
+<li><a href="/core/crypto/legacy/sha1">legacy/sha1</a></li>
+<li><a href="/core/crypto/pbkdf2">pbkdf2</a></li>
+<li><a href="/core/crypto/poly1305">poly1305</a></li>
+<li><a href="/core/crypto/ristretto255">ristretto255</a></li>
+<li><a href="/core/crypto/sha2">sha2</a></li>
+<li><a href="/core/crypto/sha3">sha3</a></li>
+<li><a href="/core/crypto/shake">shake</a></li>
+<li><a href="/core/crypto/sm3">sm3</a></li>
+<li><a href="/core/crypto/tuplehash">tuplehash</a></li>
+<li><a href="/core/crypto/x25519">x25519</a></li>
+<li><a href="/core/crypto/x448">x448</a></li>
+</ul>
+
+</li>
+<li class="nav-item">debug<ul>
+<li><a href="/core/debug/pe">pe</a></li>
+<li><a href="/core/debug/trace">trace</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/dynlib">dynlib</a></li>
+<li class="nav-item">encoding<ul>
+<li><a href="/core/encoding/base32">base32</a></li>
+<li><a href="/core/encoding/base64">base64</a></li>
+<li><a href="/core/encoding/cbor">cbor</a></li>
+<li><a href="/core/encoding/csv">csv</a></li>
+<li><a href="/core/encoding/endian">endian</a></li>
+<li><a href="/core/encoding/entity">entity</a></li>
+<li><a href="/core/encoding/hex">hex</a></li>
+<li><a href="/core/encoding/hxa">hxa</a></li>
+<li><a href="/core/encoding/ini">ini</a></li>
+<li><a href="/core/encoding/json">json</a></li>
+<li><a href="/core/encoding/uuid">uuid</a></li>
+<li><a href="/core/encoding/uuid/legacy">uuid/legacy</a></li>
+<li><a href="/core/encoding/varint">varint</a></li>
+<li><a href="/core/encoding/xml">xml</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/flags">flags</a></li>
+<li class="nav-item"><a href="/core/fmt">fmt</a></li>
+<li class="nav-item"><a href="/core/hash">hash</a><ul>
+<li><a href="/core/hash/xxhash">xxhash</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/image">image</a><ul>
+<li><a href="/core/image/bmp">bmp</a></li>
+<li><a href="/core/image/netpbm">netpbm</a></li>
+<li><a href="/core/image/png">png</a></li>
+<li><a href="/core/image/qoi">qoi</a></li>
+<li><a href="/core/image/tga">tga</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/io">io</a></li>
+<li class="nav-item"><a href="/core/log">log</a></li>
+<li class="nav-item"><a href="/core/math">math</a><ul>
+<li><a href="/core/math/big">big</a></li>
+<li><a href="/core/math/bits">bits</a></li>
+<li><a href="/core/math/cmplx">cmplx</a></li>
+<li><a href="/core/math/ease">ease</a></li>
+<li><a href="/core/math/fixed">fixed</a></li>
+<li><a href="/core/math/linalg">linalg</a></li>
+<li><a href="/core/math/linalg/glsl">linalg/glsl</a></li>
+<li><a href="/core/math/linalg/hlsl">linalg/hlsl</a></li>
+<li><a href="/core/math/noise">noise</a></li>
+<li><a href="/core/math/rand">rand</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/mem">mem</a><ul>
+<li><a href="/core/mem/tlsf">tlsf</a></li>
+<li><a href="/core/mem/virtual">virtual</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/net">net</a></li>
+<li class="nav-item">odin<ul>
+<li><a href="/core/odin/ast">ast</a></li>
+<li><a href="/core/odin/doc-format">doc-format</a></li>
+<li><a href="/core/odin/parser">parser</a></li>
+<li><a href="/core/odin/tokenizer">tokenizer</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/os">os</a></li>
+<li class="nav-item">path<ul>
+<li><a href="/core/path/filepath">filepath</a></li>
+<li><a href="/core/path/slashpath">slashpath</a></li>
+</ul>
+
+</li>
+<li class="nav-item">prof<ul>
+<li><a href="/core/prof/spall">spall</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/reflect">reflect</a></li>
+<li class="nav-item"><a href="/core/relative">relative</a></li>
+<li class="nav-item"><a href="/core/simd">simd</a><ul>
+<li><a href="/core/simd/x86">x86</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/slice">slice</a><ul>
+<li><a href="/core/slice/heap">heap</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/sort">sort</a></li>
+<li class="nav-item"><a href="/core/strconv">strconv</a><ul>
+<li><a href="/core/strconv/decimal">decimal</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/strings">strings</a></li>
+<li class="nav-item"><a href="/core/sync">sync</a><ul>
+<li><a href="/core/sync/chan">chan</a></li>
+</ul>
+
+</li>
+<li class="nav-item">sys<ul>
+<li><a href="/core/sys/darwin">darwin</a></li>
+<li><a href="/core/sys/darwin/CoreFoundation">darwin/CoreFoundation</a></li>
+<li><a href="/core/sys/darwin/Foundation">darwin/Foundation</a></li>
+<li><a href="/core/sys/darwin/Security">darwin/Security</a></li>
+<li><a href="/core/sys/freebsd">freebsd</a></li>
+<li><a href="/core/sys/haiku">haiku</a></li>
+<li><a href="/core/sys/info">info</a></li>
+<li><a href="/core/sys/kqueue">kqueue</a></li>
+<li><a href="/core/sys/linux">linux</a></li>
+<li><a href="/core/sys/orca">orca</a></li>
+<li><a href="/core/sys/posix">posix</a></li>
+<li><a href="/core/sys/unix">unix</a></li>
+<li><a href="/core/sys/valgrind">valgrind</a></li>
+<li><a href="/core/sys/windows">windows</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/terminal">terminal</a><ul>
+<li><a href="/core/terminal/ansi">ansi</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/testing">testing</a></li>
+<li class="nav-item">text<ul>
+<li><a href="/core/text/edit">edit</a></li>
+<li><a href="/core/text/i18n">i18n</a></li>
+<li><a href="/core/text/match">match</a></li>
+<li><a href="/core/text/regex">regex</a></li>
+<li><a href="/core/text/regex/common">regex/common</a></li>
+<li><a href="/core/text/regex/compiler">regex/compiler</a></li>
+<li><a href="/core/text/regex/optimizer">regex/optimizer</a></li>
+<li><a href="/core/text/regex/parser">regex/parser</a></li>
+<li><a href="/core/text/regex/tokenizer">regex/tokenizer</a></li>
+<li><a href="/core/text/regex/virtual_machine">regex/virtual_machine</a></li>
+<li><a href="/core/text/scanner">scanner</a></li>
+<li><a href="/core/text/table">table</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/thread">thread</a></li>
+<li class="nav-item"><a href="/core/time">time</a><ul>
+<li><a href="/core/time/datetime">datetime</a></li>
+<li><a class="active" href="/core/time/timezone">timezone</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/core/unicode">unicode</a><ul>
+<li><a href="/core/unicode/utf16">utf16</a></li>
+<li><a href="/core/unicode/utf8">utf8</a></li>
+<li><a href="/core/unicode/utf8/utf8string">utf8/utf8string</a></li>
+</ul>
+
+</li>
+</ul>
+</div>
+</nav>
+<article class="col-lg-8 p-4 documentation odin-article">
+<nav class="pkg-breadcrumb" aria-label="breadcrumb">
+<ol class="breadcrumb">
+<li class="breadcrumb-item"><a href="/core">core</a></li>
+<li class="breadcrumb-item"><a href="/core/time">time</a></li>
+<li class="breadcrumb-item active" aria-current="page"><a href="/core/time/timezone">timezone</a></li>
+</ol>
+</nav>
+<h1>package core:time/timezone<div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone"><em>Source</em></a></div></h1>
+
+		<div class="odin-search-wrapper">
+			<input type="search" id="odin-search" class="odin-search-package" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">
+			<div class="odin-search-shortcut">
+				<div class="odin-search-key key-macos">⌘K</div>
+				<div class="odin-search-key key-windows">Ctrl+K</div>
+				<span class="odin-search-or">or</span>
+				<div class="odin-search-key">/</div>
+			</div>
+		</div>
+	
+<div id="odin-search-info">
+<div id="odin-search-time"></div>
+
+		<div id="odin-search-options">
+			<input type="checkbox" id="odin-search-filter" name="odin-search-filter">
+			<label for="odin-search-filter">Filter Results</label>
+		</div>
+</div>
+<ul id="odin-search-results"></ul>
+<div id="pkg-top">
+<div id="pkg-index">
+<h2>Index</h2>
+<div>
+<details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
+<summary id="#doc-index-Types-header">
+Types (5)</summary>
+<ul>
+<li><a href="#Leapsecond_Record">Leapsecond_Record</a></li>
+<li><a href="#Local_Time_Type">Local_Time_Type</a></li>
+<li><a href="#Sun_Shift">Sun_Shift</a></li>
+<li><a href="#TZif_Header">TZif_Header</a></li>
+<li><a href="#TZif_Version">TZif_Version</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
+<summary id="#doc-index-Constants-header">
+Constants (3)</summary>
+<ul>
+<li><a href="#BIG_BANG_ISH">BIG_BANG_ISH</a></li>
+<li><a href="#TWO_AM">TWO_AM</a></li>
+<li><a href="#TZIF_MAGIC">TZIF_MAGIC</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Variables" aria-labelledby="#doc-index-Variables-header">
+<summary id="#doc-index-Variables-header">
+Variables (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
+<summary id="#doc-index-Procedures-header">
+Procedures (16)</summary>
+<ul>
+<li><a href="#datetime_to_str">datetime_to_str</a></li>
+<li><a href="#datetime_to_tz">datetime_to_tz</a></li>
+<li><a href="#datetime_to_utc">datetime_to_utc</a></li>
+<li><a href="#dst">dst</a></li>
+<li><a href="#dst_unsafe">dst_unsafe</a></li>
+<li><a href="#load_tzif_file">load_tzif_file</a></li>
+<li><a href="#parse_posix_rrule">parse_posix_rrule</a></li>
+<li><a href="#parse_posix_tz">parse_posix_tz</a></li>
+<li><a href="#parse_tzif">parse_tzif</a></li>
+<li><a href="#region_destroy">region_destroy</a></li>
+<li><a href="#region_load">region_load</a></li>
+<li><a href="#region_load_from_buffer">region_load_from_buffer</a></li>
+<li><a href="#region_load_from_file">region_load_from_file</a></li>
+<li><a href="#rrule_destroy">rrule_destroy</a></li>
+<li><a href="#shortname">shortname</a></li>
+<li><a href="#shortname_unsafe">shortname_unsafe</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedure Groups" aria-labelledby="#doc-index-Procedure Groups-header">
+<summary id="#doc-index-Procedure Groups-header">
+Procedure Groups (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+</div>
+</div>
+<section class="documentation">
+<h2 id="pkg-Types" class="pkg-header">Types</h2>
+<div class="pkg-entity">
+<h3 id="Leapsecond_Record"><span><a class="doc-id-link" href="#Leapsecond_Record">Leapsecond_Record<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzif.odin#L45"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Leapsecond_Record :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
+	occur: <a href="/base/builtin#i64be"><span class="doc-builtin">i64be</span></a>,
+	corr:  <a href="/base/builtin#i32be"><span class="doc-builtin">i32be</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Local_Time_Type"><span><a class="doc-id-link" href="#Local_Time_Type">Local_Time_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzif.odin#L39"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Local_Time_Type :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
+	utoff: <a href="/base/builtin#i32be"><span class="doc-builtin">i32be</span></a>,
+	dst:   <a class="code-typename" href="/core/time/timezone/#Sun_Shift">Sun_Shift</a>,
+	idx:   <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Sun_Shift"><span><a class="doc-id-link" href="#Sun_Shift">Sun_Shift<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzif.odin#L34"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Sun_Shift :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+	Standard = 0, 
+	DST      = 1, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="TZif_Header"><span><a class="doc-id-link" href="#TZif_Header">TZif_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzif.odin#L22"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TZif_Header :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
+	magic:    <a href="/base/builtin#u32be"><span class="doc-builtin">u32be</span></a>,
+	version:  <a class="code-typename" href="/core/time/timezone/#TZif_Version">TZif_Version</a>,
+	reserved: [15]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	isutcnt:  <a href="/base/builtin#u32be"><span class="doc-builtin">u32be</span></a>,
+	isstdcnt: <a href="/base/builtin#u32be"><span class="doc-builtin">u32be</span></a>,
+	leapcnt:  <a href="/base/builtin#u32be"><span class="doc-builtin">u32be</span></a>,
+	timecnt:  <a href="/base/builtin#u32be"><span class="doc-builtin">u32be</span></a>,
+	typecnt:  <a href="/base/builtin#u32be"><span class="doc-builtin">u32be</span></a>,
+	charcnt:  <a href="/base/builtin#u32be"><span class="doc-builtin">u32be</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="TZif_Version"><span><a class="doc-id-link" href="#TZif_Version">TZif_Version<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzif.odin#L14"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TZif_Version :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+	V1 = 0, 
+	V2 = 50, 
+	V3 = 51, 
+	V4 = 52, 
+}</pre>
+</div>
+</div>
+<h2 id="pkg-Constants" class="pkg-header">Constants</h2>
+<div class="pkg-entity">
+<h3 id="BIG_BANG_ISH"><span><a class="doc-id-link" href="#BIG_BANG_ISH">BIG_BANG_ISH<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzif.odin#L20"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BIG_BANG_ISH: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : -0x800000000000000</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="TWO_AM"><span><a class="doc-id-link" href="#TWO_AM">TWO_AM<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzif.odin#L256"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TWO_AM: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 2 * 60 * 60</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="TZIF_MAGIC"><span><a class="doc-id-link" href="#TZIF_MAGIC">TZIF_MAGIC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzif.odin#L13"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">TZIF_MAGIC :: u32be(0x545A6966)</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>'TZif'</p>
+</details>
+</div>
+<h2 id="pkg-Variables" class="pkg-header">Variables</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+<h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
+<div class="pkg-entity">
+<h3 id="datetime_to_str"><span><a class="doc-id-link" href="#datetime_to_str">datetime_to_str<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzdate.odin#L312"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">datetime_to_str :: <span class="keyword-type">proc</span>(dt: datetime.<a class="code-typename" href="/core/time/datetime/#DateTime">DateTime</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="datetime_to_tz"><span><a class="doc-id-link" href="#datetime_to_tz">datetime_to_tz<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzdate.odin#L211"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">datetime_to_tz :: <span class="keyword-type">proc</span>(dt: datetime.<a class="code-typename" href="/core/time/datetime/#DateTime">DateTime</a>, tz: ^datetime.<a class="code-typename" href="/core/time/datetime/#TZ_Region">TZ_Region</a>) -> (out: datetime.<a class="code-typename" href="/core/time/datetime/#DateTime">DateTime</a>, success: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) <span class="directive">#optional_ok</span> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Converts a datetime on one timezone to another timezone</p>
+<p><b>Inputs:</b><br><span class="doc-list">dt: The input datetime</span>
+<span class="doc-list">tz: The timezone to convert to</span></p>
+<p>NOTE: tz will be referenced in the result datetime, so it must stay alive/allocated as long as it is used
+Returns:
+<span class="doc-list">out: The converted datetime</span>
+<span class="doc-list">success: <code>false</code> if the datetime was invalid</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="datetime_to_utc"><span><a class="doc-id-link" href="#datetime_to_utc">datetime_to_utc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzdate.odin#L185"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">datetime_to_utc :: <span class="keyword-type">proc</span>(dt: datetime.<a class="code-typename" href="/core/time/datetime/#DateTime">DateTime</a>) -> (out: datetime.<a class="code-typename" href="/core/time/datetime/#DateTime">DateTime</a>, success: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) <span class="directive">#optional_ok</span> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="dst"><span><a class="doc-id-link" href="#dst">dst<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzdate.odin#L285"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">dst :: <span class="keyword-type">proc</span>(dt: datetime.<a class="code-typename" href="/core/time/datetime/#DateTime">DateTime</a>) -> (is_dst: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, success: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) <span class="directive">#optional_ok</span> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Checks DST for a given date.</p>
+<p><b>Inputs:</b><br><span class="doc-list">dt: The input datetime</span></p>
+<p><b>Returns:</b><br><span class="doc-list">is_dst: returns <code>true</code> if dt is in daylight savings time, <code>false</code> if not</span>
+<span class="doc-list">success: returns <code>false</code> if the passed datetime is invalid</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="dst_unsafe"><span><a class="doc-id-link" href="#dst_unsafe">dst_unsafe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzdate.odin#L304"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">dst_unsafe :: <span class="keyword-type">proc</span>(dt: datetime.<a class="code-typename" href="/core/time/datetime/#DateTime">DateTime</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Checks DST for a given date.</p>
+<p>WARNING: This is unsafe because it doesn't check if your datetime is valid or if your region contains a valid record.</p>
+<p><b>Inputs:</b><br><span class="doc-list">dt: The input datetime</span></p>
+<p><b>Returns:</b><br><span class="doc-list">is_dst: returns <code>true</code> if dt is in daylight savings time, <code>false</code> if not</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="load_tzif_file"><span><a class="doc-id-link" href="#load_tzif_file">load_tzif_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzif.odin#L72"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">load_tzif_file :: <span class="keyword-type">proc</span>(filename: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, region_name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (out: ^datetime.<a class="code-typename" href="/core/time/datetime/#TZ_Region">TZ_Region</a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="parse_posix_rrule"><span><a class="doc-id-link" href="#parse_posix_rrule">parse_posix_rrule<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzif.odin#L257"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">parse_posix_rrule :: <span class="keyword-type">proc</span>(str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> (out: datetime.<a class="code-typename" href="/core/time/datetime/#TZ_Transition_Date">TZ_Transition_Date</a>, idx: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="parse_posix_tz"><span><a class="doc-id-link" href="#parse_posix_tz">parse_posix_tz<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzif.odin#L364"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">parse_posix_tz :: <span class="keyword-type">proc</span>(posix_tz: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (out: datetime.<a class="code-typename" href="/core/time/datetime/#TZ_RRule">TZ_RRule</a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="parse_tzif"><span><a class="doc-id-link" href="#parse_tzif">parse_tzif<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzif.odin#L434"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">parse_tzif :: <span class="keyword-type">proc</span>(_buffer: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, region_name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (out: ^datetime.<a class="code-typename" href="/core/time/datetime/#TZ_Region">TZ_Region</a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="region_destroy"><span><a class="doc-id-link" href="#region_destroy">region_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzdate.odin#L25"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">region_destroy :: <span class="keyword-type">proc</span>(region: ^datetime.<a class="code-typename" href="/core/time/datetime/#TZ_Region">TZ_Region</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="region_load"><span><a class="doc-id-link" href="#region_load">region_load<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzdate.odin#L8"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">region_load :: <span class="keyword-type">proc</span>(reg: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (out_reg: ^datetime.<a class="code-typename" href="/core/time/datetime/#TZ_Region">TZ_Region</a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="region_load_from_buffer"><span><a class="doc-id-link" href="#region_load_from_buffer">region_load_from_buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzdate.odin#L16"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">region_load_from_buffer :: <span class="keyword-type">proc</span>(buffer: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, reg: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (out_reg: ^datetime.<a class="code-typename" href="/core/time/datetime/#TZ_Region">TZ_Region</a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="region_load_from_file"><span><a class="doc-id-link" href="#region_load_from_file">region_load_from_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzdate.odin#L12"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">region_load_from_file :: <span class="keyword-type">proc</span>(file_path, reg: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (out_reg: ^datetime.<a class="code-typename" href="/core/time/datetime/#TZ_Region">TZ_Region</a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="rrule_destroy"><span><a class="doc-id-link" href="#rrule_destroy">rrule_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzdate.odin#L20"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">rrule_destroy :: <span class="keyword-type">proc</span>(rrule: datetime.<a class="code-typename" href="/core/time/datetime/#TZ_RRule">TZ_RRule</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="shortname"><span><a class="doc-id-link" href="#shortname">shortname<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzdate.odin#L246"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">shortname :: <span class="keyword-type">proc</span>(dt: datetime.<a class="code-typename" href="/core/time/datetime/#DateTime">DateTime</a>) -> (name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, success: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) <span class="directive">#optional_ok</span> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Gets the timezone abbreviation/shortname for a given date.
+(ex: "PDT")</p>
+<p><b>Inputs:</b><br><span class="doc-list">dt: The datetime containing the date, time, and timezone pointer for the lookup</span></p>
+<p>NOTE: The lifetime of name matches the timezone it was pulled from.
+Returns:
+<span class="doc-list">name: The timezone abbreviation</span>
+<span class="doc-list">success: returns <code>false</code> if the passed datetime is invalid</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="shortname_unsafe"><span><a class="doc-id-link" href="#shortname_unsafe">shortname_unsafe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzdate.odin#L267"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">shortname_unsafe :: <span class="keyword-type">proc</span>(dt: datetime.<a class="code-typename" href="/core/time/datetime/#DateTime">DateTime</a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Gets the timezone abbreviation/shortname for a given date.
+(ex: "PDT")</p>
+<p>WARNING: This is unsafe because it doesn't check if your datetime is valid or if your region contains a valid record.</p>
+<p><b>Inputs:</b><br><span class="doc-list">dt: The input datetime</span></p>
+<p>NOTE: The lifetime of name matches the timezone it was pulled from.
+Returns:
+<span class="doc-list">name: The timezone abbreviation</span></p>
+</details>
+</div>
+<h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+</section>
+<h2 id="pkg-source-files">Source Files</h2>
+<ul>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzdate.odin">tzdate.odin</a></li>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/time/timezone/tzif.odin">tzif.odin</a></li>
+<li><em>(hidden platform specific files)</em></li>
+</ul>
+<h2 id="pkg-generation-information">Generation Information</h2>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-03 16:00:58.124554700 +0000 UTC</code></p>
+</article>
+<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
+<nav id="TableOfContents">
+<ul>
+<li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#Leapsecond_Record">Leapsecond_Record</a></li>
+<li><a href="#Local_Time_Type">Local_Time_Type</a></li>
+<li><a href="#Sun_Shift">Sun_Shift</a></li>
+<li><a href="#TZif_Header">TZif_Header</a></li>
+<li><a href="#TZif_Version">TZif_Version</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Constants">Constants</a><ul>
+<li><a href="#BIG_BANG_ISH">BIG_BANG_ISH</a></li>
+<li><a href="#TWO_AM">TWO_AM</a></li>
+<li><a href="#TZIF_MAGIC">TZIF_MAGIC</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Procedures">Procedures</a><ul>
+<li><a href="#datetime_to_str">datetime_to_str</a></li>
+<li><a href="#datetime_to_tz">datetime_to_tz</a></li>
+<li><a href="#datetime_to_utc">datetime_to_utc</a></li>
+<li><a href="#dst">dst</a></li>
+<li><a href="#dst_unsafe">dst_unsafe</a></li>
+<li><a href="#load_tzif_file">load_tzif_file</a></li>
+<li><a href="#parse_posix_rrule">parse_posix_rrule</a></li>
+<li><a href="#parse_posix_tz">parse_posix_tz</a></li>
+<li><a href="#parse_tzif">parse_tzif</a></li>
+<li><a href="#region_destroy">region_destroy</a></li>
+<li><a href="#region_load">region_load</a></li>
+<li><a href="#region_load_from_buffer">region_load_from_buffer</a></li>
+<li><a href="#region_load_from_file">region_load_from_file</a></li>
+<li><a href="#rrule_destroy">rrule_destroy</a></li>
+<li><a href="#shortname">shortname</a></li>
+<li><a href="#shortname_unsafe">shortname_unsafe</a></li>
+</ul>
+</li>
+<li><a href="#pkg-source-files">Source Files</a></ul>
+</nav>
+</div></div>
+<script type="text/javascript">var odin_pkg_name = "timezone";</script>
+</div>
+
+</div>
+</main>
+
+<footer class="odin-footer">
+	<div class="container pb-5 pt-5">
+		<div class="row g-4">
+		<div class="col">
+		<a class="navbar-brand" href="https://odin-lang.org">
+		<img class="mb-3" src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+		<p>
+		The Data-Oriented Language for Sane Software Development.
+		</p>
+		</div>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Resources</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://odin-lang.org/docs" class="link-light">Docs</a></li>
+			<li><a href="https://pkg.odin-lang.org/" class="link-light">Packages</a></li>
+			<li><a href="https://odin-lang.org/news" class="link-light">News</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Community</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin" target="_blank" class="link-light">GitHub</a></li>
+			<li><a href="https://forum.odin-lang.org" target="_blank" class="link-light">Forum</a></li>
+			<li><a href="https://discord.com/invite/sVBPHEv" target="_blank" class="link-light">Discord</a></li>
+			<li><a href="https://www.twitch.tv/ginger_bill" target="_blank" class="link-light">Twitch</a></li>
+			<li><a href="https://www.youtube.com/channel/UCUSck1dOH7VKmG4lRW7tZXg" target="_blank" class="link-light">YouTube</a></li>
+			<li><a href="https://odin-lang.org/showcase" target="_blank" class="link-light">Showcase</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Contribute</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin/issues" target="_blank" class="link-light">Issues</a></li>
+			<li><a href="https://www.patreon.com/gingerbill" target="_blank" class="link-light">Donate</a></li>
+			</ul>
+			</nav>
+		</div>
+		<div class="mt-4 text-muted">© 2016–2023 Ginger Bill</div>
+	</div>
+</footer>
+
+<script src="https://odin-lang.org/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://odin-lang.org/js/script.js"></script>
+<script src="/pkg-data.js"></script>
+<script src="/search.js"></script>
+</body>
+</html>
