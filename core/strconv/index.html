@@ -379,7 +379,7 @@ Variables (1)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (42)</summary>
+Procedures (49)</summary>
 <ul>
 <li><a href="#append_bits">append_bits</a></li>
 <li><a href="#append_bits_128">append_bits_128</a></li>
@@ -423,6 +423,13 @@ Procedures (42)</summary>
 <li><a href="#round_shortest">round_shortest</a></li>
 <li><a href="#unquote_char">unquote_char</a></li>
 <li><a href="#unquote_string">unquote_string</a></li>
+<li><a href="#write_bits">write_bits</a></li>
+<li><a href="#write_bits_128">write_bits_128</a></li>
+<li><a href="#write_bool">write_bool</a></li>
+<li><a href="#write_float">write_float</a></li>
+<li><a href="#write_int">write_int</a></li>
+<li><a href="#write_u128">write_u128</a></li>
+<li><a href="#write_uint">write_uint</a></li>
 </ul>
 </details>
 </div>
@@ -503,7 +510,7 @@ Procedure Groups (4)</summary>
 </div>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="append_bits"><span><a class="doc-id-link" href="#append_bits">append_bits<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/integers.odin#L65"><em>Source</em></a></div></h3>
+<h3 id="append_bits"><span><a class="doc-id-link" href="#append_bits">append_bits<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/deprecated.odin#L6"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_bits :: <span class="keyword-type">proc</span>(
 	buf:       []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
@@ -515,23 +522,9 @@ Procedure Groups (4)</summary>
 	flags:     <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/core/strconv/#Int_Flag">Int_Flag</a>], 
 ) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>Appends the string representation of an integer to a buffer with specified base, flags, and digit set.</p>
-<p><b>Inputs</b><br>
-<span class="doc-list">buf: The buffer to append the integer representation to</span>
-<span class="doc-list">x: The integer value to convert</span>
-<span class="doc-list">base: The base for the integer representation (2 &lt;= base &lt;= MAX_BASE)</span>
-<span class="doc-list">is_signed: A boolean indicating if the input should be treated as a signed integer</span>
-<span class="doc-list">bit_size: The bit size of the signed integer representation (8, 16, 32, or 64)</span>
-<span class="doc-list">digits: The digit set used for the integer representation</span>
-<span class="doc-list">flags: The Int_Flags bit set to control integer formatting</span></p>
-<p><b>Returns</b><br>
-<span class="doc-list">The string containing the integer representation appended to the buffer</span></p>
-</details>
 </div>
 <div class="pkg-entity">
-<h3 id="append_bits_128"><span><a class="doc-id-link" href="#append_bits_128">append_bits_128<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/integers.odin#L163"><em>Source</em></a></div></h3>
+<h3 id="append_bits_128"><span><a class="doc-id-link" href="#append_bits_128">append_bits_128<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/deprecated.odin#L11"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_bits_128 :: <span class="keyword-type">proc</span>(
 	buf:       []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
@@ -543,147 +536,36 @@ Procedure Groups (4)</summary>
 	flags:     <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/core/strconv/#Int_Flag">Int_Flag</a>], 
 ) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>Appends the string representation of a 128-bit integer to a buffer with specified base, flags, and digit set.</p>
-<p><b>Inputs</b><br>
-<span class="doc-list">buf: The buffer to append the integer representation to</span>
-<span class="doc-list">x: The 128-bit integer value to convert</span>
-<span class="doc-list">base: The base for the integer representation (2 &lt;= base &lt;= MAX_BASE)</span>
-<span class="doc-list">is_signed: A boolean indicating if the input should be treated as a signed integer</span>
-<span class="doc-list">bit_size: The bit size of the signed integer representation (8, 16, 32, 64, or 128)</span>
-<span class="doc-list">digits: The digit set used for the integer representation</span>
-<span class="doc-list">flags: The Int_Flags bit set to control integer formatting</span></p>
-<p><b>Returns</b><br>
-<span class="doc-list">The string containing the integer representation appended to the buffer</span></p>
-</details>
 </div>
 <div class="pkg-entity">
-<h3 id="append_bool"><span><a class="doc-id-link" href="#append_bool">append_bool<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1477"><em>Source</em></a></div></h3>
+<h3 id="append_bool"><span><a class="doc-id-link" href="#append_bool">append_bool<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/deprecated.odin#L16"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_bool :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, b: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>Appends a boolean value as a string to the given buffer</p>
-<p><b>Inputs</b><br>
-<span class="doc-list">buf: The buffer to append the boolean value to</span>
-<span class="doc-list">b: The boolean value to be appended</span></p>
-<details open class="code-example">
-<summary><b>Example:</b></summary>
-<pre><code class="hljs language-odin" data-lang="odin">import "core:fmt"
-import "core:strconv"
-append_bool_example :: proc() {
-	buf: [6]byte
-	result := strconv.append_bool(buf[:], true)
-	fmt.println(result, buf)
-}
-</code></pre>
-</details>
-<b>Output:</b>
-<pre class="doc-code">true [116, 114, 117, 101, 0, 0]
-</pre>
-<p><b>Returns</b><br>
-<span class="doc-list">The resulting string after appending the boolean value</span></p>
-</details>
 </div>
 <div class="pkg-entity">
-<h3 id="append_float"><span><a class="doc-id-link" href="#append_float">append_float<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1655"><em>Source</em></a></div></h3>
+<h3 id="append_float"><span><a class="doc-id-link" href="#append_float">append_float<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/deprecated.odin#L36"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_float :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, f: <a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a>, fmt: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, prec, bit_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>Appends a float64 value as a string to the given buffer with the specified format and precision</p>
-<p><b>Inputs</b><br>
-<span class="doc-list">buf: The buffer to append the float64 value to</span>
-<span class="doc-list">f: The float64 value to be appended</span>
-<span class="doc-list">fmt: The byte specifying the format to use for the conversion</span>
-<span class="doc-list">prec: The precision to use for the conversion</span>
-<span class="doc-list">bit_size: The size of the float in bits (32 or 64)</span></p>
-<details open class="code-example">
-<summary><b>Example:</b></summary>
-<pre><code class="hljs language-odin" data-lang="odin">import "core:fmt"
-import "core:strconv"
-append_float_example :: proc() {
-	buf: [8]byte
-	result := strconv.append_float(buf[:], 3.14159, 'f', 2, 64)
-	fmt.println(result, buf)
-}
-</code></pre>
-</details>
-<b>Output:</b>
-<pre class="doc-code">+3.14 [43, 51, 46, 49, 52, 0, 0, 0]
-</pre>
-<p><b>Returns</b><br>
-<span class="doc-list">The resulting string after appending the float</span></p>
-</details>
 </div>
 <div class="pkg-entity">
-<h3 id="append_int"><span><a class="doc-id-link" href="#append_int">append_int<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1539"><em>Source</em></a></div></h3>
+<h3 id="append_int"><span><a class="doc-id-link" href="#append_int">append_int<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/deprecated.odin#L26"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_int :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, i: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, base: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>Appends a signed integer value as a string to the given buffer with the specified base</p>
-<p><b>Inputs</b><br>
-<span class="doc-list">buf: The buffer to append the signed integer value to</span>
-<span class="doc-list">i: The signed integer value to be appended</span>
-<span class="doc-list">base: The base to use for converting the integer value</span></p>
-<details open class="code-example">
-<summary><b>Example:</b></summary>
-<pre><code class="hljs language-odin" data-lang="odin">import "core:fmt"
-import "core:strconv"
-append_int_example :: proc() {
-	buf: [4]byte
-	result := strconv.append_int(buf[:], -42, 10)
-	fmt.println(result, buf)
-}
-</code></pre>
-</details>
-<b>Output:</b>
-<pre class="doc-code">-42 [45, 52, 50, 0]
-</pre>
-<p><b>Returns</b><br>
-<span class="doc-list">The resulting string after appending the signed integer value</span></p>
-</details>
 </div>
 <div class="pkg-entity">
-<h3 id="append_u128"><span><a class="doc-id-link" href="#append_u128">append_u128<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1545"><em>Source</em></a></div></h3>
+<h3 id="append_u128"><span><a class="doc-id-link" href="#append_u128">append_u128<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/deprecated.odin#L31"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_u128 :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, u: <a href="/base/builtin#u128"><span class="doc-builtin">u128</span></a>, base: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="append_uint"><span><a class="doc-id-link" href="#append_uint">append_uint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1511"><em>Source</em></a></div></h3>
+<h3 id="append_uint"><span><a class="doc-id-link" href="#append_uint">append_uint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/deprecated.odin#L21"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_uint :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, u: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>, base: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>Appends an unsigned integer value as a string to the given buffer with the specified base</p>
-<p><b>Inputs</b><br>
-<span class="doc-list">buf: The buffer to append the unsigned integer value to</span>
-<span class="doc-list">u: The unsigned integer value to be appended</span>
-<span class="doc-list">base: The base to use for converting the integer value</span></p>
-<details open class="code-example">
-<summary><b>Example:</b></summary>
-<pre><code class="hljs language-odin" data-lang="odin">import "core:fmt"
-import "core:strconv"
-append_uint_example :: proc() {
-	buf: [4]byte
-	result := strconv.append_uint(buf[:], 42, 16)
-	fmt.println(result, buf)
-}
-</code></pre>
-</details>
-<b>Output:</b>
-<pre class="doc-code">2a [50, 97, 0, 0]
-</pre>
-<p><b>Returns</b><br>
-<span class="doc-list">The resulting string after appending the unsigned integer value</span></p>
-</details>
 </div>
 <div class="pkg-entity">
 <h3 id="atof"><span><a class="doc-id-link" href="#atof">atof<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1622"><em>Source</em></a></div></h3>
@@ -693,7 +575,7 @@ append_uint_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Converts a string to a float64 value</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">s: The string to be converted</span></p>
 <details open class="code-example">
 <summary><b>Example:</b></summary>
@@ -707,7 +589,7 @@ atof_example :: proc() {
 <b>Output:</b>
 <pre class="doc-code">3.140
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">The resulting float64 value after converting the string</span></p>
 </details>
 </div>
@@ -719,7 +601,7 @@ atof_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Converts a string to an integer value</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">s: The string to be converted</span></p>
 <details open class="code-example">
 <summary><b>Example:</b></summary>
@@ -733,7 +615,7 @@ atoi_example :: proc() {
 <b>Output:</b>
 <pre class="doc-code">42
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">The resulting integer value</span></p>
 </details>
 </div>
@@ -745,10 +627,10 @@ atoi_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Converts a decimal number to its floating-point representation with the given format and returns the resulting bits</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">d: Pointer to the decimal number to convert</span>
 <span class="doc-list">info: Pointer to the Float_Info structure containing information about the floating-point format</span></p>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">b: The bits representing the floating-point number</span>
 <span class="doc-list">overflow: A boolean indicating whether an overflow occurred during conversion</span></p>
 </details>
@@ -768,28 +650,28 @@ atoi_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Converts a decimal floating-point number into a byte buffer with the given format</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">buf: The byte buffer to store the formatted number</span>
 <span class="doc-list">shortest: If true, generates the shortest representation of the number</span>
 <span class="doc-list">neg: If true, the number is negative</span>
 <span class="doc-list">digs: The decimal number to be formatted</span>
 <span class="doc-list">precision: The number of digits after the decimal point</span>
 <span class="doc-list">fmt: The format specifier (accepted values: 'f', 'F', 'e', 'E', 'g', 'G')</span></p>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">A byte slice containing the formatted decimal floating-point number</span></p>
 </details>
 </div>
 <div class="pkg-entity">
 <h3 id="ftoa"><span><a class="doc-id-link" href="#ftoa">ftoa<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1655"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">ftoa :: <a class="code-procedure" href="/core/strconv/#append_float">append_float</a></pre>
+<pre class="doc-code">ftoa :: <a class="code-procedure" href="/core/strconv/#write_float">write_float</a></pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Appends a float64 value as a string to the given buffer with the specified format and precision</p>
-<p><b>Inputs</b><br>
-<span class="doc-list">buf: The buffer to append the float64 value to</span>
-<span class="doc-list">f: The float64 value to be appended</span>
+<p>Writes a float64 value as a string to the given buffer with the specified format and precision</p>
+<p><b>Inputs</b>
+<span class="doc-list">buf: The buffer to write the float64 value to</span>
+<span class="doc-list">f: The float64 value to be written</span>
 <span class="doc-list">fmt: The byte specifying the format to use for the conversion</span>
 <span class="doc-list">prec: The precision to use for the conversion</span>
 <span class="doc-list">bit_size: The size of the float in bits (32 or 64)</span></p>
@@ -797,9 +679,9 @@ atoi_example :: proc() {
 <summary><b>Example:</b></summary>
 <pre><code class="hljs language-odin" data-lang="odin">import "core:fmt"
 import "core:strconv"
-append_float_example :: proc() {
+write_float_example :: proc() {
 	buf: [8]byte
-	result := strconv.append_float(buf[:], 3.14159, 'f', 2, 64)
+	result := strconv.write_float(buf[:], 3.14159, 'f', 2, 64)
 	fmt.println(result, buf)
 }
 </code></pre>
@@ -807,8 +689,8 @@ append_float_example :: proc() {
 <b>Output:</b>
 <pre class="doc-code">+3.14 [43, 51, 46, 49, 52, 0, 0, 0]
 </pre>
-<p><b>Returns</b><br>
-<span class="doc-list">The resulting string after appending the float</span></p>
+<p><b>Returns</b>
+<span class="doc-list">The resulting string after writing the float</span></p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -819,7 +701,7 @@ append_float_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Converts a floating-point number to a string with the specified format and precision.</p>
-<p><b>Inputs</b><br></p>
+<p><b>Inputs</b></p>
 <p>buf: A byte slice to store the resulting string
 val: The floating-point value to be converted
 fmt: The formatting byte, accepted values are 'e', 'E', 'f', 'F', 'g', 'G'
@@ -835,7 +717,7 @@ bit_size := 64
 result := strconv.generic_ftoa(buf[:], val, fmt, precision, bit_size) -&gt; "3.14"
 </code></pre>
 </details>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">A byte slice containing the formatted string</span></p>
 </details>
 </div>
@@ -847,11 +729,11 @@ result := strconv.generic_ftoa(buf[:], val, fmt, precision, bit_size) -&gt; "3.1
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Determines whether the given unsigned 64-bit integer is a negative value by interpreting it as a signed integer with the specified bit size.</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">x: The unsigned 64-bit integer to check for negativity</span>
 <span class="doc-list">is_signed: A boolean indicating if the input should be treated as a signed integer</span>
 <span class="doc-list">bit_size: The bit size of the signed integer representation (8, 16, 32, or 64)</span></p>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">u: The absolute value of the input integer</span>
 <span class="doc-list">neg: A boolean indicating whether the input integer is negative</span></p>
 </details>
@@ -864,11 +746,11 @@ result := strconv.generic_ftoa(buf[:], val, fmt, precision, bit_size) -&gt; "3.1
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Determines whether the given unsigned 128-bit integer is a negative value by interpreting it as a signed integer with the specified bit size.</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">x: The unsigned 128-bit integer to check for negativity</span>
 <span class="doc-list">is_signed: A boolean indicating if the input should be treated as a signed integer</span>
 <span class="doc-list">bit_size: The bit size of the signed integer representation (8, 16, 32, 64, or 128)</span></p>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">u: The absolute value of the input integer</span>
 <span class="doc-list">neg: A boolean indicating whether the input integer is negative</span></p>
 </details>
@@ -881,7 +763,7 @@ result := strconv.generic_ftoa(buf[:], val, fmt, precision, bit_size) -&gt; "3.1
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Converts an integer value to a string and stores it in the given buffer</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">buf: The buffer to store the resulting string</span>
 <span class="doc-list">i: The integer value to be converted</span></p>
 <details open class="code-example">
@@ -898,7 +780,7 @@ itoa_example :: proc() {
 <b>Output:</b>
 <pre class="doc-code">42 [52, 50, 0, 0]
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">The resulting string after converting the integer value</span></p>
 </details>
 </div>
@@ -910,8 +792,8 @@ itoa_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses a boolean value from the input string</p>
-<p><b>Inputs</b><br>
-<span class="doc-list">s: The input string<br></span></p>
+<p><b>Inputs</b>
+<span class="doc-list">s: The input string</span></p>
 <pre>- true: "1", "t", "T", "true", "TRUE", "True"
 - false: "0", "f", "F", "false", "FALSE", "False"
 </pre>
@@ -929,7 +811,7 @@ itoa_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses a 128-bit complex number from a string</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">str: The input string containing a 128-bit complex number.</span>
 <span class="doc-list">n: An optional pointer to an int to store the length of the parsed substring (default: nil).</span></p>
 <details open class="code-example">
@@ -950,7 +832,7 @@ parse_complex128_example :: proc() {
 <pre class="doc-code">3+1i 4 true
 5+7i 4 false
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">value: The parsed 128-bit complex number.</span>
 <span class="doc-list">ok: <code>false</code> if a complex number could not be found, or if the input string contained more than just the number.</span></p>
 </details>
@@ -963,7 +845,7 @@ parse_complex128_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses a 32-bit complex number from a string</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">str: The input string containing a 32-bit complex number.</span>
 <span class="doc-list">n: An optional pointer to an int to store the length of the parsed substring (default: nil).</span></p>
 <details open class="code-example">
@@ -984,7 +866,7 @@ parse_complex32_example :: proc() {
 <pre class="doc-code">3+1i 4 true
 5+7i 4 false
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">value: The parsed 32-bit complex number.</span>
 <span class="doc-list">ok: <code>false</code> if a complex number could not be found, or if the input string contained more than just the number.</span></p>
 </details>
@@ -997,7 +879,7 @@ parse_complex32_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses a 64-bit complex number from a string</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">str: The input string containing a 64-bit complex number.</span>
 <span class="doc-list">n: An optional pointer to an int to store the length of the parsed substring (default: nil).</span></p>
 <details open class="code-example">
@@ -1018,7 +900,7 @@ parse_complex64_example :: proc() {
 <pre class="doc-code">3+1i 4 true
 5+7i 4 false
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">value: The parsed 64-bit complex number.</span>
 <span class="doc-list">ok: <code>false</code> if a complex number could not be found, or if the input string contained more than just the number.</span></p>
 </details>
@@ -1031,7 +913,7 @@ parse_complex64_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses a 32-bit floating point number from a string</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">s: The input string containing a 32-bit floating point number.</span>
 <span class="doc-list">n: An optional pointer to an int to store the length of the parsed substring (default: nil).</span></p>
 <details open class="code-example">
@@ -1051,7 +933,7 @@ parse_f32_example :: proc() {
 <pre class="doc-code">0.000 false
 567800.000 true
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">value: The parsed 32-bit floating point number.</span>
 <span class="doc-list">ok: <code>false</code> if a base 10 float could not be found, or if the input string contained more than just the number.</span></p>
 </details>
@@ -1064,7 +946,7 @@ parse_f32_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses a 32-bit floating point number from a string and returns the parsed number, the length of the parsed substring, and a boolean indicating whether the parsing was successful</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">str: The input string containing a 32-bit floating point number.</span></p>
 <details open class="code-example">
 <summary><b>Example:</b></summary>
@@ -1083,7 +965,7 @@ parse_f32_prefix_example :: proc() {
 <pre class="doc-code">0.000 false
 567800.000 true
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">value: The parsed 32-bit floating point number.</span>
 <span class="doc-list">nr: The length of the parsed substring.</span>
 <span class="doc-list">ok: A boolean indicating whether the parsing was successful.</span></p>
@@ -1097,7 +979,7 @@ parse_f32_prefix_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses a 64-bit floating point number from a string</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">str: The input string containing a 64-bit floating point number.</span>
 <span class="doc-list">n: An optional pointer to an int to store the length of the parsed substring (default: nil).</span></p>
 <details open class="code-example">
@@ -1117,7 +999,7 @@ parse_f64_example :: proc() {
 <pre class="doc-code">0.000 false
 567800.000 true
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">value: The parsed 64-bit floating point number.</span>
 <span class="doc-list">ok: <code>false</code> if a base 10 float could not be found, or if the input string contained more than just the number.</span></p>
 </details>
@@ -1130,7 +1012,7 @@ parse_f64_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses a 64-bit floating point number from a string and returns the parsed number, the length of the parsed substring, and a boolean indicating whether the parsing was successful</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">str: The input string containing a 64-bit floating point number.</span></p>
 <details open class="code-example">
 <summary><b>Example:</b></summary>
@@ -1153,7 +1035,7 @@ parse_f64_prefix_example :: proc() {
 1234.000 true
 13.370 true
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">value: The parsed 64-bit floating point number.</span>
 <span class="doc-list">nr: The length of the parsed substring.</span>
 <span class="doc-list">ok: <code>false</code> if a base 10 float could not be found</span></p>
@@ -1167,7 +1049,7 @@ parse_f64_prefix_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses an integer value from a string in base 10, unless there's a prefix</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">str: The input string containing the integer value</span>
 <span class="doc-list">n: An optional pointer to an int to store the length of the parsed substring (default: nil)</span></p>
 <details open class="code-example">
@@ -1187,7 +1069,7 @@ parse_i128_maybe_prefixed_example :: proc() {
 <pre class="doc-code">1234 true
 61166 true
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">value: The parsed i128 value</span>
 <span class="doc-list">ok: <code>false</code> if a valid integer could not be found, or if the input string contained more than just the number.</span></p>
 </details>
@@ -1200,7 +1082,7 @@ parse_i128_maybe_prefixed_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses an integer value from a string in the given base, without any prefix</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">str: The input string containing the integer value</span>
 <span class="doc-list">base: The base (radix) to use for parsing the integer (1-16)</span>
 <span class="doc-list">n: An optional pointer to an int to store the length of the parsed substring (default: nil)</span></p>
@@ -1217,7 +1099,7 @@ parse_i128_of_base_example :: proc() {
 <b>Output:</b>
 <pre class="doc-code">-1234 false
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">value: The parsed i128 value</span>
 <span class="doc-list">ok: false if no numeric value of the appropriate base could be found, or if the input string contained more than just the number.</span></p>
 </details>
@@ -1334,7 +1216,7 @@ parse_int_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses a 128-bit quaternion from a string</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">str: The input string containing a 128-bit quaternion.</span>
 <span class="doc-list">n: An optional pointer to an int to store the length of the parsed substring (default: nil).</span></p>
 <details open class="code-example">
@@ -1355,7 +1237,7 @@ parse_quaternion128_example :: proc() {
 <pre class="doc-code">1+2i+3j+4k 10 true
 1+2i+3j+4k 10 false
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">value: The parsed 128-bit quaternion.</span>
 <span class="doc-list">ok: <code>false</code> if a quaternion could not be found, or if the input string contained more than just the quaternion.</span></p>
 </details>
@@ -1368,7 +1250,7 @@ parse_quaternion128_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses a 256-bit quaternion from a string</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">str: The input string containing a 256-bit quaternion.</span>
 <span class="doc-list">n: An optional pointer to an int to store the length of the parsed substring (default: nil).</span></p>
 <details open class="code-example">
@@ -1389,7 +1271,7 @@ parse_quaternion256_example :: proc() {
 <pre class="doc-code">1+2i+3j+4k 10 true
 1+2i+3j+4k 10 false
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">value: The parsed 256-bit quaternion.</span>
 <span class="doc-list">ok: <code>false</code> if a quaternion could not be found, or if the input string contained more than just the quaternion.</span></p>
 </details>
@@ -1402,7 +1284,7 @@ parse_quaternion256_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses a 64-bit quaternion from a string</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">str: The input string containing a 64-bit quaternion.</span>
 <span class="doc-list">n: An optional pointer to an int to store the length of the parsed substring (default: nil).</span></p>
 <details open class="code-example">
@@ -1423,7 +1305,7 @@ parse_quaternion64_example :: proc() {
 <pre class="doc-code">1+2i+3j+4k 10 true
 1+2i+3j+4k 10 false
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">value: The parsed 64-bit quaternion.</span>
 <span class="doc-list">ok: <code>false</code> if a quaternion could not be found, or if the input string contained more than just the quaternion.</span></p>
 </details>
@@ -1436,7 +1318,7 @@ parse_quaternion64_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses an unsigned integer value from a string in base 10, unless there's a prefix</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">str: The input string containing the integer value</span>
 <span class="doc-list">n: An optional pointer to an int to store the length of the parsed substring (default: nil)</span></p>
 <details open class="code-example">
@@ -1456,7 +1338,7 @@ parse_u128_maybe_prefixed_example :: proc() {
 <pre class="doc-code">1234 true
 5678 false
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">value: The parsed u128 value</span>
 <span class="doc-list">ok: false if a valid integer could not be found, if the value was negative, or if the input string contained more than just the number.</span></p>
 </details>
@@ -1469,7 +1351,7 @@ parse_u128_maybe_prefixed_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses an unsigned integer value from a string in the given base, without any prefix</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">str: The input string containing the integer value</span>
 <span class="doc-list">base: The base (radix) to use for parsing the integer (1-16)</span>
 <span class="doc-list">n: An optional pointer to an int to store the length of the parsed substring (default: nil)</span></p>
@@ -1490,7 +1372,7 @@ parse_u128_of_base_example :: proc() {
 <pre class="doc-code">1234 false
 1450766062 true
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">value: The parsed u128 value</span>
 <span class="doc-list">ok: <code>false</code> if no numeric value of the appropriate base could be found, or if the input string contained more than just the number.</span></p>
 </details>
@@ -1604,7 +1486,7 @@ parse_uint_example :: proc() {
 65535 true
 65535 true
 </pre>
-<p><b>Returns</b><br></p>
+<p><b>Returns</b></p>
 <p>value: The parsed uint value
 ok: <code>false</code> if no appropriate value could be found; the value was negative; he input string contained more than just the number</p>
 </details>
@@ -1616,11 +1498,11 @@ ok: <code>false</code> if no appropriate value could be found; the value was neg
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Appends a quoted string representation of the input string to a given byte slice and returns the result as a string</p>
-<p><b>Inputs</b><br>
-<span class="doc-list">buf: The byte slice to which the quoted string will be appended</span>
+<p>Writes a quoted string representation of the input string to a given byte slice and returns the result as a string</p>
+<p><b>Inputs</b>
+<span class="doc-list">buf: The byte slice to which the quoted string will be written</span>
 <span class="doc-list">str: The input string to be quoted</span></p>
-<p>!! ISSUE !! NOT EXPECTED -- "\"hello\"" was expected<br></p>
+<p>!! ISSUE !! NOT EXPECTED -- "\"hello\"" was expected</p>
 <details open class="code-example">
 <summary><b>Example:</b></summary>
 <pre><code class="hljs language-odin" data-lang="odin">import "core:fmt"
@@ -1635,8 +1517,8 @@ quote_example :: proc() {
 <b>Output:</b>
 <pre class="doc-code">"'h''e''l''l''o'" [34, 39, 104, 39, 39, 101, 39, 39, 108, 39, 39, 108, 39, 39, 111, 39, 34, 0, 0, 0]
 </pre>
-<p><b>Returns</b><br>
-<span class="doc-list">The resulting string after appending the quoted string representation</span></p>
+<p><b>Returns</b>
+<span class="doc-list">The resulting string after writing the quoted string representation</span></p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1646,9 +1528,9 @@ quote_example :: proc() {
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Appends a quoted rune representation of the input rune to a given byte slice and returns the result as a string</p>
-<p><b>Inputs</b><br>
-<span class="doc-list">buf: The byte slice to which the quoted rune will be appended</span>
+<p>Writes a quoted rune representation of the input rune to a given byte slice and returns the result as a string</p>
+<p><b>Inputs</b>
+<span class="doc-list">buf: The byte slice to which the quoted rune will be written</span>
 <span class="doc-list">r: The input rune to be quoted</span></p>
 <details open class="code-example">
 <summary><b>Example:</b></summary>
@@ -1664,8 +1546,8 @@ quote_rune_example :: proc() {
 <b>Output:</b>
 <pre class="doc-code">'A' [39, 65, 39, 0]
 </pre>
-<p><b>Returns</b><br>
-<span class="doc-list">The resulting string after appending the quoted rune representation</span></p>
+<p><b>Returns</b>
+<span class="doc-list">The resulting string after writing the quoted rune representation</span></p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1676,7 +1558,7 @@ quote_rune_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Rounds the given decimal number to its shortest representation, considering the provided floating-point format</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">d: The decimal number to round</span>
 <span class="doc-list">mant: The mantissa of the floating-point number</span>
 <span class="doc-list">exp: The exponent of the floating-point number</span>
@@ -1691,7 +1573,7 @@ quote_rune_example :: proc() {
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Unquotes a single character from the input string, considering the given quote character</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">str: The input string containing the character to unquote</span>
 <span class="doc-list">quote: The quote character to consider (e.g., '"')</span></p>
 <details open class="code-example">
@@ -1710,7 +1592,7 @@ unquote_char_example :: proc() {
 <pre class="doc-code">Source: 'The' raven
 r: &lt;'&gt;, multiple_bytes:false, tail_string:&lt;The' raven&gt;, success:true
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">r: The unquoted rune</span>
 <span class="doc-list">multiple_bytes: A boolean indicating if the rune has multiple bytes</span>
 <span class="doc-list">tail_string: The remaining portion of the input string after unquoting the character</span>
@@ -1725,7 +1607,7 @@ r: &lt;'&gt;, multiple_bytes:false, tail_string:&lt;The' raven&gt;, success:true
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Unquotes the input string considering any type of quote character and returns the unquoted string</p>
-<p><b>Inputs</b><br>
+<p><b>Inputs</b>
 <span class="doc-list">lit: The input string to unquote</span>
 <span class="doc-list">allocator: (default: context.allocator)</span></p>
 <p>WARNING: This procedure gives unexpected results if the quotes are not the first and last characters.</p>
@@ -1747,7 +1629,7 @@ unquote_string_example :: proc() {
 	src="The raven \'Huginn\' is black."
 	s, allocated, ok = strconv.unquote_string(src) // Will produce undesireable results
 	fmt.println(src)
-	fmt.printf("Unquoted: &lt;%s&gt;, alloc:%v, ok:%v\n", s, allocated, ok) 
+	fmt.printf("Unquoted: &lt;%s&gt;, alloc:%v, ok:%v\n", s, allocated, ok)
 }
 </code></pre>
 </details>
@@ -1761,11 +1643,194 @@ Unquoted: &lt;The raven Huginn' is black&gt;, alloc:false, ok:true
 The raven 'Huginn' is black.
 Unquoted: &lt;he raven 'Huginn' is black&gt;, alloc:false, ok:true
 </pre>
-<p><b>Returns</b><br>
+<p><b>Returns</b>
 <span class="doc-list">res: The resulting unquoted string</span>
 <span class="doc-list">allocated: A boolean indicating if the resulting string was allocated using the provided allocator</span>
 <span class="doc-list">success: A boolean indicating whether the unquoting was successful</span></p>
 <p>NOTE: If unquoting is unsuccessful, the allocated memory for the result will be freed.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="write_bits"><span><a class="doc-id-link" href="#write_bits">write_bits<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/integers.odin#L65"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">write_bits :: <span class="keyword-type">proc</span>(
+	buf:       []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
+	x:         <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>, 
+	base:      <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, 
+	is_signed: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, 
+	bit_size:  <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, 
+	digits:    <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, 
+	flags:     <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/core/strconv/#Int_Flag">Int_Flag</a>], 
+) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Writes the string representation of an integer to a buffer with specified base, flags, and digit set.</p>
+<p><b>Inputs</b>
+<span class="doc-list">buf: The buffer to append the integer representation to</span>
+<span class="doc-list">x: The integer value to convert</span>
+<span class="doc-list">base: The base for the integer representation (2 &lt;= base &lt;= MAX_BASE)</span>
+<span class="doc-list">is_signed: A boolean indicating if the input should be treated as a signed integer</span>
+<span class="doc-list">bit_size: The bit size of the signed integer representation (8, 16, 32, or 64)</span>
+<span class="doc-list">digits: The digit set used for the integer representation</span>
+<span class="doc-list">flags: The Int_Flags bit set to control integer formatting</span></p>
+<p><b>Returns</b>
+<span class="doc-list">The string containing the integer representation appended to the buffer</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="write_bits_128"><span><a class="doc-id-link" href="#write_bits_128">write_bits_128<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/integers.odin#L163"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">write_bits_128 :: <span class="keyword-type">proc</span>(
+	buf:       []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
+	x:         <a href="/base/builtin#u128"><span class="doc-builtin">u128</span></a>, 
+	base:      <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, 
+	is_signed: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, 
+	bit_size:  <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, 
+	digits:    <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, 
+	flags:     <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/core/strconv/#Int_Flag">Int_Flag</a>], 
+) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Writes the string representation of a 128-bit integer to a buffer with specified base, flags, and digit set.</p>
+<p><b>Inputs</b>
+<span class="doc-list">buf: The buffer to append the integer representation to</span>
+<span class="doc-list">x: The 128-bit integer value to convert</span>
+<span class="doc-list">base: The base for the integer representation (2 &lt;= base &lt;= MAX_BASE)</span>
+<span class="doc-list">is_signed: A boolean indicating if the input should be treated as a signed integer</span>
+<span class="doc-list">bit_size: The bit size of the signed integer representation (8, 16, 32, 64, or 128)</span>
+<span class="doc-list">digits: The digit set used for the integer representation</span>
+<span class="doc-list">flags: The Int_Flags bit set to control integer formatting</span></p>
+<p><b>Returns</b>
+<span class="doc-list">The string containing the integer representation written to the buffer</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="write_bool"><span><a class="doc-id-link" href="#write_bool">write_bool<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1477"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">write_bool :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, b: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Writes a boolean value as a string to the given buffer</p>
+<p><b>Inputs</b>
+<span class="doc-list">buf: The buffer to write the boolean value to</span>
+<span class="doc-list">b: The boolean value to be written</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:fmt"
+import "core:strconv"
+write_bool_example :: proc() {
+	buf: [6]byte
+	result := strconv.write_bool(buf[:], true)
+	fmt.println(result, buf)
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">true [116, 114, 117, 101, 0, 0]
+</pre>
+<p><b>Returns</b>
+<span class="doc-list">The resulting string after writing the boolean value</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="write_float"><span><a class="doc-id-link" href="#write_float">write_float<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1655"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">write_float :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, f: <a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a>, fmt: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, prec, bit_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Writes a float64 value as a string to the given buffer with the specified format and precision</p>
+<p><b>Inputs</b>
+<span class="doc-list">buf: The buffer to write the float64 value to</span>
+<span class="doc-list">f: The float64 value to be written</span>
+<span class="doc-list">fmt: The byte specifying the format to use for the conversion</span>
+<span class="doc-list">prec: The precision to use for the conversion</span>
+<span class="doc-list">bit_size: The size of the float in bits (32 or 64)</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:fmt"
+import "core:strconv"
+write_float_example :: proc() {
+	buf: [8]byte
+	result := strconv.write_float(buf[:], 3.14159, 'f', 2, 64)
+	fmt.println(result, buf)
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">+3.14 [43, 51, 46, 49, 52, 0, 0, 0]
+</pre>
+<p><b>Returns</b>
+<span class="doc-list">The resulting string after writing the float</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="write_int"><span><a class="doc-id-link" href="#write_int">write_int<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1539"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">write_int :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, i: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, base: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Writes a signed integer value as a string to the given buffer with the specified base</p>
+<p><b>Inputs</b>
+<span class="doc-list">buf: The buffer to write the signed integer value to</span>
+<span class="doc-list">i: The signed integer value to be written</span>
+<span class="doc-list">base: The base to use for converting the integer value</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:fmt"
+import "core:strconv"
+write_int_example :: proc() {
+	buf: [4]byte
+	result := strconv.write_int(buf[:], -42, 10)
+	fmt.println(result, buf)
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">-42 [45, 52, 50, 0]
+</pre>
+<p><b>Returns</b>
+<span class="doc-list">The resulting string after writing the signed integer value</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="write_u128"><span><a class="doc-id-link" href="#write_u128">write_u128<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1545"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">write_u128 :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, u: <a href="/base/builtin#u128"><span class="doc-builtin">u128</span></a>, base: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="write_uint"><span><a class="doc-id-link" href="#write_uint">write_uint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1511"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">write_uint :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, u: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>, base: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Writes an unsigned integer value as a string to the given buffer with the specified base</p>
+<p><b>Inputs</b>
+<span class="doc-list">buf: The buffer to write the unsigned integer value to</span>
+<span class="doc-list">u: The unsigned integer value to be written</span>
+<span class="doc-list">base: The base to use for converting the integer value</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:fmt"
+import "core:strconv"
+write_uint_example :: proc() {
+	buf: [4]byte
+	result := strconv.write_uint(buf[:], 42, 16)
+	fmt.println(result, buf)
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">2a [50, 97, 0, 0]
+</pre>
+<p><b>Returns</b>
+<span class="doc-list">The resulting string after writing the unsigned integer value</span></p>
 </details>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
@@ -1812,12 +1877,13 @@ Unquoted: &lt;he raven 'Huginn' is black&gt;, alloc:false, ok:true
 </section>
 <h2 id="pkg-source-files">Source Files</h2>
 <ul>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/deprecated.odin">deprecated.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/generic_float.odin">generic_float.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/integers.odin">integers.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin">strconv.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-05 21:12:30.344868800 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-06 21:12:39.652179300 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -1880,6 +1946,13 @@ Unquoted: &lt;he raven 'Huginn' is black&gt;, alloc:false, ok:true
 <li><a href="#round_shortest">round_shortest</a></li>
 <li><a href="#unquote_char">unquote_char</a></li>
 <li><a href="#unquote_string">unquote_string</a></li>
+<li><a href="#write_bits">write_bits</a></li>
+<li><a href="#write_bits_128">write_bits_128</a></li>
+<li><a href="#write_bool">write_bool</a></li>
+<li><a href="#write_float">write_float</a></li>
+<li><a href="#write_int">write_int</a></li>
+<li><a href="#write_u128">write_u128</a></li>
+<li><a href="#write_uint">write_uint</a></li>
 </ul>
 </li>
 <li><a href="#pkg-Procedure Groups">Procedure Groups</a><ul>
