@@ -363,6 +363,13 @@ The format is similar to the Odin binary's way of handling compiler flags.</p>
 
 
 </pre>
+<p>Unhandled Arguments:</p>
+<p>All unhandled positional arguments are placed into the <code>overflow</code> field on a
+struct, if it exists. In UNIX-style parsing, the existence of a <code>--</code> on the
+command line will also pass all arguments afterwards into this field.</p>
+<p>If desired, the name of the field may be changed from <code>overflow</code> to any string
+by setting the <code>ODIN_CORE_FLAGS_OVERFLOW_FLAG</code> compile-time config option with
+<code>-define:ODIN_CORE_FLAGS_OVERFLOW_FLAG=&lt;name&gt;</code>.</p>
 <p>Struct Tags:</p>
 <p>Users of the <code>core:encoding/json</code> package may be familiar with using tags to
 annotate struct metadata. The same technique is used here to annotate where
@@ -372,7 +379,7 @@ arguments should go and which are required.</p>
 <span class="doc-list"><code>pos=N</code>: place positional argument <code>N</code> into this flag.</span>
 <span class="doc-list"><code>hidden</code>: hide this flag from the usage documentation.</span>
 <span class="doc-list"><code>required</code>: cause verification to fail if this argument is not set.</span>
-<span class="doc-list"><code>variadic</code>: take all remaining arguments when set, UNIX-style only.</span>
+<span class="doc-list"><code>manifold=N</code>: take several arguments at once, UNIX-style only.</span>
 <span class="doc-list"><code>file</code>: for <code>os.Handle</code> types, file open mode.</span>
 <span class="doc-list"><code>perms</code>: for <code>os.Handle</code> types, file open permissions.</span>
 <span class="doc-list"><code>indistinct</code>: allow the setting of distinct types by their base type.</span></p>
@@ -385,8 +392,9 @@ min&lt;max
 <p><code>max</code> is not inclusive in this range, as noted by the less-than <code>&lt;</code> sign, so if
 you want to require 3 and only 3 arguments in a dynamic array, you would
 specify <code>required=3&lt;4</code>.</p>
-<p><code>variadic</code> may be given a number (<code>variadic=N</code>) above 1 to limit how many extra
-arguments it consumes.</p>
+<p><code>manifold</code> may be given a number (<code>manifold=N</code>) above 1 to limit how many extra
+arguments it consumes at once. If this number is not specified, it will take as
+many arguments as can be converted to the underlying element type.</p>
 <p><code>file</code> determines the file open mode for an <code>os.Handle</code>.
 It accepts a string of flags that can be mixed together:
 <span class="doc-list">r: read</span>
@@ -461,7 +469,7 @@ at parse time.</p>
 <pre>--flag
 --flag=argument
 --flag argument
---flag argument repeating-argument
+--flag argument (manifold-argument)
 
 </pre>
 <p><code>-flag</code> may also be substituted for <code>--flag</code>.</p>
@@ -495,7 +503,7 @@ Constants (18)</summary>
 <ul>
 <li><a href="#IMPORTING_NET">IMPORTING_NET</a></li>
 <li><a href="#IMPORTING_TIME">IMPORTING_TIME</a></li>
-<li><a href="#INTERNAL_VARIADIC_FLAG">INTERNAL_VARIADIC_FLAG</a></li>
+<li><a href="#INTERNAL_OVERFLOW_FLAG">INTERNAL_OVERFLOW_FLAG</a></li>
 <li><a href="#NO_CORE_NAMED_TYPES">NO_CORE_NAMED_TYPES</a></li>
 <li><a href="#ONE_LINE_FLAG_CUTOFF_COUNT">ONE_LINE_FLAG_CUTOFF_COUNT</a></li>
 <li><a href="#RESERVED_HELP_FLAG">RESERVED_HELP_FLAG</a></li>
@@ -503,11 +511,11 @@ Constants (18)</summary>
 <li><a href="#SUBTAG_FILE">SUBTAG_FILE</a></li>
 <li><a href="#SUBTAG_HIDDEN">SUBTAG_HIDDEN</a></li>
 <li><a href="#SUBTAG_INDISTINCT">SUBTAG_INDISTINCT</a></li>
+<li><a href="#SUBTAG_MANIFOLD">SUBTAG_MANIFOLD</a></li>
 <li><a href="#SUBTAG_NAME">SUBTAG_NAME</a></li>
 <li><a href="#SUBTAG_PERMS">SUBTAG_PERMS</a></li>
 <li><a href="#SUBTAG_POS">SUBTAG_POS</a></li>
 <li><a href="#SUBTAG_REQUIRED">SUBTAG_REQUIRED</a></li>
-<li><a href="#SUBTAG_VARIADIC">SUBTAG_VARIADIC</a></li>
 <li><a href="#TAG_ARGS">TAG_ARGS</a></li>
 <li><a href="#TAG_USAGE">TAG_USAGE</a></li>
 <li><a href="#UNDOCUMENTED_FLAG">UNDOCUMENTED_FLAG</a></li>
@@ -651,7 +659,7 @@ Provides more granular information than what just a string could hold.</p>
 <div>
 <pre class="doc-code">Parse_Error_Reason :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
 	None, 
-	<span class="comment">// An extra positional argument was given, and there is no `varg` field.</span>
+	<span class="comment">// An extra positional argument was given, and there is no `overflow` field.</span>
 	Extra_Positional, 
 	<span class="comment">// The underlying type does not support the string value it is being set to.</span>
 	Bad_Value, 
@@ -672,7 +680,7 @@ Provides more granular information than what just a string could hold.</p>
 <pre class="doc-code">Parsing_Style :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
 	<span class="comment">// Odin-style: `-flag`, `-flag:option`, `-map:key=value`</span>
 	Odin, 
-	<span class="comment">// UNIX-style: `-flag` or `--flag`, `--flag=argument`, `--flag argument repeating-argument`</span>
+	<span class="comment">// UNIX-style: `-flag` or `--flag`, `--flag=argument`, `--flag argument (manifold-argument)`</span>
 	Unix, 
 }</pre>
 </div>
@@ -729,9 +737,9 @@ TODO: Update this when the BSDs are supported.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="INTERNAL_VARIADIC_FLAG"><span><a class="doc-id-link" href="#INTERNAL_VARIADIC_FLAG">INTERNAL_VARIADIC_FLAG<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/flags/constants.odin#L31"><em>Source</em></a></div></h3>
+<h3 id="INTERNAL_OVERFLOW_FLAG"><span><a class="doc-id-link" href="#INTERNAL_OVERFLOW_FLAG">INTERNAL_OVERFLOW_FLAG<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/flags/constants.odin#L31"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">INTERNAL_VARIADIC_FLAG: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> : <span class="string">"varg"</span></pre>
+<pre class="doc-code">INTERNAL_OVERFLOW_FLAG: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> : #config(ODIN_CORE_FLAGS_OVERFLOW_FLAG, "overflow")</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -788,6 +796,12 @@ positional flags will be shown in the one-line usage summary.</p>
 </div>
 </div>
 <div class="pkg-entity">
+<h3 id="SUBTAG_MANIFOLD"><span><a class="doc-id-link" href="#SUBTAG_MANIFOLD">SUBTAG_MANIFOLD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/flags/constants.odin#L22"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SUBTAG_MANIFOLD: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> : <span class="string">"manifold"</span></pre>
+</div>
+</div>
+<div class="pkg-entity">
 <h3 id="SUBTAG_NAME"><span><a class="doc-id-link" href="#SUBTAG_NAME">SUBTAG_NAME<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/flags/constants.odin#L18"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SUBTAG_NAME: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> : <span class="string">"name"</span></pre>
@@ -809,12 +823,6 @@ positional flags will be shown in the one-line usage summary.</p>
 <h3 id="SUBTAG_REQUIRED"><span><a class="doc-id-link" href="#SUBTAG_REQUIRED">SUBTAG_REQUIRED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/flags/constants.odin#L20"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SUBTAG_REQUIRED: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> : <span class="string">"required"</span></pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="SUBTAG_VARIADIC"><span><a class="doc-id-link" href="#SUBTAG_VARIADIC">SUBTAG_VARIADIC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/flags/constants.odin#L22"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">SUBTAG_VARIADIC: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> : <span class="string">"variadic"</span></pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1022,7 +1030,7 @@ has to append to a dynamic array, set a map value, or set a cstring.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/flags/validation.odin">validation.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-08 21:11:51.732842000 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-09 21:13:48.827775400 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -1043,7 +1051,7 @@ has to append to a dynamic array, set a map value, or set a cstring.</p>
 <li><a href="#pkg-Constants">Constants</a><ul>
 <li><a href="#IMPORTING_NET">IMPORTING_NET</a></li>
 <li><a href="#IMPORTING_TIME">IMPORTING_TIME</a></li>
-<li><a href="#INTERNAL_VARIADIC_FLAG">INTERNAL_VARIADIC_FLAG</a></li>
+<li><a href="#INTERNAL_OVERFLOW_FLAG">INTERNAL_OVERFLOW_FLAG</a></li>
 <li><a href="#NO_CORE_NAMED_TYPES">NO_CORE_NAMED_TYPES</a></li>
 <li><a href="#ONE_LINE_FLAG_CUTOFF_COUNT">ONE_LINE_FLAG_CUTOFF_COUNT</a></li>
 <li><a href="#RESERVED_HELP_FLAG">RESERVED_HELP_FLAG</a></li>
@@ -1051,11 +1059,11 @@ has to append to a dynamic array, set a map value, or set a cstring.</p>
 <li><a href="#SUBTAG_FILE">SUBTAG_FILE</a></li>
 <li><a href="#SUBTAG_HIDDEN">SUBTAG_HIDDEN</a></li>
 <li><a href="#SUBTAG_INDISTINCT">SUBTAG_INDISTINCT</a></li>
+<li><a href="#SUBTAG_MANIFOLD">SUBTAG_MANIFOLD</a></li>
 <li><a href="#SUBTAG_NAME">SUBTAG_NAME</a></li>
 <li><a href="#SUBTAG_PERMS">SUBTAG_PERMS</a></li>
 <li><a href="#SUBTAG_POS">SUBTAG_POS</a></li>
 <li><a href="#SUBTAG_REQUIRED">SUBTAG_REQUIRED</a></li>
-<li><a href="#SUBTAG_VARIADIC">SUBTAG_VARIADIC</a></li>
 <li><a href="#TAG_ARGS">TAG_ARGS</a></li>
 <li><a href="#TAG_USAGE">TAG_USAGE</a></li>
 <li><a href="#UNDOCUMENTED_FLAG">UNDOCUMENTED_FLAG</a></li>

@@ -188,7 +188,7 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (32)</summary>
+Procedures (36)</summary>
 <ul>
 <li><a href="#address_describe_address">address_describe_address</a></li>
 <li><a href="#address_get_alloc_stack_trace">address_get_alloc_stack_trace</a></li>
@@ -222,17 +222,22 @@ Procedures (32)</summary>
 <li><a href="#address_unpoison_rawptr_uint">address_unpoison_rawptr_uint</a></li>
 <li><a href="#address_unpoison_slice">address_unpoison_slice</a></li>
 <li><a href="#address_update_allocation_context">address_update_allocation_context</a></li>
+<li><a href="#memory_unpoison_ptr">memory_unpoison_ptr</a></li>
+<li><a href="#memory_unpoison_rawptr">memory_unpoison_rawptr</a></li>
+<li><a href="#memory_unpoison_rawptr_uint">memory_unpoison_rawptr_uint</a></li>
+<li><a href="#memory_unpoison_slice">memory_unpoison_slice</a></li>
 </ul>
 </details>
 </div>
 <div>
 <details class="doc-index" id="doc-index-Procedure Groups" aria-labelledby="#doc-index-Procedure Groups-header">
 <summary id="#doc-index-Procedure Groups-header">
-Procedure Groups (3)</summary>
+Procedure Groups (4)</summary>
 <ul>
 <li><a href="#address_poison">address_poison</a></li>
 <li><a href="#address_region_is_poisoned">address_region_is_poisoned</a></li>
 <li><a href="#address_unpoison">address_unpoison</a></li>
+<li><a href="#memory_unpoison">memory_unpoison</a></li>
 </ul>
 </details>
 </div>
@@ -703,6 +708,58 @@ can poison or unpoison memory in the same memory region region simultaneously.</
 <p>When asan is not enabled this procedure returns <code>false</code>.</p>
 </details>
 </div>
+<div class="pkg-entity">
+<h3 id="memory_unpoison_ptr"><span><a class="doc-id-link" href="#memory_unpoison_ptr">memory_unpoison_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/memory.odin#L35"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">memory_unpoison_ptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: ^$T) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Marks a pointer as fully initialized.</p>
+<p>Code instrumented with <code>-sanitize:memory</code> will be permitted to access memory
+within the region the pointer points to as if it had already been initialized.</p>
+<p>When msan is not enabled this procedure does nothing.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="memory_unpoison_rawptr"><span><a class="doc-id-link" href="#memory_unpoison_rawptr">memory_unpoison_rawptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/memory.odin#L49"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">memory_unpoison_rawptr :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Marks the region covering <code>[ptr, ptr+len)</code> as fully initialized.</p>
+<p>Code instrumented with <code>-sanitize:memory</code> will be permitted to access memory
+within this range as if it had already been initialized.</p>
+<p>When msan is not enabled this procedure does nothing.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="memory_unpoison_rawptr_uint"><span><a class="doc-id-link" href="#memory_unpoison_rawptr_uint">memory_unpoison_rawptr_uint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/memory.odin#L63"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">memory_unpoison_rawptr_uint :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Marks the region covering <code>[ptr, ptr+len)</code> as fully initialized.</p>
+<p>Code instrumented with <code>-sanitize:memory</code> will be permitted to access memory
+within this range as if it had already been initialized.</p>
+<p>When msan is not enabled this procedure does nothing.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="memory_unpoison_slice"><span><a class="doc-id-link" href="#memory_unpoison_slice">memory_unpoison_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/memory.odin#L21"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">memory_unpoison_slice :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (region: $T/[]$E) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Marks a slice as fully initialized.</p>
+<p>Code instrumented with <code>-sanitize:memory</code> will be permitted to access any
+address within the slice as if it had already been initialized.</p>
+<p>When msan is not enabled this procedure does nothing.</p>
+</details>
+</div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
 <h3 id="address_poison"><span><a class="doc-id-link" href="#address_poison">address_poison<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin#L185"><em>Source</em></a></div></h3>
@@ -740,14 +797,27 @@ can poison or unpoison memory in the same memory region region simultaneously.</
 </pre>
 </div>
 </div>
+<div class="pkg-entity">
+<h3 id="memory_unpoison"><span><a class="doc-id-link" href="#memory_unpoison">memory_unpoison<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/memory.odin#L69"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">memory_unpoison :: <span class="keyword-type">proc</span>{
+	<a class="code-procedure" href="/base/sanitizer/#memory_unpoison_slice">memory_unpoison_slice</a>,
+	<a class="code-procedure" href="/base/sanitizer/#memory_unpoison_ptr">memory_unpoison_ptr</a>,
+	<a class="code-procedure" href="/base/sanitizer/#memory_unpoison_rawptr">memory_unpoison_rawptr</a>,
+	<a class="code-procedure" href="/base/sanitizer/#memory_unpoison_rawptr_uint">memory_unpoison_rawptr_uint</a>,
+}
+</pre>
+</div>
+</div>
 </section>
 <h2 id="pkg-source-files">Source Files</h2>
 <ul>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/address.odin">address.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/doc.odin">doc.odin</a></li>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/base/sanitizer/memory.odin">memory.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-08 21:11:51.507846100 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-09 21:13:48.634600700 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -792,12 +862,17 @@ can poison or unpoison memory in the same memory region region simultaneously.</
 <li><a href="#address_unpoison_rawptr_uint">address_unpoison_rawptr_uint</a></li>
 <li><a href="#address_unpoison_slice">address_unpoison_slice</a></li>
 <li><a href="#address_update_allocation_context">address_update_allocation_context</a></li>
+<li><a href="#memory_unpoison_ptr">memory_unpoison_ptr</a></li>
+<li><a href="#memory_unpoison_rawptr">memory_unpoison_rawptr</a></li>
+<li><a href="#memory_unpoison_rawptr_uint">memory_unpoison_rawptr_uint</a></li>
+<li><a href="#memory_unpoison_slice">memory_unpoison_slice</a></li>
 </ul>
 </li>
 <li><a href="#pkg-Procedure Groups">Procedure Groups</a><ul>
 <li><a href="#address_poison">address_poison</a></li>
 <li><a href="#address_region_is_poisoned">address_region_is_poisoned</a></li>
 <li><a href="#address_unpoison">address_unpoison</a></li>
+<li><a href="#memory_unpoison">memory_unpoison</a></li>
 </ul>
 </li>
 <li><a href="#pkg-source-files">Source Files</a></ul>
