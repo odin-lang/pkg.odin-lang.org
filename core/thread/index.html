@@ -527,7 +527,8 @@ pool's memory address is not allowed to change until it is destroyed.</p>
 <pre class="doc-code">Thread :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> specific:     Thread_Os_Specific,
 	flags:              <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/core/thread/#Thread_State">Thread_State</a>; <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>],
-	<span class="comment">// Thread ID.</span>
+	<span class="comment">// Thread ID. Depending on the platform, may start out as 0 (zero) until the thread</span>
+	<span class="comment">// has had a chance to run.</span>
 	id:                 <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
 	<span class="comment">// The thread procedure.</span>
 	procedure:          <a class="code-typename" href="/core/thread/#Thread_Proc">Thread_Proc</a>,
@@ -590,7 +591,7 @@ pool's memory address is not allowed to change until it is destroyed.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Thread_Priority"><span><a class="doc-id-link" href="#Thread_Priority">Thread_Priority<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L88"><em>Source</em></a></div></h3>
+<h3 id="Thread_Priority"><span><a class="doc-id-link" href="#Thread_Priority">Thread_Priority<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L89"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Thread_Priority :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
 	Normal, 
@@ -675,7 +676,7 @@ current platform.</p>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="create"><span><a class="doc-id-link" href="#create">create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L104"><em>Source</em></a></div></h3>
+<h3 id="create"><span><a class="doc-id-link" href="#create">create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L105"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create :: <span class="keyword-type">proc</span>(procedure: <a class="code-typename" href="/core/thread/#Thread_Proc">Thread_Proc</a>, priority: <a class="code-typename" href="/core/thread/#Thread_Priority">Thread_Priority</a> = Thread_Priority.Normal) -> ^<a class="code-typename" href="/core/thread/#Thread">Thread</a> {…}</pre>
 </div>
@@ -690,7 +691,7 @@ procedure can be called to create and start the thread immediately.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_and_start"><span><a class="doc-id-link" href="#create_and_start">create_and_start<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L267"><em>Source</em></a></div></h3>
+<h3 id="create_and_start"><span><a class="doc-id-link" href="#create_and_start">create_and_start<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L268"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_and_start :: <span class="keyword-type">proc</span>(fn: <span class="keyword-type">proc</span>(), init_context: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=Context) = nil, priority: <a class="code-typename" href="/core/thread/#Thread_Priority">Thread_Priority</a> = Thread_Priority.Normal, self_cleanup: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = false) -> (t: ^<a class="code-typename" href="/core/thread/#Thread">Thread</a>) {…}</pre>
 </div>
@@ -710,7 +711,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_and_start_with_data"><span><a class="doc-id-link" href="#create_and_start_with_data">create_and_start_with_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L300"><em>Source</em></a></div></h3>
+<h3 id="create_and_start_with_data"><span><a class="doc-id-link" href="#create_and_start_with_data">create_and_start_with_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L301"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_and_start_with_data :: <span class="keyword-type">proc</span>(data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, fn: <span class="keyword-type">proc</span>(data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>), init_context: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=Context) = nil, priority: <a class="code-typename" href="/core/thread/#Thread_Priority">Thread_Priority</a> = Thread_Priority.Normal, self_cleanup: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = false) -> (t: ^<a class="code-typename" href="/core/thread/#Thread">Thread</a>) {…}</pre>
 </div>
@@ -730,7 +731,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_and_start_with_poly_data"><span><a class="doc-id-link" href="#create_and_start_with_poly_data">create_and_start_with_poly_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L337"><em>Source</em></a></div></h3>
+<h3 id="create_and_start_with_poly_data"><span><a class="doc-id-link" href="#create_and_start_with_poly_data">create_and_start_with_poly_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L338"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_and_start_with_poly_data :: <span class="keyword-type">proc</span>(data: $T, fn: <span class="keyword-type">proc</span>(data: $T), init_context: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=Context) = nil, priority: <a class="code-typename" href="/core/thread/#Thread_Priority">Thread_Priority</a> = Thread_Priority.Normal, self_cleanup: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = false) -> (t: ^<a class="code-typename" href="/core/thread/#Thread">Thread</a>) {…}</pre>
 </div>
@@ -750,7 +751,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_and_start_with_poly_data2"><span><a class="doc-id-link" href="#create_and_start_with_poly_data2">create_and_start_with_poly_data2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L380"><em>Source</em></a></div></h3>
+<h3 id="create_and_start_with_poly_data2"><span><a class="doc-id-link" href="#create_and_start_with_poly_data2">create_and_start_with_poly_data2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L381"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_and_start_with_poly_data2 :: <span class="keyword-type">proc</span>(
 	arg1:         $T1, 
@@ -777,7 +778,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_and_start_with_poly_data3"><span><a class="doc-id-link" href="#create_and_start_with_poly_data3">create_and_start_with_poly_data3<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L429"><em>Source</em></a></div></h3>
+<h3 id="create_and_start_with_poly_data3"><span><a class="doc-id-link" href="#create_and_start_with_poly_data3">create_and_start_with_poly_data3<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L430"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_and_start_with_poly_data3 :: <span class="keyword-type">proc</span>(
 	arg1:         $T1, 
@@ -805,7 +806,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_and_start_with_poly_data4"><span><a class="doc-id-link" href="#create_and_start_with_poly_data4">create_and_start_with_poly_data4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L480"><em>Source</em></a></div></h3>
+<h3 id="create_and_start_with_poly_data4"><span><a class="doc-id-link" href="#create_and_start_with_poly_data4">create_and_start_with_poly_data4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L481"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_and_start_with_poly_data4 :: <span class="keyword-type">proc</span>(
 	arg1:         $T1, 
@@ -834,7 +835,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L111"><em>Source</em></a></div></h3>
+<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L112"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy :: <span class="keyword-type">proc</span>(thread: ^<a class="code-typename" href="/core/thread/#Thread">Thread</a>) {…}</pre>
 </div>
@@ -844,7 +845,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="is_done"><span><a class="doc-id-link" href="#is_done">is_done<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L125"><em>Source</em></a></div></h3>
+<h3 id="is_done"><span><a class="doc-id-link" href="#is_done">is_done<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L126"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_done :: <span class="keyword-type">proc</span>(thread: ^<a class="code-typename" href="/core/thread/#Thread">Thread</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -854,7 +855,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="join"><span><a class="doc-id-link" href="#join">join<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L132"><em>Source</em></a></div></h3>
+<h3 id="join"><span><a class="doc-id-link" href="#join">join<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L133"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">join :: <span class="keyword-type">proc</span>(thread: ^<a class="code-typename" href="/core/thread/#Thread">Thread</a>) {…}</pre>
 </div>
@@ -864,7 +865,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="join_multiple"><span><a class="doc-id-link" href="#join_multiple">join_multiple<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L139"><em>Source</em></a></div></h3>
+<h3 id="join_multiple"><span><a class="doc-id-link" href="#join_multiple">join_multiple<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L140"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">join_multiple :: <span class="keyword-type">proc</span>(<span class="keyword-type">..</span> threads: ..^<a class="code-typename" href="/core/thread/#Thread">Thread</a>) {…}</pre>
 </div>
@@ -1065,7 +1066,7 @@ resources unclaimed.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="run"><span><a class="doc-id-link" href="#run">run<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L168"><em>Source</em></a></div></h3>
+<h3 id="run"><span><a class="doc-id-link" href="#run">run<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L169"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">run :: <span class="keyword-type">proc</span>(fn: <span class="keyword-type">proc</span>(), init_context: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=Context) = nil, priority: <a class="code-typename" href="/core/thread/#Thread_Priority">Thread_Priority</a> = Thread_Priority.Normal) {…}</pre>
 </div>
@@ -1081,7 +1082,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="run_with_data"><span><a class="doc-id-link" href="#run_with_data">run_with_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L183"><em>Source</em></a></div></h3>
+<h3 id="run_with_data"><span><a class="doc-id-link" href="#run_with_data">run_with_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L184"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">run_with_data :: <span class="keyword-type">proc</span>(data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, fn: <span class="keyword-type">proc</span>(data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>), init_context: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=Context) = nil, priority: <a class="code-typename" href="/core/thread/#Thread_Priority">Thread_Priority</a> = Thread_Priority.Normal) {…}</pre>
 </div>
@@ -1097,7 +1098,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="run_with_poly_data"><span><a class="doc-id-link" href="#run_with_poly_data">run_with_poly_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L198"><em>Source</em></a></div></h3>
+<h3 id="run_with_poly_data"><span><a class="doc-id-link" href="#run_with_poly_data">run_with_poly_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L199"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">run_with_poly_data :: <span class="keyword-type">proc</span>(data: $T, fn: <span class="keyword-type">proc</span>(data: $T), init_context: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=Context) = nil, priority: <a class="code-typename" href="/core/thread/#Thread_Priority">Thread_Priority</a> = Thread_Priority.Normal) {…}</pre>
 </div>
@@ -1113,7 +1114,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="run_with_poly_data2"><span><a class="doc-id-link" href="#run_with_poly_data2">run_with_poly_data2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L214"><em>Source</em></a></div></h3>
+<h3 id="run_with_poly_data2"><span><a class="doc-id-link" href="#run_with_poly_data2">run_with_poly_data2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L215"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">run_with_poly_data2 :: <span class="keyword-type">proc</span>(arg1: $T1, arg2: $T2, fn: <span class="keyword-type">proc</span>($T1, $T2), init_context: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=Context) = nil, priority: <a class="code-typename" href="/core/thread/#Thread_Priority">Thread_Priority</a> = Thread_Priority.Normal) {…}</pre>
 </div>
@@ -1129,7 +1130,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="run_with_poly_data3"><span><a class="doc-id-link" href="#run_with_poly_data3">run_with_poly_data3<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L230"><em>Source</em></a></div></h3>
+<h3 id="run_with_poly_data3"><span><a class="doc-id-link" href="#run_with_poly_data3">run_with_poly_data3<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L231"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">run_with_poly_data3 :: <span class="keyword-type">proc</span>(
 	arg1:         $T1, 
@@ -1152,7 +1153,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="run_with_poly_data4"><span><a class="doc-id-link" href="#run_with_poly_data4">run_with_poly_data4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L246"><em>Source</em></a></div></h3>
+<h3 id="run_with_poly_data4"><span><a class="doc-id-link" href="#run_with_poly_data4">run_with_poly_data4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L247"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">run_with_poly_data4 :: <span class="keyword-type">proc</span>(
 	arg1:         $T1, 
@@ -1176,7 +1177,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="start"><span><a class="doc-id-link" href="#start">start<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L118"><em>Source</em></a></div></h3>
+<h3 id="start"><span><a class="doc-id-link" href="#start">start<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L119"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">start :: <span class="keyword-type">proc</span>(thread: ^<a class="code-typename" href="/core/thread/#Thread">Thread</a>) {…}</pre>
 </div>
@@ -1186,7 +1187,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="terminate"><span><a class="doc-id-link" href="#terminate">terminate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L146"><em>Source</em></a></div></h3>
+<h3 id="terminate"><span><a class="doc-id-link" href="#terminate">terminate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L147"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">terminate :: <span class="keyword-type">proc</span>(thread: ^<a class="code-typename" href="/core/thread/#Thread">Thread</a>, exit_code: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
@@ -1196,7 +1197,7 @@ in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="yield"><span><a class="doc-id-link" href="#yield">yield<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L153"><em>Source</em></a></div></h3>
+<h3 id="yield"><span><a class="doc-id-link" href="#yield">yield<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L154"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">yield :: <span class="keyword-type">proc</span>() {…}</pre>
 </div>
@@ -1215,7 +1216,7 @@ in order to free the resources associated with the temporary allocations.</p>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-11 21:13:39.568474700 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-12 21:13:40.489949200 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

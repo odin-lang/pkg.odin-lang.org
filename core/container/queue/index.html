@@ -375,7 +375,7 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (29)</summary>
+Procedures (32)</summary>
 <ul>
 <li><a href="#append_elem">append_elem</a></li>
 <li><a href="#append_elems">append_elems</a></li>
@@ -385,7 +385,9 @@ Procedures (29)</summary>
 <li><a href="#clear">clear</a></li>
 <li><a href="#consume_back">consume_back</a></li>
 <li><a href="#consume_front">consume_front</a></li>
+<li><a href="#dequeue">dequeue</a></li>
 <li><a href="#destroy">destroy</a></li>
+<li><a href="#enqueue">enqueue</a></li>
 <li><a href="#front">front</a></li>
 <li><a href="#front_ptr">front_ptr</a></li>
 <li><a href="#get">get</a></li>
@@ -405,6 +407,7 @@ Procedures (29)</summary>
 <li><a href="#push_front">push_front</a></li>
 <li><a href="#reserve">reserve</a></li>
 <li><a href="#set">set</a></li>
+<li><a href="#shrink">shrink</a></li>
 <li><a href="#space">space</a></li>
 </ul>
 </details>
@@ -424,7 +427,7 @@ Procedure Groups (2)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Queue"><span><a class="doc-id-link" href="#Queue">Queue<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L8"><em>Source</em></a></div></h3>
+<h3 id="Queue"><span><a class="doc-id-link" href="#Queue">Queue<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L14"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Queue :: <span class="keyword-type">struct</span>($T: <span class="keyword-type">typeid</span>) {
 	<span class="comment">… // See source for fields</span>
@@ -432,7 +435,10 @@ Procedure Groups (2)</summary>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Dynamically resizable double-ended queue/ring-buffer</p>
+<p><code>Queue</code> is a dynamically resizable double-ended queue/ring-buffer.</p>
+<p>Being double-ended means that either end may be pushed onto or popped from
+across the same block of memory, in any order, thus providing both stack and
+queue-like behaviors in the same data structure.</p>
 </details>
 <h5>Related Procedures With Parameters</h5>
 <ul>
@@ -462,6 +468,7 @@ Procedure Groups (2)</summary>
 <li><a href="/core/container/queue/#push_front">push_front</a></li>
 <li><a href="/core/container/queue/#reserve">reserve</a></li>
 <li><a href="/core/container/queue/#set">set</a></li>
+<li><a href="/core/container/queue/#shrink">shrink</a></li>
 <li><a href="/core/container/queue/#space">space</a></li>
 <li><a href="/core/container/queue/#append">append</a>&nbsp;<em>(procedure groups)</em></li>
 <li><a href="/core/container/queue/#push">push</a>&nbsp;<em>(procedure groups)</em></li>
@@ -469,7 +476,7 @@ Procedure Groups (2)</summary>
 </div>
 <h2 id="pkg-Constants" class="pkg-header">Constants</h2>
 <div class="pkg-entity">
-<h3 id="DEFAULT_CAPACITY"><span><a class="doc-id-link" href="#DEFAULT_CAPACITY">DEFAULT_CAPACITY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L14"><em>Source</em></a></div></h3>
+<h3 id="DEFAULT_CAPACITY"><span><a class="doc-id-link" href="#DEFAULT_CAPACITY">DEFAULT_CAPACITY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L20"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DEFAULT_CAPACITY: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 16</pre>
 </div>
@@ -478,265 +485,459 @@ Procedure Groups (2)</summary>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="append_elem"><span><a class="doc-id-link" href="#append_elem">append_elem<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L131"><em>Source</em></a></div></h3>
+<h3 id="append_elem"><span><a class="doc-id-link" href="#append_elem">append_elem<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L272"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_elem :: <a class="code-procedure" href="/core/container/queue/#push_back">push_back</a></pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Push an element to the back of the queue</p>
+<p>Push an element to the back of the queue.</p>
+<p>If there is no more space left and allocation fails to get more, this will
+return false with an <code>Allocator_Error</code>.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "base:runtime"
+import "core:container/queue"
+
+// This demonstrates typical queue behavior (First-In First-Out).
+main :: proc() {
+	q: queue.Queue(int)
+	queue.init(&q)
+	queue.push_back(&q, 1)
+	queue.push_back(&q, 2)
+	queue.push_back(&q, 3)
+	// q.data is now [1, 2, 3, ...]
+	assert(queue.pop_front(&q) == 1)
+	assert(queue.pop_front(&q) == 2)
+	assert(queue.pop_front(&q) == 3)
+}
+</code></pre>
+</details>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="append_elems"><span><a class="doc-id-link" href="#append_elems">append_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L192"><em>Source</em></a></div></h3>
+<h3 id="append_elems"><span><a class="doc-id-link" href="#append_elems">append_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L399"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_elems :: <a class="code-procedure" href="/core/container/queue/#push_back_elems">push_back_elems</a></pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Push multiple elements to the back of the queue</p>
+<p>Push many elements at once to the back of the queue.</p>
+<p>If there is not enough space left and allocation fails to get more, this will
+return false with an <code>Allocator_Error</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="back"><span><a class="doc-id-link" href="#back">back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L96"><em>Source</em></a></div></h3>
+<h3 id="back"><span><a class="doc-id-link" href="#back">back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L216"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">back :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T)) -> $T {…}</pre>
+<pre class="doc-code">back :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> $T {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Get the element at the back of the queue.</p>
+<p>This will raise a bounds checking error if the queue is empty.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="back_ptr"><span><a class="doc-id-link" href="#back_ptr">back_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L100"><em>Source</em></a></div></h3>
+<h3 id="back_ptr"><span><a class="doc-id-link" href="#back_ptr">back_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L229"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">back_ptr :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T)) -> ^$T {…}</pre>
+<pre class="doc-code">back_ptr :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ^$T {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Get a pointer to the element at the back of the queue.</p>
+<p>This will raise a bounds checking error if the queue is empty.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="cap"><span><a class="doc-id-link" href="#cap">cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L64"><em>Source</em></a></div></h3>
+<h3 id="cap"><span><a class="doc-id-link" href="#cap">cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L99"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">cap :: <span class="keyword-type">proc</span>(q: $Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T)) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>The current capacity of the queue</p>
+<p>Return the capacity of the queue.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="clear"><span><a class="doc-id-link" href="#clear">clear<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L237"><em>Source</em></a></div></h3>
+<h3 id="clear"><span><a class="doc-id-link" href="#clear">clear<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L461"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">clear :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T)) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Clear the contents of the queue</p>
+<p>Reset the queue's length and offset to zero, letting it write new elements over
+old memory, in effect clearing the accessible contents.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="consume_back"><span><a class="doc-id-link" href="#consume_back">consume_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L221"><em>Source</em></a></div></h3>
+<h3 id="consume_back"><span><a class="doc-id-link" href="#consume_back">consume_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L438"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">consume_back :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Consume <code>n</code> elements from the back of the queue</p>
+<p>Consume <code>n</code> elements from the back of the queue.</p>
+<p>This will raise a bounds checking error if the queue does not have enough elements.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="consume_front"><span><a class="doc-id-link" href="#consume_front">consume_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L211"><em>Source</em></a></div></h3>
+<h3 id="consume_front"><span><a class="doc-id-link" href="#consume_front">consume_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L422"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">consume_front :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Consume <code>n</code> elements from the front of the queue</p>
+<p>Consume <code>n</code> elements from the back of the queue.</p>
+<p>This will raise a bounds checking error if the queue does not have enough elements.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L54"><em>Source</em></a></div></h3>
+<h3 id="dequeue"><span><a class="doc-id-link" href="#dequeue">dequeue<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L369"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">dequeue :: <a class="code-procedure" href="/core/container/queue/#pop_front">pop_front</a></pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Pop an element from the front of the queue</p>
+<p>This will raise a bounds checking error if the queue is empty.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L85"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T)) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Procedure to destroy a queue</p>
+<p>Delete memory that has been dynamically allocated from a <code>Queue</code> that was setup with <code>init</code>.</p>
+<p>Note that this procedure should not be used on queues setup with
+<code>init_from_slice</code> or <code>init_with_contents</code>, as neither of those procedures keep
+track of the allocator state of the underlying <code>backing</code> slice.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="front"><span><a class="doc-id-link" href="#front">front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L89"><em>Source</em></a></div></h3>
+<h3 id="enqueue"><span><a class="doc-id-link" href="#enqueue">enqueue<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L272"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">front :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T)) -> $T {…}</pre>
+<pre class="doc-code">enqueue :: <a class="code-procedure" href="/core/container/queue/#push_back">push_back</a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Push an element to the back of the queue.</p>
+<p>If there is no more space left and allocation fails to get more, this will
+return false with an <code>Allocator_Error</code>.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "base:runtime"
+import "core:container/queue"
+
+// This demonstrates typical queue behavior (First-In First-Out).
+main :: proc() {
+	q: queue.Queue(int)
+	queue.init(&q)
+	queue.push_back(&q, 1)
+	queue.push_back(&q, 2)
+	queue.push_back(&q, 3)
+	// q.data is now [1, 2, 3, ...]
+	assert(queue.pop_front(&q) == 1)
+	assert(queue.pop_front(&q) == 2)
+	assert(queue.pop_front(&q) == 3)
+}
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="front_ptr"><span><a class="doc-id-link" href="#front_ptr">front_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L92"><em>Source</em></a></div></h3>
+<h3 id="front"><span><a class="doc-id-link" href="#front">front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L192"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">front_ptr :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T)) -> ^$T {…}</pre>
+<pre class="doc-code">front :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> $T {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Get the element at the front of the queue.</p>
+<p>This will raise a bounds checking error if the queue is empty.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="get"><span><a class="doc-id-link" href="#get">get<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L82"><em>Source</em></a></div></h3>
+<h3 id="front_ptr"><span><a class="doc-id-link" href="#front_ptr">front_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L204"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">front_ptr :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ^$T {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Get a pointer to the element at the front of the queue.</p>
+<p>This will raise a bounds checking error if the queue is empty.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="get"><span><a class="doc-id-link" href="#get">get<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L156"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">get :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), <span class="keyword-type">#any_int</span> i: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> $T {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Get the element at index <code>i</code>.</p>
+<p>This will raise a bounds checking error if <code>i</code> is an invalid index.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="get_ptr"><span><a class="doc-id-link" href="#get_ptr">get_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L111"><em>Source</em></a></div></h3>
+<h3 id="get_ptr"><span><a class="doc-id-link" href="#get_ptr">get_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L168"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">get_ptr :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), <span class="keyword-type">#any_int</span> i: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ^$T {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Get a pointer to the element at index <code>i</code>.</p>
+<p>This will raise a bounds checking error if <code>i</code> is an invalid index.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="init"><span><a class="doc-id-link" href="#init">init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L17"><em>Source</em></a></div></h3>
+<h3 id="init"><span><a class="doc-id-link" href="#init">init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L25"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">init :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_CAPACITY, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Procedure to initialize a queue</p>
+<p>Initialize a <code>Queue</code> with a starting <code>capacity</code> and an <code>allocator</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="init_from_slice"><span><a class="doc-id-link" href="#init_from_slice">init_from_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L28"><em>Source</em></a></div></h3>
+<h3 id="init_from_slice"><span><a class="doc-id-link" href="#init_from_slice">init_from_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L47"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">init_from_slice :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), backing: []$T) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Procedure to initialize a queue from a fixed backing slice.
-The contents of the <code>backing</code> will be overwritten as items are pushed onto the <code>Queue</code>.
-Any previous contents are not available.</p>
+<p>Initialize a <code>Queue</code> from a fixed <code>backing</code> slice into which modifications are
+made directly.</p>
+<p>The contents of the <code>backing</code> will be overwritten as items are pushed onto the
+<code>Queue</code>. Any previous contents will not be available through the API but are
+not explicitly zeroed either.</p>
+<p>Note that procedures which need space to work (<code>push_back</code>, ...) will fail if
+the backing slice runs out of space.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="init_with_contents"><span><a class="doc-id-link" href="#init_with_contents">init_with_contents<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L41"><em>Source</em></a></div></h3>
+<h3 id="init_with_contents"><span><a class="doc-id-link" href="#init_with_contents">init_with_contents<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L66"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">init_with_contents :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), backing: []$T) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Procedure to initialize a queue from a fixed backing slice.
-Existing contents are preserved and available on the queue.</p>
+<p>Initialize a <code>Queue</code> from a fixed <code>backing</code> slice into which modifications are
+made directly.</p>
+<p>The contents of the queue will start out with all of the elements in <code>backing</code>,
+effectively creating a full queue from the slice. As such, no procedures will
+be able to add more elements to the queue until some are taken off.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="len"><span><a class="doc-id-link" href="#len">len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L59"><em>Source</em></a></div></h3>
+<h3 id="len"><span><a class="doc-id-link" href="#len">len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L92"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">len :: <span class="keyword-type">proc</span>(q: $Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T)) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>The length of the queue</p>
+<p>Return the length of the queue.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="peek_back"><span><a class="doc-id-link" href="#peek_back">peek_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L124"><em>Source</em></a></div></h3>
+<h3 id="peek_back"><span><a class="doc-id-link" href="#peek_back">peek_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L244"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">peek_back :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ^$T {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="peek_front"><span><a class="doc-id-link" href="#peek_front">peek_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L118"><em>Source</em></a></div></h3>
+<h3 id="peek_front"><span><a class="doc-id-link" href="#peek_front">peek_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L239"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">peek_front :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ^$T {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="pop_back"><span><a class="doc-id-link" href="#pop_back">pop_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L154"><em>Source</em></a></div></h3>
+<h3 id="pop_back"><span><a class="doc-id-link" href="#pop_back">pop_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L340"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pop_back :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (elem: $T) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Pop an element from the back of the queue</p>
+<p>Pop an element from the back of the queue.</p>
+<p>This will raise a bounds checking error if the queue is empty.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "base:runtime"
+import "core:container/queue"
+
+// This demonstrates stack behavior (First-In Last-Out) at the far end of the data array.
+main :: proc() {
+	q: queue.Queue(int)
+	queue.init(&q)
+	queue.push_front(&q, 1)
+	queue.push_front(&q, 2)
+	queue.push_front(&q, 3)
+	// q.data is now [..., 3, 2, 1]
+	log.infof("%#v", q)
+	assert(queue.pop_front(&q) == 3)
+	assert(queue.pop_front(&q) == 2)
+	assert(queue.pop_front(&q) == 1)
+}
+</code></pre>
+</details>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="pop_back_safe"><span><a class="doc-id-link" href="#pop_back_safe">pop_back_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L162"><em>Source</em></a></div></h3>
+<h3 id="pop_back_safe"><span><a class="doc-id-link" href="#pop_back_safe">pop_back_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L354"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pop_back_safe :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T)) -> (elem: $T, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Safely pop an element from the back of the queue</p>
+<p>Pop an element from the back of the queue if one exists and return true.
+Otherwise, return a nil element and false.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="pop_front"><span><a class="doc-id-link" href="#pop_front">pop_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L173"><em>Source</em></a></div></h3>
+<h3 id="pop_front"><span><a class="doc-id-link" href="#pop_front">pop_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L369"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pop_front :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (elem: $T) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Pop an element from the front of the queue</p>
+<p>This will raise a bounds checking error if the queue is empty.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="pop_front_safe"><span><a class="doc-id-link" href="#pop_front_safe">pop_front_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L181"><em>Source</em></a></div></h3>
+<h3 id="pop_front_safe"><span><a class="doc-id-link" href="#pop_front_safe">pop_front_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L383"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pop_front_safe :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T)) -> (elem: $T, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Safely pop an element from the front of the queue</p>
+<p>Pop an element from the front of the queue if one exists and return true.
+Otherwise, return a nil element and false.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="push_back"><span><a class="doc-id-link" href="#push_back">push_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L131"><em>Source</em></a></div></h3>
+<h3 id="push_back"><span><a class="doc-id-link" href="#push_back">push_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L272"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">push_back :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), elem: $T) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Push an element to the back of the queue</p>
+<p>Push an element to the back of the queue.</p>
+<p>If there is no more space left and allocation fails to get more, this will
+return false with an <code>Allocator_Error</code>.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "base:runtime"
+import "core:container/queue"
+
+// This demonstrates typical queue behavior (First-In First-Out).
+main :: proc() {
+	q: queue.Queue(int)
+	queue.init(&q)
+	queue.push_back(&q, 1)
+	queue.push_back(&q, 2)
+	queue.push_back(&q, 3)
+	// q.data is now [1, 2, 3, ...]
+	assert(queue.pop_front(&q) == 1)
+	assert(queue.pop_front(&q) == 2)
+	assert(queue.pop_front(&q) == 3)
+}
+</code></pre>
+</details>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="push_back_elems"><span><a class="doc-id-link" href="#push_back_elems">push_back_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L192"><em>Source</em></a></div></h3>
+<h3 id="push_back_elems"><span><a class="doc-id-link" href="#push_back_elems">push_back_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L399"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">push_back_elems :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), <span class="keyword-type">..</span> elems: ..$T) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Push multiple elements to the back of the queue</p>
+<p>Push many elements at once to the back of the queue.</p>
+<p>If there is not enough space left and allocation fails to get more, this will
+return false with an <code>Allocator_Error</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="push_front"><span><a class="doc-id-link" href="#push_front">push_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L142"><em>Source</em></a></div></h3>
+<h3 id="push_front"><span><a class="doc-id-link" href="#push_front">push_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L306"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">push_front :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), elem: $T) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Push an element to the front of the queue</p>
+<p>Push an element to the front of the queue.</p>
+<p>If there is no more space left and allocation fails to get more, this will
+return false with an <code>Allocator_Error</code>.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "base:runtime"
+import "core:container/queue"
+
+// This demonstrates stack behavior (First-In Last-Out).
+main :: proc() {
+	q: queue.Queue(int)
+	queue.init(&q)
+	queue.push_back(&q, 1)
+	queue.push_back(&q, 2)
+	queue.push_back(&q, 3)
+	// q.data is now [1, 2, 3, ...]
+	assert(queue.pop_back(&q) == 3)
+	assert(queue.pop_back(&q) == 2)
+	assert(queue.pop_back(&q) == 1)
+}
+</code></pre>
+</details>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="reserve"><span><a class="doc-id-link" href="#reserve">reserve<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L74"><em>Source</em></a></div></h3>
+<h3 id="reserve"><span><a class="doc-id-link" href="#reserve">reserve<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L117"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">reserve :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Reserve enough space for at least the specified capacity</p>
+<p>Reserve enough space in the queue for at least the specified capacity.</p>
+<p>This may return an error if allocation failed.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="set"><span><a class="doc-id-link" href="#set">set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L105"><em>Source</em></a></div></h3>
+<h3 id="set"><span><a class="doc-id-link" href="#set">set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L180"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">set :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), <span class="keyword-type">#any_int</span> i: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, val: $T, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Set the element at index <code>i</code> to <code>val</code>.</p>
+<p>This will raise a bounds checking error if <code>i</code> is an invalid index.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="space"><span><a class="doc-id-link" href="#space">space<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L69"><em>Source</em></a></div></h3>
+<h3 id="shrink"><span><a class="doc-id-link" href="#shrink">shrink<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L129"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">shrink :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), temp_allocator := <a href="/base/runtime/#Context">context.temp_allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Shrink a queue's dynamically allocated array.</p>
+<p>This has no effect if the queue was initialized with a backing slice.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="space"><span><a class="doc-id-link" href="#space">space<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L108"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">space :: <span class="keyword-type">proc</span>(q: $Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T)) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Remaining space in the queue (cap-len)</p>
+<p>Return the remaining space in the queue.</p>
+<p>This will be <code>cap() - len()</code>.</p>
 </details>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="append"><span><a class="doc-id-link" href="#append">append<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L233"><em>Source</em></a></div></h3>
+<h3 id="append"><span><a class="doc-id-link" href="#append">append<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L452"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/container/queue/#push_back">push_back</a>,
@@ -746,7 +947,7 @@ Existing contents are preserved and available on the queue.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="push"><span><a class="doc-id-link" href="#push">push<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L232"><em>Source</em></a></div></h3>
+<h3 id="push"><span><a class="doc-id-link" href="#push">push<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L451"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">push :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/container/queue/#push_back">push_back</a>,
@@ -761,7 +962,7 @@ Existing contents are preserved and available on the queue.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin">queue.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-11 21:13:37.710304900 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-12 21:13:38.674817300 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -783,7 +984,9 @@ Existing contents are preserved and available on the queue.</p>
 <li><a href="#clear">clear</a></li>
 <li><a href="#consume_back">consume_back</a></li>
 <li><a href="#consume_front">consume_front</a></li>
+<li><a href="#dequeue">dequeue</a></li>
 <li><a href="#destroy">destroy</a></li>
+<li><a href="#enqueue">enqueue</a></li>
 <li><a href="#front">front</a></li>
 <li><a href="#front_ptr">front_ptr</a></li>
 <li><a href="#get">get</a></li>
@@ -803,6 +1006,7 @@ Existing contents are preserved and available on the queue.</p>
 <li><a href="#push_front">push_front</a></li>
 <li><a href="#reserve">reserve</a></li>
 <li><a href="#set">set</a></li>
+<li><a href="#shrink">shrink</a></li>
 <li><a href="#space">space</a></li>
 </ul>
 </li>
