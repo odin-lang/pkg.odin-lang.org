@@ -440,7 +440,7 @@ Variables (4)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (73)</summary>
+Procedures (75)</summary>
 <ul>
 <li><a href="#change_directory">change_directory</a></li>
 <li><a href="#clear_env">clear_env</a></li>
@@ -458,7 +458,8 @@ Procedures (73)</summary>
 <li><a href="#fstat">fstat</a></li>
 <li><a href="#ftruncate">ftruncate</a></li>
 <li><a href="#get_current_directory">get_current_directory</a></li>
-<li><a href="#get_env">get_env</a></li>
+<li><a href="#get_env_alloc">get_env_alloc</a></li>
+<li><a href="#get_env_buf">get_env_buf</a></li>
 <li><a href="#get_last_error">get_last_error</a></li>
 <li><a href="#get_page_size">get_page_size</a></li>
 <li><a href="#get_std_handle">get_std_handle</a></li>
@@ -477,7 +478,8 @@ Procedures (73)</summary>
 <li><a href="#last_write_time">last_write_time</a></li>
 <li><a href="#last_write_time_by_name">last_write_time_by_name</a></li>
 <li><a href="#link">link</a></li>
-<li><a href="#lookup_env">lookup_env</a></li>
+<li><a href="#lookup_env_alloc">lookup_env_alloc</a></li>
+<li><a href="#lookup_env_buffer">lookup_env_buffer</a></li>
 <li><a href="#lstat">lstat</a></li>
 <li><a href="#make_directory">make_directory</a></li>
 <li><a href="#open">open</a></li>
@@ -521,8 +523,10 @@ Procedures (73)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedure Groups" aria-labelledby="#doc-index-Procedure Groups-header">
 <summary id="#doc-index-Procedure Groups-header">
-Procedure Groups (2)</summary>
+Procedure Groups (4)</summary>
 <ul>
+<li><a href="#get_env">get_env</a></li>
+<li><a href="#lookup_env">lookup_env</a></li>
 <li><a href="#read_entire_file">read_entire_file</a></li>
 <li><a href="#read_entire_file_or_err">read_entire_file_or_err</a></li>
 </ul>
@@ -533,7 +537,7 @@ Procedure Groups (2)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Errno"><span><a class="doc-id-link" href="#Errno">Errno<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/errors.odin#L41"><em>Source</em></a></div></h3>
+<h3 id="Errno"><span><a class="doc-id-link" href="#Errno">Errno<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/errors.odin#L44"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Errno :: <a class="code-typename" href="/core/os/#Error">Error</a></pre>
 </div>
@@ -547,7 +551,7 @@ Procedure Groups (2)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Error"><span><a class="doc-id-link" href="#Error">Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/errors.odin#L43"><em>Source</em></a></div></h3>
+<h3 id="Error"><span><a class="doc-id-link" href="#Error">Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/errors.odin#L46"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Error :: <span class="keyword-type">union</span> {
 	<a class="code-typename" href="/core/os/#General_Error">General_Error</a>, 
@@ -573,6 +577,7 @@ Procedure Groups (2)</summary>
 <li><a href="/core/os/#last_write_time">last_write_time</a></li>
 <li><a href="/core/os/#last_write_time_by_name">last_write_time_by_name</a></li>
 <li><a href="/core/os/#link">link</a></li>
+<li><a href="/core/os/#lookup_env_buffer">lookup_env_buffer</a></li>
 <li><a href="/core/os/#lstat">lstat</a></li>
 <li><a href="/core/os/#make_directory">make_directory</a></li>
 <li><a href="/core/os/#open">open</a></li>
@@ -603,6 +608,7 @@ Procedure Groups (2)</summary>
 <li><a href="/core/os/#write_ptr">write_ptr</a></li>
 <li><a href="/core/os/#write_rune">write_rune</a></li>
 <li><a href="/core/os/#write_string">write_string</a></li>
+<li><a href="/core/os/#lookup_env">lookup_env</a>&nbsp;<em>(procedure groups)</em></li>
 <li><a href="/core/os/#read_entire_file_or_err">read_entire_file_or_err</a>&nbsp;<em>(procedure groups)</em></li>
 </ul>
 <h5>Related Constants</h5>
@@ -684,6 +690,8 @@ Procedure Groups (2)</summary>
 	Unsupported, 
 	File_Is_Pipe, 
 	Not_Dir, 
+	<span class="comment">// Environment variable not found.</span>
+	Env_Var_Not_Found, 
 }</pre>
 </div>
 <h5>Related Constants</h5>
@@ -822,7 +830,7 @@ Procedure Groups (2)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ERROR_EOF"><span><a class="doc-id-link" href="#ERROR_EOF">ERROR_EOF<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/errors.odin#L53"><em>Source</em></a></div></h3>
+<h3 id="ERROR_EOF"><span><a class="doc-id-link" href="#ERROR_EOF">ERROR_EOF<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/errors.odin#L56"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ERROR_EOF: io.<a class="code-typename" href="/core/io/#Error">Error</a> : io.Error.EOF</pre>
 </div>
@@ -906,7 +914,7 @@ Procedure Groups (2)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ERROR_NONE"><span><a class="doc-id-link" href="#ERROR_NONE">ERROR_NONE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/errors.odin#L51"><em>Source</em></a></div></h3>
+<h3 id="ERROR_NONE"><span><a class="doc-id-link" href="#ERROR_NONE">ERROR_NONE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/errors.odin#L54"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ERROR_NONE :: Error{}</pre>
 </div>
@@ -1156,7 +1164,7 @@ TODO: Narrow down this range once Win 11 is published and the last Win 10 builds
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="clear_env"><span><a class="doc-id-link" href="#clear_env">clear_env<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L92"><em>Source</em></a></div></h3>
+<h3 id="clear_env"><span><a class="doc-id-link" href="#clear_env">clear_env<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L129"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">clear_env :: <span class="keyword-type">proc</span>() {…}</pre>
 </div>
@@ -1178,7 +1186,7 @@ TODO: Narrow down this range once Win 11 is published and the last Win 10 builds
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="environ"><span><a class="doc-id-link" href="#environ">environ<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L66"><em>Source</em></a></div></h3>
+<h3 id="environ"><span><a class="doc-id-link" href="#environ">environ<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L103"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">environ :: <span class="keyword-type">proc</span>(allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> []<a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
@@ -1189,7 +1197,7 @@ NOTE: the slice of strings and the strings with be allocated using the supplied 
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="error_string"><span><a class="doc-id-link" href="#error_string">error_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/errors.odin#L62"><em>Source</em></a></div></h3>
+<h3 id="error_string"><span><a class="doc-id-link" href="#error_string">error_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/errors.odin#L65"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">error_string :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ferr: <a class="code-typename" href="/core/os/#Error">Error</a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
@@ -1255,9 +1263,9 @@ NOTE: the slice of strings and the strings with be allocated using the supplied 
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="get_env"><span><a class="doc-id-link" href="#get_env">get_env<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L38"><em>Source</em></a></div></h3>
+<h3 id="get_env_alloc"><span><a class="doc-id-link" href="#get_env_alloc">get_env_alloc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L67"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">get_env :: <span class="keyword-type">proc</span>(key: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (value: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
+<pre class="doc-code">get_env_alloc :: <span class="keyword-type">proc</span>(key: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (value: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1266,6 +1274,12 @@ It returns the value, which will be empty if the variable is not present
 To distinguish between an empty value and an unset value, use lookup_env
 NOTE: the value will be allocated with the supplied allocator</p>
 </details>
+</div>
+<div class="pkg-entity">
+<h3 id="get_env_buf"><span><a class="doc-id-link" href="#get_env_buf">get_env_buf<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L73"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">get_env_buf :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, key: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> (value: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
+</div>
 </div>
 <div class="pkg-entity">
 <h3 id="get_last_error"><span><a class="doc-id-link" href="#get_last_error">get_last_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os_windows.odin#L63"><em>Source</em></a></div></h3>
@@ -1310,7 +1324,7 @@ NOTE: the value will be allocated with the supplied allocator</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="is_platform_error"><span><a class="doc-id-link" href="#is_platform_error">is_platform_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/errors.odin#L56"><em>Source</em></a></div></h3>
+<h3 id="is_platform_error"><span><a class="doc-id-link" href="#is_platform_error">is_platform_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/errors.odin#L59"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_platform_error :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ferr: <a class="code-typename" href="/core/os/#Error">Error</a>) -> (err: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1376,9 +1390,9 @@ NOTE: the value will be allocated with the supplied allocator</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="lookup_env"><span><a class="doc-id-link" href="#lookup_env">lookup_env<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L11"><em>Source</em></a></div></h3>
+<h3 id="lookup_env_alloc"><span><a class="doc-id-link" href="#lookup_env_alloc">lookup_env_alloc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L11"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">lookup_env :: <span class="keyword-type">proc</span>(key: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (value: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, found: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+<pre class="doc-code">lookup_env_alloc :: <span class="keyword-type">proc</span>(key: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (value: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, found: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1386,6 +1400,18 @@ NOTE: the value will be allocated with the supplied allocator</p>
 If the variable is found in the environment the value (which can be empty) is returned and the boolean is true
 Otherwise the returned value will be empty and the boolean will be false
 NOTE: the value will be allocated with the supplied allocator</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="lookup_env_buffer"><span><a class="doc-id-link" href="#lookup_env_buffer">lookup_env_buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L36"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">lookup_env_buffer :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, key: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> (value: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, err: <a class="code-typename" href="/core/os/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>This version of <code>lookup_env</code> doesn't allocate and instead requires the user to provide a buffer.
+Note that it is limited to environment names and values of 512 utf-16 values each
+due to the necessary utf-8 &lt;&gt; utf-16 conversion.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1413,7 +1439,7 @@ NOTE: the value will be allocated with the supplied allocator</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="print_error"><span><a class="doc-id-link" href="#print_error">print_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/errors.odin#L119"><em>Source</em></a></div></h3>
+<h3 id="print_error"><span><a class="doc-id-link" href="#print_error">print_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/errors.odin#L123"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">print_error :: <span class="keyword-type">proc</span>(f: <a class="code-typename" href="/core/os/#Handle">Handle</a>, ferr: <a class="code-typename" href="/core/os/#Error">Error</a>, msg: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/os/#Error">Error</a>) {…}</pre>
 </div>
@@ -1529,7 +1555,7 @@ NOTE: the value will be allocated with the supplied allocator</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="set_env"><span><a class="doc-id-link" href="#set_env">set_env<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L44"><em>Source</em></a></div></h3>
+<h3 id="set_env"><span><a class="doc-id-link" href="#set_env">set_env<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L81"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">set_env :: <span class="keyword-type">proc</span>(key, value: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> <a class="code-typename" href="/core/os/#Error">Error</a> {…}</pre>
 </div>
@@ -1563,7 +1589,7 @@ NOTE: the value will be allocated with the supplied allocator</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="unset_env"><span><a class="doc-id-link" href="#unset_env">unset_env<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L55"><em>Source</em></a></div></h3>
+<h3 id="unset_env"><span><a class="doc-id-link" href="#unset_env">unset_env<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L92"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">unset_env :: <span class="keyword-type">proc</span>(key: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> <a class="code-typename" href="/core/os/#Error">Error</a> {…}</pre>
 </div>
@@ -1628,6 +1654,26 @@ NOTE: the value will be allocated with the supplied allocator</p>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
+<h3 id="get_env"><span><a class="doc-id-link" href="#get_env">get_env<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L77"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">get_env :: <span class="keyword-type">proc</span>{
+	<a class="code-procedure" href="/core/os/#get_env_alloc">get_env_alloc</a>,
+	<a class="code-procedure" href="/core/os/#get_env_buf">get_env_buf</a>,
+}
+</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="lookup_env"><span><a class="doc-id-link" href="#lookup_env">lookup_env<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/env_windows.odin#L60"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">lookup_env :: <span class="keyword-type">proc</span>{
+	<a class="code-procedure" href="/core/os/#lookup_env_alloc">lookup_env_alloc</a>,
+	<a class="code-procedure" href="/core/os/#lookup_env_buffer">lookup_env_buffer</a>,
+}
+</pre>
+</div>
+</div>
+<div class="pkg-entity">
 <h3 id="read_entire_file"><span><a class="doc-id-link" href="#read_entire_file">read_entire_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os.odin#L126"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_entire_file :: <span class="keyword-type">proc</span>{
@@ -1657,7 +1703,7 @@ NOTE: the value will be allocated with the supplied allocator</p>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-15 21:12:09.355071800 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-16 21:13:22.936631000 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -1755,7 +1801,8 @@ NOTE: the value will be allocated with the supplied allocator</p>
 <li><a href="#fstat">fstat</a></li>
 <li><a href="#ftruncate">ftruncate</a></li>
 <li><a href="#get_current_directory">get_current_directory</a></li>
-<li><a href="#get_env">get_env</a></li>
+<li><a href="#get_env_alloc">get_env_alloc</a></li>
+<li><a href="#get_env_buf">get_env_buf</a></li>
 <li><a href="#get_last_error">get_last_error</a></li>
 <li><a href="#get_page_size">get_page_size</a></li>
 <li><a href="#get_std_handle">get_std_handle</a></li>
@@ -1774,7 +1821,8 @@ NOTE: the value will be allocated with the supplied allocator</p>
 <li><a href="#last_write_time">last_write_time</a></li>
 <li><a href="#last_write_time_by_name">last_write_time_by_name</a></li>
 <li><a href="#link">link</a></li>
-<li><a href="#lookup_env">lookup_env</a></li>
+<li><a href="#lookup_env_alloc">lookup_env_alloc</a></li>
+<li><a href="#lookup_env_buffer">lookup_env_buffer</a></li>
 <li><a href="#lstat">lstat</a></li>
 <li><a href="#make_directory">make_directory</a></li>
 <li><a href="#open">open</a></li>
@@ -1815,6 +1863,8 @@ NOTE: the value will be allocated with the supplied allocator</p>
 </ul>
 </li>
 <li><a href="#pkg-Procedure Groups">Procedure Groups</a><ul>
+<li><a href="#get_env">get_env</a></li>
+<li><a href="#lookup_env">lookup_env</a></li>
 <li><a href="#read_entire_file">read_entire_file</a></li>
 <li><a href="#read_entire_file_or_err">read_entire_file_or_err</a></li>
 </ul>
