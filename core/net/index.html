@@ -445,10 +445,9 @@ Types (61)</summary>
 <div>
 <details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
 <summary id="#doc-index-Constants-header">
-Constants (13)</summary>
+Constants (12)</summary>
 <ul>
 <li><a href="#DEFAULT_DIGIT_BASES">DEFAULT_DIGIT_BASES</a></li>
-<li><a href="#DEFAULT_DNS_CONFIGURATION">DEFAULT_DNS_CONFIGURATION</a></li>
 <li><a href="#DEFAULT_TCP_OPTIONS">DEFAULT_TCP_OPTIONS</a></li>
 <li><a href="#IP4_Loopback">IP4_Loopback</a></li>
 <li><a href="#IP6_Loopback">IP6_Loopback</a></li>
@@ -466,12 +465,13 @@ Constants (13)</summary>
 <div>
 <details class="doc-index" id="doc-index-Variables" aria-labelledby="#doc-index-Variables-header">
 <summary id="#doc-index-Variables-header">
-Variables (5)</summary>
+Variables (6)</summary>
 <ul>
 <li><a href="#IP4_Any">IP4_Any</a></li>
 <li><a href="#IP4_mDNS_Broadcast">IP4_mDNS_Broadcast</a></li>
 <li><a href="#IP6_Any">IP6_Any</a></li>
 <li><a href="#IP6_mDNS_Broadcast">IP6_mDNS_Broadcast</a></li>
+<li><a href="#dns_config_initialized">dns_config_initialized</a></li>
 <li><a href="#dns_configuration">dns_configuration</a></li>
 </ul>
 </details>
@@ -479,7 +479,7 @@ Variables (5)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (68)</summary>
+Procedures (67)</summary>
 <ul>
 <li><a href="#accept_tcp">accept_tcp</a></li>
 <li><a href="#address_to_string">address_to_string</a></li>
@@ -506,7 +506,6 @@ Procedures (68)</summary>
 <li><a href="#get_dns_records_from_nameservers">get_dns_records_from_nameservers</a></li>
 <li><a href="#get_dns_records_from_os">get_dns_records_from_os</a></li>
 <li><a href="#get_network_interfaces">get_network_interfaces</a></li>
-<li><a href="#init_dns_configuration">init_dns_configuration</a></li>
 <li><a href="#join_port">join_port</a></li>
 <li><a href="#join_url">join_url</a></li>
 <li><a href="#last_platform_error">last_platform_error</a></li>
@@ -740,6 +739,8 @@ Procedure Groups (4)</summary>
 	<span class="comment">// Configuration files.</span>
 	resolv_conf:        <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
 	hosts_file:         <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
+	resolv_conf_buf:    [128]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	hosts_file_buf:     [128]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
 	<span class="comment">// TODO: Allow loading these up with `reload_configuration()` call or the like,</span>
 	<span class="comment">// so we don't have to do it each call.</span>
 	name_servers:       []<a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>,
@@ -750,10 +751,6 @@ Procedure Groups (4)</summary>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>DNS DEFINITIONS</p>
 </details>
-<h5>Related Constants</h5>
-<ul>
-<li><a href="/core/net/#DEFAULT_DNS_CONFIGURATION">DEFAULT_DNS_CONFIGURATION</a></li>
-</ul>
 </div>
 <div class="pkg-entity">
 <h3 id="DNS_Error"><span><a class="doc-id-link" href="#DNS_Error">DNS_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L96"><em>Source</em></a></div></h3>
@@ -775,7 +772,7 @@ Procedure Groups (4)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Header"><span><a class="doc-id-link" href="#DNS_Header">DNS_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L402"><em>Source</em></a></div></h3>
+<h3 id="DNS_Header"><span><a class="doc-id-link" href="#DNS_Header">DNS_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L405"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Header :: <span class="keyword-type">struct</span> {
 	id:                     <a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a>,
@@ -798,7 +795,7 @@ Procedure Groups (4)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Host_Entry"><span><a class="doc-id-link" href="#DNS_Host_Entry">DNS_Host_Entry<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L420"><em>Source</em></a></div></h3>
+<h3 id="DNS_Host_Entry"><span><a class="doc-id-link" href="#DNS_Host_Entry">DNS_Host_Entry<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L423"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Host_Entry :: <span class="keyword-type">struct</span> {
 	name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
@@ -807,7 +804,7 @@ Procedure Groups (4)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Query"><span><a class="doc-id-link" href="#DNS_Query">DNS_Query<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L393"><em>Source</em></a></div></h3>
+<h3 id="DNS_Query"><span><a class="doc-id-link" href="#DNS_Query">DNS_Query<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L396"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Query :: <span class="keyword-type">enum</span> <a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a> {
 	Host_Address              = 1, 
@@ -820,7 +817,7 @@ Procedure Groups (4)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record"><span><a class="doc-id-link" href="#DNS_Record">DNS_Record<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L374"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record"><span><a class="doc-id-link" href="#DNS_Record">DNS_Record<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L377"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record :: <span class="keyword-type">union</span> {
 	<a class="code-typename" href="/core/net/#DNS_Record_IP4">DNS_Record_IP4</a>, 
@@ -838,7 +835,7 @@ Procedure Groups (4)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_Base"><span><a class="doc-id-link" href="#DNS_Record_Base">DNS_Record_Base<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L289"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_Base"><span><a class="doc-id-link" href="#DNS_Record_Base">DNS_Record_Base<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L292"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_Base :: <span class="keyword-type">struct</span> {
 	record_name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
@@ -851,7 +848,7 @@ Procedure Groups (4)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_CNAME"><span><a class="doc-id-link" href="#DNS_Record_CNAME">DNS_Record_CNAME<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L311"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_CNAME"><span><a class="doc-id-link" href="#DNS_Record_CNAME">DNS_Record_CNAME<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L314"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_CNAME :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> base: <a class="code-typename" href="/core/net/#DNS_Record_Base">DNS_Record_Base</a>,
@@ -866,7 +863,7 @@ Domains can be pointed to another domain instead of directly to an IP address.
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_Header"><span><a class="doc-id-link" href="#DNS_Record_Header">DNS_Record_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L413"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_Header"><span><a class="doc-id-link" href="#DNS_Record_Header">DNS_Record_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L416"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_Header :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
 	type:   <a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a>,
@@ -877,7 +874,7 @@ Domains can be pointed to another domain instead of directly to an IP address.
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_IP4"><span><a class="doc-id-link" href="#DNS_Record_IP4">DNS_Record_IP4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L295"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_IP4"><span><a class="doc-id-link" href="#DNS_Record_IP4">DNS_Record_IP4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L298"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_IP4 :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> base: <a class="code-typename" href="/core/net/#DNS_Record_Base">DNS_Record_Base</a>,
@@ -890,7 +887,7 @@ Domains can be pointed to another domain instead of directly to an IP address.
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_IP6"><span><a class="doc-id-link" href="#DNS_Record_IP6">DNS_Record_IP6<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L301"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_IP6"><span><a class="doc-id-link" href="#DNS_Record_IP6">DNS_Record_IP6<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L304"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_IP6 :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> base: <a class="code-typename" href="/core/net/#DNS_Record_Base">DNS_Record_Base</a>,
@@ -903,7 +900,7 @@ Domains can be pointed to another domain instead of directly to an IP address.
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_MX"><span><a class="doc-id-link" href="#DNS_Record_MX">DNS_Record_MX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L337"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_MX"><span><a class="doc-id-link" href="#DNS_Record_MX">DNS_Record_MX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L340"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_MX :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> base: <a class="code-typename" href="/core/net/#DNS_Record_Base">DNS_Record_Base</a>,
@@ -918,7 +915,7 @@ These records also have values which ranks them in the order they should be pref
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_NS"><span><a class="doc-id-link" href="#DNS_Record_NS">DNS_Record_NS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L330"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_NS"><span><a class="doc-id-link" href="#DNS_Record_NS">DNS_Record_NS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L333"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_NS :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> base: <a class="code-typename" href="/core/net/#DNS_Record_Base">DNS_Record_Base</a>,
@@ -932,7 +929,7 @@ TODO(tetra): Expand on what these records are used for, and when you should use 
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_SRV"><span><a class="doc-id-link" href="#DNS_Record_SRV">DNS_Record_SRV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L354"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_SRV"><span><a class="doc-id-link" href="#DNS_Record_SRV">DNS_Record_SRV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L357"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_SRV :: <span class="keyword-type">struct</span> {
 	<span class="comment">// base contains the full name of this record.</span>
@@ -964,7 +961,7 @@ A weight of zero indicates a very low weight, or, when there is no choice (to re
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_TXT"><span><a class="doc-id-link" href="#DNS_Record_TXT">DNS_Record_TXT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L321"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_TXT"><span><a class="doc-id-link" href="#DNS_Record_TXT">DNS_Record_TXT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L324"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_TXT :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> base: <a class="code-typename" href="/core/net/#DNS_Record_Base">DNS_Record_Base</a>,
@@ -979,7 +976,7 @@ These can be used for any purpose.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Record_Type"><span><a class="doc-id-link" href="#DNS_Record_Type">DNS_Record_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L270"><em>Source</em></a></div></h3>
+<h3 id="DNS_Record_Type"><span><a class="doc-id-link" href="#DNS_Record_Type">DNS_Record_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L273"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Record_Type :: <span class="keyword-type">enum</span> <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> {
 	DNS_TYPE_A     = 1,  <span class="comment">// IP4 address.</span>
@@ -1007,7 +1004,7 @@ These can be used for any purpose.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="DNS_Response_Code"><span><a class="doc-id-link" href="#DNS_Response_Code">DNS_Response_Code<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L384"><em>Source</em></a></div></h3>
+<h3 id="DNS_Response_Code"><span><a class="doc-id-link" href="#DNS_Response_Code">DNS_Response_Code<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L387"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DNS_Response_Code :: <span class="keyword-type">enum</span> <a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a> {
 	No_Error, 
@@ -1797,12 +1794,6 @@ we treat it as a handle large enough to accomodate OS-specific notions of socket
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DEFAULT_DNS_CONFIGURATION"><span><a class="doc-id-link" href="#DEFAULT_DNS_CONFIGURATION">DEFAULT_DNS_CONFIGURATION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L34"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">DEFAULT_DNS_CONFIGURATION :: DNS_Configuration{resolv_conf = "", hosts_file = "%WINDIR%\\system32\\drivers\\etc\\hosts"}</pre>
-</div>
-</div>
-<div class="pkg-entity">
 <h3 id="DEFAULT_TCP_OPTIONS"><span><a class="doc-id-link" href="#DEFAULT_TCP_OPTIONS">DEFAULT_TCP_OPTIONS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/common.odin#L111"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DEFAULT_TCP_OPTIONS :: TCP_Options{no_delay = ODIN_NET_TCP_NODELAY_DEFAULT}</pre>
@@ -1853,7 +1844,7 @@ and at most 9 (using <code>::</code> for a trailing or leading 0)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="LABEL_MAX"><span><a class="doc-id-link" href="#LABEL_MAX">LABEL_MAX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L328"><em>Source</em></a></div></h3>
+<h3 id="LABEL_MAX"><span><a class="doc-id-link" href="#LABEL_MAX">LABEL_MAX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L330"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">LABEL_MAX: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 63</pre>
 </div>
@@ -1865,7 +1856,7 @@ and at most 9 (using <code>::</code> for a trailing or leading 0)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="NAME_MAX"><span><a class="doc-id-link" href="#NAME_MAX">NAME_MAX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L327"><em>Source</em></a></div></h3>
+<h3 id="NAME_MAX"><span><a class="doc-id-link" href="#NAME_MAX">NAME_MAX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L329"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">NAME_MAX: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 255</pre>
 </div>
@@ -1902,7 +1893,13 @@ and at most 9 (using <code>::</code> for a trailing or leading 0)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="dns_configuration"><span><a class="doc-id-link" href="#dns_configuration">dns_configuration<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L64"><em>Source</em></a></div></h3>
+<h3 id="dns_config_initialized"><span><a class="doc-id-link" href="#dns_config_initialized">dns_config_initialized<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L33"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">dns_config_initialized: sync.<a class="code-typename" href="/core/sync/#Once">Once</a></pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="dns_configuration"><span><a class="doc-id-link" href="#dns_configuration">dns_configuration<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L35"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dns_configuration: <a class="code-typename" href="/core/net/#DNS_Configuration">DNS_Configuration</a> = …</pre>
 </div>
@@ -1985,13 +1982,13 @@ a       - where `a` gives the entire 32-bit value
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="decode_hostname"><span><a class="doc-id-link" href="#decode_hostname">decode_hostname<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L498"><em>Source</em></a></div></h3>
+<h3 id="decode_hostname"><span><a class="doc-id-link" href="#decode_hostname">decode_hostname<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L502"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">decode_hostname :: <span class="keyword-type">proc</span>(packet: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, start_idx: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (hostname: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, encode_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="destroy_dns_records"><span><a class="doc-id-link" href="#destroy_dns_records">destroy_dns_records<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L285"><em>Source</em></a></div></h3>
+<h3 id="destroy_dns_records"><span><a class="doc-id-link" href="#destroy_dns_records">destroy_dns_records<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L287"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy_dns_records :: <span class="keyword-type">proc</span>(records: []<a class="code-typename" href="/core/net/#DNS_Record">DNS_Record</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
@@ -2086,7 +2083,7 @@ a       - where `a` gives the entire 32-bit value
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="encode_hostname"><span><a class="doc-id-link" href="#encode_hostname">encode_hostname<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L438"><em>Source</em></a></div></h3>
+<h3 id="encode_hostname"><span><a class="doc-id-link" href="#encode_hostname">encode_hostname<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L442"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">encode_hostname :: <span class="keyword-type">proc</span>(b: ^strings.<a class="code-typename" href="/core/strings/#Builder">Builder</a>, hostname: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -2129,7 +2126,7 @@ If there's a port, uses the <code>ip4address:port</code> or <code>[ip6address]:p
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="get_dns_records_from_nameservers"><span><a class="doc-id-link" href="#get_dns_records_from_nameservers">get_dns_records_from_nameservers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L199"><em>Source</em></a></div></h3>
+<h3 id="get_dns_records_from_nameservers"><span><a class="doc-id-link" href="#get_dns_records_from_nameservers">get_dns_records_from_nameservers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L198"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">get_dns_records_from_nameservers :: <span class="keyword-type">proc</span>(hostname: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, type: <a class="code-typename" href="/core/net/#DNS_Record_Type">DNS_Record_Type</a>, name_servers: []<a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, host_overrides: []<a class="code-typename" href="/core/net/#DNS_Record">DNS_Record</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (records: []<a class="code-typename" href="/core/net/#DNS_Record">DNS_Record</a>, err: <a class="code-typename" href="/core/net/#DNS_Error">DNS_Error</a>) {…}</pre>
 </div>
@@ -2145,7 +2142,7 @@ See <code>destroy_records</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="get_dns_records_from_os"><span><a class="doc-id-link" href="#get_dns_records_from_os">get_dns_records_from_os<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L184"><em>Source</em></a></div></h3>
+<h3 id="get_dns_records_from_os"><span><a class="doc-id-link" href="#get_dns_records_from_os">get_dns_records_from_os<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L180"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">get_dns_records_from_os :: <span class="keyword-type">proc</span>(hostname: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, type: <a class="code-typename" href="/core/net/#DNS_Record_Type">DNS_Record_Type</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (records: []<a class="code-typename" href="/core/net/#DNS_Record">DNS_Record</a>, err: <a class="code-typename" href="/core/net/#DNS_Error">DNS_Error</a>) {…}</pre>
 </div>
@@ -2168,12 +2165,6 @@ See <code>destroy_records</code>.</p>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Returns an address for each interface that can be bound to.</p>
 </details>
-</div>
-<div class="pkg-entity">
-<h3 id="init_dns_configuration"><span><a class="doc-id-link" href="#init_dns_configuration">init_dns_configuration<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L48"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">init_dns_configuration :: <span class="keyword-type">proc</span>() {…}</pre>
-</div>
 </div>
 <div class="pkg-entity">
 <h3 id="join_port"><span><a class="doc-id-link" href="#join_port">join_port<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/addr.odin#L465"><em>Source</em></a></div></h3>
@@ -2233,13 +2224,13 @@ See <code>destroy_records</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="load_hosts"><span><a class="doc-id-link" href="#load_hosts">load_hosts<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L405"><em>Source</em></a></div></h3>
+<h3 id="load_hosts"><span><a class="doc-id-link" href="#load_hosts">load_hosts<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L407"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">load_hosts :: <span class="keyword-type">proc</span>(hosts_file_path: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (hosts: []<a class="code-typename" href="/core/net/#DNS_Host_Entry">DNS_Host_Entry</a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="load_resolv_conf"><span><a class="doc-id-link" href="#load_resolv_conf">load_resolv_conf<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L365"><em>Source</em></a></div></h3>
+<h3 id="load_resolv_conf"><span><a class="doc-id-link" href="#load_resolv_conf">load_resolv_conf<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L367"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">load_resolv_conf :: <span class="keyword-type">proc</span>(resolv_conf_path: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (name_servers: []<a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -2281,7 +2272,7 @@ It is likely what you want if you want to send data unsolicited.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="pack_dns_header"><span><a class="doc-id-link" href="#pack_dns_header">pack_dns_header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L330"><em>Source</em></a></div></h3>
+<h3 id="pack_dns_header"><span><a class="doc-id-link" href="#pack_dns_header">pack_dns_header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L332"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pack_dns_header :: <span class="keyword-type">proc</span>(hdr: <a class="code-typename" href="/core/net/#DNS_Header">DNS_Header</a>) -> (id: <a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a>, bits: <a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a>) {…}</pre>
 </div>
@@ -2358,13 +2349,13 @@ Numbers will otherwise be considered to be in base 10.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="parse_record"><span><a class="doc-id-link" href="#parse_record">parse_record<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L620"><em>Source</em></a></div></h3>
+<h3 id="parse_record"><span><a class="doc-id-link" href="#parse_record">parse_record<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L624"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parse_record :: <span class="keyword-type">proc</span>(packet: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, cur_off: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, filter: <a class="code-typename" href="/core/net/#DNS_Record_Type">DNS_Record_Type</a> = nil) -> (record: <a class="code-typename" href="/core/net/#DNS_Record">DNS_Record</a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="parse_response"><span><a class="doc-id-link" href="#parse_response">parse_response<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L793"><em>Source</em></a></div></h3>
+<h3 id="parse_response"><span><a class="doc-id-link" href="#parse_response">parse_response<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L797"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parse_response :: <span class="keyword-type">proc</span>(response: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, filter: <a class="code-typename" href="/core/net/#DNS_Record_Type">DNS_Record_Type</a> = nil, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (records: []<a class="code-typename" href="/core/net/#DNS_Record">DNS_Record</a>, xid: <a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -2437,7 +2428,7 @@ will always return <code>nil</code>.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="resolve"><span><a class="doc-id-link" href="#resolve">resolve<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L80"><em>Source</em></a></div></h3>
+<h3 id="resolve"><span><a class="doc-id-link" href="#resolve">resolve<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L76"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">resolve :: <span class="keyword-type">proc</span>(hostname_and_maybe_port: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> (ep4, ep6: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
@@ -2455,13 +2446,13 @@ back an endpoint in both cases.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="resolve_ip4"><span><a class="doc-id-link" href="#resolve_ip4">resolve_ip4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L106"><em>Source</em></a></div></h3>
+<h3 id="resolve_ip4"><span><a class="doc-id-link" href="#resolve_ip4">resolve_ip4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L102"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">resolve_ip4 :: <span class="keyword-type">proc</span>(hostname_and_maybe_port: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> (ep4: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="resolve_ip6"><span><a class="doc-id-link" href="#resolve_ip6">resolve_ip6<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L140"><em>Source</em></a></div></h3>
+<h3 id="resolve_ip6"><span><a class="doc-id-link" href="#resolve_ip6">resolve_ip6<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L136"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">resolve_ip6 :: <span class="keyword-type">proc</span>(hostname_and_maybe_port: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> (ep6: <a class="code-typename" href="/core/net/#Endpoint">Endpoint</a>, err: <a class="code-typename" href="/core/net/#Network_Error">Network_Error</a>) {…}</pre>
 </div>
@@ -2525,7 +2516,7 @@ UDP packets are not guarenteed to be received in order.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="skip_hostname"><span><a class="doc-id-link" href="#skip_hostname">skip_hostname<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L453"><em>Source</em></a></div></h3>
+<h3 id="skip_hostname"><span><a class="doc-id-link" href="#skip_hostname">skip_hostname<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L457"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">skip_hostname :: <span class="keyword-type">proc</span>(packet: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, start_idx: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> (encode_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -2548,13 +2539,13 @@ Returns ok=false if port is not a number.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="unpack_dns_header"><span><a class="doc-id-link" href="#unpack_dns_header">unpack_dns_header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L352"><em>Source</em></a></div></h3>
+<h3 id="unpack_dns_header"><span><a class="doc-id-link" href="#unpack_dns_header">unpack_dns_header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L354"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">unpack_dns_header :: <span class="keyword-type">proc</span>(id: <a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a>, bits: <a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a>) -> (hdr: <a class="code-typename" href="/core/net/#DNS_Header">DNS_Header</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="validate_hostname"><span><a class="doc-id-link" href="#validate_hostname">validate_hostname<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L592"><em>Source</em></a></div></h3>
+<h3 id="validate_hostname"><span><a class="doc-id-link" href="#validate_hostname">validate_hostname<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/net/dns.odin#L596"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">validate_hostname :: <span class="keyword-type">proc</span>(hostname: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -2624,7 +2615,7 @@ Returns ok=false if port is not a number.</p>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-16 21:13:22.916686100 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-17 21:13:50.348988700 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -2695,7 +2686,6 @@ Returns ok=false if port is not a number.</p>
 </li>
 <li><a href="#pkg-Constants">Constants</a><ul>
 <li><a href="#DEFAULT_DIGIT_BASES">DEFAULT_DIGIT_BASES</a></li>
-<li><a href="#DEFAULT_DNS_CONFIGURATION">DEFAULT_DNS_CONFIGURATION</a></li>
 <li><a href="#DEFAULT_TCP_OPTIONS">DEFAULT_TCP_OPTIONS</a></li>
 <li><a href="#IP4_Loopback">IP4_Loopback</a></li>
 <li><a href="#IP6_Loopback">IP6_Loopback</a></li>
@@ -2714,6 +2704,7 @@ Returns ok=false if port is not a number.</p>
 <li><a href="#IP4_mDNS_Broadcast">IP4_mDNS_Broadcast</a></li>
 <li><a href="#IP6_Any">IP6_Any</a></li>
 <li><a href="#IP6_mDNS_Broadcast">IP6_mDNS_Broadcast</a></li>
+<li><a href="#dns_config_initialized">dns_config_initialized</a></li>
 <li><a href="#dns_configuration">dns_configuration</a></li>
 </ul>
 </li>
@@ -2743,7 +2734,6 @@ Returns ok=false if port is not a number.</p>
 <li><a href="#get_dns_records_from_nameservers">get_dns_records_from_nameservers</a></li>
 <li><a href="#get_dns_records_from_os">get_dns_records_from_os</a></li>
 <li><a href="#get_network_interfaces">get_network_interfaces</a></li>
-<li><a href="#init_dns_configuration">init_dns_configuration</a></li>
 <li><a href="#join_port">join_port</a></li>
 <li><a href="#join_url">join_url</a></li>
 <li><a href="#last_platform_error">last_platform_error</a></li>
