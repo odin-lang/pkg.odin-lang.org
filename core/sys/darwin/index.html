@@ -542,7 +542,7 @@ Variables (1)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (91)</summary>
+Procedures (92)</summary>
 <ul>
 <li><a href="#VM_GET_FLAGS_ALIAS">VM_GET_FLAGS_ALIAS</a></li>
 <li><a href="#copyfile">copyfile</a></li>
@@ -604,6 +604,7 @@ Procedures (91)</summary>
 <li><a href="#syscall_getentropy">syscall_getentropy</a></li>
 <li><a href="#syscall_getrusage">syscall_getrusage</a></li>
 <li><a href="#syscall_gettid">syscall_gettid</a></li>
+<li><a href="#syscall_ioctl">syscall_ioctl</a></li>
 <li><a href="#syscall_kill">syscall_kill</a></li>
 <li><a href="#syscall_link">syscall_link</a></li>
 <li><a href="#syscall_linkat">syscall_linkat</a></li>
@@ -3614,19 +3615,19 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_access"><span><a class="doc-id-link" href="#syscall_access">syscall_access<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L314"><em>Source</em></a></div></h3>
+<h3 id="syscall_access"><span><a class="doc-id-link" href="#syscall_access">syscall_access<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L318"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_access :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, mode: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_adjtime"><span><a class="doc-id-link" href="#syscall_adjtime">syscall_adjtime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L383"><em>Source</em></a></div></h3>
+<h3 id="syscall_adjtime"><span><a class="doc-id-link" href="#syscall_adjtime">syscall_adjtime<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L387"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_adjtime :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (delta: ^<a class="code-typename" href="/core/sys/darwin/#_STRUCT_TIMEVAL">_STRUCT_TIMEVAL</a>, old_delta: ^<a class="code-typename" href="/core/sys/darwin/#_STRUCT_TIMEVAL">_STRUCT_TIMEVAL</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_chdir"><span><a class="doc-id-link" href="#syscall_chdir">syscall_chdir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L407"><em>Source</em></a></div></h3>
+<h3 id="syscall_chdir"><span><a class="doc-id-link" href="#syscall_chdir">syscall_chdir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L411"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_chdir :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
@@ -3644,37 +3645,37 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_copyfile"><span><a class="doc-id-link" href="#syscall_copyfile">syscall_copyfile<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L338"><em>Source</em></a></div></h3>
+<h3 id="syscall_copyfile"><span><a class="doc-id-link" href="#syscall_copyfile">syscall_copyfile<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L342"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_copyfile :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (from: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, to: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, state: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, flags: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_dup"><span><a class="doc-id-link" href="#syscall_dup">syscall_dup<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L355"><em>Source</em></a></div></h3>
+<h3 id="syscall_dup"><span><a class="doc-id-link" href="#syscall_dup">syscall_dup<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L359"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_dup :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_execve"><span><a class="doc-id-link" href="#syscall_execve">syscall_execve<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L359"><em>Source</em></a></div></h3>
+<h3 id="syscall_execve"><span><a class="doc-id-link" href="#syscall_execve">syscall_execve<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L363"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_execve :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, argv: [^]<a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, env: [^]<a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_exit"><span><a class="doc-id-link" href="#syscall_exit">syscall_exit<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L347"><em>Source</em></a></div></h3>
+<h3 id="syscall_exit"><span><a class="doc-id-link" href="#syscall_exit">syscall_exit<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L351"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_exit :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (code: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_faccessat"><span><a class="doc-id-link" href="#syscall_faccessat">syscall_faccessat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L318"><em>Source</em></a></div></h3>
+<h3 id="syscall_faccessat"><span><a class="doc-id-link" href="#syscall_faccessat">syscall_faccessat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L322"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_faccessat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, mode: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, flag: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_fchdir"><span><a class="doc-id-link" href="#syscall_fchdir">syscall_fchdir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L411"><em>Source</em></a></div></h3>
+<h3 id="syscall_fchdir"><span><a class="doc-id-link" href="#syscall_fchdir">syscall_fchdir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L415"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_fchdir :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
@@ -3686,7 +3687,7 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_fcntl"><span><a class="doc-id-link" href="#syscall_fcntl">syscall_fcntl<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L343"><em>Source</em></a></div></h3>
+<h3 id="syscall_fcntl"><span><a class="doc-id-link" href="#syscall_fcntl">syscall_fcntl<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L347"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_fcntl :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, cmd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, other: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
@@ -3696,19 +3697,19 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_flock"><span><a class="doc-id-link" href="#syscall_flock">syscall_flock<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L371"><em>Source</em></a></div></h3>
+<h3 id="syscall_flock"><span><a class="doc-id-link" href="#syscall_flock">syscall_flock<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L375"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_flock :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, operation: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_fstat"><span><a class="doc-id-link" href="#syscall_fstat">syscall_fstat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L282"><em>Source</em></a></div></h3>
+<h3 id="syscall_fstat"><span><a class="doc-id-link" href="#syscall_fstat">syscall_fstat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L286"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_fstat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, status: ^<a class="code-typename" href="/core/sys/darwin/#__DARWIN_STRUCT_STAT64">__DARWIN_STRUCT_STAT64</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_fstatat"><span><a class="doc-id-link" href="#syscall_fstatat">syscall_fstatat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L294"><em>Source</em></a></div></h3>
+<h3 id="syscall_fstatat"><span><a class="doc-id-link" href="#syscall_fstatat">syscall_fstatat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L298"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_fstatat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, status: ^<a class="code-typename" href="/core/sys/darwin/#__DARWIN_STRUCT_STAT64">__DARWIN_STRUCT_STAT64</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
@@ -3720,55 +3721,61 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_ftruncate"><span><a class="doc-id-link" href="#syscall_ftruncate">syscall_ftruncate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L330"><em>Source</em></a></div></h3>
+<h3 id="syscall_ftruncate"><span><a class="doc-id-link" href="#syscall_ftruncate">syscall_ftruncate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L334"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_ftruncate :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, length: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_futimes"><span><a class="doc-id-link" href="#syscall_futimes">syscall_futimes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L379"><em>Source</em></a></div></h3>
+<h3 id="syscall_futimes"><span><a class="doc-id-link" href="#syscall_futimes">syscall_futimes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L383"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_futimes :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, times: ^<a class="code-typename" href="/core/sys/darwin/#_STRUCT_TIMEVAL">_STRUCT_TIMEVAL</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_getdirentries"><span><a class="doc-id-link" href="#syscall_getdirentries">syscall_getdirentries<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L322"><em>Source</em></a></div></h3>
+<h3 id="syscall_getdirentries"><span><a class="doc-id-link" href="#syscall_getdirentries">syscall_getdirentries<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L326"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_getdirentries :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, buf: ^<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, nbytes: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, base_pointer: ^<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_getentropy"><span><a class="doc-id-link" href="#syscall_getentropy">syscall_getentropy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L399"><em>Source</em></a></div></h3>
+<h3 id="syscall_getentropy"><span><a class="doc-id-link" href="#syscall_getentropy">syscall_getentropy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L403"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_getentropy :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (buf: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, buflen: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_getrusage"><span><a class="doc-id-link" href="#syscall_getrusage">syscall_getrusage<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L415"><em>Source</em></a></div></h3>
+<h3 id="syscall_getrusage"><span><a class="doc-id-link" href="#syscall_getrusage">syscall_getrusage<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L419"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_getrusage :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (who: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, rusage: ^<a class="code-typename" href="/core/sys/darwin/#RUsage">RUsage</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_gettid"><span><a class="doc-id-link" href="#syscall_gettid">syscall_gettid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L278"><em>Source</em></a></div></h3>
+<h3 id="syscall_gettid"><span><a class="doc-id-link" href="#syscall_gettid">syscall_gettid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L282"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_gettid :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_kill"><span><a class="doc-id-link" href="#syscall_kill">syscall_kill<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L351"><em>Source</em></a></div></h3>
+<h3 id="syscall_ioctl"><span><a class="doc-id-link" href="#syscall_ioctl">syscall_ioctl<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L278"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">syscall_ioctl :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, request: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, arg: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="syscall_kill"><span><a class="doc-id-link" href="#syscall_kill">syscall_kill<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L355"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_kill :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (pid: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, sig: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_link"><span><a class="doc-id-link" href="#syscall_link">syscall_link<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L298"><em>Source</em></a></div></h3>
+<h3 id="syscall_link"><span><a class="doc-id-link" href="#syscall_link">syscall_link<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L302"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_link :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, to_link: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_linkat"><span><a class="doc-id-link" href="#syscall_linkat">syscall_linkat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L302"><em>Source</em></a></div></h3>
+<h3 id="syscall_linkat"><span><a class="doc-id-link" href="#syscall_linkat">syscall_linkat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L306"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_linkat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, fd2: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, to_link: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
@@ -3780,7 +3787,7 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_lstat"><span><a class="doc-id-link" href="#syscall_lstat">syscall_lstat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L286"><em>Source</em></a></div></h3>
+<h3 id="syscall_lstat"><span><a class="doc-id-link" href="#syscall_lstat">syscall_lstat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L290"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_lstat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, status: ^<a class="code-typename" href="/core/sys/darwin/#__DARWIN_STRUCT_STAT64">__DARWIN_STRUCT_STAT64</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
@@ -3798,7 +3805,7 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_mmap"><span><a class="doc-id-link" href="#syscall_mmap">syscall_mmap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L367"><em>Source</em></a></div></h3>
+<h3 id="syscall_mmap"><span><a class="doc-id-link" href="#syscall_mmap">syscall_mmap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L371"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_mmap :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (
 	addr:   ^<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
@@ -3811,7 +3818,7 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_munmap"><span><a class="doc-id-link" href="#syscall_munmap">syscall_munmap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L363"><em>Source</em></a></div></h3>
+<h3 id="syscall_munmap"><span><a class="doc-id-link" href="#syscall_munmap">syscall_munmap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L367"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_munmap :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (addr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
@@ -3823,19 +3830,19 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_openat"><span><a class="doc-id-link" href="#syscall_openat">syscall_openat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L395"><em>Source</em></a></div></h3>
+<h3 id="syscall_openat"><span><a class="doc-id-link" href="#syscall_openat">syscall_openat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L399"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_openat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, oflag: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, mode: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_pipe"><span><a class="doc-id-link" href="#syscall_pipe">syscall_pipe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L403"><em>Source</em></a></div></h3>
+<h3 id="syscall_pipe"><span><a class="doc-id-link" href="#syscall_pipe">syscall_pipe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L407"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_pipe :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fds: [^]<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_proc_info"><span><a class="doc-id-link" href="#syscall_proc_info">syscall_proc_info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L391"><em>Source</em></a></div></h3>
+<h3 id="syscall_proc_info"><span><a class="doc-id-link" href="#syscall_proc_info">syscall_proc_info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L395"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_proc_info :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (
 	num:         <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
@@ -3854,13 +3861,13 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_readlink"><span><a class="doc-id-link" href="#syscall_readlink">syscall_readlink<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L306"><em>Source</em></a></div></h3>
+<h3 id="syscall_readlink"><span><a class="doc-id-link" href="#syscall_readlink">syscall_readlink<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L310"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_readlink :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, buf: ^<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, buf_size: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) -> <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_readlinkat"><span><a class="doc-id-link" href="#syscall_readlinkat">syscall_readlinkat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L310"><em>Source</em></a></div></h3>
+<h3 id="syscall_readlinkat"><span><a class="doc-id-link" href="#syscall_readlinkat">syscall_readlinkat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L314"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_readlinkat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, buf: ^<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, buf_size: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) -> <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a> {…}</pre>
 </div>
@@ -3884,25 +3891,25 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_shm_open"><span><a class="doc-id-link" href="#syscall_shm_open">syscall_shm_open<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L419"><em>Source</em></a></div></h3>
+<h3 id="syscall_shm_open"><span><a class="doc-id-link" href="#syscall_shm_open">syscall_shm_open<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L423"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_shm_open :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (name: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, oflag: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, mode: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_shm_unlink"><span><a class="doc-id-link" href="#syscall_shm_unlink">syscall_shm_unlink<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L423"><em>Source</em></a></div></h3>
+<h3 id="syscall_shm_unlink"><span><a class="doc-id-link" href="#syscall_shm_unlink">syscall_shm_unlink<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L427"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_shm_unlink :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (name: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_stat"><span><a class="doc-id-link" href="#syscall_stat">syscall_stat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L290"><em>Source</em></a></div></h3>
+<h3 id="syscall_stat"><span><a class="doc-id-link" href="#syscall_stat">syscall_stat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L294"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_stat :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, status: ^<a class="code-typename" href="/core/sys/darwin/#__DARWIN_STRUCT_STAT64">__DARWIN_STRUCT_STAT64</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_sysctl"><span><a class="doc-id-link" href="#syscall_sysctl">syscall_sysctl<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L334"><em>Source</em></a></div></h3>
+<h3 id="syscall_sysctl"><span><a class="doc-id-link" href="#syscall_sysctl">syscall_sysctl<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L338"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_sysctl :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (
 	name:    [^]<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
@@ -3915,19 +3922,19 @@ EINVAL	:	The operation associated with existing kernel state</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_sysctlbyname"><span><a class="doc-id-link" href="#syscall_sysctlbyname">syscall_sysctlbyname<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L387"><em>Source</em></a></div></h3>
+<h3 id="syscall_sysctlbyname"><span><a class="doc-id-link" href="#syscall_sysctlbyname">syscall_sysctlbyname<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L391"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_sysctlbyname :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (name: untyped string, oldp: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, oldlenp: ^<a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, newp: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, newlen: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_truncate"><span><a class="doc-id-link" href="#syscall_truncate">syscall_truncate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L326"><em>Source</em></a></div></h3>
+<h3 id="syscall_truncate"><span><a class="doc-id-link" href="#syscall_truncate">syscall_truncate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L330"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_truncate :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, length: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="syscall_utimes"><span><a class="doc-id-link" href="#syscall_utimes">syscall_utimes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L375"><em>Source</em></a></div></h3>
+<h3 id="syscall_utimes"><span><a class="doc-id-link" href="#syscall_utimes">syscall_utimes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/darwin/xnu_system_call_wrappers.odin#L379"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">syscall_utimes :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (path: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, times: ^<a class="code-typename" href="/core/sys/darwin/#_STRUCT_TIMEVAL">_STRUCT_TIMEVAL</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
 </div>
@@ -3988,7 +3995,7 @@ EINVAL	:	The operation associated with existing kernel state</p>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-18 21:13:27.873753100 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-19 21:13:14.770835600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -4231,6 +4238,7 @@ EINVAL	:	The operation associated with existing kernel state</p>
 <li><a href="#syscall_getentropy">syscall_getentropy</a></li>
 <li><a href="#syscall_getrusage">syscall_getrusage</a></li>
 <li><a href="#syscall_gettid">syscall_gettid</a></li>
+<li><a href="#syscall_ioctl">syscall_ioctl</a></li>
 <li><a href="#syscall_kill">syscall_kill</a></li>
 <li><a href="#syscall_link">syscall_link</a></li>
 <li><a href="#syscall_linkat">syscall_linkat</a></li>

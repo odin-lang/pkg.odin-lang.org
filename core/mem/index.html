@@ -523,7 +523,7 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (196)</summary>
+Procedures (198)</summary>
 <ul>
 <li><a href="#align_backward">align_backward</a></li>
 <li><a href="#align_backward_int">align_backward_int</a></li>
@@ -585,6 +585,7 @@ Procedures (196)</summary>
 <li><a href="#delete_soa_dynamic_array">delete_soa_dynamic_array</a></li>
 <li><a href="#delete_soa_slice">delete_soa_slice</a></li>
 <li><a href="#delete_string">delete_string</a></li>
+<li><a href="#dynamic_arena_alloc">dynamic_arena_alloc</a></li>
 <li><a href="#dynamic_arena_alloc_bytes">dynamic_arena_alloc_bytes</a></li>
 <li><a href="#dynamic_arena_alloc_bytes_non_zeroed">dynamic_arena_alloc_bytes_non_zeroed</a></li>
 <li><a href="#dynamic_arena_alloc_non_zeroed">dynamic_arena_alloc_non_zeroed</a></li>
@@ -598,6 +599,7 @@ Procedures (196)</summary>
 <li><a href="#dynamic_arena_resize_bytes">dynamic_arena_resize_bytes</a></li>
 <li><a href="#dynamic_arena_resize_bytes_non_zeroed">dynamic_arena_resize_bytes_non_zeroed</a></li>
 <li><a href="#dynamic_arena_resize_non_zeroed">dynamic_arena_resize_non_zeroed</a></li>
+<li><a href="#dynamic_pool_alloc">dynamic_pool_alloc</a></li>
 <li><a href="#dynamic_pool_alloc_bytes">dynamic_pool_alloc_bytes</a></li>
 <li><a href="#dynamic_pool_allocator">dynamic_pool_allocator</a></li>
 <li><a href="#dynamic_pool_allocator_proc">dynamic_pool_allocator_proc</a></li>
@@ -992,7 +994,7 @@ in time. Currently the type is defined as follows:</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Arena"><span><a class="doc-id-link" href="#Arena">Arena<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L97"><em>Source</em></a></div></h3>
+<h3 id="Arena"><span><a class="doc-id-link" href="#Arena">Arena<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L147"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Arena :: <span class="keyword-type">struct</span> {
 	data:       []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
@@ -1018,7 +1020,7 @@ in time. Currently the type is defined as follows:</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Arena_Temp_Memory"><span><a class="doc-id-link" href="#Arena_Temp_Memory">Arena_Temp_Memory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L287"><em>Source</em></a></div></h3>
+<h3 id="Arena_Temp_Memory"><span><a class="doc-id-link" href="#Arena_Temp_Memory">Arena_Temp_Memory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L337"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Arena_Temp_Memory :: <span class="keyword-type">struct</span> {
 	arena:       ^<a class="code-typename" href="/core/mem/#Arena">Arena</a>,
@@ -1027,11 +1029,11 @@ in time. Currently the type is defined as follows:</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Temporary memory region of arena.</p>
-<p>Temporary memory regions of arena act as "savepoints" for arena. When one is
-created, the subsequent allocations are done inside the temporary memory
-region. When <code>end_arena_temp_memory</code> is called, the arena is rolled back, and
-all of the memory that was allocated from the arena will be freed.</p>
+<p>Temporary memory region of an <code>Arena</code> allocator.</p>
+<p>Temporary memory regions of an arena act as "save-points" for the allocator.
+When one is created, the subsequent allocations are done inside the temporary
+memory region. When <code>end_arena_temp_memory</code> is called, the arena is rolled
+back, and all of the memory that was allocated from the arena will be freed.</p>
 <p>Multiple temporary memory regions can exist at the same time for an arena.</p>
 </details>
 <h5>Related Procedures With Parameters</h5>
@@ -1044,7 +1046,7 @@ all of the memory that was allocated from the arena will be freed.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Buddy_Allocator"><span><a class="doc-id-link" href="#Buddy_Allocator">Buddy_Allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2084"><em>Source</em></a></div></h3>
+<h3 id="Buddy_Allocator"><span><a class="doc-id-link" href="#Buddy_Allocator">Buddy_Allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2197"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Buddy_Allocator :: <span class="keyword-type">struct</span> {
 	head:      ^<a class="code-typename" href="/core/mem/#Buddy_Block">Buddy_Block</a>,
@@ -1070,7 +1072,7 @@ all of the memory that was allocated from the arena will be freed.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Buddy_Block"><span><a class="doc-id-link" href="#Buddy_Block">Buddy_Block<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1948"><em>Source</em></a></div></h3>
+<h3 id="Buddy_Block"><span><a class="doc-id-link" href="#Buddy_Block">Buddy_Block<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2060"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Buddy_Block :: <span class="keyword-type">struct</span> <span class="directive">#align</span>&nbsp;(align_of(uint)) {
 	size:    <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
@@ -1090,7 +1092,7 @@ all of the memory that was allocated from the arena will be freed.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Compat_Allocator"><span><a class="doc-id-link" href="#Compat_Allocator">Compat_Allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2300"><em>Source</em></a></div></h3>
+<h3 id="Compat_Allocator"><span><a class="doc-id-link" href="#Compat_Allocator">Compat_Allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2424"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Compat_Allocator :: <span class="keyword-type">struct</span> {
 	parent: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>,
@@ -1113,7 +1115,7 @@ used to store the size and alignment.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Dynamic_Arena"><span><a class="doc-id-link" href="#Dynamic_Arena">Dynamic_Arena<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1552"><em>Source</em></a></div></h3>
+<h3 id="Dynamic_Arena"><span><a class="doc-id-link" href="#Dynamic_Arena">Dynamic_Arena<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1658"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Dynamic_Arena :: <span class="keyword-type">struct</span> {
 	block_size:           <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
@@ -1134,6 +1136,7 @@ used to store the size and alignment.</p>
 </details>
 <h5>Related Procedures With Parameters</h5>
 <ul>
+<li><a href="/core/mem/#dynamic_arena_alloc">dynamic_arena_alloc</a></li>
 <li><a href="/core/mem/#dynamic_arena_alloc_bytes">dynamic_arena_alloc_bytes</a></li>
 <li><a href="/core/mem/#dynamic_arena_alloc_bytes_non_zeroed">dynamic_arena_alloc_bytes_non_zeroed</a></li>
 <li><a href="/core/mem/#dynamic_arena_alloc_non_zeroed">dynamic_arena_alloc_non_zeroed</a></li>
@@ -1149,7 +1152,7 @@ used to store the size and alignment.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Dynamic_Pool"><span><a class="doc-id-link" href="#Dynamic_Pool">Dynamic_Pool<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1527"><em>Source</em></a></div></h3>
+<h3 id="Dynamic_Pool"><span><a class="doc-id-link" href="#Dynamic_Pool">Dynamic_Pool<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1633"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Dynamic_Pool :: <a class="code-typename" href="/core/mem/#Dynamic_Arena">Dynamic_Arena</a></pre>
 </div>
@@ -1413,14 +1416,15 @@ byte buffers return <code>nil</code> and no error.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Scratch"><span><a class="doc-id-link" href="#Scratch">Scratch<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L330"><em>Source</em></a></div></h3>
+<h3 id="Scratch"><span><a class="doc-id-link" href="#Scratch">Scratch<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L380"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Scratch :: <span class="keyword-type">struct</span> {
-	data:               []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
-	curr_offset:        <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
-	prev_allocation:    <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
-	backup_allocator:   runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>,
-	leaked_allocations: [<span class="keyword">dynamic</span>][]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	data:                 []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	curr_offset:          <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	prev_allocation:      <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
+	prev_allocation_root: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
+	backup_allocator:     runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>,
+	leaked_allocations:   [<span class="keyword">dynamic</span>][]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
 }</pre>
 </div>
 <details class="odin-doc-toggle" open>
@@ -1445,7 +1449,7 @@ byte buffers return <code>nil</code> and no error.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Scratch_Allocator"><span><a class="doc-id-link" href="#Scratch_Allocator">Scratch_Allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L323"><em>Source</em></a></div></h3>
+<h3 id="Scratch_Allocator"><span><a class="doc-id-link" href="#Scratch_Allocator">Scratch_Allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L373"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Scratch_Allocator :: <a class="code-typename" href="/core/mem/#Scratch">Scratch</a></pre>
 </div>
@@ -1455,7 +1459,7 @@ byte buffers return <code>nil</code> and no error.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Small_Stack"><span><a class="doc-id-link" href="#Small_Stack">Small_Stack<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1156"><em>Source</em></a></div></h3>
+<h3 id="Small_Stack"><span><a class="doc-id-link" href="#Small_Stack">Small_Stack<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1247"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Small_Stack :: <span class="keyword-type">struct</span> {
 	data:      []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
@@ -1484,7 +1488,7 @@ byte buffers return <code>nil</code> and no error.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Small_Stack_Allocation_Header"><span><a class="doc-id-link" href="#Small_Stack_Allocation_Header">Small_Stack_Allocation_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1149"><em>Source</em></a></div></h3>
+<h3 id="Small_Stack_Allocation_Header"><span><a class="doc-id-link" href="#Small_Stack_Allocation_Header">Small_Stack_Allocation_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1240"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Small_Stack_Allocation_Header :: <span class="keyword-type">struct</span> {
 	padding: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
@@ -1496,7 +1500,7 @@ byte buffers return <code>nil</code> and no error.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Stack"><span><a class="doc-id-link" href="#Stack">Stack<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L743"><em>Source</em></a></div></h3>
+<h3 id="Stack"><span><a class="doc-id-link" href="#Stack">Stack<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L821"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Stack :: <span class="keyword-type">struct</span> {
 	data:        []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
@@ -1526,7 +1530,7 @@ byte buffers return <code>nil</code> and no error.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Stack_Allocation_Header"><span><a class="doc-id-link" href="#Stack_Allocation_Header">Stack_Allocation_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L753"><em>Source</em></a></div></h3>
+<h3 id="Stack_Allocation_Header"><span><a class="doc-id-link" href="#Stack_Allocation_Header">Stack_Allocation_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L831"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Stack_Allocation_Header :: <span class="keyword-type">struct</span> {
 	prev_offset: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
@@ -1656,7 +1660,7 @@ alignment is not specified explicitly.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DYNAMIC_ARENA_BLOCK_SIZE_DEFAULT"><span><a class="doc-id-link" href="#DYNAMIC_ARENA_BLOCK_SIZE_DEFAULT">DYNAMIC_ARENA_BLOCK_SIZE_DEFAULT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1542"><em>Source</em></a></div></h3>
+<h3 id="DYNAMIC_ARENA_BLOCK_SIZE_DEFAULT"><span><a class="doc-id-link" href="#DYNAMIC_ARENA_BLOCK_SIZE_DEFAULT">DYNAMIC_ARENA_BLOCK_SIZE_DEFAULT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1648"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DYNAMIC_ARENA_BLOCK_SIZE_DEFAULT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 65536</pre>
 </div>
@@ -1666,7 +1670,7 @@ alignment is not specified explicitly.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DYNAMIC_ARENA_OUT_OF_BAND_SIZE_DEFAULT"><span><a class="doc-id-link" href="#DYNAMIC_ARENA_OUT_OF_BAND_SIZE_DEFAULT">DYNAMIC_ARENA_OUT_OF_BAND_SIZE_DEFAULT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1547"><em>Source</em></a></div></h3>
+<h3 id="DYNAMIC_ARENA_OUT_OF_BAND_SIZE_DEFAULT"><span><a class="doc-id-link" href="#DYNAMIC_ARENA_OUT_OF_BAND_SIZE_DEFAULT">DYNAMIC_ARENA_OUT_OF_BAND_SIZE_DEFAULT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1653"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DYNAMIC_ARENA_OUT_OF_BAND_SIZE_DEFAULT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 6554</pre>
 </div>
@@ -1676,13 +1680,13 @@ alignment is not specified explicitly.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="DYNAMIC_POOL_BLOCK_SIZE_DEFAULT"><span><a class="doc-id-link" href="#DYNAMIC_POOL_BLOCK_SIZE_DEFAULT">DYNAMIC_POOL_BLOCK_SIZE_DEFAULT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1528"><em>Source</em></a></div></h3>
+<h3 id="DYNAMIC_POOL_BLOCK_SIZE_DEFAULT"><span><a class="doc-id-link" href="#DYNAMIC_POOL_BLOCK_SIZE_DEFAULT">DYNAMIC_POOL_BLOCK_SIZE_DEFAULT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1634"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DYNAMIC_POOL_BLOCK_SIZE_DEFAULT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : DYNAMIC_ARENA_BLOCK_SIZE_DEFAULT</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DYNAMIC_POOL_OUT_OF_BAND_SIZE_DEFAULT"><span><a class="doc-id-link" href="#DYNAMIC_POOL_OUT_OF_BAND_SIZE_DEFAULT">DYNAMIC_POOL_OUT_OF_BAND_SIZE_DEFAULT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1529"><em>Source</em></a></div></h3>
+<h3 id="DYNAMIC_POOL_OUT_OF_BAND_SIZE_DEFAULT"><span><a class="doc-id-link" href="#DYNAMIC_POOL_OUT_OF_BAND_SIZE_DEFAULT">DYNAMIC_POOL_OUT_OF_BAND_SIZE_DEFAULT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1635"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DYNAMIC_POOL_OUT_OF_BAND_SIZE_DEFAULT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : DYNAMIC_ARENA_OUT_OF_BAND_SIZE_DEFAULT</pre>
 </div>
@@ -2010,7 +2014,7 @@ value of the <code>any</code> type.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="arena_alloc"><span><a class="doc-id-link" href="#arena_alloc">arena_alloc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L153"><em>Source</em></a></div></h3>
+<h3 id="arena_alloc"><span><a class="doc-id-link" href="#arena_alloc">arena_alloc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L202"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">arena_alloc :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Arena">Arena</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -2023,7 +2027,7 @@ This procedure returns a pointer to the newly allocated memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="arena_alloc_bytes"><span><a class="doc-id-link" href="#arena_alloc_bytes">arena_alloc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L171"><em>Source</em></a></div></h3>
+<h3 id="arena_alloc_bytes"><span><a class="doc-id-link" href="#arena_alloc_bytes">arena_alloc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L220"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">arena_alloc_bytes :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Arena">Arena</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -2036,7 +2040,7 @@ This procedure returns a slice of the newly allocated memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="arena_alloc_bytes_non_zeroed"><span><a class="doc-id-link" href="#arena_alloc_bytes_non_zeroed">arena_alloc_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L212"><em>Source</em></a></div></h3>
+<h3 id="arena_alloc_bytes_non_zeroed"><span><a class="doc-id-link" href="#arena_alloc_bytes_non_zeroed">arena_alloc_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L261"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">arena_alloc_bytes_non_zeroed :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Arena">Arena</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -2050,7 +2054,7 @@ memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="arena_alloc_non_zeroed"><span><a class="doc-id-link" href="#arena_alloc_non_zeroed">arena_alloc_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L193"><em>Source</em></a></div></h3>
+<h3 id="arena_alloc_non_zeroed"><span><a class="doc-id-link" href="#arena_alloc_non_zeroed">arena_alloc_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L242"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">arena_alloc_non_zeroed :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Arena">Arena</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -2064,7 +2068,7 @@ memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="arena_allocator"><span><a class="doc-id-link" href="#arena_allocator">arena_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L124"><em>Source</em></a></div></h3>
+<h3 id="arena_allocator"><span><a class="doc-id-link" href="#arena_allocator">arena_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L173"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">arena_allocator :: <span class="keyword-type">proc</span>(arena: ^<a class="code-typename" href="/core/mem/#Arena">Arena</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a> {…}</pre>
 </div>
@@ -2074,11 +2078,10 @@ memory region.</p>
 <p>The arena allocator (also known as a linear allocator, bump allocator,
 region allocator) is an allocator that uses a single backing buffer for
 allocations.</p>
-<p>The buffer is being used contiguously, from start by end. Each subsequent
-allocation occupies the next adjacent region of memory in the buffer. Since
-arena allocator does not keep track of any metadata associated with the
-allocations and their locations, it is impossible to free individual
-allocations.</p>
+<p>The buffer is used contiguously, from start to end. Each subsequent allocation
+occupies the next adjacent region of memory in the buffer. Since the arena
+allocator does not keep track of any metadata associated with the allocations
+and their locations, it is impossible to free individual allocations.</p>
 <p>The arena allocator can be used for temporary allocations in frame-based memory
 management. Games are one example of such applications. A global arena can be
 used for any temporary memory allocations, and at the end of each frame all
@@ -2087,7 +2090,7 @@ longer than a frame, no lifetimes are violated.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="arena_allocator_proc"><span><a class="doc-id-link" href="#arena_allocator_proc">arena_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L242"><em>Source</em></a></div></h3>
+<h3 id="arena_allocator_proc"><span><a class="doc-id-link" href="#arena_allocator_proc">arena_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L292"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">arena_allocator_proc :: <span class="keyword-type">proc</span>(
 	allocator_data:  <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
@@ -2100,29 +2103,29 @@ longer than a frame, no lifetimes are violated.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="arena_free_all"><span><a class="doc-id-link" href="#arena_free_all">arena_free_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L237"><em>Source</em></a></div></h3>
+<h3 id="arena_free_all"><span><a class="doc-id-link" href="#arena_free_all">arena_free_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L287"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">arena_free_all :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Arena">Arena</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Free all memory to an arena.</p>
+<p>Free all memory back to the arena allocator.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="arena_init"><span><a class="doc-id-link" href="#arena_init">arena_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L137"><em>Source</em></a></div></h3>
+<h3 id="arena_init"><span><a class="doc-id-link" href="#arena_init">arena_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L186"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">arena_init :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Arena">Arena</a>, data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Initialize an arena.</p>
-<p>This procedure initializes the arena <code>a</code> with memory region <code>data</code> as it's
+<p>This procedure initializes the arena <code>a</code> with memory region <code>data</code> as its
 backing buffer.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="begin_arena_temp_memory"><span><a class="doc-id-link" href="#begin_arena_temp_memory">begin_arena_temp_memory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L300"><em>Source</em></a></div></h3>
+<h3 id="begin_arena_temp_memory"><span><a class="doc-id-link" href="#begin_arena_temp_memory">begin_arena_temp_memory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L350"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">begin_arena_temp_memory :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Arena">Arena</a>) -> <a class="code-typename" href="/core/mem/#Arena_Temp_Memory">Arena_Temp_Memory</a> {…}</pre>
 </div>
@@ -2135,7 +2138,7 @@ region, until <code>end_arena_temp_memory</code> is called.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="buddy_allocator"><span><a class="doc-id-link" href="#buddy_allocator">buddy_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2101"><em>Source</em></a></div></h3>
+<h3 id="buddy_allocator"><span><a class="doc-id-link" href="#buddy_allocator">buddy_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2214"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buddy_allocator :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/mem/#Buddy_Allocator">Buddy_Allocator</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a> {…}</pre>
 </div>
@@ -2151,94 +2154,98 @@ the contiguous free blocks are coalesced and the search is performed again.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="buddy_allocator_alloc"><span><a class="doc-id-link" href="#buddy_allocator_alloc">buddy_allocator_alloc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2154"><em>Source</em></a></div></h3>
+<h3 id="buddy_allocator_alloc"><span><a class="doc-id-link" href="#buddy_allocator_alloc">buddy_allocator_alloc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2269"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buddy_allocator_alloc :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/mem/#Buddy_Allocator">Buddy_Allocator</a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> (<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Allocate memory from a buddy allocator.</p>
-<p>This procedure allocates <code>size</code> bytes of memory aligned on a boundary specified
-by <code>alignment</code>. The allocated memory region is zero-initialized. This procedure
-returns a pointer to the allocated memory region.</p>
+<p>This procedure allocates <code>size</code> bytes of memory. The allocation's alignment is
+fixed to the <code>alignment</code> specified at initialization. The allocated memory
+region is zero-initialized. This procedure returns a pointer to the allocated
+memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="buddy_allocator_alloc_bytes"><span><a class="doc-id-link" href="#buddy_allocator_alloc_bytes">buddy_allocator_alloc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2167"><em>Source</em></a></div></h3>
+<h3 id="buddy_allocator_alloc_bytes"><span><a class="doc-id-link" href="#buddy_allocator_alloc_bytes">buddy_allocator_alloc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2283"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buddy_allocator_alloc_bytes :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/mem/#Buddy_Allocator">Buddy_Allocator</a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Allocate memory from a buddy allocator.</p>
-<p>This procedure allocates <code>size</code> bytes of memory aligned on a boundary specified
-by <code>alignment</code>. The allocated memory region is zero-initialized. This procedure
-returns a slice of the allocated memory region.</p>
+<p>This procedure allocates <code>size</code> bytes of memory. The allocation's alignment is
+fixed to the <code>alignment</code> specified at initialization. The allocated memory
+region is zero-initialized. This procedure returns a slice of the allocated
+memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="buddy_allocator_alloc_bytes_non_zeroed"><span><a class="doc-id-link" href="#buddy_allocator_alloc_bytes_non_zeroed">buddy_allocator_alloc_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2196"><em>Source</em></a></div></h3>
+<h3 id="buddy_allocator_alloc_bytes_non_zeroed"><span><a class="doc-id-link" href="#buddy_allocator_alloc_bytes_non_zeroed">buddy_allocator_alloc_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2314"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buddy_allocator_alloc_bytes_non_zeroed :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/mem/#Buddy_Allocator">Buddy_Allocator</a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Allocate non-initialized memory from a buddy allocator.</p>
-<p>This procedure allocates <code>size</code> bytes of memory aligned on a boundary specified
-by <code>alignment</code>. The allocated memory region is not explicitly zero-initialized.
-This procedure returns a slice of the allocated memory region.</p>
+<p>This procedure allocates <code>size</code> bytes of memory. The allocation's alignment is
+fixed to the <code>alignment</code> specified at initialization. The allocated memory
+region is not explicitly zero-initialized. This procedure returns a slice of
+the allocated memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="buddy_allocator_alloc_non_zeroed"><span><a class="doc-id-link" href="#buddy_allocator_alloc_non_zeroed">buddy_allocator_alloc_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2183"><em>Source</em></a></div></h3>
+<h3 id="buddy_allocator_alloc_non_zeroed"><span><a class="doc-id-link" href="#buddy_allocator_alloc_non_zeroed">buddy_allocator_alloc_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2300"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buddy_allocator_alloc_non_zeroed :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/mem/#Buddy_Allocator">Buddy_Allocator</a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> (<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Allocate non-initialized memory from a buddy allocator.</p>
-<p>This procedure allocates <code>size</code> bytes of memory aligned on a boundary specified
-by <code>alignment</code>. The allocated memory region is not explicitly zero-initialized.
-This procedure returns a pointer to the allocated memory region.</p>
+<p>This procedure allocates <code>size</code> bytes of memory. The allocation's alignment is
+fixed to the <code>alignment</code> specified at initialization. The allocated memory
+region is not explicitly zero-initialized. This procedure returns a pointer to
+the allocated memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="buddy_allocator_free"><span><a class="doc-id-link" href="#buddy_allocator_free">buddy_allocator_free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2223"><em>Source</em></a></div></h3>
+<h3 id="buddy_allocator_free"><span><a class="doc-id-link" href="#buddy_allocator_free">buddy_allocator_free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2344"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buddy_allocator_free :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/mem/#Buddy_Allocator">Buddy_Allocator</a>, ptr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Free memory to the buddy allocator.</p>
+<p>Free memory back to the buddy allocator.</p>
 <p>This procedure frees the memory region allocated at pointer <code>ptr</code>.</p>
 <p>If <code>ptr</code> is not the latest allocation and is not a leaked allocation, this
 operation is a no-op.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="buddy_allocator_free_all"><span><a class="doc-id-link" href="#buddy_allocator_free_all">buddy_allocator_free_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2238"><em>Source</em></a></div></h3>
+<h3 id="buddy_allocator_free_all"><span><a class="doc-id-link" href="#buddy_allocator_free_all">buddy_allocator_free_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2361"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buddy_allocator_free_all :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/mem/#Buddy_Allocator">Buddy_Allocator</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Free all memory to the buddy allocator.</p>
+<p>Free all memory back to the buddy allocator.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="buddy_allocator_init"><span><a class="doc-id-link" href="#buddy_allocator_init">buddy_allocator_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2114"><em>Source</em></a></div></h3>
+<h3 id="buddy_allocator_init"><span><a class="doc-id-link" href="#buddy_allocator_init">buddy_allocator_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2227"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buddy_allocator_init :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/mem/#Buddy_Allocator">Buddy_Allocator</a>, data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, alignment: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Initialize the buddy allocator.</p>
+<p>Initialize a buddy allocator.</p>
 <p>This procedure initializes the buddy allocator <code>b</code> with a backing buffer <code>data</code>
 and block alignment specified by <code>alignment</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="buddy_allocator_proc"><span><a class="doc-id-link" href="#buddy_allocator_proc">buddy_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2246"><em>Source</em></a></div></h3>
+<h3 id="buddy_allocator_proc"><span><a class="doc-id-link" href="#buddy_allocator_proc">buddy_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2370"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buddy_allocator_proc :: <span class="keyword-type">proc</span>(
 	allocator_data:  <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
@@ -2251,7 +2258,7 @@ and block alignment specified by <code>alignment</code>.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="buddy_block_coalescence"><span><a class="doc-id-link" href="#buddy_block_coalescence">buddy_block_coalescence<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1987"><em>Source</em></a></div></h3>
+<h3 id="buddy_block_coalescence"><span><a class="doc-id-link" href="#buddy_block_coalescence">buddy_block_coalescence<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2100"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buddy_block_coalescence :: <span class="keyword-type">proc</span>(head, tail: ^<a class="code-typename" href="/core/mem/#Buddy_Block">Buddy_Block</a>) {…}</pre>
 </div>
@@ -2261,7 +2268,7 @@ and block alignment specified by <code>alignment</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="buddy_block_find_best"><span><a class="doc-id-link" href="#buddy_block_find_best">buddy_block_find_best<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2024"><em>Source</em></a></div></h3>
+<h3 id="buddy_block_find_best"><span><a class="doc-id-link" href="#buddy_block_find_best">buddy_block_find_best<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2137"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buddy_block_find_best :: <span class="keyword-type">proc</span>(head, tail: ^<a class="code-typename" href="/core/mem/#Buddy_Block">Buddy_Block</a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> ^<a class="code-typename" href="/core/mem/#Buddy_Block">Buddy_Block</a> {…}</pre>
 </div>
@@ -2271,7 +2278,7 @@ and block alignment specified by <code>alignment</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="buddy_block_next"><span><a class="doc-id-link" href="#buddy_block_next">buddy_block_next<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1957"><em>Source</em></a></div></h3>
+<h3 id="buddy_block_next"><span><a class="doc-id-link" href="#buddy_block_next">buddy_block_next<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2069"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buddy_block_next :: <span class="keyword-type">proc</span>(block: ^<a class="code-typename" href="/core/mem/#Buddy_Block">Buddy_Block</a>) -> ^<a class="code-typename" href="/core/mem/#Buddy_Block">Buddy_Block</a> {…}</pre>
 </div>
@@ -2281,7 +2288,7 @@ and block alignment specified by <code>alignment</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="buddy_block_size_required"><span><a class="doc-id-link" href="#buddy_block_size_required">buddy_block_size_required<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2135"><em>Source</em></a></div></h3>
+<h3 id="buddy_block_size_required"><span><a class="doc-id-link" href="#buddy_block_size_required">buddy_block_size_required<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2249"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buddy_block_size_required :: <span class="keyword-type">proc</span>(b: ^<a class="code-typename" href="/core/mem/#Buddy_Allocator">Buddy_Allocator</a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a> {…}</pre>
 </div>
@@ -2291,7 +2298,7 @@ and block alignment specified by <code>alignment</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="buddy_block_split"><span><a class="doc-id-link" href="#buddy_block_split">buddy_block_split<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1965"><em>Source</em></a></div></h3>
+<h3 id="buddy_block_split"><span><a class="doc-id-link" href="#buddy_block_split">buddy_block_split<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2077"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buddy_block_split :: <span class="keyword-type">proc</span>(block: ^<a class="code-typename" href="/core/mem/#Buddy_Block">Buddy_Block</a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> ^<a class="code-typename" href="/core/mem/#Buddy_Block">Buddy_Block</a> {…}</pre>
 </div>
@@ -2462,19 +2469,19 @@ ordering.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="compat_allocator"><span><a class="doc-id-link" href="#compat_allocator">compat_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2308"><em>Source</em></a></div></h3>
+<h3 id="compat_allocator"><span><a class="doc-id-link" href="#compat_allocator">compat_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2432"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">compat_allocator :: <span class="keyword-type">proc</span>(rra: ^<a class="code-typename" href="/core/mem/#Compat_Allocator">Compat_Allocator</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="compat_allocator_init"><span><a class="doc-id-link" href="#compat_allocator_init">compat_allocator_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2304"><em>Source</em></a></div></h3>
+<h3 id="compat_allocator_init"><span><a class="doc-id-link" href="#compat_allocator_init">compat_allocator_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2428"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">compat_allocator_init :: <span class="keyword-type">proc</span>(rra: ^<a class="code-typename" href="/core/mem/#Compat_Allocator">Compat_Allocator</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="compat_allocator_proc"><span><a class="doc-id-link" href="#compat_allocator_proc">compat_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2315"><em>Source</em></a></div></h3>
+<h3 id="compat_allocator_proc"><span><a class="doc-id-link" href="#compat_allocator_proc">compat_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2439"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">compat_allocator_proc :: <span class="keyword-type">proc</span>(
 	allocator_data:  <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
@@ -2680,7 +2687,21 @@ freed.
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_arena_alloc_bytes"><span><a class="doc-id-link" href="#dynamic_arena_alloc_bytes">dynamic_arena_alloc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1683"><em>Source</em></a></div></h3>
+<h3 id="dynamic_arena_alloc"><span><a class="doc-id-link" href="#dynamic_arena_alloc">dynamic_arena_alloc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1776"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">dynamic_arena_alloc :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Dynamic_Arena">Dynamic_Arena</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Allocate memory from a dynamic arena.</p>
+<p>This procedure allocates <code>size</code> bytes of memory aligned on a boundary specified
+by <code>alignment</code> from a dynamic arena <code>a</code>. The allocated memory is
+zero-initialized. This procedure returns a pointer to the newly allocated memory
+region.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="dynamic_arena_alloc_bytes"><span><a class="doc-id-link" href="#dynamic_arena_alloc_bytes">dynamic_arena_alloc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1790"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_arena_alloc_bytes :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Dynamic_Arena">Dynamic_Arena</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -2694,7 +2715,7 @@ region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_arena_alloc_bytes_non_zeroed"><span><a class="doc-id-link" href="#dynamic_arena_alloc_bytes_non_zeroed">dynamic_arena_alloc_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1714"><em>Source</em></a></div></h3>
+<h3 id="dynamic_arena_alloc_bytes_non_zeroed"><span><a class="doc-id-link" href="#dynamic_arena_alloc_bytes_non_zeroed">dynamic_arena_alloc_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1821"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_arena_alloc_bytes_non_zeroed :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Dynamic_Arena">Dynamic_Arena</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -2708,7 +2729,7 @@ memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_arena_alloc_non_zeroed"><span><a class="doc-id-link" href="#dynamic_arena_alloc_non_zeroed">dynamic_arena_alloc_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1700"><em>Source</em></a></div></h3>
+<h3 id="dynamic_arena_alloc_non_zeroed"><span><a class="doc-id-link" href="#dynamic_arena_alloc_non_zeroed">dynamic_arena_alloc_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1807"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_arena_alloc_non_zeroed :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Dynamic_Arena">Dynamic_Arena</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -2722,7 +2743,7 @@ memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_arena_allocator"><span><a class="doc-id-link" href="#dynamic_arena_allocator">dynamic_arena_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1610"><em>Source</em></a></div></h3>
+<h3 id="dynamic_arena_allocator"><span><a class="doc-id-link" href="#dynamic_arena_allocator">dynamic_arena_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1716"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_arena_allocator :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Dynamic_Arena">Dynamic_Arena</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a> {…}</pre>
 </div>
@@ -2730,21 +2751,21 @@ memory region.</p>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Dynamic arena allocator.</p>
 <p>The dynamic arena allocator uses blocks of a specific size, allocated on-demand
-using the block allocator. This allocator acts similarly to arena. All
+using the block allocator. This allocator acts similarly to <code>Arena</code>. All
 allocations in a block happen contiguously, from start to end. If an allocation
-does not fit into the remaining space of the block, and its size is smaller
+does not fit into the remaining space of the block and its size is smaller
 than the specified out-band size, a new block is allocated using the
 <code>block_allocator</code> and the allocation is performed from a newly-allocated block.</p>
-<p>If an allocation has bigger size than the specified out-band size, a new block
+<p>If an allocation is larger than the specified out-band size, a new block
 is allocated such that the allocation fits into this new block. This is referred
 to as an <i>out-band allocation</i>. The out-band blocks are kept separately from
 normal blocks.</p>
-<p>Just like arena, the dynamic arena does not support freeing of individual
+<p>Just like <code>Arena</code>, the dynamic arena does not support freeing of individual
 objects.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_arena_allocator_proc"><span><a class="doc-id-link" href="#dynamic_arena_allocator_proc">dynamic_arena_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1903"><em>Source</em></a></div></h3>
+<h3 id="dynamic_arena_allocator_proc"><span><a class="doc-id-link" href="#dynamic_arena_allocator_proc">dynamic_arena_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2015"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_arena_allocator_proc :: <span class="keyword-type">proc</span>(
 	allocator_data:  <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
@@ -2757,31 +2778,31 @@ objects.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_arena_destroy"><span><a class="doc-id-link" href="#dynamic_arena_destroy">dynamic_arena_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1623"><em>Source</em></a></div></h3>
+<h3 id="dynamic_arena_destroy"><span><a class="doc-id-link" href="#dynamic_arena_destroy">dynamic_arena_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1729"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_arena_destroy :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Dynamic_Arena">Dynamic_Arena</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Destroy a dynamic arena.</p>
-<p>This procedure frees all allocations, made on a dynamic arena, including the
+<p>This procedure frees all allocations made on a dynamic arena, including the
 unused blocks, as well as the arrays for storing blocks.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_arena_free_all"><span><a class="doc-id-link" href="#dynamic_arena_free_all">dynamic_arena_free_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1770"><em>Source</em></a></div></h3>
+<h3 id="dynamic_arena_free_all"><span><a class="doc-id-link" href="#dynamic_arena_free_all">dynamic_arena_free_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1882"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_arena_free_all :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Dynamic_Arena">Dynamic_Arena</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Free all memory from a dynamic arena.</p>
-<p>This procedure frees all the allocations, owned by the dynamic arena, including
+<p>Free all memory back to the dynamic arena allocator.</p>
+<p>This procedure frees all the allocations owned by the dynamic arena, including
 the unused blocks.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_arena_init"><span><a class="doc-id-link" href="#dynamic_arena_init">dynamic_arena_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1574"><em>Source</em></a></div></h3>
+<h3 id="dynamic_arena_init"><span><a class="doc-id-link" href="#dynamic_arena_init">dynamic_arena_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1680"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_arena_init :: <span class="keyword-type">proc</span>(
 	pool:            ^<a class="code-typename" href="/core/mem/#Dynamic_Arena">Dynamic_Arena</a>, 
@@ -2803,95 +2824,101 @@ will be aligned to a boundary specified by <code>alignment</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_arena_reset"><span><a class="doc-id-link" href="#dynamic_arena_reset">dynamic_arena_reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1748"><em>Source</em></a></div></h3>
+<h3 id="dynamic_arena_reset"><span><a class="doc-id-link" href="#dynamic_arena_reset">dynamic_arena_reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1858"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_arena_reset :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Dynamic_Arena">Dynamic_Arena</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Reset the dynamic arena.</p>
-<p>This procedure frees all the allocations, owned by the dynamic arena, excluding
+<p>Reset a dynamic arena allocator.</p>
+<p>This procedure frees all the allocations owned by the dynamic arena, excluding
 the unused blocks.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_arena_resize"><span><a class="doc-id-link" href="#dynamic_arena_resize">dynamic_arena_resize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1795"><em>Source</em></a></div></h3>
+<h3 id="dynamic_arena_resize"><span><a class="doc-id-link" href="#dynamic_arena_resize">dynamic_arena_resize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1905"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_arena_resize :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Dynamic_Arena">Dynamic_Arena</a>, old_memory: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, old_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation.</p>
-<p>This procedure resizes a memory region, defined by its location, <code>old_memory</code>,
-and its size, <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
-newly allocated memory, if any is zero-initialized.</p>
+<p>Resize an allocation owned by a dynamic arena allocator.</p>
+<p>This procedure resizes a memory region defined by its location <code>old_memory</code>
+and its size <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
+newly allocated memory, if any, is zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>dynamic_arena_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
 by <code>alignment</code>.</p>
-<p>If <code>size</code> is 0, this procedure acts just like <code>dynamic_arena_free()</code>, freeing
-the memory region located at an address specified by <code>old_memory</code>.</p>
 <p>This procedure returns the pointer to the resized memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_arena_resize_bytes"><span><a class="doc-id-link" href="#dynamic_arena_resize_bytes">dynamic_arena_resize_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1823"><em>Source</em></a></div></h3>
+<h3 id="dynamic_arena_resize_bytes"><span><a class="doc-id-link" href="#dynamic_arena_resize_bytes">dynamic_arena_resize_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1930"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_arena_resize_bytes :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Dynamic_Arena">Dynamic_Arena</a>, old_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation.</p>
-<p>This procedure resizes a memory region, specified by <code>old_data</code>, to have a size
-<code>size</code> and alignment <code>alignment</code>. The newly allocated memory, if any is
+<p>Resize an allocation owned by a dynamic arena allocator.</p>
+<p>This procedure resizes a memory region specified by <code>old_data</code> to have a size
+<code>size</code> and alignment <code>alignment</code>. The newly allocated memory, if any, is
 zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>dynamic_arena_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
 by <code>alignment</code>.</p>
-<p>If <code>size</code> is 0, this procedure acts just like <code>dynamic_arena_free()</code>, freeing the
-memory region located at an address specified by <code>old_memory</code>.</p>
 <p>This procedure returns the slice of the resized memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_arena_resize_bytes_non_zeroed"><span><a class="doc-id-link" href="#dynamic_arena_resize_bytes_non_zeroed">dynamic_arena_resize_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1885"><em>Source</em></a></div></h3>
+<h3 id="dynamic_arena_resize_bytes_non_zeroed"><span><a class="doc-id-link" href="#dynamic_arena_resize_bytes_non_zeroed">dynamic_arena_resize_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1990"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_arena_resize_bytes_non_zeroed :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Dynamic_Arena">Dynamic_Arena</a>, old_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation.</p>
-<p>This procedure resizes a memory region, specified by <code>old_data</code>, to have a size
-<code>size</code> and alignment <code>alignment</code>. The newly allocated memory, if any is not
+<p>Resize an allocation owned by a dynamic arena allocator, without zero-initialization.</p>
+<p>This procedure resizes a memory region specified by <code>old_data</code> to have a size
+<code>size</code> and alignment <code>alignment</code>. The newly allocated memory, if any, is not
 explicitly zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>dynamic_arena_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
 by <code>alignment</code>.</p>
-<p>If <code>size</code> is 0, this procedure acts just like <code>dynamic_arena_free()</code>, freeing
-the memory region located at an address specified by <code>old_memory</code>.</p>
 <p>This procedure returns the slice of the resized memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_arena_resize_non_zeroed"><span><a class="doc-id-link" href="#dynamic_arena_resize_non_zeroed">dynamic_arena_resize_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1857"><em>Source</em></a></div></h3>
+<h3 id="dynamic_arena_resize_non_zeroed"><span><a class="doc-id-link" href="#dynamic_arena_resize_non_zeroed">dynamic_arena_resize_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1965"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_arena_resize_non_zeroed :: <span class="keyword-type">proc</span>(a: ^<a class="code-typename" href="/core/mem/#Dynamic_Arena">Dynamic_Arena</a>, old_memory: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, old_size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation without zero-initialization.</p>
-<p>This procedure resizes a memory region, defined by its location, <code>old_memory</code>,
-and its size, <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
-newly allocated memory, if any is not explicitly zero-initialized.</p>
+<p>Resize an allocation owned by a dynamic arena allocator, without zero-initialization.</p>
+<p>This procedure resizes a memory region defined by its location <code>old_memory</code>
+and its size <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
+newly allocated memory, if any, is not explicitly zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>dynamic_arena_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
 by <code>alignment</code>.</p>
-<p>If <code>size</code> is 0, this procedure acts just like <code>dynamic_arena_free()</code>, freeing the
-memory region located at an address specified by <code>old_memory</code>.</p>
 <p>This procedure returns the pointer to the resized memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_pool_alloc_bytes"><span><a class="doc-id-link" href="#dynamic_pool_alloc_bytes">dynamic_pool_alloc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1683"><em>Source</em></a></div></h3>
+<h3 id="dynamic_pool_alloc"><span><a class="doc-id-link" href="#dynamic_pool_alloc">dynamic_pool_alloc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1776"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">dynamic_pool_alloc :: <a class="code-procedure" href="/core/mem/#dynamic_arena_alloc">dynamic_arena_alloc</a></pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Allocate memory from a dynamic arena.</p>
+<p>This procedure allocates <code>size</code> bytes of memory aligned on a boundary specified
+by <code>alignment</code> from a dynamic arena <code>a</code>. The allocated memory is
+zero-initialized. This procedure returns a pointer to the newly allocated memory
+region.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="dynamic_pool_alloc_bytes"><span><a class="doc-id-link" href="#dynamic_pool_alloc_bytes">dynamic_pool_alloc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1790"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_pool_alloc_bytes :: <a class="code-procedure" href="/core/mem/#dynamic_arena_alloc_bytes">dynamic_arena_alloc_bytes</a></pre>
 </div>
@@ -2905,7 +2932,7 @@ region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_pool_allocator"><span><a class="doc-id-link" href="#dynamic_pool_allocator">dynamic_pool_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1610"><em>Source</em></a></div></h3>
+<h3 id="dynamic_pool_allocator"><span><a class="doc-id-link" href="#dynamic_pool_allocator">dynamic_pool_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1716"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_pool_allocator :: <a class="code-procedure" href="/core/mem/#dynamic_arena_allocator">dynamic_arena_allocator</a></pre>
 </div>
@@ -2913,51 +2940,51 @@ region.</p>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Dynamic arena allocator.</p>
 <p>The dynamic arena allocator uses blocks of a specific size, allocated on-demand
-using the block allocator. This allocator acts similarly to arena. All
+using the block allocator. This allocator acts similarly to <code>Arena</code>. All
 allocations in a block happen contiguously, from start to end. If an allocation
-does not fit into the remaining space of the block, and its size is smaller
+does not fit into the remaining space of the block and its size is smaller
 than the specified out-band size, a new block is allocated using the
 <code>block_allocator</code> and the allocation is performed from a newly-allocated block.</p>
-<p>If an allocation has bigger size than the specified out-band size, a new block
+<p>If an allocation is larger than the specified out-band size, a new block
 is allocated such that the allocation fits into this new block. This is referred
 to as an <i>out-band allocation</i>. The out-band blocks are kept separately from
 normal blocks.</p>
-<p>Just like arena, the dynamic arena does not support freeing of individual
+<p>Just like <code>Arena</code>, the dynamic arena does not support freeing of individual
 objects.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_pool_allocator_proc"><span><a class="doc-id-link" href="#dynamic_pool_allocator_proc">dynamic_pool_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1903"><em>Source</em></a></div></h3>
+<h3 id="dynamic_pool_allocator_proc"><span><a class="doc-id-link" href="#dynamic_pool_allocator_proc">dynamic_pool_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L2015"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_pool_allocator_proc :: <a class="code-procedure" href="/core/mem/#dynamic_arena_allocator_proc">dynamic_arena_allocator_proc</a></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_pool_destroy"><span><a class="doc-id-link" href="#dynamic_pool_destroy">dynamic_pool_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1623"><em>Source</em></a></div></h3>
+<h3 id="dynamic_pool_destroy"><span><a class="doc-id-link" href="#dynamic_pool_destroy">dynamic_pool_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1729"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_pool_destroy :: <a class="code-procedure" href="/core/mem/#dynamic_arena_destroy">dynamic_arena_destroy</a></pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Destroy a dynamic arena.</p>
-<p>This procedure frees all allocations, made on a dynamic arena, including the
+<p>This procedure frees all allocations made on a dynamic arena, including the
 unused blocks, as well as the arrays for storing blocks.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_pool_free_all"><span><a class="doc-id-link" href="#dynamic_pool_free_all">dynamic_pool_free_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1770"><em>Source</em></a></div></h3>
+<h3 id="dynamic_pool_free_all"><span><a class="doc-id-link" href="#dynamic_pool_free_all">dynamic_pool_free_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1882"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_pool_free_all :: <a class="code-procedure" href="/core/mem/#dynamic_arena_free_all">dynamic_arena_free_all</a></pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Free all memory from a dynamic arena.</p>
-<p>This procedure frees all the allocations, owned by the dynamic arena, including
+<p>Free all memory back to the dynamic arena allocator.</p>
+<p>This procedure frees all the allocations owned by the dynamic arena, including
 the unused blocks.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_pool_init"><span><a class="doc-id-link" href="#dynamic_pool_init">dynamic_pool_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1574"><em>Source</em></a></div></h3>
+<h3 id="dynamic_pool_init"><span><a class="doc-id-link" href="#dynamic_pool_init">dynamic_pool_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1680"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_pool_init :: <a class="code-procedure" href="/core/mem/#dynamic_arena_init">dynamic_arena_init</a></pre>
 </div>
@@ -2972,19 +2999,19 @@ will be aligned to a boundary specified by <code>alignment</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="dynamic_pool_reset"><span><a class="doc-id-link" href="#dynamic_pool_reset">dynamic_pool_reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1748"><em>Source</em></a></div></h3>
+<h3 id="dynamic_pool_reset"><span><a class="doc-id-link" href="#dynamic_pool_reset">dynamic_pool_reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1858"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">dynamic_pool_reset :: <a class="code-procedure" href="/core/mem/#dynamic_arena_reset">dynamic_arena_reset</a></pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Reset the dynamic arena.</p>
-<p>This procedure frees all the allocations, owned by the dynamic arena, excluding
+<p>Reset a dynamic arena allocator.</p>
+<p>This procedure frees all the allocations owned by the dynamic arena, excluding
 the unused blocks.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="end_arena_temp_memory"><span><a class="doc-id-link" href="#end_arena_temp_memory">end_arena_temp_memory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L314"><em>Source</em></a></div></h3>
+<h3 id="end_arena_temp_memory"><span><a class="doc-id-link" href="#end_arena_temp_memory">end_arena_temp_memory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L364"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">end_arena_temp_memory :: <span class="keyword-type">proc</span>(tmp: <a class="code-typename" href="/core/mem/#Arena_Temp_Memory">Arena_Temp_Memory</a>) {…}</pre>
 </div>
@@ -3379,7 +3406,7 @@ otherwise. The allocated object is initialized with <code>data</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="nil_allocator"><span><a class="doc-id-link" href="#nil_allocator">nil_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L15"><em>Source</em></a></div></h3>
+<h3 id="nil_allocator"><span><a class="doc-id-link" href="#nil_allocator">nil_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L65"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">nil_allocator :: <span class="keyword-type">proc</span>() -> runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a> {…}</pre>
 </div>
@@ -3392,7 +3419,7 @@ but an attempt to allocate memory is not an error.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="nil_allocator_proc"><span><a class="doc-id-link" href="#nil_allocator_proc">nil_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L22"><em>Source</em></a></div></h3>
+<h3 id="nil_allocator_proc"><span><a class="doc-id-link" href="#nil_allocator_proc">nil_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L72"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">nil_allocator_proc :: <span class="keyword-type">proc</span>(
 	allocator_data:  <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
@@ -3405,7 +3432,7 @@ but an attempt to allocate memory is not an error.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="panic_allocator"><span><a class="doc-id-link" href="#panic_allocator">panic_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L42"><em>Source</em></a></div></h3>
+<h3 id="panic_allocator"><span><a class="doc-id-link" href="#panic_allocator">panic_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L92"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">panic_allocator :: <span class="keyword-type">proc</span>() -> runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a> {…}</pre>
 </div>
@@ -3418,7 +3445,7 @@ not be allocated, and an attempt to allocate memory is an error.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="panic_allocator_proc"><span><a class="doc-id-link" href="#panic_allocator_proc">panic_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L49"><em>Source</em></a></div></h3>
+<h3 id="panic_allocator_proc"><span><a class="doc-id-link" href="#panic_allocator_proc">panic_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L99"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">panic_allocator_proc :: <span class="keyword-type">proc</span>(
 	allocator_data:  <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
@@ -3900,59 +3927,59 @@ the requested alignment.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_alloc"><span><a class="doc-id-link" href="#scratch_alloc">scratch_alloc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L400"><em>Source</em></a></div></h3>
+<h3 id="scratch_alloc"><span><a class="doc-id-link" href="#scratch_alloc">scratch_alloc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L462"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_alloc :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Scratch">Scratch</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Allocate memory from scratch allocator.</p>
+<p>Allocate memory from a scratch allocator.</p>
 <p>This procedure allocates <code>size</code> bytes of memory aligned on a boundary specified
 by <code>alignment</code>. The allocated memory region is zero-initialized. This procedure
 returns a pointer to the allocated memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_alloc_bytes"><span><a class="doc-id-link" href="#scratch_alloc_bytes">scratch_alloc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L418"><em>Source</em></a></div></h3>
+<h3 id="scratch_alloc_bytes"><span><a class="doc-id-link" href="#scratch_alloc_bytes">scratch_alloc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L480"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_alloc_bytes :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Scratch">Scratch</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Allocate memory from scratch allocator.</p>
+<p>Allocate memory from a scratch allocator.</p>
 <p>This procedure allocates <code>size</code> bytes of memory aligned on a boundary specified
 by <code>alignment</code>. The allocated memory region is zero-initialized. This procedure
 returns a slice of the allocated memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_alloc_bytes_non_zeroed"><span><a class="doc-id-link" href="#scratch_alloc_bytes_non_zeroed">scratch_alloc_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L457"><em>Source</em></a></div></h3>
+<h3 id="scratch_alloc_bytes_non_zeroed"><span><a class="doc-id-link" href="#scratch_alloc_bytes_non_zeroed">scratch_alloc_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L519"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_alloc_bytes_non_zeroed :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Scratch">Scratch</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Allocate non-initialized memory from scratch allocator.</p>
+<p>Allocate non-initialized memory from a scratch allocator.</p>
 <p>This procedure allocates <code>size</code> bytes of memory aligned on a boundary specified
 by <code>alignment</code>. The allocated memory region is not explicitly zero-initialized.
 This procedure returns a slice of the allocated memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_alloc_non_zeroed"><span><a class="doc-id-link" href="#scratch_alloc_non_zeroed">scratch_alloc_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L439"><em>Source</em></a></div></h3>
+<h3 id="scratch_alloc_non_zeroed"><span><a class="doc-id-link" href="#scratch_alloc_non_zeroed">scratch_alloc_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L501"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_alloc_non_zeroed :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Scratch">Scratch</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Allocate non-initialized memory from scratch allocator.</p>
+<p>Allocate non-initialized memory from a scratch allocator.</p>
 <p>This procedure allocates <code>size</code> bytes of memory aligned on a boundary specified
 by <code>alignment</code>. The allocated memory region is not explicitly zero-initialized.
 This procedure returns a pointer to the allocated memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_allocator"><span><a class="doc-id-link" href="#scratch_allocator">scratch_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L356"><em>Source</em></a></div></h3>
+<h3 id="scratch_allocator"><span><a class="doc-id-link" href="#scratch_allocator">scratch_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L414"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_allocator :: <span class="keyword-type">proc</span>(allocator: ^<a class="code-typename" href="/core/mem/#Scratch">Scratch</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a> {…}</pre>
 </div>
@@ -3960,40 +3987,47 @@ This procedure returns a pointer to the allocated memory region.</p>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Scratch allocator.</p>
 <p>The scratch allocator works in a similar way to the <code>Arena</code> allocator. The
-scratch allocator has a backing buffer, that is being allocated in
-contiguous regions, from start to end.</p>
+scratch allocator has a backing buffer that is allocated in contiguous regions,
+from start to end.</p>
 <p>Each subsequent allocation will be the next adjacent region of memory in the
 backing buffer. If the allocation doesn't fit into the remaining space of the
 backing buffer, this allocation is put at the start of the buffer, and all
-previous allocations will become invalidated. If the allocation doesn't fit
-into the backing buffer as a whole, it will be allocated using a backing
-allocator, and pointer to the allocated memory region will be put into the
-<code>leaked_allocations</code> array.</p>
-<p>The <code>leaked_allocations</code> array is managed by the <code>context</code> allocator.</p>
+previous allocations will become invalidated.</p>
+<p>If the allocation doesn't fit into the backing buffer as a whole, it will be
+allocated using a backing allocator, and the pointer to the allocated memory
+region will be put into the <code>leaked_allocations</code> array. A <code>Warning</code>-level log
+message will be sent as well.</p>
+<p>Allocations which are resized will be resized in-place if they were the last
+allocation. Otherwise, they are re-allocated to avoid overwriting previous
+allocations.</p>
+<p>The <code>leaked_allocations</code> array is managed by the <code>context</code> allocator if no
+<code>backup_allocator</code> is specified in <code>scratch_init</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_allocator_destroy"><span><a class="doc-id-link" href="#scratch_allocator_destroy">scratch_allocator_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L379"><em>Source</em></a></div></h3>
+<h3 id="scratch_allocator_destroy"><span><a class="doc-id-link" href="#scratch_allocator_destroy">scratch_allocator_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L441"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_allocator_destroy :: <a class="code-procedure" href="/core/mem/#scratch_destroy">scratch_destroy</a></pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Free all data associated with a scratch allocator.</p>
+<p>This is distinct from <code>scratch_free_all</code> in that it deallocates all memory used
+to setup the allocator, as opposed to all allocations made from that space.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_allocator_init"><span><a class="doc-id-link" href="#scratch_allocator_init">scratch_allocator_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L366"><em>Source</em></a></div></h3>
+<h3 id="scratch_allocator_init"><span><a class="doc-id-link" href="#scratch_allocator_init">scratch_allocator_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L424"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_allocator_init :: <a class="code-procedure" href="/core/mem/#scratch_init">scratch_init</a></pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Initialize scratch allocator.</p>
+<p>Initialize a scratch allocator.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_allocator_proc"><span><a class="doc-id-link" href="#scratch_allocator_proc">scratch_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L703"><em>Source</em></a></div></h3>
+<h3 id="scratch_allocator_proc"><span><a class="doc-id-link" href="#scratch_allocator_proc">scratch_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L781"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_allocator_proc :: <span class="keyword-type">proc</span>(
 	allocator_data:  <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
@@ -4006,50 +4040,52 @@ allocator, and pointer to the allocated memory region will be put into the
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_destroy"><span><a class="doc-id-link" href="#scratch_destroy">scratch_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L379"><em>Source</em></a></div></h3>
+<h3 id="scratch_destroy"><span><a class="doc-id-link" href="#scratch_destroy">scratch_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L441"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_destroy :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Scratch">Scratch</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Free all data associated with a scratch allocator.</p>
+<p>This is distinct from <code>scratch_free_all</code> in that it deallocates all memory used
+to setup the allocator, as opposed to all allocations made from that space.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_free"><span><a class="doc-id-link" href="#scratch_free">scratch_free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L517"><em>Source</em></a></div></h3>
+<h3 id="scratch_free"><span><a class="doc-id-link" href="#scratch_free">scratch_free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L587"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_free :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Scratch">Scratch</a>, ptr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Free memory to the scratch allocator.</p>
+<p>Free memory back to the scratch allocator.</p>
 <p>This procedure frees the memory region allocated at pointer <code>ptr</code>.</p>
 <p>If <code>ptr</code> is not the latest allocation and is not a leaked allocation, this
 operation is a no-op.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_free_all"><span><a class="doc-id-link" href="#scratch_free_all">scratch_free_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L553"><em>Source</em></a></div></h3>
+<h3 id="scratch_free_all"><span><a class="doc-id-link" href="#scratch_free_all">scratch_free_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L624"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_free_all :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Scratch">Scratch</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Free all memory to the scratch allocator.</p>
+<p>Free all memory back to the scratch allocator.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_init"><span><a class="doc-id-link" href="#scratch_init">scratch_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L366"><em>Source</em></a></div></h3>
+<h3 id="scratch_init"><span><a class="doc-id-link" href="#scratch_init">scratch_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L424"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_init :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Scratch">Scratch</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, backup_allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Initialize scratch allocator.</p>
+<p>Initialize a scratch allocator.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_resize"><span><a class="doc-id-link" href="#scratch_resize">scratch_resize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L580"><em>Source</em></a></div></h3>
+<h3 id="scratch_resize"><span><a class="doc-id-link" href="#scratch_resize">scratch_resize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L651"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_resize :: <span class="keyword-type">proc</span>(
 	s:          ^<a class="code-typename" href="/core/mem/#Scratch">Scratch</a>, 
@@ -4062,10 +4098,10 @@ operation is a no-op.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation.</p>
-<p>This procedure resizes a memory region, defined by its location, <code>old_memory</code>,
-and its size, <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
-newly allocated memory, if any is zero-initialized.</p>
+<p>Resize an allocation owned by a scratch allocator.</p>
+<p>This procedure resizes a memory region defined by its location <code>old_memory</code>
+and its size <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
+newly allocated memory, if any, is zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>scratch_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
 by <code>alignment</code>.</p>
@@ -4075,15 +4111,15 @@ memory region located at an address specified by <code>old_memory</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_resize_bytes"><span><a class="doc-id-link" href="#scratch_resize_bytes">scratch_resize_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L609"><em>Source</em></a></div></h3>
+<h3 id="scratch_resize_bytes"><span><a class="doc-id-link" href="#scratch_resize_bytes">scratch_resize_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L680"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_resize_bytes :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Scratch">Scratch</a>, old_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation.</p>
-<p>This procedure resizes a memory region, specified by <code>old_data</code>, to have a size
-<code>size</code> and alignment <code>alignment</code>. The newly allocated memory, if any is
+<p>Resize an allocation owned by a scratch allocator.</p>
+<p>This procedure resizes a memory region specified by <code>old_data</code> to have a size
+<code>size</code> and alignment <code>alignment</code>. The newly allocated memory, if any, is
 zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>scratch_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
@@ -4094,15 +4130,15 @@ memory region located at an address specified by <code>old_memory</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_resize_bytes_non_zeroed"><span><a class="doc-id-link" href="#scratch_resize_bytes_non_zeroed">scratch_resize_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L669"><em>Source</em></a></div></h3>
+<h3 id="scratch_resize_bytes_non_zeroed"><span><a class="doc-id-link" href="#scratch_resize_bytes_non_zeroed">scratch_resize_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L740"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_resize_bytes_non_zeroed :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Scratch">Scratch</a>, old_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation.</p>
-<p>This procedure resizes a memory region, specified by <code>old_data</code>, to have a size
-<code>size</code> and alignment <code>alignment</code>. The newly allocated memory, if any is not
+<p>Resize an allocation owned by a scratch allocator.</p>
+<p>This procedure resizes a memory region specified by <code>old_data</code> to have a size
+<code>size</code> and alignment <code>alignment</code>. The newly allocated memory, if any, is not
 explicitly zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>scratch_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
@@ -4113,7 +4149,7 @@ memory region located at an address specified by <code>old_memory</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="scratch_resize_non_zeroed"><span><a class="doc-id-link" href="#scratch_resize_non_zeroed">scratch_resize_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L640"><em>Source</em></a></div></h3>
+<h3 id="scratch_resize_non_zeroed"><span><a class="doc-id-link" href="#scratch_resize_non_zeroed">scratch_resize_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L711"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">scratch_resize_non_zeroed :: <span class="keyword-type">proc</span>(
 	s:          ^<a class="code-typename" href="/core/mem/#Scratch">Scratch</a>, 
@@ -4126,10 +4162,10 @@ memory region located at an address specified by <code>old_memory</code>.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation without zero-initialization.</p>
-<p>This procedure resizes a memory region, defined by its location, <code>old_memory</code>,
-and its size, <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
-newly allocated memory, if any is not explicitly zero-initialized.</p>
+<p>Resize an allocation owned by a scratch allocator, without zero-initialization.</p>
+<p>This procedure resizes a memory region defined by its location <code>old_memory</code>
+and its size <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
+newly allocated memory, if any, is not explicitly zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>scratch_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
 by <code>alignment</code>.</p>
@@ -4215,68 +4251,71 @@ by slice <code>slice</code> and the length of the slice.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="small_stack_alloc"><span><a class="doc-id-link" href="#small_stack_alloc">small_stack_alloc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1205"><em>Source</em></a></div></h3>
+<h3 id="small_stack_alloc"><span><a class="doc-id-link" href="#small_stack_alloc">small_stack_alloc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1299"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">small_stack_alloc :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Small_Stack">Small_Stack</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Allocate memory from small stack.</p>
+<p>Allocate memory from a small stack allocator.</p>
 <p>This procedure allocates <code>size</code> bytes of memory aligned to a boundary specified
 by <code>alignment</code>. The allocated memory is zero-initialized. This procedure
 returns a pointer to the allocated memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="small_stack_alloc_bytes"><span><a class="doc-id-link" href="#small_stack_alloc_bytes">small_stack_alloc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1223"><em>Source</em></a></div></h3>
+<h3 id="small_stack_alloc_bytes"><span><a class="doc-id-link" href="#small_stack_alloc_bytes">small_stack_alloc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1317"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">small_stack_alloc_bytes :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Small_Stack">Small_Stack</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Allocate memory from small stack.</p>
+<p>Allocate memory from a small stack allocator.</p>
 <p>This procedure allocates <code>size</code> bytes of memory aligned to a boundary specified
 by <code>alignment</code>. The allocated memory is zero-initialized. This procedure
 returns a slice of the allocated memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="small_stack_alloc_bytes_non_zeroed"><span><a class="doc-id-link" href="#small_stack_alloc_bytes_non_zeroed">small_stack_alloc_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1262"><em>Source</em></a></div></h3>
+<h3 id="small_stack_alloc_bytes_non_zeroed"><span><a class="doc-id-link" href="#small_stack_alloc_bytes_non_zeroed">small_stack_alloc_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1356"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">small_stack_alloc_bytes_non_zeroed :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Small_Stack">Small_Stack</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Allocate memory from small stack.</p>
+<p>Allocate memory from a small stack allocator.</p>
 <p>This procedure allocates <code>size</code> bytes of memory aligned to a boundary specified
 by <code>alignment</code>. The allocated memory is not explicitly zero-initialized. This
 procedure returns a slice of the allocated memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="small_stack_alloc_non_zeroed"><span><a class="doc-id-link" href="#small_stack_alloc_non_zeroed">small_stack_alloc_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1244"><em>Source</em></a></div></h3>
+<h3 id="small_stack_alloc_non_zeroed"><span><a class="doc-id-link" href="#small_stack_alloc_non_zeroed">small_stack_alloc_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1338"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">small_stack_alloc_non_zeroed :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Small_Stack">Small_Stack</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Allocate memory from small stack.</p>
+<p>Allocate memory from a small stack allocator.</p>
 <p>This procedure allocates <code>size</code> bytes of memory aligned to a boundary specified
 by <code>alignment</code>. The allocated memory is not explicitly zero-initialized. This
 procedure returns a pointer to the allocated memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="small_stack_allocator"><span><a class="doc-id-link" href="#small_stack_allocator">small_stack_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1190"><em>Source</em></a></div></h3>
+<h3 id="small_stack_allocator"><span><a class="doc-id-link" href="#small_stack_allocator">small_stack_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1284"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">small_stack_allocator :: <span class="keyword-type">proc</span>(stack: ^<a class="code-typename" href="/core/mem/#Small_Stack">Small_Stack</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Small stack allocator.</p>
-<p>The small stack allocator is just like a stack allocator, with the only
+<p>The small stack allocator is just like a <code>Stack</code> allocator, with the only
 difference being an extremely small header size. Unlike the stack allocator,
-small stack allows out-of order freeing of memory.</p>
+the small stack allows out-of order freeing of memory, with the stipulation
+that all allocations made after the freed allocation will become invalidated
+upon following allocations as they will begin to overwrite the memory formerly
+used by the freed allocation.</p>
 <p>The memory is allocated in the backing buffer linearly, from start to end.
 Each subsequent allocation will get the next adjacent memory region.</p>
 <p>The metadata is stored in the allocation headers, that are located before the
@@ -4285,7 +4324,7 @@ padding bytes between that header and end of the previous allocation.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="small_stack_allocator_proc"><span><a class="doc-id-link" href="#small_stack_allocator_proc">small_stack_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1488"><em>Source</em></a></div></h3>
+<h3 id="small_stack_allocator_proc"><span><a class="doc-id-link" href="#small_stack_allocator_proc">small_stack_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1594"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">small_stack_allocator_proc :: <span class="keyword-type">proc</span>(
 	allocator_data:  <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
@@ -4298,42 +4337,42 @@ padding bytes between that header and end of the previous allocation.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="small_stack_free"><span><a class="doc-id-link" href="#small_stack_free">small_stack_free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1297"><em>Source</em></a></div></h3>
+<h3 id="small_stack_free"><span><a class="doc-id-link" href="#small_stack_free">small_stack_free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1395"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">small_stack_free :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Small_Stack">Small_Stack</a>, old_memory: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Allocate memory from small stack.</p>
+<p>Allocate memory from a small stack allocator.</p>
 <p>This procedure allocates <code>size</code> bytes of memory aligned to a boundary specified
 by <code>alignment</code>. The allocated memory is not explicitly zero-initialized. This
 procedure returns a slice of the allocated memory region.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="small_stack_free_all"><span><a class="doc-id-link" href="#small_stack_free_all">small_stack_free_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1329"><em>Source</em></a></div></h3>
+<h3 id="small_stack_free_all"><span><a class="doc-id-link" href="#small_stack_free_all">small_stack_free_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1426"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">small_stack_free_all :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Small_Stack">Small_Stack</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Free all memory to small stack.</p>
+<p>Free all memory back to the small stack allocator.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="small_stack_init"><span><a class="doc-id-link" href="#small_stack_init">small_stack_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1168"><em>Source</em></a></div></h3>
+<h3 id="small_stack_init"><span><a class="doc-id-link" href="#small_stack_init">small_stack_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1259"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">small_stack_init :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Small_Stack">Small_Stack</a>, data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Initialize small stack.</p>
+<p>Initialize a small stack allocator.</p>
 <p>This procedure initializes the small stack allocator with <code>data</code> as its backing
 buffer.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="small_stack_resize"><span><a class="doc-id-link" href="#small_stack_resize">small_stack_resize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1351"><em>Source</em></a></div></h3>
+<h3 id="small_stack_resize"><span><a class="doc-id-link" href="#small_stack_resize">small_stack_resize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1448"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">small_stack_resize :: <span class="keyword-type">proc</span>(
 	s:          ^<a class="code-typename" href="/core/mem/#Small_Stack">Small_Stack</a>, 
@@ -4346,10 +4385,10 @@ buffer.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation.</p>
-<p>This procedure resizes a memory region, defined by its location, <code>old_memory</code>,
-and its size, <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
-newly allocated memory, if any is zero-initialized.</p>
+<p>Resize an allocation owned by a small stack allocator.</p>
+<p>This procedure resizes a memory region defined by its location <code>old_memory</code>
+and its size <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
+newly allocated memory, if any, is zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>small_stack_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
 by <code>alignment</code>.</p>
@@ -4359,16 +4398,16 @@ memory region located at an address specified by <code>old_memory</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="small_stack_resize_bytes"><span><a class="doc-id-link" href="#small_stack_resize_bytes">small_stack_resize_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1380"><em>Source</em></a></div></h3>
+<h3 id="small_stack_resize_bytes"><span><a class="doc-id-link" href="#small_stack_resize_bytes">small_stack_resize_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1477"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">small_stack_resize_bytes :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Small_Stack">Small_Stack</a>, old_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation.</p>
-<p>This procedure resizes a memory region, specified by the <code>old_data</code> parameter
-to have a size <code>size</code> and alignment <code>alignment</code>. The newly allocated memory,
-if any is zero-initialized.</p>
+<p>Resize an allocation owned by a small stack allocator.</p>
+<p>This procedure resizes a memory region specified by <code>old_data</code> to have a size
+<code>size</code> and alignment <code>alignment</code>. The newly allocated memory, if any, is
+zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>small_stack_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
 by <code>alignment</code>.</p>
@@ -4378,16 +4417,16 @@ memory region located at an address specified by <code>old_memory</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="small_stack_resize_bytes_non_zeroed"><span><a class="doc-id-link" href="#small_stack_resize_bytes_non_zeroed">small_stack_resize_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1444"><em>Source</em></a></div></h3>
+<h3 id="small_stack_resize_bytes_non_zeroed"><span><a class="doc-id-link" href="#small_stack_resize_bytes_non_zeroed">small_stack_resize_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1541"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">small_stack_resize_bytes_non_zeroed :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Small_Stack">Small_Stack</a>, old_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation without zero-initialization.</p>
-<p>This procedure resizes a memory region, specified by the <code>old_data</code> parameter
-to have a size <code>size</code> and alignment <code>alignment</code>. The newly allocated memory,
-if any is not explicitly zero-initialized.</p>
+<p>Resize an allocation owned by a small stack allocator, without zero-initialization.</p>
+<p>This procedure resizes a memory region specified by <code>old_data</code> to have a size
+<code>size</code> and alignment <code>alignment</code>. The newly allocated memory, if any, is not
+explicitly zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>small_stack_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
 by <code>alignment</code>.</p>
@@ -4397,7 +4436,7 @@ memory region located at an address specified by <code>old_memory</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="small_stack_resize_non_zeroed"><span><a class="doc-id-link" href="#small_stack_resize_non_zeroed">small_stack_resize_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1415"><em>Source</em></a></div></h3>
+<h3 id="small_stack_resize_non_zeroed"><span><a class="doc-id-link" href="#small_stack_resize_non_zeroed">small_stack_resize_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1512"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">small_stack_resize_non_zeroed :: <span class="keyword-type">proc</span>(
 	s:          ^<a class="code-typename" href="/core/mem/#Small_Stack">Small_Stack</a>, 
@@ -4410,10 +4449,10 @@ memory region located at an address specified by <code>old_memory</code>.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation without zero-initialization.</p>
-<p>This procedure resizes a memory region, defined by its location, <code>old_memory</code>,
-and its size, <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
-newly allocated memory, if any is not explicitly zero-initialized.</p>
+<p>Resize an allocation owned by a small stack allocator, without zero-initialization.</p>
+<p>This procedure resizes a memory region defined by its location <code>old_memory</code>
+and its size <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
+newly allocated memory, if any, is not explicitly zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>small_stack_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
 by <code>alignment</code>.</p>
@@ -4423,59 +4462,59 @@ memory region located at an address specified by <code>old_memory</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="stack_alloc"><span><a class="doc-id-link" href="#stack_alloc">stack_alloc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L804"><em>Source</em></a></div></h3>
+<h3 id="stack_alloc"><span><a class="doc-id-link" href="#stack_alloc">stack_alloc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L882"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stack_alloc :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Stack">Stack</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Allocate memory from stack.</p>
+<p>Allocate memory from a stack allocator.</p>
 <p>This procedure allocates <code>size</code> bytes of memory, aligned to the boundary
 specified by <code>alignment</code>. The allocated memory is zero-initialized. This
 procedure returns the pointer to the allocated memory.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="stack_alloc_bytes"><span><a class="doc-id-link" href="#stack_alloc_bytes">stack_alloc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L822"><em>Source</em></a></div></h3>
+<h3 id="stack_alloc_bytes"><span><a class="doc-id-link" href="#stack_alloc_bytes">stack_alloc_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L900"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stack_alloc_bytes :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Stack">Stack</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Allocate memory from stack.</p>
+<p>Allocate memory from a stack allocator.</p>
 <p>This procedure allocates <code>size</code> bytes of memory, aligned to the boundary
 specified by <code>alignment</code>. The allocated memory is zero-initialized. This
 procedure returns the slice of the allocated memory.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="stack_alloc_bytes_non_zeroed"><span><a class="doc-id-link" href="#stack_alloc_bytes_non_zeroed">stack_alloc_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L861"><em>Source</em></a></div></h3>
+<h3 id="stack_alloc_bytes_non_zeroed"><span><a class="doc-id-link" href="#stack_alloc_bytes_non_zeroed">stack_alloc_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L939"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stack_alloc_bytes_non_zeroed :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Stack">Stack</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Allocate memory from stack.</p>
+<p>Allocate memory from a stack allocator.</p>
 <p>This procedure allocates <code>size</code> bytes of memory, aligned to the boundary
 specified by <code>alignment</code>. The allocated memory is not explicitly
 zero-initialized. This procedure returns the slice of the allocated memory.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="stack_alloc_non_zeroed"><span><a class="doc-id-link" href="#stack_alloc_non_zeroed">stack_alloc_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L843"><em>Source</em></a></div></h3>
+<h3 id="stack_alloc_non_zeroed"><span><a class="doc-id-link" href="#stack_alloc_non_zeroed">stack_alloc_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L921"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stack_alloc_non_zeroed :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Stack">Stack</a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Allocate memory from stack.</p>
+<p>Allocate memory from a stack allocator.</p>
 <p>This procedure allocates <code>size</code> bytes of memory, aligned to the boundary
 specified by <code>alignment</code>. The allocated memory is not explicitly
 zero-initialized. This procedure returns the pointer to the allocated memory.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="stack_allocator"><span><a class="doc-id-link" href="#stack_allocator">stack_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L775"><em>Source</em></a></div></h3>
+<h3 id="stack_allocator"><span><a class="doc-id-link" href="#stack_allocator">stack_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L853"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stack_allocator :: <span class="keyword-type">proc</span>(stack: ^<a class="code-typename" href="/core/mem/#Stack">Stack</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a> {…}</pre>
 </div>
@@ -4495,7 +4534,7 @@ previous allocation header.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="stack_allocator_proc"><span><a class="doc-id-link" href="#stack_allocator_proc">stack_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1107"><em>Source</em></a></div></h3>
+<h3 id="stack_allocator_proc"><span><a class="doc-id-link" href="#stack_allocator_proc">stack_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1198"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stack_allocator_proc :: <span class="keyword-type">proc</span>(
 	allocator_data:  <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
@@ -4508,42 +4547,42 @@ previous allocation header.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="stack_free"><span><a class="doc-id-link" href="#stack_free">stack_free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L901"><em>Source</em></a></div></h3>
+<h3 id="stack_free"><span><a class="doc-id-link" href="#stack_free">stack_free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L979"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stack_free :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Stack">Stack</a>, old_memory: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Free memory to the stack.</p>
+<p>Free memory back to the stack allocator.</p>
 <p>This procedure frees the memory region starting at <code>old_memory</code> to the stack.
-If the freeing does is an out of order freeing, the <code>.Invalid_Pointer</code> error
+If the freeing is an out of order freeing, the <code>.Invalid_Pointer</code> error
 is returned.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="stack_free_all"><span><a class="doc-id-link" href="#stack_free_all">stack_free_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L939"><em>Source</em></a></div></h3>
+<h3 id="stack_free_all"><span><a class="doc-id-link" href="#stack_free_all">stack_free_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1016"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stack_free_all :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Stack">Stack</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Free all allocations to the stack.</p>
+<p>Free all memory back to the stack allocator.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="stack_init"><span><a class="doc-id-link" href="#stack_init">stack_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L788"><em>Source</em></a></div></h3>
+<h3 id="stack_init"><span><a class="doc-id-link" href="#stack_init">stack_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L866"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stack_init :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Stack">Stack</a>, data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Initialize the stack allocator.</p>
+<p>Initialize a stack allocator.</p>
 <p>This procedure initializes the stack allocator with a backing buffer specified
 by <code>data</code> parameter.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="stack_resize"><span><a class="doc-id-link" href="#stack_resize">stack_resize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L962"><em>Source</em></a></div></h3>
+<h3 id="stack_resize"><span><a class="doc-id-link" href="#stack_resize">stack_resize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1039"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stack_resize :: <span class="keyword-type">proc</span>(
 	s:          ^<a class="code-typename" href="/core/mem/#Stack">Stack</a>, 
@@ -4556,10 +4595,10 @@ by <code>data</code> parameter.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation.</p>
-<p>This procedure resizes a memory region, defined by its location, <code>old_memory</code>,
-and its size, <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
-newly allocated memory, if any is zero-initialized.</p>
+<p>Resize an allocation owned by a stack allocator.</p>
+<p>This procedure resizes a memory region defined by its location <code>old_memory</code>
+and its size <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
+newly allocated memory, if any, is zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>stack_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
 by <code>alignment</code>.</p>
@@ -4569,16 +4608,16 @@ memory region located at an address specified by <code>old_memory</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="stack_resize_bytes"><span><a class="doc-id-link" href="#stack_resize_bytes">stack_resize_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L991"><em>Source</em></a></div></h3>
+<h3 id="stack_resize_bytes"><span><a class="doc-id-link" href="#stack_resize_bytes">stack_resize_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1068"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stack_resize_bytes :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Stack">Stack</a>, old_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation.</p>
-<p>This procedure resizes a memory region, specified by the <code>old_data</code> parameter
-to have a size <code>size</code> and alignment <code>alignment</code>. The newly allocated memory,
-if any is zero-initialized.</p>
+<p>Resize an allocation owned by a stack allocator.</p>
+<p>This procedure resizes a memory region specified by <code>old_data</code> to have a size
+<code>size</code> and alignment <code>alignment</code>. The newly allocated memory, if any, is
+zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>stack_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
 by <code>alignment</code>.</p>
@@ -4588,16 +4627,16 @@ memory region located at an address specified by <code>old_memory</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="stack_resize_bytes_non_zeroed"><span><a class="doc-id-link" href="#stack_resize_bytes_non_zeroed">stack_resize_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1055"><em>Source</em></a></div></h3>
+<h3 id="stack_resize_bytes_non_zeroed"><span><a class="doc-id-link" href="#stack_resize_bytes_non_zeroed">stack_resize_bytes_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1132"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stack_resize_bytes_non_zeroed :: <span class="keyword-type">proc</span>(s: ^<a class="code-typename" href="/core/mem/#Stack">Stack</a>, old_data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_ALIGNMENT, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation without zero-initialization.</p>
-<p>This procedure resizes a memory region, specified by the <code>old_data</code> parameter
-to have a size <code>size</code> and alignment <code>alignment</code>. The newly allocated memory,
-if any is not explicitly zero-initialized.</p>
+<p>Resize an allocation owned by a stack allocator, without zero-initialization.</p>
+<p>This procedure resizes a memory region specified by <code>old_data</code> to have a size
+<code>size</code> and alignment <code>alignment</code>. The newly allocated memory, if any, is not
+explicitly zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>stack_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
 by <code>alignment</code>.</p>
@@ -4607,7 +4646,7 @@ memory region located at an address specified by <code>old_memory</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="stack_resize_non_zeroed"><span><a class="doc-id-link" href="#stack_resize_non_zeroed">stack_resize_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1026"><em>Source</em></a></div></h3>
+<h3 id="stack_resize_non_zeroed"><span><a class="doc-id-link" href="#stack_resize_non_zeroed">stack_resize_non_zeroed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/allocators.odin#L1103"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stack_resize_non_zeroed :: <span class="keyword-type">proc</span>(
 	s:          ^<a class="code-typename" href="/core/mem/#Stack">Stack</a>, 
@@ -4620,10 +4659,10 @@ memory region located at an address specified by <code>old_memory</code>.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize an allocation without zero-initialization.</p>
-<p>This procedure resizes a memory region, defined by its location, <code>old_memory</code>,
-and its size, <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
-newly allocated memory, if any is not explicitly zero-initialized.</p>
+<p>Resize an allocation owned by a stack allocator, without zero-initialization.</p>
+<p>This procedure resizes a memory region defined by its location <code>old_memory</code>
+and its size <code>old_size</code> to have a size <code>size</code> and alignment <code>alignment</code>. The
+newly allocated memory, if any, is not explicitly zero-initialized.</p>
 <p>If <code>old_memory</code> is <code>nil</code>, this procedure acts just like <code>stack_alloc()</code>,
 allocating a memory region <code>size</code> bytes in size, aligned on a boundary specified
 by <code>alignment</code>.</p>
@@ -4879,7 +4918,7 @@ to zero, and returns the slice <code>data</code>.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin">tracking_allocator.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-18 21:13:27.781989300 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-19 21:13:14.680141600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -5010,6 +5049,7 @@ to zero, and returns the slice <code>data</code>.</p>
 <li><a href="#delete_soa_dynamic_array">delete_soa_dynamic_array</a></li>
 <li><a href="#delete_soa_slice">delete_soa_slice</a></li>
 <li><a href="#delete_string">delete_string</a></li>
+<li><a href="#dynamic_arena_alloc">dynamic_arena_alloc</a></li>
 <li><a href="#dynamic_arena_alloc_bytes">dynamic_arena_alloc_bytes</a></li>
 <li><a href="#dynamic_arena_alloc_bytes_non_zeroed">dynamic_arena_alloc_bytes_non_zeroed</a></li>
 <li><a href="#dynamic_arena_alloc_non_zeroed">dynamic_arena_alloc_non_zeroed</a></li>
@@ -5023,6 +5063,7 @@ to zero, and returns the slice <code>data</code>.</p>
 <li><a href="#dynamic_arena_resize_bytes">dynamic_arena_resize_bytes</a></li>
 <li><a href="#dynamic_arena_resize_bytes_non_zeroed">dynamic_arena_resize_bytes_non_zeroed</a></li>
 <li><a href="#dynamic_arena_resize_non_zeroed">dynamic_arena_resize_non_zeroed</a></li>
+<li><a href="#dynamic_pool_alloc">dynamic_pool_alloc</a></li>
 <li><a href="#dynamic_pool_alloc_bytes">dynamic_pool_alloc_bytes</a></li>
 <li><a href="#dynamic_pool_allocator">dynamic_pool_allocator</a></li>
 <li><a href="#dynamic_pool_allocator_proc">dynamic_pool_allocator_proc</a></li>
