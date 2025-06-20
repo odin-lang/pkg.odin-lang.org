@@ -565,6 +565,8 @@ chan_example :: proc() {
 	r_waiting:       <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
 	<span class="comment">// guarded by `mutex`</span>
 	w_waiting:       <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	<span class="comment">// guarded by `mutex`</span>
+	did_read:        <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
 	<span class="comment">// Buffered</span>
 	queue:           ^Raw_Queue,
 	<span class="comment">// Unbuffered</span>
@@ -612,7 +614,7 @@ raw_chan_example :: proc() {
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Select_Status"><span><a class="doc-id-link" href="#Select_Status">Select_Status<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1119"><em>Source</em></a></div></h3>
+<h3 id="Select_Status"><span><a class="doc-id-link" href="#Select_Status">Select_Status<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1135"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Select_Status :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
 	None, 
@@ -636,7 +638,7 @@ raw_chan_example :: proc() {
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="as_recv"><span><a class="doc-id-link" href="#as_recv">as_recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L415"><em>Source</em></a></div></h3>
+<h3 id="as_recv"><span><a class="doc-id-link" href="#as_recv">as_recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L417"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">as_recv :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: $C/<a class="code-typename" href="/core/sync/chan/#Chan">Chan</a>($T, $D)) -> (r: <a class="code-typename" href="/core/sync/chan/#Chan">Chan</a>($T, $D=1)) {…}</pre>
 </div>
@@ -672,7 +674,7 @@ as_recv_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="as_send"><span><a class="doc-id-link" href="#as_send">as_send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L380"><em>Source</em></a></div></h3>
+<h3 id="as_send"><span><a class="doc-id-link" href="#as_send">as_send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L382"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">as_send :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: $C/<a class="code-typename" href="/core/sync/chan/#Chan">Chan</a>($T, $D)) -> (s: <a class="code-typename" href="/core/sync/chan/#Chan">Chan</a>($T, $D=-1)) {…}</pre>
 </div>
@@ -709,14 +711,15 @@ as_send_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="can_recv"><span><a class="doc-id-link" href="#can_recv">can_recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1073"><em>Source</em></a></div></h3>
+<h3 id="can_recv"><span><a class="doc-id-link" href="#can_recv">can_recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1089"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">can_recv :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Returns whether a message is ready to be read, i.e.,
-if a call to <code>recv</code> or <code>recv_raw</code> would block</p>
+<p>Returns whether a message can be read without blocking the current
+thread. Specifically, it checks if the channel is buffered and not full,
+or if there is already a writer attempting to send a message.</p>
 <p><b>Inputs</b>
 <span class="doc-list"><code>c</code>: The channel</span></p>
 <p><b>Returns</b>
@@ -739,7 +742,7 @@ can_recv_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="can_send"><span><a class="doc-id-link" href="#can_send">can_send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1108"><em>Source</em></a></div></h3>
+<h3 id="can_send"><span><a class="doc-id-link" href="#can_send">can_send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1124"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">can_send :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -751,7 +754,7 @@ or if there is already a reader waiting for a message.</p>
 <p><b>Inputs</b>
 <span class="doc-list"><code>c</code>: The channel</span></p>
 <p><b>Returns</b>
-<span class="doc-list"><code>true</code> if a message can be send, <code>false</code> otherwise</span></p>
+<span class="doc-list"><code>true</code> if a message can be sent, <code>false</code> otherwise</span></p>
 <details open class="code-example">
 <summary><b>Example:</b></summary>
 <pre><code class="hljs language-odin" data-lang="odin">import "core:sync/chan"
@@ -770,7 +773,7 @@ can_send_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="cap"><span><a class="doc-id-link" href="#cap">cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L978"><em>Source</em></a></div></h3>
+<h3 id="cap"><span><a class="doc-id-link" href="#cap">cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L993"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">cap :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
@@ -802,7 +805,7 @@ cap_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="close"><span><a class="doc-id-link" href="#close">close<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1016"><em>Source</em></a></div></h3>
+<h3 id="close"><span><a class="doc-id-link" href="#close">close<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1031"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">close :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -838,7 +841,7 @@ close_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_buffered"><span><a class="doc-id-link" href="#create_buffered">create_buffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L185"><em>Source</em></a></div></h3>
+<h3 id="create_buffered"><span><a class="doc-id-link" href="#create_buffered">create_buffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L187"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_buffered :: <span class="keyword-type">proc</span>($C: <span class="keyword-type">typeid</span>/<a class="code-typename" href="/core/sync/chan/#Chan">Chan</a>($T, $D=0), <span class="keyword-type">#any_int</span> cap: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (c: $/<a class="code-typename" href="/core/sync/chan/#Chan">Chan</a>($T, $D=0), err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -867,7 +870,7 @@ create_buffered_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_raw_buffered"><span><a class="doc-id-link" href="#create_raw_buffered">create_raw_buffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L301"><em>Source</em></a></div></h3>
+<h3 id="create_raw_buffered"><span><a class="doc-id-link" href="#create_raw_buffered">create_raw_buffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L303"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_raw_buffered :: <span class="keyword-type">proc</span>(<span class="keyword-type">#any_int</span> msg_size, <span class="keyword-type">#any_int</span> msg_alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">#any_int</span> cap: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -898,7 +901,7 @@ create_raw_unbuffered_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_raw_unbuffered"><span><a class="doc-id-link" href="#create_raw_unbuffered">create_raw_unbuffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L256"><em>Source</em></a></div></h3>
+<h3 id="create_raw_unbuffered"><span><a class="doc-id-link" href="#create_raw_unbuffered">create_raw_unbuffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L258"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_raw_unbuffered :: <span class="keyword-type">proc</span>(<span class="keyword-type">#any_int</span> msg_size, <span class="keyword-type">#any_int</span> msg_alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -928,7 +931,7 @@ create_raw_unbuffered_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_unbuffered"><span><a class="doc-id-link" href="#create_unbuffered">create_unbuffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L154"><em>Source</em></a></div></h3>
+<h3 id="create_unbuffered"><span><a class="doc-id-link" href="#create_unbuffered">create_unbuffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L156"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_unbuffered :: <span class="keyword-type">proc</span>($C: <span class="keyword-type">typeid</span>/<a class="code-typename" href="/core/sync/chan/#Chan">Chan</a>($T, $D=0), allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (c: $/<a class="code-typename" href="/core/sync/chan/#Chan">Chan</a>($T, $D=0), err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -956,7 +959,7 @@ create_unbuffered_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L340"><em>Source</em></a></div></h3>
+<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L342"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy :: <span class="keyword-type">proc</span>(c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> (err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -970,7 +973,7 @@ create_unbuffered_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="is_buffered"><span><a class="doc-id-link" href="#is_buffered">is_buffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L881"><em>Source</em></a></div></h3>
+<h3 id="is_buffered"><span><a class="doc-id-link" href="#is_buffered">is_buffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L896"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_buffered :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -995,7 +998,7 @@ is_buffered_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="is_closed"><span><a class="doc-id-link" href="#is_closed">is_closed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1040"><em>Source</em></a></div></h3>
+<h3 id="is_closed"><span><a class="doc-id-link" href="#is_closed">is_closed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1055"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_closed :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -1009,7 +1012,7 @@ is_buffered_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="is_unbuffered"><span><a class="doc-id-link" href="#is_unbuffered">is_unbuffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L905"><em>Source</em></a></div></h3>
+<h3 id="is_unbuffered"><span><a class="doc-id-link" href="#is_unbuffered">is_unbuffered<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L920"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_unbuffered :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -1034,7 +1037,7 @@ is_buffered_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="len"><span><a class="doc-id-link" href="#len">len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L941"><em>Source</em></a></div></h3>
+<h3 id="len"><span><a class="doc-id-link" href="#len">len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L956"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">len :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
@@ -1069,7 +1072,7 @@ len_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="recv"><span><a class="doc-id-link" href="#recv">recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L529"><em>Source</em></a></div></h3>
+<h3 id="recv"><span><a class="doc-id-link" href="#recv">recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L532"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">recv :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: $/<a class="code-typename" href="/core/sync/chan/#Chan">Chan</a>($T, $D=0)) -> (data: $T, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1078,8 +1081,9 @@ len_example :: proc() {
 <p>Reads a message from the channel, blocking the current thread if:
 <span class="doc-list">the channel is unbuffered</span>
 <span class="doc-list">the channel's buffer is empty</span>
-until the channel is being written to. <code>recv</code> will return
-<code>false</code> when attempting to receive a message on an already closed channel.</p>
+until the channel is being written to or the channel is closed. <code>recv</code> will
+return <code>false</code> when attempting to receive a message on an already closed
+channel.</p>
 <p><b>Inputs</b>
 <span class="doc-list"><code>c</code>: The channel</span></p>
 <p><b>Returns</b>
@@ -1112,7 +1116,7 @@ recv_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="recv_raw"><span><a class="doc-id-link" href="#recv_raw">recv_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L681"><em>Source</em></a></div></h3>
+<h3 id="recv_raw"><span><a class="doc-id-link" href="#recv_raw">recv_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L696"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">recv_raw :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, msg_out: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1121,8 +1125,9 @@ recv_example :: proc() {
 <p>Reads a message from the channel, blocking the current thread if:
 <span class="doc-list">the channel is unbuffered</span>
 <span class="doc-list">the channel's buffer is empty</span>
-until the channel is being written to. <code>recv_raw</code> will return
-<code>false</code> when attempting to receive a message on an already closed channel.</p>
+until the channel is being written to or the channel is closed. <code>recv_raw</code>
+will return <code>false</code> when attempting to receive a message on an already closed
+channel.</p>
 <p>Note: The location pointed to by <code>msg_out</code> must match the size
 and alignment used when the <code>Raw_Chan</code> was created.</p>
 <p><b>Inputs</b>
@@ -1156,13 +1161,13 @@ recv_raw_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="select_raw"><span><a class="doc-id-link" href="#select_raw">select_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1258"><em>Source</em></a></div></h3>
+<h3 id="select_raw"><span><a class="doc-id-link" href="#select_raw">select_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1274"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">select_raw :: <span class="keyword-type">proc</span>(recvs: []^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, sends: []^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, send_msgs: []<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, recv_out: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> (select_idx: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, status: <a class="code-typename" href="/core/sync/chan/#Select_Status">Select_Status</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="send"><span><a class="doc-id-link" href="#send">send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L452"><em>Source</em></a></div></h3>
+<h3 id="send"><span><a class="doc-id-link" href="#send">send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L454"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">send :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: $C/<a class="code-typename" href="/core/sync/chan/#Chan">Chan</a>($T, $D), data: $T) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1171,8 +1176,8 @@ recv_raw_example :: proc() {
 <p>Sends the specified message, blocking the current thread if:
 <span class="doc-list">the channel is unbuffered</span>
 <span class="doc-list">the channel's buffer is full</span>
-until the channel is being read from. <code>send</code> will return
-<code>false</code> when attempting to send on an already closed channel.</p>
+until the channel is being read from or the channel is closed. <code>send</code> will
+return <code>false</code> when attempting to send on an already closed channel.</p>
 <p><b>Inputs</b>
 <span class="doc-list"><code>c</code>: The channel</span>
 <span class="doc-list"><code>data</code>: The message to send</span></p>
@@ -1201,7 +1206,7 @@ send_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="send_raw"><span><a class="doc-id-link" href="#send_raw">send_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L603"><em>Source</em></a></div></h3>
+<h3 id="send_raw"><span><a class="doc-id-link" href="#send_raw">send_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L606"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">send_raw :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, msg_in: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1210,8 +1215,8 @@ send_example :: proc() {
 <p>Sends the specified message, blocking the current thread if:
 <span class="doc-list">the channel is unbuffered</span>
 <span class="doc-list">the channel's buffer is full</span>
-until the channel is being read from. <code>send_raw</code> will return
-<code>false</code> when attempting to send on an already closed channel.</p>
+until the channel is being read from or the channel is closed. <code>send_raw</code> will
+return <code>false</code> when attempting to send on an already closed channel.</p>
 <p>Note: The message referenced by <code>msg_out</code> must match the size
 and alignment used when the <code>Raw_Chan</code> was created.</p>
 <p><b>Inputs</b>
@@ -1243,7 +1248,7 @@ send_raw_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="try_recv"><span><a class="doc-id-link" href="#try_recv">try_recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L559"><em>Source</em></a></div></h3>
+<h3 id="try_recv"><span><a class="doc-id-link" href="#try_recv">try_recv<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L562"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">try_recv :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: $/<a class="code-typename" href="/core/sync/chan/#Chan">Chan</a>($T, $D=0)) -> (data: $T, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1272,7 +1277,7 @@ try_recv_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="try_recv_raw"><span><a class="doc-id-link" href="#try_recv_raw">try_recv_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L824"><em>Source</em></a></div></h3>
+<h3 id="try_recv_raw"><span><a class="doc-id-link" href="#try_recv_raw">try_recv_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L839"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">try_recv_raw :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, msg_out: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -1303,7 +1308,7 @@ try_recv_raw_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="try_select_raw"><span><a class="doc-id-link" href="#try_select_raw">try_select_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1193"><em>Source</em></a></div></h3>
+<h3 id="try_select_raw"><span><a class="doc-id-link" href="#try_select_raw">try_select_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L1209"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">try_select_raw :: <span class="keyword-type">proc</span>(recvs: []^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, sends: []^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, send_msgs: []<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, recv_out: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> (select_idx: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, status: <a class="code-typename" href="/core/sync/chan/#Select_Status">Select_Status</a>) {…}</pre>
 </div>
@@ -1370,7 +1375,7 @@ SELECT:         0 false
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="try_send"><span><a class="doc-id-link" href="#try_send">try_send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L485"><em>Source</em></a></div></h3>
+<h3 id="try_send"><span><a class="doc-id-link" href="#try_send">try_send<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L487"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">try_send :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: $C/<a class="code-typename" href="/core/sync/chan/#Chan">Chan</a>($T, $D), data: $T) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1402,7 +1407,7 @@ try_send_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="try_send_raw"><span><a class="doc-id-link" href="#try_send_raw">try_send_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L761"><em>Source</em></a></div></h3>
+<h3 id="try_send_raw"><span><a class="doc-id-link" href="#try_send_raw">try_send_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L776"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">try_send_raw :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (c: ^<a class="code-typename" href="/core/sync/chan/#Raw_Chan">Raw_Chan</a>, msg_in: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1438,7 +1443,7 @@ try_send_raw_example :: proc() {
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="create"><span><a class="doc-id-link" href="#create">create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L125"><em>Source</em></a></div></h3>
+<h3 id="create"><span><a class="doc-id-link" href="#create">create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L127"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/sync/chan/#create_unbuffered">create_unbuffered</a>,
@@ -1479,7 +1484,7 @@ create_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_raw"><span><a class="doc-id-link" href="#create_raw">create_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L225"><em>Source</em></a></div></h3>
+<h3 id="create_raw"><span><a class="doc-id-link" href="#create_raw">create_raw<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/chan.odin#L227"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_raw :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/sync/chan/#create_raw_unbuffered">create_raw_unbuffered</a>,
@@ -1528,7 +1533,7 @@ create_raw_example :: proc() {
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sync/chan/doc.odin">doc.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-19 21:13:14.760828800 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-20 21:12:44.453877600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

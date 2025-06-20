@@ -1,0 +1,2969 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>package kb_text_shape - pkg.odin-lang.org</title>	<link rel="icon" href="/favicon.svg">
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/scss/custom.min.css">
+	<link rel=stylesheet href="//odin-lang.org/lib/highlight/styles/github-dark.min.css">
+	<script src="//odin-lang.org/lib/highlight/highlight.min.js"></script>
+
+	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
+	<script>hljs.highlightAll()</script>
+	<script>
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
+		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
+	</script>
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
+
+	<link rel="stylesheet" type="text/css" href="/style.css">
+
+	</style>
+</head>
+<body>
+<script>
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
+</script>
+<header class="sticky-top">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
+		<div class="container">
+			<a class="navbar-brand" href="https://odin-lang.org/">
+			<img src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#odin-navbar-content" aria-controls="odin-navbar-content" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+			<div class="collapse navbar-collapse" id="odin-navbar-content">
+			<ul class="navbar-nav ms-md-auto">
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/">Home</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/docs">Docs</a></li>
+				<li class="nav-item"><a class="nav-link active" href="/">Packages</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/news">News</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/showcase">Showcase</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://forum.odin-lang.org">Forum</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/community">Community</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://github.com/odin-lang/Odin" target="_blank">GitHub</a></li>
+				<li class="nav-item">
+					<a
+						class="nav-link btn-dark-mode"
+						onclick="toggleDarkMode();"
+						title="Toggle Light/Dark Mode"
+					>
+						<span class="dark-mode-appearance">Appearance:</span>
+						<svg fill="white" id="dark-mode-icon" viewBox="0 0 384 512"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"/></svg>
+						<svg fill="white" id="light-mode-icon" viewBox="0 0 16 16">
+						  <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+						</svg>
+					</button>
+					</a>
+				</li>
+			</ul>
+		</div>
+		</div>
+	</nav>
+</header>
+<main>
+<div class="container full-width">
+<div class="row odin-main my-4" id="pkg">
+<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">
+<div class="py-3">
+<h4><a style="text-transform: capitalize; color: inherit;" href="/vendor">vendor Library</a></h4>
+<ul>
+<li class="nav-item"><a href="/vendor/box2d">box2d</a></li>
+<li class="nav-item"><a href="/vendor/cgltf">cgltf</a></li>
+<li class="nav-item"><a href="/vendor/commonmark">commonmark</a></li>
+<li class="nav-item">darwin<ul>
+<li><a href="/vendor/darwin/Metal">Metal</a></li>
+<li><a href="/vendor/darwin/MetalKit">MetalKit</a></li>
+<li><a href="/vendor/darwin/QuartzCore">QuartzCore</a></li>
+</ul>
+
+</li>
+<li class="nav-item">directx<ul>
+<li><a href="/vendor/directx/d3d11">d3d11</a></li>
+<li><a href="/vendor/directx/d3d12">d3d12</a></li>
+<li><a href="/vendor/directx/d3d_compiler">d3d_compiler</a></li>
+<li><a href="/vendor/directx/dxc">dxc</a></li>
+<li><a href="/vendor/directx/dxgi">dxgi</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/ENet">ENet</a></li>
+<li class="nav-item"><a href="/vendor/fontstash">fontstash</a></li>
+<li class="nav-item"><a href="/vendor/ggpo">ggpo</a></li>
+<li class="nav-item"><a href="/vendor/glfw">glfw</a><ul>
+<li><a href="/vendor/glfw/bindings">bindings</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a class="active" href="/vendor/kb_text_shape">kb_text_shape</a></li>
+<li class="nav-item">lua<ul>
+<li><a href="/vendor/lua/5.4">5.4</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/microui">microui</a></li>
+<li class="nav-item"><a href="/vendor/miniaudio">miniaudio</a></li>
+<li class="nav-item"><a href="/vendor/nanovg">nanovg</a><ul>
+<li><a href="/vendor/nanovg/gl">gl</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/OpenEXRCore">OpenEXRCore</a></li>
+<li class="nav-item"><a href="/vendor/OpenGL">OpenGL</a></li>
+<li class="nav-item"><a href="/vendor/portmidi">portmidi</a></li>
+<li class="nav-item"><a href="/vendor/raylib">raylib</a></li>
+<li class="nav-item"><a href="/vendor/sdl2">sdl2</a><ul>
+<li><a href="/vendor/sdl2/image">image</a></li>
+<li><a href="/vendor/sdl2/mixer">mixer</a></li>
+<li><a href="/vendor/sdl2/net">net</a></li>
+<li><a href="/vendor/sdl2/ttf">ttf</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/sdl3">sdl3</a><ul>
+<li><a href="/vendor/sdl3/image">image</a></li>
+<li><a href="/vendor/sdl3/ttf">ttf</a></li>
+</ul>
+
+</li>
+<li class="nav-item">stb<ul>
+<li><a href="/vendor/stb/easy_font">easy_font</a></li>
+<li><a href="/vendor/stb/image">image</a></li>
+<li><a href="/vendor/stb/rect_pack">rect_pack</a></li>
+<li><a href="/vendor/stb/truetype">truetype</a></li>
+<li><a href="/vendor/stb/vorbis">vorbis</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/vulkan">vulkan</a></li>
+<li class="nav-item"><a href="/vendor/wgpu">wgpu</a><ul>
+<li><a href="/vendor/wgpu/glfwglue">glfwglue</a></li>
+<li><a href="/vendor/wgpu/sdl2glue">sdl2glue</a></li>
+<li><a href="/vendor/wgpu/sdl3glue">sdl3glue</a></li>
+</ul>
+
+</li>
+<li class="nav-item">windows<ul>
+<li><a href="/vendor/windows/GameInput">GameInput</a></li>
+<li><a href="/vendor/windows/XAudio2">XAudio2</a></li>
+</ul>
+
+</li>
+<li class="nav-item">x11<ul>
+<li><a href="/vendor/x11/xlib">xlib</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/zlib">zlib</a></li>
+</ul>
+</div>
+</nav>
+<article class="col-lg-8 p-4 documentation odin-article">
+<nav class="pkg-breadcrumb" aria-label="breadcrumb">
+<ol class="breadcrumb">
+<li class="breadcrumb-item"><a href="/vendor">vendor</a></li>
+<li class="breadcrumb-item active" aria-current="page"><a href="/vendor/kb_text_shape">kb_text_shape</a></li>
+</ol>
+</nav>
+<h1>package vendor:kb_text_shape<div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape"><em>Source</em></a></div></h1>
+
+		<div class="odin-search-wrapper">
+			<input type="search" id="odin-search" class="odin-search-package" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">
+			<div class="odin-search-shortcut">
+				<div class="odin-search-key key-macos">⌘K</div>
+				<div class="odin-search-key key-windows">Ctrl+K</div>
+				<span class="odin-search-or">or</span>
+				<div class="odin-search-key">/</div>
+			</div>
+		</div>
+	
+<div id="odin-search-info">
+<div id="odin-search-time"></div>
+
+		<div id="odin-search-options">
+			<input type="checkbox" id="odin-search-filter" name="odin-search-filter">
+			<label for="odin-search-filter">Filter Results</label>
+		</div>
+</div>
+<ul id="odin-search-results"></ul>
+<div id="pkg-top">
+<div id="pkg-index">
+<h2>Index</h2>
+<div>
+<details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
+<summary id="#doc-index-Types-header">
+Types (61)</summary>
+<ul>
+<li><a href="#bracket">bracket</a></li>
+<li><a href="#break_flag">break_flag</a></li>
+<li><a href="#break_flags">break_flags</a></li>
+<li><a href="#break_state">break_state</a></li>
+<li><a href="#break_state_flag">break_state_flag</a></li>
+<li><a href="#break_state_flags">break_state_flags</a></li>
+<li><a href="#break_type">break_type</a></li>
+<li><a href="#cmap_14">cmap_14</a></li>
+<li><a href="#cursor">cursor</a></li>
+<li><a href="#direction">direction</a></li>
+<li><a href="#feature">feature</a></li>
+<li><a href="#feature_id">feature_id</a></li>
+<li><a href="#feature_set">feature_set</a></li>
+<li><a href="#feature_tag">feature_tag</a></li>
+<li><a href="#font">font</a></li>
+<li><a href="#gdef">gdef</a></li>
+<li><a href="#glyph">glyph</a></li>
+<li><a href="#glyph_array">glyph_array</a></li>
+<li><a href="#glyph_classes">glyph_classes</a></li>
+<li><a href="#glyph_flag">glyph_flag</a></li>
+<li><a href="#glyph_flags">glyph_flags</a></li>
+<li><a href="#gsub_gpos">gsub_gpos</a></li>
+<li><a href="#hea">hea</a></li>
+<li><a href="#head">head</a></li>
+<li><a href="#indic_script_properties">indic_script_properties</a></li>
+<li><a href="#iterate_features">iterate_features</a></li>
+<li><a href="#japanese_line_break_style">japanese_line_break_style</a></li>
+<li><a href="#joining_feature">joining_feature</a></li>
+<li><a href="#langsys">langsys</a></li>
+<li><a href="#language">language</a></li>
+<li><a href="#line_break_class">line_break_class</a></li>
+<li><a href="#lookup_indices">lookup_indices</a></li>
+<li><a href="#lookup_info">lookup_info</a></li>
+<li><a href="#lookup_subtable_info">lookup_subtable_info</a></li>
+<li><a href="#maxp">maxp</a></li>
+<li><a href="#op">op</a></li>
+<li><a href="#op_kind">op_kind</a></li>
+<li><a href="#op_list">op_list</a></li>
+<li><a href="#op_state">op_state</a></li>
+<li><a href="#op_state_gsub">op_state_gsub</a></li>
+<li><a href="#op_state_normalize">op_state_normalize</a></li>
+<li><a href="#op_state_normalize_hangul">op_state_normalize_hangul</a></li>
+<li><a href="#op_state_op_specific">op_state_op_specific</a></li>
+<li><a href="#orientation">orientation</a></li>
+<li><a href="#reph_encoding">reph_encoding</a></li>
+<li><a href="#reph_position">reph_position</a></li>
+<li><a href="#script">script</a></li>
+<li><a href="#shape_config">shape_config</a></li>
+<li><a href="#shape_state">shape_state</a></li>
+<li><a href="#shaper">shaper</a></li>
+<li><a href="#shaper_properties">shaper_properties</a></li>
+<li><a href="#shaping_table">shaping_table</a></li>
+<li><a href="#skip_flag">skip_flag</a></li>
+<li><a href="#skip_flags">skip_flags</a></li>
+<li><a href="#syllabic_position">syllabic_position</a></li>
+<li><a href="#un">un</a></li>
+<li><a href="#unicode_bidirectional_class">unicode_bidirectional_class</a></li>
+<li><a href="#unicode_flag">unicode_flag</a></li>
+<li><a href="#unicode_flags">unicode_flags</a></li>
+<li><a href="#unicode_joining_type">unicode_joining_type</a></li>
+<li><a href="#word_break_class">word_break_class</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
+<summary id="#doc-index-Constants-header">
+Constants (14)</summary>
+<ul>
+<li><a href="#BREAK_FLAGS_ANY">BREAK_FLAGS_ANY</a></li>
+<li><a href="#BREAK_FLAGS_DIRECTION">BREAK_FLAGS_DIRECTION</a></li>
+<li><a href="#BREAK_FLAGS_GRAPHEME">BREAK_FLAGS_GRAPHEME</a></li>
+<li><a href="#BREAK_FLAGS_LINE">BREAK_FLAGS_LINE</a></li>
+<li><a href="#BREAK_FLAGS_LINE_HARD">BREAK_FLAGS_LINE_HARD</a></li>
+<li><a href="#BREAK_FLAGS_LINE_SOFT">BREAK_FLAGS_LINE_SOFT</a></li>
+<li><a href="#BREAK_FLAGS_SCRIPT">BREAK_FLAGS_SCRIPT</a></li>
+<li><a href="#BREAK_FLAGS_WORD">BREAK_FLAGS_WORD</a></li>
+<li><a href="#BREAK_REORDER_BUFFER_FLUSH_THRESHOLD">BREAK_REORDER_BUFFER_FLUSH_THRESHOLD</a></li>
+<li><a href="#BREAK_REORDER_BUFFER_SIZE">BREAK_REORDER_BUFFER_SIZE</a></li>
+<li><a href="#GLYPH_FEATURE_MASK">GLYPH_FEATURE_MASK</a></li>
+<li><a href="#JOINING_FEATURE_MASK">JOINING_FEATURE_MASK</a></li>
+<li><a href="#MAX_SIMULTANEOUS_FEATURES">MAX_SIMULTANEOUS_FEATURES</a></li>
+<li><a href="#USE_GLYPH_FEATURE_MASK">USE_GLYPH_FEATURE_MASK</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Variables" aria-labelledby="#doc-index-Variables-header">
+<summary id="#doc-index-Variables-header">
+Variables (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
+<summary id="#doc-index-Procedures-header">
+Procedures (26)</summary>
+<ul>
+<li><a href="#BeginBreak">BeginBreak</a></li>
+<li><a href="#Break">Break</a></li>
+<li><a href="#BreakAddCodepoint">BreakAddCodepoint</a></li>
+<li><a href="#BreakFlush">BreakFlush</a></li>
+<li><a href="#BreakStateIsValid">BreakStateIsValid</a></li>
+<li><a href="#CodepointToGlyph">CodepointToGlyph</a></li>
+<li><a href="#CreateShapeState">CreateShapeState</a></li>
+<li><a href="#Cursor">Cursor</a></li>
+<li><a href="#DecodeUtf8">DecodeUtf8</a></li>
+<li><a href="#FontFromMemory">FontFromMemory</a></li>
+<li><a href="#FontIsValid">FontIsValid</a></li>
+<li><a href="#FreeFont">FreeFont</a></li>
+<li><a href="#FreeShapeState">FreeShapeState</a></li>
+<li><a href="#InferScript">InferScript</a></li>
+<li><a href="#PlaceShapeState">PlaceShapeState</a></li>
+<li><a href="#PositionGlyph">PositionGlyph</a></li>
+<li><a href="#PostReadFontInitialize">PostReadFontInitialize</a></li>
+<li><a href="#ReadFontData">ReadFontData</a></li>
+<li><a href="#ReadFontHeader">ReadFontHeader</a></li>
+<li><a href="#ResetShapeState">ResetShapeState</a></li>
+<li><a href="#ScriptIsComplex">ScriptIsComplex</a></li>
+<li><a href="#Shape">Shape</a></li>
+<li><a href="#ShapeConfig">ShapeConfig</a></li>
+<li><a href="#ShapeDynamic">ShapeDynamic</a></li>
+<li><a href="#ShaperIsComplex">ShaperIsComplex</a></li>
+<li><a href="#SizeOfShapeState">SizeOfShapeState</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedure Groups" aria-labelledby="#doc-index-Procedure Groups-header">
+<summary id="#doc-index-Procedure Groups-header">
+Procedure Groups (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+</div>
+</div>
+<section class="documentation">
+<h2 id="pkg-Types" class="pkg-header">Types</h2>
+<div class="pkg-entity">
+<h3 id="bracket"><span><a class="doc-id-link" href="#bracket">bracket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1790"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">bracket :: <span class="keyword-type">struct</span> {
+	Codepoint:         untyped rune,
+	<span class="keyword-type">using</span> DirectionBitField: <span class="keyword-type">bit_field</span>&nbsp;<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+		Direction: <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a> | 8,
+	},
+	<span class="keyword-type">using</span> ScriptBitField: <span class="keyword-type">bit_field</span>&nbsp;<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+		Script: <a class="code-typename" href="/vendor/kb_text_shape/#script">script</a> | 8,
+	},
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="break_flag"><span><a class="doc-id-link" href="#break_flag">break_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L760"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">break_flag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+	<span class="comment">// Direction changes from left-to-right to right-to-left, or vice versa.</span>
+	DIRECTION = 0, 
+	<span class="comment">// Script changes.</span>
+	<span class="comment">// Note that some characters, such as digits, are used in multiple</span>
+	<span class="comment">// scripts and, as such, will not produce script breaks.</span>
+	SCRIPT    = 1, 
+	<span class="comment">// Graphemes are "visual units". They may be composed of more than one codepoint.</span>
+	<span class="comment">// They are used as interaction boundaries in graphical interfaces, e.g. moving the</span>
+	<span class="comment">// caret.</span>
+	GRAPHEME  = 2, 
+	<span class="comment">// In most scripts, words are broken up by whitespace, but Unicode word breaking has</span>
+	<span class="comment">// better script coverage and also handles some special cases that a simple stateless</span>
+	<span class="comment">// loop cannot handle.</span>
+	WORD      = 3, 
+	<span class="comment">// By default, you are not allowed to break a line.</span>
+	<span class="comment">// Soft line breaks allow for line breaking, but do not require it.</span>
+	<span class="comment">// This is useful for when you are doing line wrapping.</span>
+	LINE_SOFT = 4, 
+	<span class="comment">// Hard line breaks are required. They signal the end of a paragraph.</span>
+	<span class="comment">// (In Unicode, there is no meaningful distinction between a line and a paragraph.</span>
+	<span class="comment">// a paragraph is pretty much just a line of text that can wrap.)</span>
+	LINE_HARD = 5, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="break_flags"><span><a class="doc-id-link" href="#break_flags">break_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L759"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">break_flags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/kb_text_shape/#break_flag">break_flag</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
+</div>
+<h5>Related Constants</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#BREAK_FLAGS_ANY">BREAK_FLAGS_ANY</a></li>
+<li><a href="/vendor/kb_text_shape/#BREAK_FLAGS_DIRECTION">BREAK_FLAGS_DIRECTION</a></li>
+<li><a href="/vendor/kb_text_shape/#BREAK_FLAGS_GRAPHEME">BREAK_FLAGS_GRAPHEME</a></li>
+<li><a href="/vendor/kb_text_shape/#BREAK_FLAGS_LINE">BREAK_FLAGS_LINE</a></li>
+<li><a href="/vendor/kb_text_shape/#BREAK_FLAGS_LINE_HARD">BREAK_FLAGS_LINE_HARD</a></li>
+<li><a href="/vendor/kb_text_shape/#BREAK_FLAGS_LINE_SOFT">BREAK_FLAGS_LINE_SOFT</a></li>
+<li><a href="/vendor/kb_text_shape/#BREAK_FLAGS_SCRIPT">BREAK_FLAGS_SCRIPT</a></li>
+<li><a href="/vendor/kb_text_shape/#BREAK_FLAGS_WORD">BREAK_FLAGS_WORD</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="break_state"><span><a class="doc-id-link" href="#break_state">break_state<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1818"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">break_state :: <span class="keyword-type">struct</span> {
+	Breaks:                             [8]<a class="code-typename" href="/vendor/kb_text_shape/#break_type">break_type</a> <span class="string">`fmt:"v,Breaks"`</span>,
+	BreakCount:                         <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	MainDirection:                      <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>,
+	LastFlushedBreakPosition:           <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	CurrentPosition:                    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	LastScripts:                        [2]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	Brackets:                           [64]<a class="code-typename" href="/vendor/kb_text_shape/#bracket">bracket</a> <span class="string">`fmt:"v,BracketCount"`</span>,
+	BracketCount:                       <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	Flags:                              <a class="code-typename" href="/vendor/kb_text_shape/#break_state_flags">break_state_flags</a>,
+	FlagState:                          <span class="keyword-type">bit_field</span>&nbsp;<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+		_0: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> | 8,
+		_1: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> | 8,
+		_2: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> | 8,
+		_3: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> | 8,
+	},
+	PositionOffset2:                    <a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>,
+	PositionOffset3:                    <a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>,
+	WordBreakHistory:                   <span class="keyword-type">bit_field</span>&nbsp;<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+		_0: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> | 8,
+		_1: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> | 8,
+		_2: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> | 8,
+		_3: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> | 8,
+	},
+	WordBreaks:                         <span class="keyword-type">bit_field</span>&nbsp;<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> {
+		_0: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> | 4,
+		_1: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> | 4,
+		_2: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> | 4,
+		_3: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> | 4,
+	},
+	WordUnbreaks:                       <span class="keyword-type">bit_field</span>&nbsp;<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> {
+		_0: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> | 4,
+		_1: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> | 4,
+		_2: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> | 4,
+		_3: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> | 4,
+	},
+	WordBreak2PositionOffset:           <a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>,
+	LineBreaks:                         <span class="keyword-type">bit_field</span>&nbsp;<a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> {
+		_0: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> | 16,
+		_1: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> | 16,
+		_2: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> | 16,
+		_3: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> | 16,
+	},
+	<span class="comment">// Instead of staying synchronized with LineBreaks/LineUnbreaks,</span>
+	<span class="comment">// this advances every character always.</span>
+	<span class="comment">// (This is only needed because ZWJ can create an unbreak while simultaneously being ignored.)</span>
+	LineUnbreaksAsync:                  <span class="keyword-type">bit_field</span>&nbsp;<a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> {
+		_0: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> | 16,
+		_1: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> | 16,
+		_2: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> | 16,
+		_3: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> | 16,
+	},
+	LineUnbreaks:                       <span class="keyword-type">bit_field</span>&nbsp;<a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> {
+		_0: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> | 16,
+		_1: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> | 16,
+		_2: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> | 16,
+		_3: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> | 16,
+	},
+	LineBreakHistory:                   <span class="keyword-type">bit_field</span>&nbsp;<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+		_0: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> | 8,
+		_1: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> | 8,
+		_2: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> | 8,
+		_3: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> | 8,
+	},
+	LineBreak2PositionOffset:           <a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>,
+	LineBreak3PositionOffset:           <a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>,
+	<span class="keyword-type">using</span> LastDirectionBitField:        <span class="keyword-type">bit_field</span>&nbsp;<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+		LastDirection: <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a> | 8,
+	},
+	BidirectionalClass2:                <a class="code-typename" href="/vendor/kb_text_shape/#unicode_bidirectional_class">unicode_bidirectional_class</a>,
+	BidirectionalClass1:                <a class="code-typename" href="/vendor/kb_text_shape/#unicode_bidirectional_class">unicode_bidirectional_class</a>,
+	JapaneseLineBreakStyle:             <a class="code-typename" href="/vendor/kb_text_shape/#japanese_line_break_style">japanese_line_break_style</a>,
+	GraphemeBreakState:                 <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	LastLineBreakClass:                 <a class="code-typename" href="/vendor/kb_text_shape/#line_break_class">line_break_class</a>,
+	LastWordBreakClass:                 <a class="code-typename" href="/vendor/kb_text_shape/#word_break_class">word_break_class</a>,
+	LastWordBreakClassIncludingIgnored: <a class="code-typename" href="/vendor/kb_text_shape/#word_break_class">word_break_class</a>,
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#BeginBreak">BeginBreak</a></li>
+<li><a href="/vendor/kb_text_shape/#Break">Break</a></li>
+<li><a href="/vendor/kb_text_shape/#BreakAddCodepoint">BreakAddCodepoint</a></li>
+<li><a href="/vendor/kb_text_shape/#BreakFlush">BreakFlush</a></li>
+<li><a href="/vendor/kb_text_shape/#BreakStateIsValid">BreakStateIsValid</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="break_state_flag"><span><a class="doc-id-link" href="#break_state_flag">break_state_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1801"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">break_state_flag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+	STARTED                         = 0, 
+	END                             = 1, 
+	RAN_OUT_OF_REORDER_BUFFER_SPACE = 2, 
+	<span class="comment">// Bidirectional flags</span>
+	SAW_R_AFTER_L                   = 3, 
+	SAW_AL_AFTER_LR                 = 4, 
+	LAST_WAS_BRACKET                = 5, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="break_state_flags"><span><a class="doc-id-link" href="#break_state_flags">break_state_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1800"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">break_state_flags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/kb_text_shape/#break_state_flag">break_state_flag</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="break_type"><span><a class="doc-id-link" href="#break_type">break_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1781"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">break_type :: <span class="keyword-type">struct</span> {
+	<span class="comment">// The break code mostly works in relative positions, but we convert to absolute positions for the user.</span>
+	<span class="comment">// That way, breaks can be trivially stored and compared and such and it just works.</span>
+	Position:  <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	Flags:     <a class="code-typename" href="/vendor/kb_text_shape/#break_flags">break_flags</a>,
+	Direction: <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>,
+	<span class="comment">// Only valid if (Flags & BREAK_FLAG_DIRECTION).</span>
+	Script:    <a class="code-typename" href="/vendor/kb_text_shape/#script">script</a>,
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#Break">Break</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="cmap_14"><span><a class="doc-id-link" href="#cmap_14">cmap_14<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1518"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">cmap_14 :: <span class="keyword-type">struct</span> {}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="cursor"><span><a class="doc-id-link" href="#cursor">cursor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1774"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">cursor :: <span class="keyword-type">struct</span> {
+	Direction:    <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>,
+	LastAdvanceX: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	X:            <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	Y:            <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#PositionGlyph">PositionGlyph</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#Cursor">Cursor</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="direction"><span><a class="doc-id-link" href="#direction">direction<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L896"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">direction :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+	NONE, 
+	LTR, 
+	RTL, 
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#BeginBreak">BeginBreak</a></li>
+<li><a href="/vendor/kb_text_shape/#Cursor">Cursor</a></li>
+<li><a href="/vendor/kb_text_shape/#InferScript">InferScript</a></li>
+<li><a href="/vendor/kb_text_shape/#Shape">Shape</a></li>
+<li><a href="/vendor/kb_text_shape/#ShapeDynamic">ShapeDynamic</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="feature"><span><a class="doc-id-link" href="#feature">feature<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1524"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">feature :: <span class="keyword-type">struct</span> {}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="feature_id"><span><a class="doc-id-link" href="#feature_id">feature_id<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1373"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">feature_id :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+	isol, <span class="comment">// Isolated Forms</span>
+	fina, <span class="comment">// Terminal Forms</span>
+	fin2, <span class="comment">// Terminal Forms #2</span>
+	fin3, <span class="comment">// Terminal Forms #3</span>
+	medi, <span class="comment">// Medial Forms</span>
+	med2, <span class="comment">// Medial Forms #2</span>
+	init, <span class="comment">// Initial Forms</span>
+	ljmo, <span class="comment">// Leading Jamo Forms</span>
+	vjmo, <span class="comment">// Vowel Jamo Forms</span>
+	tjmo, <span class="comment">// Trailing Jamo Forms</span>
+	rphf, <span class="comment">// Reph Form</span>
+	blwf, <span class="comment">// Below-base Forms</span>
+	half, <span class="comment">// Half Forms</span>
+	pstf, <span class="comment">// Post-base Forms</span>
+	abvf, <span class="comment">// Above-base Forms</span>
+	pref, <span class="comment">// Pre-base Forms</span>
+	numr, <span class="comment">// Numerators</span>
+	frac, <span class="comment">// Fractions</span>
+	dnom, <span class="comment">// Denominators</span>
+	cfar, <span class="comment">// Conjunct Form After Ro</span>
+	aalt, <span class="comment">// Access All Alternates</span>
+	abvm, <span class="comment">// Above-base Mark Positioning</span>
+	abvs, <span class="comment">// Above-base Substitutions</span>
+	afrc, <span class="comment">// Alternative Fractions</span>
+	akhn, <span class="comment">// Akhand</span>
+	apkn, <span class="comment">// Kerning for Alternate Proportional Widths</span>
+	blwm, <span class="comment">// Below-base Mark Positioning</span>
+	blws, <span class="comment">// Below-base Substitutions</span>
+	calt, <span class="comment">// Contextual Alternates</span>
+	Case, <span class="comment">// Case-sensitive Forms</span>
+	ccmp, <span class="comment">// Glyph Composition / Decomposition</span>
+	chws, <span class="comment">// Contextual Half-width Spacing</span>
+	cjct, <span class="comment">// Conjunct Forms</span>
+	clig, <span class="comment">// Contextual Ligatures</span>
+	cpct, <span class="comment">// Centered CJK Punctuation</span>
+	cpsp, <span class="comment">// Capital Spacing</span>
+	cswh, <span class="comment">// Contextual Swash</span>
+	curs, <span class="comment">// Cursive Positioning</span>
+	cv01, <span class="comment">//  'cv99'  Character Variant 1 – Character Variant 99</span>
+	c2pc, <span class="comment">// Petite Capitals From Capitals</span>
+	c2sc, <span class="comment">// Small Capitals From Capitals</span>
+	dist, <span class="comment">// Distances</span>
+	dlig, <span class="comment">// Discretionary Ligatures</span>
+	dtls, <span class="comment">// Dotless Forms</span>
+	expt, <span class="comment">// Expert Forms</span>
+	falt, <span class="comment">// Final Glyph on Line Alternates</span>
+	flac, <span class="comment">// Flattened Accent Forms</span>
+	fwid, <span class="comment">// Full Widths</span>
+	haln, <span class="comment">// Halant Forms</span>
+	halt, <span class="comment">// Alternate Half Widths</span>
+	hist, <span class="comment">// Historical Forms</span>
+	hkna, <span class="comment">// Horizontal Kana Alternates</span>
+	hlig, <span class="comment">// Historical Ligatures</span>
+	hngl, <span class="comment">// Hangul</span>
+	hojo, <span class="comment">// Hojo Kanji Forms (JIS X 0212-1990 Kanji Forms)</span>
+	hwid, <span class="comment">// Half Widths</span>
+	ital, <span class="comment">// Italics</span>
+	jalt, <span class="comment">// Justification Alternates</span>
+	jp78, <span class="comment">// JIS78 Forms</span>
+	jp83, <span class="comment">// JIS83 Forms</span>
+	jp90, <span class="comment">// JIS90 Forms</span>
+	jp04, <span class="comment">// JIS2004 Forms</span>
+	kern, <span class="comment">// Kerning</span>
+	lfbd, <span class="comment">// Left Bounds</span>
+	liga, <span class="comment">// Standard Ligatures</span>
+	lnum, <span class="comment">// Lining Figures</span>
+	locl, <span class="comment">// Localized Forms</span>
+	ltra, <span class="comment">// Left-to-right Alternates</span>
+	ltrm, <span class="comment">// Left-to-right Mirrored Forms</span>
+	mark, <span class="comment">// Mark Positioning</span>
+	mgrk, <span class="comment">// Mathematical Greek</span>
+	mkmk, <span class="comment">// Mark to Mark Positioning</span>
+	mset, <span class="comment">// Mark Positioning via Substitution</span>
+	nalt, <span class="comment">// Alternate Annotation Forms</span>
+	nlck, <span class="comment">// NLC Kanji Forms</span>
+	nukt, <span class="comment">// Nukta Forms</span>
+	onum, <span class="comment">// Oldstyle Figures</span>
+	opbd, <span class="comment">// Optical Bounds</span>
+	ordn, <span class="comment">// Ordinals</span>
+	ornm, <span class="comment">// Ornaments</span>
+	palt, <span class="comment">// Proportional Alternate Widths</span>
+	pcap, <span class="comment">// Petite Capitals</span>
+	pkna, <span class="comment">// Proportional Kana</span>
+	pnum, <span class="comment">// Proportional Figures</span>
+	pres, <span class="comment">// Pre-base Substitutions</span>
+	psts, <span class="comment">// Post-base Substitutions</span>
+	pwid, <span class="comment">// Proportional Widths</span>
+	qwid, <span class="comment">// Quarter Widths</span>
+	rand, <span class="comment">// Randomize</span>
+	rclt, <span class="comment">// Required Contextual Alternates</span>
+	rkrf, <span class="comment">// Rakar Forms</span>
+	rlig, <span class="comment">// Required Ligatures</span>
+	rtbd, <span class="comment">// Right Bounds</span>
+	rtla, <span class="comment">// Right-to-left Alternates</span>
+	rtlm, <span class="comment">// Right-to-left Mirrored Forms</span>
+	ruby, <span class="comment">// Ruby Notation Forms</span>
+	rvrn, <span class="comment">// Required Variation Alternates</span>
+	salt, <span class="comment">// Stylistic Alternates</span>
+	sinf, <span class="comment">// Scientific Inferiors</span>
+	size, <span class="comment">// Optical size</span>
+	smcp, <span class="comment">// Small Capitals</span>
+	smpl, <span class="comment">// Simplified Forms</span>
+	ss01, <span class="comment">//  'ss20'  Stylistic Set 1 – Stylistic Set 20</span>
+	ssty, <span class="comment">// Math Script-style Alternates</span>
+	stch, <span class="comment">// Stretching Glyph Decomposition</span>
+	subs, <span class="comment">// Subscript</span>
+	sups, <span class="comment">// Superscript</span>
+	swsh, <span class="comment">// Swash</span>
+	test, <span class="comment">// Test features, only for development</span>
+	titl, <span class="comment">// Titling</span>
+	tnam, <span class="comment">// Traditional Name Forms</span>
+	tnum, <span class="comment">// Tabular Figures</span>
+	trad, <span class="comment">// Traditional Forms</span>
+	twid, <span class="comment">// Third Widths</span>
+	unic, <span class="comment">// Unicase</span>
+	valt, <span class="comment">// Alternate Vertical Metrics</span>
+	vapk, <span class="comment">// Kerning for Alternate Proportional Vertical Metrics</span>
+	vatu, <span class="comment">// Vattu Variants</span>
+	vchw, <span class="comment">// Vertical Contextual Half-width Spacing</span>
+	vert, <span class="comment">// Vertical Alternates</span>
+	vhal, <span class="comment">// Alternate Vertical Half Metrics</span>
+	vkna, <span class="comment">// Vertical Kana Alternates</span>
+	vkrn, <span class="comment">// Vertical Kerning</span>
+	vpal, <span class="comment">// Proportional Alternate Vertical Metrics</span>
+	vrt2, <span class="comment">// Vertical Alternates and Rotation</span>
+	vrtr, <span class="comment">// Vertical Alternates for Rotation</span>
+	zero, <span class="comment">// Slashed Zero</span>
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="feature_set"><span><a class="doc-id-link" href="#feature_set">feature_set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1671"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">feature_set :: <span class="keyword-type">struct</span> {
+	Flags: [2]<a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="feature_tag"><span><a class="doc-id-link" href="#feature_tag">feature_tag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1243"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">feature_tag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+	isol = 1819243369, <span class="comment">// Isolated Forms</span>
+	fina = 1634625894, <span class="comment">// Terminal Forms</span>
+	fin2 = 846096742,  <span class="comment">// Terminal Forms #2</span>
+	fin3 = 862873958,  <span class="comment">// Terminal Forms #3</span>
+	medi = 1768187245, <span class="comment">// Medial Forms</span>
+	med2 = 845440365,  <span class="comment">// Medial Forms #2</span>
+	init = 1953066601, <span class="comment">// Initial Forms</span>
+	ljmo = 1869441644, <span class="comment">// Leading Jamo Forms</span>
+	vjmo = 1869441654, <span class="comment">// Vowel Jamo Forms</span>
+	tjmo = 1869441652, <span class="comment">// Trailing Jamo Forms</span>
+	rphf = 1718120562, <span class="comment">// Reph Form</span>
+	blwf = 1719102562, <span class="comment">// Below-base Forms</span>
+	half = 1718378856, <span class="comment">// Half Forms</span>
+	pstf = 1718907760, <span class="comment">// Post-base Forms</span>
+	abvf = 1719034465, <span class="comment">// Above-base Forms</span>
+	pref = 1717924464, <span class="comment">// Pre-base Forms</span>
+	numr = 1919776110, <span class="comment">// Numerators</span>
+	frac = 1667330662, <span class="comment">// Fractions</span>
+	dnom = 1836019300, <span class="comment">// Denominators</span>
+	cfar = 1918985827, <span class="comment">// Conjunct Form After Ro</span>
+	aalt = 1953259873, <span class="comment">// Access All Alternates</span>
+	abvm = 1836474977, <span class="comment">// Above-base Mark Positioning</span>
+	abvs = 1937138273, <span class="comment">// Above-base Substitutions</span>
+	afrc = 1668441697, <span class="comment">// Alternative Fractions</span>
+	akhn = 1852336993, <span class="comment">// Akhand</span>
+	apkn = 1852534881, <span class="comment">// Kerning for Alternate Proportional Widths</span>
+	blwm = 1836543074, <span class="comment">// Below-base Mark Positioning</span>
+	blws = 1937206370, <span class="comment">// Below-base Substitutions</span>
+	calt = 1953259875, <span class="comment">// Contextual Alternates</span>
+	Case = 1702060387, <span class="comment">// Case-sensitive Forms</span>
+	ccmp = 1886217059, <span class="comment">// Glyph Composition / Decomposition</span>
+	chws = 1937205347, <span class="comment">// Contextual Half-width Spacing</span>
+	cjct = 1952672355, <span class="comment">// Conjunct Forms</span>
+	clig = 1734962275, <span class="comment">// Contextual Ligatures</span>
+	cpct = 1952673891, <span class="comment">// Centered CJK Punctuation</span>
+	cpsp = 1886613603, <span class="comment">// Capital Spacing</span>
+	cswh = 1752658787, <span class="comment">// Contextual Swash</span>
+	curs = 1936880995, <span class="comment">// Cursive Positioning</span>
+	cv01 = 825259619,  <span class="comment">//  'cv99'  Character Variant 1 – Character Variant 99</span>
+	c2pc = 1668297315, <span class="comment">// Petite Capitals From Capitals</span>
+	c2sc = 1668493923, <span class="comment">// Small Capitals From Capitals</span>
+	dist = 1953720676, <span class="comment">// Distances</span>
+	dlig = 1734962276, <span class="comment">// Discretionary Ligatures</span>
+	dtls = 1936487524, <span class="comment">// Dotless Forms</span>
+	expt = 1953527909, <span class="comment">// Expert Forms</span>
+	falt = 1953259878, <span class="comment">// Final Glyph on Line Alternates</span>
+	flac = 1667329126, <span class="comment">// Flattened Accent Forms</span>
+	fwid = 1684633446, <span class="comment">// Full Widths</span>
+	haln = 1852596584, <span class="comment">// Halant Forms</span>
+	halt = 1953259880, <span class="comment">// Alternate Half Widths</span>
+	hist = 1953720680, <span class="comment">// Historical Forms</span>
+	hkna = 1634626408, <span class="comment">// Horizontal Kana Alternates</span>
+	hlig = 1734962280, <span class="comment">// Historical Ligatures</span>
+	hngl = 1818717800, <span class="comment">// Hangul</span>
+	hojo = 1869246312, <span class="comment">// Hojo Kanji Forms (JIS X 0212-1990 Kanji Forms)</span>
+	hwid = 1684633448, <span class="comment">// Half Widths</span>
+	ital = 1818326121, <span class="comment">// Italics</span>
+	jalt = 1953259882, <span class="comment">// Justification Alternates</span>
+	jp78 = 943157354,  <span class="comment">// JIS78 Forms</span>
+	jp83 = 859336810,  <span class="comment">// JIS83 Forms</span>
+	jp90 = 809070698,  <span class="comment">// JIS90 Forms</span>
+	jp04 = 875589738,  <span class="comment">// JIS2004 Forms</span>
+	kern = 1852990827, <span class="comment">// Kerning</span>
+	lfbd = 1684170348, <span class="comment">// Left Bounds</span>
+	liga = 1634167148, <span class="comment">// Standard Ligatures</span>
+	lnum = 1836412524, <span class="comment">// Lining Figures</span>
+	locl = 1818455916, <span class="comment">// Localized Forms</span>
+	ltra = 1634890860, <span class="comment">// Left-to-right Alternates</span>
+	ltrm = 1836217452, <span class="comment">// Left-to-right Mirrored Forms</span>
+	mark = 1802658157, <span class="comment">// Mark Positioning</span>
+	mgrk = 1802659693, <span class="comment">// Mathematical Greek</span>
+	mkmk = 1802333037, <span class="comment">// Mark to Mark Positioning</span>
+	mset = 1952805741, <span class="comment">// Mark Positioning via Substitution</span>
+	nalt = 1953259886, <span class="comment">// Alternate Annotation Forms</span>
+	nlck = 1801677934, <span class="comment">// NLC Kanji Forms</span>
+	nukt = 1953199470, <span class="comment">// Nukta Forms</span>
+	onum = 1836412527, <span class="comment">// Oldstyle Figures</span>
+	opbd = 1684172911, <span class="comment">// Optical Bounds</span>
+	ordn = 1852076655, <span class="comment">// Ordinals</span>
+	ornm = 1835954799, <span class="comment">// Ornaments</span>
+	palt = 1953259888, <span class="comment">// Proportional Alternate Widths</span>
+	pcap = 1885430640, <span class="comment">// Petite Capitals</span>
+	pkna = 1634626416, <span class="comment">// Proportional Kana</span>
+	pnum = 1836412528, <span class="comment">// Proportional Figures</span>
+	pres = 1936028272, <span class="comment">// Pre-base Substitutions</span>
+	psts = 1937011568, <span class="comment">// Post-base Substitutions</span>
+	pwid = 1684633456, <span class="comment">// Proportional Widths</span>
+	qwid = 1684633457, <span class="comment">// Quarter Widths</span>
+	rand = 1684955506, <span class="comment">// Randomize</span>
+	rclt = 1953260402, <span class="comment">// Required Contextual Alternates</span>
+	rkrf = 1718774642, <span class="comment">// Rakar Forms</span>
+	rlig = 1734962290, <span class="comment">// Required Ligatures</span>
+	rtbd = 1684173938, <span class="comment">// Right Bounds</span>
+	rtla = 1634497650, <span class="comment">// Right-to-left Alternates</span>
+	rtlm = 1835824242, <span class="comment">// Right-to-left Mirrored Forms</span>
+	ruby = 2036495730, <span class="comment">// Ruby Notation Forms</span>
+	rvrn = 1852995186, <span class="comment">// Required Variation Alternates</span>
+	salt = 1953259891, <span class="comment">// Stylistic Alternates</span>
+	sinf = 1718511987, <span class="comment">// Scientific Inferiors</span>
+	size = 1702521203, <span class="comment">// Optical size</span>
+	smcp = 1885564275, <span class="comment">// Small Capitals</span>
+	smpl = 1819307379, <span class="comment">// Simplified Forms</span>
+	ss01 = 825258867,  <span class="comment">//  'ss20'  Stylistic Set 1 – Stylistic Set 20</span>
+	ssty = 2037674867, <span class="comment">// Math Script-style Alternates</span>
+	stch = 1751348339, <span class="comment">// Stretching Glyph Decomposition</span>
+	subs = 1935832435, <span class="comment">// Subscript</span>
+	sups = 1936749939, <span class="comment">// Superscript</span>
+	swsh = 1752397683, <span class="comment">// Swash</span>
+	test = 1953719668, <span class="comment">// Test features, only for development</span>
+	titl = 1819568500, <span class="comment">// Titling</span>
+	tnam = 1835101812, <span class="comment">// Traditional Name Forms</span>
+	tnum = 1836412532, <span class="comment">// Tabular Figures</span>
+	trad = 1684107892, <span class="comment">// Traditional Forms</span>
+	twid = 1684633460, <span class="comment">// Third Widths</span>
+	unic = 1667853941, <span class="comment">// Unicase</span>
+	valt = 1953259894, <span class="comment">// Alternate Vertical Metrics</span>
+	vapk = 1802527094, <span class="comment">// Kerning for Alternate Proportional Vertical Metrics</span>
+	vatu = 1970561398, <span class="comment">// Vattu Variants</span>
+	vchw = 2003329910, <span class="comment">// Vertical Contextual Half-width Spacing</span>
+	vert = 1953654134, <span class="comment">// Vertical Alternates</span>
+	vhal = 1818323062, <span class="comment">// Alternate Vertical Half Metrics</span>
+	vkna = 1634626422, <span class="comment">// Vertical Kana Alternates</span>
+	vkrn = 1852992374, <span class="comment">// Vertical Kerning</span>
+	vpal = 1818325110, <span class="comment">// Proportional Alternate Vertical Metrics</span>
+	vrt2 = 846492278,  <span class="comment">// Vertical Alternates and Rotation</span>
+	vrtr = 1920234102, <span class="comment">// Vertical Alternates for Rotation</span>
+	zero = 1869768058, <span class="comment">// Slashed Zero</span>
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="font"><span><a class="doc-id-link" href="#font">font<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1532"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">font :: <span class="keyword-type">struct</span> {
+	FileBase:                   [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	Head:                       ^<a class="code-typename" href="/vendor/kb_text_shape/#head">head</a>,
+	Cmap:                       ^<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	Gdef:                       ^<a class="code-typename" href="/vendor/kb_text_shape/#gdef">gdef</a>,
+	Cmap14:                     ^<a class="code-typename" href="/vendor/kb_text_shape/#cmap_14">cmap_14</a>,
+	ShapingTables:              [<a class="code-typename" href="/vendor/kb_text_shape/#shaping_table">shaping_table</a>]^<a class="code-typename" href="/vendor/kb_text_shape/#gsub_gpos">gsub_gpos</a>,
+	Fvar:                       <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
+	Maxp:                       ^<a class="code-typename" href="/vendor/kb_text_shape/#maxp">maxp</a>,
+	Hea:                        [<a class="code-typename" href="/vendor/kb_text_shape/#orientation">orientation</a>]^<a class="code-typename" href="/vendor/kb_text_shape/#hea">hea</a>,
+	Mtx:                        [<a class="code-typename" href="/vendor/kb_text_shape/#orientation">orientation</a>]^<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	LookupInfo:                 <a class="code-typename" href="/vendor/kb_text_shape/#lookup_info">lookup_info</a>,
+	GlyphCount:                 <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	LookupCount:                <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	SubtableCount:              <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	GlyphLookupMatrix:          [^]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	<span class="comment">// [LookupCount * GlyphCount] bitmap</span>
+	GlyphLookupSubtableMatrix:  [^]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	<span class="comment">// [LookupSubtableCount * GlyphCount] bitmap</span>
+	LookupSubtableIndexOffsets: [^]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	<span class="comment">// [LookupCount]</span>
+	SubtableInfos:              [^]<a class="code-typename" href="/vendor/kb_text_shape/#lookup_subtable_info">lookup_subtable_info</a>,
+	<span class="comment">// [LookupSubtableCount]</span>
+	GposLookupIndexOffset:      <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	Error:                      <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#CodepointToGlyph">CodepointToGlyph</a></li>
+<li><a href="/vendor/kb_text_shape/#CreateShapeState">CreateShapeState</a></li>
+<li><a href="/vendor/kb_text_shape/#FontIsValid">FontIsValid</a></li>
+<li><a href="/vendor/kb_text_shape/#FreeFont">FreeFont</a></li>
+<li><a href="/vendor/kb_text_shape/#PostReadFontInitialize">PostReadFontInitialize</a></li>
+<li><a href="/vendor/kb_text_shape/#ReadFontData">ReadFontData</a></li>
+<li><a href="/vendor/kb_text_shape/#ReadFontHeader">ReadFontHeader</a></li>
+<li><a href="/vendor/kb_text_shape/#ShapeConfig">ShapeConfig</a></li>
+<li><a href="/vendor/kb_text_shape/#SizeOfShapeState">SizeOfShapeState</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#FontFromMemory">FontFromMemory</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="gdef"><span><a class="doc-id-link" href="#gdef">gdef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1517"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">gdef :: <span class="keyword-type">struct</span> {}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="glyph"><span><a class="doc-id-link" href="#glyph">glyph<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1566"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">glyph :: <span class="keyword-type">struct</span> {
+	Codepoint:                     untyped rune,
+	Id:                            <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	Uid:                           <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	Classes:                       <a class="code-typename" href="/vendor/kb_text_shape/#glyph_classes">glyph_classes</a>,
+	Decomposition:                 <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+	Flags:                         <a class="code-typename" href="/vendor/kb_text_shape/#glyph_flags">glyph_flags</a>,
+	OffsetX:                       <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	OffsetY:                       <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	AdvanceX:                      <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	AdvanceY:                      <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	ParentInfo:                    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	<span class="comment">// This is set by GSUB and used by GPOS.</span>
+	<span class="comment">// A 0-index means that we should attach to the last component in the ligature.</span>
+	<span class="comment">// </span>
+	<span class="comment">// From the Microsoft docs:</span>
+	<span class="comment">//   To correctly access the subtables, the client must keep track of the component associated with the mark.</span>
+	<span class="comment">// </span>
+	<span class="comment">//   For a given mark assigned to a particular class, the appropriate base attachment point is determined by which</span>
+	<span class="comment">//   ligature component the mark is associated with. This is dependent on the original character string and subsequent</span>
+	<span class="comment">//   character- or glyph-sequence processing, not the font data alone. While a text-layout client is performing any</span>
+	<span class="comment">//   character-based preprocessing or any glyph-substitution operations using the GSUB table, the text-layout client</span>
+	<span class="comment">//   must keep track of associations of marks to particular ligature-glyph components.</span>
+	LigatureUid:                   <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	LigatureComponentIndexPlusOne: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	<span class="comment">// Earlier on, we used to assume that, if a glyph had no advance, or had the MARK glyph class, then</span>
+	<span class="comment">// it could be handled as a mark in layout operations. This is inaccurate.</span>
+	<span class="comment">// Unicode makes a distinction between attached marks and standalone marks. For our purposes, attached</span>
+	<span class="comment">// marks are marks that have found a valid base character to attach to. In practice, this means that the</span>
+	<span class="comment">// font contains a valid display position/configuration for it in the current context.</span>
+	<span class="comment">// In contrast, standalone marks are marks that aren't attached to anything. Fonts may still have glyphs</span>
+	<span class="comment">// for them, in which case we want to display those just like regular glyphs that take up horizontal space</span>
+	<span class="comment">// on the line. When fonts don't have glyphs for them, they simply stay around as zero-width glyphs.</span>
+	<span class="comment">// Standalone marks have notably different behavior compared to attached marks, and so, once we start</span>
+	<span class="comment">// applying positioning features, it becomes worthwhile to track exactly which glyph has attached to which.</span>
+	AttachGlyphIndexPlusOne:       <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	<span class="comment">// Set in GSUB and used in GPOS, for STCH.</span>
+	JoiningFeature:                <a class="code-typename" href="/vendor/kb_text_shape/#joining_feature">joining_feature</a>,
+	<span class="comment">// Unicode properties filled in by CodepointToGlyph.</span>
+	JoiningType:                   <a class="code-typename" href="/vendor/kb_text_shape/#unicode_joining_type">unicode_joining_type</a>,
+	<span class="keyword-type">using</span> ScriptBitField:          <span class="keyword-type">bit_field</span>&nbsp;<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+		Script: <a class="code-typename" href="/vendor/kb_text_shape/#script">script</a> | 8,
+	},
+	UnicodeFlags:                  <a class="code-typename" href="/vendor/kb_text_shape/#unicode_flags">unicode_flags</a>,
+	SyllabicClass:                 <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	SyllabicPosition:              <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	UseClass:                      <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	CombiningClass:                <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	MarkOrdering:                  <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#PositionGlyph">PositionGlyph</a></li>
+<li><a href="/vendor/kb_text_shape/#Shape">Shape</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#CodepointToGlyph">CodepointToGlyph</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="glyph_array"><span><a class="doc-id-link" href="#glyph_array">glyph_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1626"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">glyph_array :: <span class="keyword-type">struct</span> {
+	Glyphs:           [^]<a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a> <span class="string">`fmt:"v,Count"`</span>,
+	Count:            <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	TotalCount:       <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	Capacity:         <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	RequiredCapacity: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="glyph_classes"><span><a class="doc-id-link" href="#glyph_classes">glyph_classes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1561"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">glyph_classes :: <span class="keyword-type">struct</span> {
+	Class:               <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	MarkAttachmentClass: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="glyph_flag"><span><a class="doc-id-link" href="#glyph_flag">glyph_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L816"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">glyph_flag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+	<span class="comment">// These feature flags must coincide with joining_feature _and_ FEATURE_FLAG!</span>
+	ISOL                           = 0, 
+	FINA                           = 1, 
+	FIN2                           = 2, 
+	FIN3                           = 3, 
+	MEDI                           = 4, 
+	MED2                           = 5, 
+	INIT                           = 6, 
+	<span class="comment">// These feature flags must coincide with FEATURE_FLAG!</span>
+	LJMO                           = 7, 
+	VJMO                           = 8, 
+	TJMO                           = 9, 
+	RPHF                           = 10, 
+	BLWF                           = 11, 
+	HALF                           = 12, 
+	PSTF                           = 13, 
+	ABVF                           = 14, 
+	PREF                           = 15, 
+	NUMR                           = 16, 
+	FRAC                           = 17, 
+	DNOM                           = 18, 
+	CFAR                           = 19, 
+	<span class="comment">// These can be anything.</span>
+	DO_NOT_DECOMPOSE               = 21, 
+	FIRST_IN_MULTIPLE_SUBSTITUTION = 22, 
+	NO_BREAK                       = 23, 
+	CURSIVE                        = 24, 
+	GENERATED_BY_GSUB              = 25, 
+	USED_IN_GPOS                   = 26, 
+	STCH_ENDPOINT                  = 27, 
+	STCH_EXTENSION                 = 28, 
+	LIGATURE                       = 29, 
+	MULTIPLE_SUBSTITUTION          = 30, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="glyph_flags"><span><a class="doc-id-link" href="#glyph_flags">glyph_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L815"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">glyph_flags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/kb_text_shape/#glyph_flag">glyph_flag</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
+</div>
+<h5>Related Constants</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#GLYPH_FEATURE_MASK">GLYPH_FEATURE_MASK</a></li>
+<li><a href="/vendor/kb_text_shape/#JOINING_FEATURE_MASK">JOINING_FEATURE_MASK</a></li>
+<li><a href="/vendor/kb_text_shape/#USE_GLYPH_FEATURE_MASK">USE_GLYPH_FEATURE_MASK</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="gsub_gpos"><span><a class="doc-id-link" href="#gsub_gpos">gsub_gpos<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1519"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">gsub_gpos :: <span class="keyword-type">struct</span> {}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="hea"><span><a class="doc-id-link" href="#hea">hea<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1521"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">hea :: <span class="keyword-type">struct</span> {}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="head"><span><a class="doc-id-link" href="#head">head<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1525"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">head :: <span class="keyword-type">struct</span> {}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="indic_script_properties"><span><a class="doc-id-link" href="#indic_script_properties">indic_script_properties<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1702"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">indic_script_properties :: <span class="keyword-type">struct</span> {
+	ViramaCodepoint:        untyped rune,
+	BlwfPostOnly:           <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	<span class="comment">// b8</span>
+	RephPosition:           <a class="code-typename" href="/vendor/kb_text_shape/#reph_position">reph_position</a>,
+	RephEncoding:           <a class="code-typename" href="/vendor/kb_text_shape/#reph_encoding">reph_encoding</a>,
+	RightSideMatraPosition: <a class="code-typename" href="/vendor/kb_text_shape/#syllabic_position">syllabic_position</a>,
+	AboveBaseMatraPosition: <a class="code-typename" href="/vendor/kb_text_shape/#syllabic_position">syllabic_position</a>,
+	BelowBaseMatraPosition: <a class="code-typename" href="/vendor/kb_text_shape/#syllabic_position">syllabic_position</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="iterate_features"><span><a class="doc-id-link" href="#iterate_features">iterate_features<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1522"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">iterate_features :: <span class="keyword-type">struct</span> {}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="japanese_line_break_style"><span><a class="doc-id-link" href="#japanese_line_break_style">japanese_line_break_style<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L878"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">japanese_line_break_style :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+	<span class="comment">// The Unicode standard does not define what strict style is used for.</span>
+	<span class="comment">// Supposedly, it is used for anything that does not fall into the other two categories of text.</span>
+	STRICT, 
+	<span class="comment">// Normal style is used for books and documents.</span>
+	NORMAL, 
+	<span class="comment">// Loose style is used for newspapers, and (I assume) any other narrow column format.</span>
+	LOOSE, 
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Japanese text contains "kinsoku" characters, around which breaking a line is forbidden.
+Exactly which characters are "kinsoku" or not depends on the context:
+<span class="doc-list">Strict style has the largest amount of kinsoku characters, which leads to longer lines.</span>
+<span class="doc-list">Loose style has the smallest amount of kinsoku characters, which leads to smaller lines.</span>
+<span class="doc-list">Normal style is somewhere in the middle.</span>
+Note that, while the Unicode standard mentions all three of these styles, it does not mention
+any differences between the normal and loose styles.
+As such, normal and loose styles currently behave the same.</p>
+</details>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#BeginBreak">BeginBreak</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="joining_feature"><span><a class="doc-id-link" href="#joining_feature">joining_feature<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L20"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">joining_feature :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+	NONE, 
+	ISOL, 
+	FINA, 
+	FIN2, 
+	FIN3, 
+	MEDI, 
+	MED2, 
+	INIT, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="langsys"><span><a class="doc-id-link" href="#langsys">langsys<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1712"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">langsys :: <span class="keyword-type">struct</span> {}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="language"><span><a class="doc-id-link" href="#language">language<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L71"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">language :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+	DONT_KNOW                     = 0, 
+	A_HMAO                        = 541347144, 
+	AARI                          = 541676097, 
+	ABAZA                         = 541147713, 
+	ABKHAZIAN                     = 541803073, 
+	ACHI                          = 542262081, 
+	ACHOLI                        = 541606721, 
+	ADYGHE                        = 542721089, 
+	AFAR                          = 542262849, 
+	AFRIKAANS                     = 541804097, 
+	AGAW                          = 542590785, 
+	AITON                         = 542067009, 
+	AKAN                          = 541150017, 
+	ALBANIAN                      = 541675859, 
+	ALSATIAN                      = 542329921, 
+	ALTAI                         = 542395457, 
+	ALUO                          = 541150809, 
+	AMERICAN_PHONETIC             = 1213222977, 
+	AMHARIC                       = 541609281, 
+	ANGLO_SAXON                   = 541544001, 
+	ARABIC                        = 541151809, 
+	ARAGONESE                     = 541545025, 
+	ARAKANESE                     = 541807169, 
+	ARAKWAL                       = 542591826, 
+	ARMENIAN                      = 541415752, 
+	ARMENIAN_EAST                 = 809851208, 
+	AROMANIAN                     = 542135634, 
+	ARPITAN                       = 542134854, 
+	ASSAMESE                      = 541938497, 
+	ASTURIAN                      = 542397249, 
+	ATHAPASKAN                    = 541611073, 
+	ATSINA                        = 542331969, 
+	AVAR                          = 542266945, 
+	AVATIME                       = 542004801, 
+	AWADHI                        = 541153089, 
+	AYMARA                        = 541940033, 
+	AZERBAIDJANI                  = 541416001, 
+	BADAGA                        = 541344066, 
+	BAGHELKHANDI                  = 541540674, 
+	BAGRI                         = 542197570, 
+	BALANTE                       = 542002242, 
+	BALINESE                      = 541999426, 
+	BALKAR                        = 541868354, 
+	BALTI                         = 542395458, 
+	BALUCHI                       = 541674562, 
+	BAMBARA                       = 541216066, 
+	BAMILEKE                      = 541871426, 
+	BANDA                         = 809779522, 
+	BANDJALANG                    = 542721090, 
+	BANGLA                        = 542000450, 
+	BASHKIR                       = 541610818, 
+	BASQUE                        = 542201157, 
+	BATAK                         = 541807682, 
+	BATAK_ALAS_KLUET              = 542790722, 
+	BATAK_ANGKOLA                 = 541215553, 
+	BATAK_DAIRI                   = 541348930, 
+	BATAK_KARO                    = 542659650, 
+	BATAK_MANDAILING              = 541938754, 
+	BATAK_SIMALUNGUN              = 542331970, 
+	BATAK_TOBA                    = 541278786, 
+	BAULE                         = 542458178, 
+	BAVARIAN                      = 542261570, 
+	BELARUSIAN                    = 541869378, 
+	BEMBA                         = 541934914, 
+	BENCH                         = 541606722, 
+	BERBER                        = 542261826, 
+	BETI                          = 541676610, 
+	BETTE_KURUMA                  = 541218136, 
+	BHILI                         = 541673538, 
+	BHOJPURI                      = 542066754, 
+	BHUTANESE                     = 542005828, 
+	BIBLE_CREE                    = 542262082, 
+	BIKOL                         = 541804866, 
+	BILEN                         = 541870402, 
+	BISHNUPRIYA_MANIPURI          = 542724162, 
+	BISLAMA                       = 542329154, 
+	BLACKFOOT                     = 541477698, 
+	BODO                          = 542659138, 
+	BOSNIAN                       = 542330690, 
+	BOUYEI                        = 541279056, 
+	BRAHUI                        = 541610562, 
+	BRAJ_BHASHA                   = 541676098, 
+	BRETON                        = 541413954, 
+	BUGIS                         = 541545794, 
+	BULGARIAN                     = 542263106, 
+	BUMTHANGKHA                   = 542788171, 
+	BURMESE                       = 541938242, 
+	BURUSHASKI                    = 541807426, 
+	CAJUN_FRENCH                  = 541282886, 
+	CARRIER                       = 542265923, 
+	CATALAN                       = 542392643, 
+	CAYUGA                        = 542720323, 
+	CEBUANO                       = 541214019, 
+	CENTRAL_YUPIK                 = 542462789, 
+	CHAHA_GURAGE                  = 541542467, 
+	CHAMORRO                      = 541149251, 
+	CHATTISGARHI                  = 541608003, 
+	CHECHEN                       = 541411395, 
+	CHEROKEE                      = 542263363, 
+	CHEYENNE                      = 542722115, 
+	CHICHEWA                      = 541673539, 
+	CHIGA                         = 541542211, 
+	CHIMILA                       = 541540931, 
+	CHIN                          = 542001489, 
+	CHINANTEC                     = 1313358659, 
+	CHINESE_PHONETIC              = 542132314, 
+	CHINESE_SIMPLIFIED            = 542328922, 
+	CHINESE_TRADITIONAL           = 542394458, 
+	CHINESE_TRADITIONAL_HONG_KONG = 541608026, 
+	CHINESE_TRADITIONAL_MACAO     = 1297369178, 
+	CHIPEWYAN                     = 542132291, 
+	CHITTAGONIAN                  = 541545539, 
+	CHOCTAW                       = 542066755, 
+	CHUKCHI                       = 541804611, 
+	CHURCH_SLAVONIC               = 541872963, 
+	CHUUKESE                      = 810240067, 
+	CHUVASH                       = 542459971, 
+	COMORIAN                      = 542264643, 
+	COMOX                         = 542068547, 
+	COPTIC                        = 542134083, 
+	CORNISH                       = 542265155, 
+	CORSICAN                      = 542330691, 
+	CREE                          = 541413955, 
+	CREOLES                       = 542134339, 
+	CRIMEAN_TATAR                 = 542396995, 
+	CRIOULO                       = 541148491, 
+	CROATIAN                      = 542528072, 
+	CYPRIOT_ARABIC                = 542720833, 
+	CZECH                         = 542724931, 
+	DAGBANI                       = 541540676, 
+	DAN                           = 541740612, 
+	DANGME                        = 541544004, 
+	DANISH                        = 541999428, 
+	DARGWA                        = 542261572, 
+	DARI                          = 541676100, 
+	DAYI                          = 542654788, 
+	DEFAULT                       = 1953261156, <span class="comment">// Can be DFLT too...</span>
+	DEHONG_DAI                    = 541344852, 
+	DHANGU                        = 541542468, 
+	DHIVEHI                       = 542525764, 
+	DHUWAL                        = 541742404, 
+	DIMLI                         = 542198084, 
+	DINKA                         = 541806148, 
+	DIVEHI                        = 542525764, 
+	DJAMBARRPUYNGU                = 810699332, 
+	DOGRI                         = 542066500, 
+	DOGRI_MACROLANGUAGE           = 542263108, 
+	DUNGAN                        = 542004548, 
+	DUTCH                         = 541346894, 
+	DZONGKHA                      = 542005828, 
+	EASTERN_ABENAKI               = 542196033, 
+	EASTERN_CHAM                  = 541936195, 
+	EASTERN_CREE                  = 542262085, 
+	EASTERN_MANINKAKAN            = 541805893, 
+	EASTERN_PWO_KAREN             = 542132811, 
+	EBIRA                         = 541672005, 
+	EDO                           = 542065733, 
+	EFIK                          = 541673029, 
+	EMBERA_BAUDO                  = 541279298, 
+	EMBERA_CATIO                  = 542069827, 
+	EMBERA_CHAMI                  = 541674819, 
+	EMBERA_TADO                   = 541279316, 
+	ENGLISH                       = 541544005, 
+	EPENA                         = 541149779, 
+	ERZYA                         = 542790213, 
+	KB_TEXT_SHAPEANTO             = 542069838, 
+	ESTONIAN                      = 541676613, 
+	EVEN                          = 542004805, 
+	EVENKI                        = 541808197, 
+	EWE                           = 541415237, 
+	FALAM_CHIN                    = 541868360, 
+	FANG                          = 810434886, 
+	FANTI                         = 542392646, 
+	FAROESE                       = 542330694, 
+	FEFE                          = 542133574, 
+	FIJIAN                        = 541674054, 
+	FILIPINO                      = 541870416, 
+	FINNISH                       = 542001478, 
+	FLEMISH                       = 541412422, 
+	FON                           = 542003014, 
+	FOREST_ENETS                  = 541412934, 
+	FRENCH                        = 541151814, 
+	FRENCH_ANTILLEAN              = 541999430, 
+	FRISIAN                       = 541676102, 
+	FRIULIAN                      = 541872710, 
+	FULAH                         = 541873478, 
+	FUTA                          = 541152326, 
+	GA                            = 541344071, 
+	GAGAUZ                        = 541540679, 
+	GALICIAN                      = 541868359, 
+	GANDA                         = 541545804, 
+	GARHWALI                      = 542589255, 
+	GARO                          = 542069319, 
+	GARSHUNI                      = 542261575, 
+	GEBA_KAREN                    = 542201419, 
+	GEEZ                          = 542786887, 
+	GEORGIAN                      = 542392651, 
+	GEPO                          = 542132057, 
+	GERMAN                        = 542459204, 
+	GIKUYU                        = 541804875, 
+	GILAKI                        = 541805639, 
+	GILBERTESE                    = 810305863, 
+	GILYAK                        = 541870407, 
+	GITHABUL                      = 541608263, 
+	GOGO                          = 541544263, 
+	GONDI                         = 542003015, 
+	GREEK                         = 541871173, 
+	GREENLANDIC                   = 542003783, 
+	GUARANI                       = 541152583, 
+	GUINEA                        = 542133063, 
+	GUJARATI                      = 541742407, 
+	GUMATJ                        = 542002759, 
+	GUMUZ                         = 542788935, 
+	GUPAPUYNGU                    = 541480263, 
+	GUSII                         = 542790983, 
+	HAIDA                         = 810107208, 
+	HAITIAN_CREOLE                = 541671752, 
+	HALKOMELEM                    = 542266696, 
+	HAMMER_BANNA                  = 541999688, 
+	HARARI                        = 541676104, 
+	HARAUTI                       = 542261576, 
+	HARYANVI                      = 541280066, 
+	HAUSA                         = 542458184, 
+	HAVASUPAI_WALAPAI_YAVAPAI     = 541480281, 
+	HAWAIIAN                      = 542589256, 
+	HAYA                          = 542720328, 
+	HAZARAGI                      = 542785864, 
+	HEBREW                        = 542267209, 
+	HEILTSUK                      = 541672776, 
+	HERERO                        = 542262600, 
+	HIGH_MARI                     = 541150536, 
+	HILIGAYNON                    = 541870408, 
+	HINDI                         = 542001480, 
+	HINDKO                        = 541347400, 
+	HIRI_MOTU                     = 542068040, 
+	HMONG                         = 542002504, 
+	HMONG_DAW                     = 542594893, 
+	HMONG_SHUAT                   = 542788936, 
+	HO                            = 538988360, 
+	HUNGARIAN                     = 542004552, 
+	IBAN                          = 541147721, 
+	IBIBIO                        = 541213257, 
+	ICELANDIC                     = 541872969, 
+	IDO                           = 542065737, 
+	IGBO                          = 542065225, 
+	IJO                           = 542067273, 
+	ILOKANO                       = 542067785, 
+	INARI_SAMI                    = 541938505, 
+	INDONESIAN                    = 541347401, 
+	INGUSH                        = 541544009, 
+	INTERLINGUA                   = 541150793, 
+	INTERLINGUE                   = 541412425, 
+	INUKTITUT                     = 542461513, 
+	INUPIAT                       = 541806665, 
+	IPA_PHONETIC                  = 542134345, 
+	IRISH                         = 541676105, 
+	IRISH_TRADITIONAL             = 542397001, 
+	IRULA                         = 542462537, 
+	ITALIAN                       = 541152329, 
+	JAMAICAN_CREOLE               = 541933898, 
+	JAPANESE                      = 541999434, 
+	JAVANESE                      = 542523722, 
+	JENNU_KURUMA                  = 541742424, 
+	JUDEO_TAT                     = 542393418, 
+	JULA                          = 541873482, 
+	KABARDIAN                     = 541213003, 
+	KABYLE                        = 809648459, 
+	KACHCHI                       = 541278539, 
+	KADIWEU                       = 541278795, 
+	KALENJIN                      = 541868363, 
+	KALMYK                        = 541936715, 
+	KAMBA                         = 541216075, 
+	KANAUJI                       = 541739586, 
+	KANNADA                       = 541999435, 
+	KANURI                        = 542264907, 
+	KAQCHIKEL                     = 541802819, 
+	KARACHAY                      = 542261579, 
+	KARAIM                        = 541938251, 
+	KARAKALPAK                    = 541807179, 
+	KARELIAN                      = 541872715, 
+	KAREN                         = 542003787, 
+	KASHMIRI                      = 541610827, 
+	KASHUBIAN                     = 541217603, 
+	KATE                          = 541543755, 
+	KAZAKH                        = 542785867, 
+	KEBENA                        = 541214027, 
+	KEKCHI                        = 541803851, 
+	KHAKASS                       = 541149259, 
+	KHAMTI_SHAN                   = 542394443, 
+	KHAMYANG                      = 542462795, 
+	KHANTY_KAZIM                  = 541804619, 
+	KHANTY_SHURISHKAR             = 542328907, 
+	KHANTY_VAKHI                  = 542525515, 
+	KHASI                         = 541676363, 
+	KHENGKHA                      = 541477720, 
+	KHINALUG                      = 541739595, 
+	KHMER                         = 541935691, 
+	KHORASANI_TURKIC              = 542788939, 
+	KHOWAR                        = 542591051, 
+	KHUTSURI_GEORGIAN             = 541411147, 
+	KICHE                         = 541283665, 
+	KIKONGO                       = 542003019, 
+	KILDIN_SAMI                   = 541938507, 
+	KINYARWANDA                   = 541152594, 
+	KIRMANJKI                     = 542460235, 
+	KISII                         = 542329163, 
+	KITUBA                        = 542591821, 
+	KODAGU                        = 541347659, 
+	KOKNI                         = 542001995, 
+	KOMI                          = 541937483, 
+	KOMI_PERMYAK                  = 542134091, 
+	KOMI_ZYRIAN                   = 542789451, 
+	KOMO                          = 542068043, 
+	KOMSO                         = 542330187, 
+	KONGO                         = 810438475, 
+	KONKANI                       = 541806411, 
+	KOORETE                       = 542397003, 
+	KOREAN                        = 542265163, 
+	KOREAO_OLD_HANGUL             = 541609803, 
+	KORYAK                        = 541808971, 
+	KOSRAEAN                      = 542330699, 
+	KPELLE                        = 541872203, 
+	KPELLE_LIBERIA                = 541413464, 
+	KRIO                          = 541676107, 
+	KRYMCHAK                      = 542393162, 
+	KUANYAMA                      = 541152587, 
+	KUBE                          = 541476683, 
+	KUI                           = 541676875, 
+	KULVI                         = 541807947, 
+	KUMAONI                       = 542002507, 
+	KUMYK                         = 541939019, 
+	KURDISH                       = 542266699, 
+	KURUKH                        = 542463307, 
+	KUY                           = 542725451, 
+	KWAKWALA                      = 541808459, 
+	KYRGYZ                        = 542263627, 
+	L_CREE                        = 542262092, 
+	LADAKHI                       = 541803596, 
+	LADIN                         = 541344076, 
+	LADINO                        = 541349194, 
+	LAHULI                        = 541606220, 
+	LAK                           = 541802828, 
+	LAKI                          = 541674316, 
+	LAMBANI                       = 541933900, 
+	LAMPUNG                       = 542132812, 
+	LAO                           = 542064972, 
+	LATIN                         = 542392652, 
+	LATVIAN                       = 541677132, 
+	LAZ                           = 542785868, 
+	LELEMI                        = 541476172, 
+	LEZGI                         = 542786892, 
+	LIGURIAN                      = 541739340, 
+	LIMBU                         = 541216076, 
+	LIMBURGISH                    = 541935948, 
+	LINGALA                       = 542001484, 
+	LIPO                          = 542068812, 
+	LISU                          = 542329164, 
+	LITHUANIAN                    = 541611084, 
+	LIV                           = 542525772, 
+	LOJBAN                        = 542065226, 
+	LOMA                          = 541937484, 
+	LOMBARD                       = 542068044, 
+	LOMWE                         = 542592332, 
+	LOW_MARI                      = 541150540, 
+	LOW_SAXON                     = 542327886, 
+	LOWER_SORBIAN                 = 541217612, 
+	LU                            = 541344344, 
+	LUBA_KATANGA                  = 541218124, 
+	LUBA_LULUA                    = 541152588, 
+	LULE_SAMI                     = 541938508, 
+	LUO                           = 542070092, 
+	LURI                          = 541282892, 
+	LUSHOOTSEED                   = 542397772, 
+	LUXEMBOURGISH                 = 542790732, 
+	LUYIA                         = 541611340, 
+	MACEDONIAN                    = 541346637, 
+	MADURA                        = 541344077, 
+	MAGAHI                        = 541540685, 
+	MAITHILI                      = 541611085, 
+	MAJANG                        = 541737293, 
+	MAKASAR                       = 542264141, 
+	MAKHUWA                       = 541802829, 
+	MAKONDE                       = 541410379, 
+	MALAGASY                      = 541543501, 
+	MALAY                         = 542723149, 
+	MALAYALAM                     = 541868365, 
+	MALAYALAM_REFORMED            = 542264397, 
+	MALE                          = 541412429, 
+	MALINKE                       = 542002253, 
+	MALTESE                       = 542331981, 
+	MAM                           = 541933901, 
+	MANCHU                        = 541606733, 
+	MANDAR                        = 542262349, 
+	MANDINKA                      = 541347405, 
+	MANINKA                       = 541806157, 
+	MANIPURI                      = 541675085, 
+	MANO                          = 542524749, 
+	MANSI                         = 541999437, 
+	MANX                          = 542658125, 
+	MAORI                         = 541676109, 
+	MAPUDUNGUN                    = 542130509, 
+	MARATHI                       = 542261581, 
+	MARSHALLESE                   = 541606221, 
+	MARWARI                       = 542589261, 
+	MAYAN                         = 542005581, 
+	MAZANDERANI                   = 542005837, 
+	MBEMBE_TIGON                  = 541153870, 
+	MBO                           = 542065229, 
+	MBUNDU                        = 541999693, 
+	MEDUMBA                       = 542529858, 
+	MEEN                          = 542000461, 
+	MENDE                         = 541410381, 
+	MERU                          = 542262605, 
+	MEWATI                        = 541938775, 
+	MINANGKABAU                   = 542001485, 
+	MINJANGBAL                    = 541215320, 
+	MIRANDESE                     = 541873997, 
+	MIZO                          = 542787917, 
+	MOHAWK                        = 541609805, 
+	MOKSHA                        = 541806413, 
+	MOLDAVIAN                     = 541871949, 
+	MON                           = 542003021, 
+	MONGOLIAN                     = 541544013, 
+	MOOSE_CREE                    = 542262093, 
+	MORISYEN                      = 541410893, 
+	MOROCCAN                      = 542265165, 
+	MOSSI                         = 542330957, 
+	MUNDARI                       = 542004557, 
+	MUSCOGEE                      = 542332237, 
+	N_CREE                        = 542262094, 
+	NAGA_ASSAMESE                 = 541540686, 
+	NAGARI                        = 542263118, 
+	NAHUATL                       = 541606222, 
+	NANAI                         = 541999438, 
+	NASKAPI                       = 542327118, 
+	NAURUAN                       = 542458190, 
+	NAVAJO                        = 542523726, 
+	NDAU                          = 541279310, 
+	NDEBELE                       = 541213774, 
+	NDONGA                        = 541541454, 
+	NEAPOLITAN                    = 542130510, 
+	NEPALI                        = 542131534, 
+	NEWARI                        = 542590286, 
+	NGBAKA                        = 541149006, 
+	NIGERIAN_FULFULDE             = 542528838, 
+	NIMADI                        = 541413198, 
+	NISI                          = 542329166, 
+	NIUEAN                        = 542460238, 
+	NKO                           = 542067534, 
+	NOGAI                         = 541544270, 
+	NORFOLK                       = 541608272, 
+	NORTH_SLAVEY                  = 542327635, 
+	NORTHERN_EMBERA               = 542133573, 
+	NORTHERN_SAMI                 = 541938510, 
+	NORTHERN_SOTHO                = 542069582, 
+	NORTHERN_TAI                  = 541152334, 
+	NORWAY_HOUSE_CREE             = 541280334, 
+	NORWEGIAN                     = 542265166, 
+	NORWEGIAN_NYNORSK             = 542005582, 
+	NOVIAL                        = 542527310, 
+	NUMANGGANG                    = 542134094, 
+	NUNAVIK_INUKTITUT             = 542461513, 
+	NUU_CHAH_NULTH                = 541807950, 
+	NYAMWEZI                      = 541940046, 
+	NYANKOLE                      = 541870926, 
+	OCCITAN                       = 541672271, 
+	ODIA                          = 541676111, 
+	OJI_CREE                      = 542262095, 
+	OJIBWAY                       = 541215311, 
+	OLD_IRISH                     = 541149011, 
+	OLD_JAVANESE                  = 542589259, 
+	ONEIDA                        = 541412943, 
+	ONONDAGA                      = 542068303, 
+	OROMO                         = 542069327, 
+	OSSETIAN                      = 542331727, 
+	PA_O_KAREN                    = 541805634, 
+	PALAUAN                       = 542458192, 
+	PALAUNG                       = 541543504, 
+	PALESTINIAN_ARAMAIC           = 541147472, 
+	PALI                          = 541868368, 
+	PALPA                         = 542130512, 
+	PAMPANGAN                     = 541933904, 
+	PANGASINAN                    = 541540688, 
+	PAPIAMENTU                    = 810565968, 
+	PASHTO                        = 542327120, 
+	PATTANI_MALAY                 = 541148749, 
+	PENNSYLVANIA_GERMAN           = 541279312, 
+	PERSIAN                       = 542261574, 
+	PHAKE                         = 541805136, 
+	PICARD                        = 541344592, 
+	PIEMONTESE                    = 542330192, 
+	PILAGA                        = 541543504, 
+	PITE_SAMI                     = 541411923, 
+	POCOMCHI                      = 541609808, 
+	POHNPEIAN                     = 542003024, 
+	POLISH                        = 541805648, 
+	POLYTONIC_GREEK               = 542263120, 
+	PORTUGUESE                    = 541545552, 
+	PROVENCAL                     = 542069328, 
+	PUNJABI                       = 541999440, 
+	QUECHUA                       = 542790993, 
+	QUECHUA_BOLIVIA               = 541611345, 
+	QUECHUA_ECUADOR               = 541677137, 
+	QUECHUA_PERU                  = 541611857, 
+	R_CREE                        = 542262098, 
+	RAJASTHANI                    = 541737298, 
+	RAKHINE                       = 541807169, 
+	RAROTONGAN                    = 542261586, 
+	REJANG                        = 541738322, 
+	RIANG                         = 541149522, 
+	RIPUARIAN                     = 541610827, 
+	RITARUNGO                     = 542394706, 
+	ROHINGYA                      = 541542482, 
+	ROMANIAN                      = 541937490, 
+	ROMANSH                       = 542330194, 
+	ROMANY                        = 542723922, 
+	ROTUMAN                       = 541938770, 
+	RUNDI                         = 542004562, 
+	RUSSIAN                       = 542332242, 
+	RUSSIAN_BURIAT                = 542458450, 
+	RUSYN                         = 542724946, 
+	SADRI                         = 541344083, 
+	SAKHA                         = 541802841, 
+	SAMOAN                        = 542068051, 
+	SAMOGITIAN                    = 542328659, 
+	SAN_BLAS_KUNA                 = 541807939, 
+	SANGO                         = 542066515, 
+	SANSKRIT                      = 541999443, 
+	SANTALI                       = 542392659, 
+	SARAIKI                       = 541807187, 
+	SARDINIAN                     = 541348435, 
+	SASAK                         = 542327123, 
+	SATERLAND_FRISIAN             = 542200915, 
+	SAYISI                        = 542720339, 
+	SCOTS                         = 541672275, 
+	SCOTTISH_GAELIC               = 541409607, 
+	SEKOTA                        = 541738323, 
+	SELKUP                        = 541869395, 
+	SENA                          = 541150803, 
+	SENECA                        = 541410643, 
+	SERBIAN                       = 541217363, 
+	SERER                         = 542265939, 
+	SGAW_KAREN                    = 542593867, 
+	SHAN                          = 542001235, 
+	SHONA                         = 541150803, 
+	SIBE                          = 541215059, 
+	SICILIAN                      = 541999955, 
+	SIDAMO                        = 541346131, 
+	SILESIAN                      = 541874771, 
+	SILTE_GURAGE                  = 541542739, 
+	SINDHI                        = 541347411, 
+	SINHALA                       = 541609555, 
+	SKOLT_SAMI                    = 542329683, 
+	SLAVEY                        = 541150291, 
+	SLOVAK                        = 542722899, 
+	SLOVENIAN                     = 542526547, 
+	SMALL_FLOWERY_MIAO            = 541935187, 
+	SODO_GURAGE                   = 541544275, 
+	SOGA                          = 541544280, 
+	SOMALI                        = 541871443, 
+	SONGE                         = 542134099, 
+	SONINKE                       = 541806163, 
+	SOUTH_SLAVEY                  = 541872979, 
+	SOUTHERN_KIWAI                = 541346379, 
+	SOUTHERN_SAMI                 = 541938515, 
+	SOUTHERN_SOTHO                = 542396243, 
+	SPANISH                       = 542135109, 
+	STANDARD_MOROCCAN_TAMAZIGHT   = 541607770, 
+	STRAITS_SALISH                = 542266451, 
+	SUKUMA                        = 541807955, 
+	SUNDANESE                     = 542004563, 
+	SURI                          = 542266707, 
+	SUTU                          = 542398547, 
+	SVAN                          = 541152851, 
+	SWADAYA_ARAMAIC               = 541153107, 
+	SWAHILI                       = 541808467, 
+	SWATI                         = 542791507, 
+	SWEDISH                       = 541414995, 
+	SYLHETI                       = 541874515, 
+	SYRIAC                        = 542267731, 
+	SYRIAC_EASTERN                = 1314019667, 
+	SYRIAC_ESTRANGELA             = 1163024723, 
+	SYRIAC_WESTERN                = 1246910803, 
+	TABASARAN                     = 541213012, 
+	TACHELHIT                     = 541673555, 
+	TAGALOG                       = 541869908, 
+	TAHAGGART_TAMAHAQ             = 542525524, 
+	TAHITIAN                      = 542394452, 
+	TAI_LAING                     = 541870676, 
+	TAJIKI                        = 541737300, 
+	TALYSH                        = 542723156, 
+	TAMASHEK                      = 541609300, 
+	TAMASHEQ                      = 542196052, 
+	TAMAZIGHT                     = 541940308, 
+	TAMIL                         = 541933908, 
+	TARIFIT                       = 541477202, 
+	TATAR                         = 542392660, 
+	TAWALLAMMAT_TAMAJAQ           = 542200916, 
+	TAY                           = 542792020, 
+	TAYART_TAMAJEQ                = 542787668, 
+	TELUGU                        = 541869396, 
+	TEMNE                         = 542002516, 
+	TETUM                         = 542393684, 
+	TH_CREE                       = 542262100, 
+	THAI                          = 541149268, 
+	THAILAND_MON                  = 1414418253, 
+	THOMPSON                      = 542132308, 
+	TIBETAN                       = 541215060, 
+	TIGRE                         = 542263124, 
+	TIGRINYA                      = 542721876, 
+	TIV                           = 542525780, 
+	TLINGIT                       = 541674580, 
+	TOBO                          = 542523988, 
+	TODO                          = 541347668, 
+	TOK_PISIN                     = 541675604, 
+	TOMA                          = 809783124, 
+	TONGA                         = 541544020, 
+	TONGAN                        = 542000980, 
+	TORKI                         = 541219393, 
+	TSHANGLA                      = 541741908, 
+	TSONGA                        = 541545300, 
+	TSWANA                        = 541150804, 
+	TULU                          = 541873492, 
+	TUMBUKA                       = 541939028, 
+	TUNDRA_ENETS                  = 541412948, 
+	TURKISH                       = 541807188, 
+	TURKMEN                       = 541936468, 
+	TUROYO_ARAMAIC                = 541152596, 
+	TUSCARORA                     = 542332244, 
+	TUVALU                        = 541873748, 
+	TUVIN                         = 542528852, 
+	TWI                           = 541677396, 
+	TZOTZIL                       = 542071380, 
+	UDI                           = 541672533, 
+	UDMURT                        = 541934677, 
+	UKRAINIAN                     = 542264149, 
+	UMBUNDU                       = 541216085, 
+	UME_SAMI                      = 542460499, 
+	UPPER_SAXON                   = 542464083, 
+	UPPER_SORBIAN                 = 541217621, 
+	URALIC_PHONETIC               = 542134357, 
+	URDU                          = 541348437, 
+	UYGHUR                        = 541546837, 
+	UZBEK                         = 541219413, 
+	VENDA                         = 542000470, 
+	VENETIAN                      = 541279574, 
+	VIETNAMESE                    = 542394710, 
+	VLAX_ROMANI                   = 542723410, 
+	VOLAPUK                       = 541871958, 
+	VORO                          = 542069334, 
+	WA                            = 538984791, 
+	WACI_GBE                      = 541672279, 
+	WAGDI                         = 541540695, 
+	WAKHI                         = 541868631, 
+	WALLOON                       = 542002263, 
+	WARAY_WARAY                   = 542261591, 
+	WAYANAD_CHETTI                = 542397507, 
+	WAYUU                         = 541283655, 
+	WELSH                         = 541869399, 
+	WENDAT                        = 542393431, 
+	WEST_CREE                     = 542262103, 
+	WESTERN_CHAM                  = 541149763, 
+	WESTERN_KAYAH                 = 542464331, 
+	WESTERN_PANJABI               = 541216336, 
+	WESTERN_PWO_KAREN             = 542070608, 
+	WOLOF                         = 541477975, 
+	WOODS_CREE                    = 542262084, 
+	WUDING_LUQUAN_YI              = 542201689, 
+	WYANDOT                       = 542005591, 
+	XHOSA                         = 542328920, 
+	Y_CREE                        = 542262105, 
+	YAO                           = 542064985, 
+	YAPESE                        = 542130521, 
+	YI_CLASSIC                    = 541280601, 
+	YI_MODERN                     = 541935961, 
+	YIDDISH                       = 541673802, 
+	YORUBA                        = 541147737, 
+	ZAMBOANGA_CHAVACANO           = 541803075, 
+	ZANDE                         = 541347418, 
+	ZARMA                         = 542263876, 
+	ZAZAKI                        = 541153882, 
+	ZEALANDIC                     = 541148506, 
+	ZHUANG                        = 541149274, 
+	ZULU                          = 541873498, 
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#ShapeConfig">ShapeConfig</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="line_break_class"><span><a class="doc-id-link" href="#line_break_class">line_break_class<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L935"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">line_break_class :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+	Onea, 
+	Oea, 
+	Ope, 
+	BK, 
+	CR, 
+	LF, 
+	NL, 
+	SP, 
+	ZW, 
+	WJ, 
+	GLnea, 
+	GLea, 
+	CLnea, 
+	CLea, 
+	CPnea, 
+	CPea, 
+	EXnea, 
+	EXea, 
+	SY, 
+	BAnea, 
+	BAea, 
+	OPnea, 
+	OPea, 
+	QU, 
+	QUPi, 
+	QUPf, 
+	IS, 
+	NSnea, 
+	NSea, 
+	B2, 
+	CB, 
+	HY, 
+	HYPHEN, 
+	INnea, 
+	INea, 
+	BB, 
+	HL, 
+	ALnea, 
+	ALea, 
+	NU, 
+	PRnea, 
+	PRea, 
+	IDnea, 
+	IDea, 
+	IDpe, 
+	EBnea, 
+	EBea, 
+	EM, 
+	POnea, 
+	POea, 
+	JL, 
+	JV, 
+	JT, 
+	H2, 
+	H3, 
+	AP, 
+	AK, 
+	DOTTED_CIRCLE, 
+	AS, 
+	VF, 
+	VI, 
+	RI, 
+	COUNT, 
+	CM, 
+	ZWJ, 
+	CJ, 
+	SOT, 
+	EOT, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="lookup_indices"><span><a class="doc-id-link" href="#lookup_indices">lookup_indices<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1663"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">lookup_indices :: <span class="keyword-type">struct</span> {
+	FeatureId:   <a class="code-typename" href="/vendor/kb_text_shape/#feature_id">feature_id</a>,
+	SkipFlags:   <a class="code-typename" href="/vendor/kb_text_shape/#skip_flags">skip_flags</a>,
+	GlyphFilter: <a class="code-typename" href="/vendor/kb_text_shape/#glyph_flags">glyph_flags</a>,
+	Count:       <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	Indices:     [^]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> <span class="string">`fmt:"v,Count"`</span>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="lookup_info"><span><a class="doc-id-link" href="#lookup_info">lookup_info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1509"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">lookup_info :: <span class="keyword-type">struct</span> {
+	MaximumBacktrackWithoutSkippingGlyphs: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	MaximumLookaheadWithoutSkippingGlyphs: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	MaximumSubstitutionOutputSize:         <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	MaximumInputSequenceLength:            <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	MaximumLookupStackSize:                <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="lookup_subtable_info"><span><a class="doc-id-link" href="#lookup_subtable_info">lookup_subtable_info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1527"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">lookup_subtable_info :: <span class="keyword-type">struct</span> {
+	MinimumBacktrackPlusOne: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	MinimumFollowupPlusOne:  <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="maxp"><span><a class="doc-id-link" href="#maxp">maxp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1520"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">maxp :: <span class="keyword-type">struct</span> {}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="op"><span><a class="doc-id-link" href="#op">op<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1675"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">op :: <span class="keyword-type">struct</span> {
+	Kind:     <a class="code-typename" href="/vendor/kb_text_shape/#op_kind">op_kind</a>,
+	Features: <a class="code-typename" href="/vendor/kb_text_shape/#feature_set">feature_set</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="op_kind"><span><a class="doc-id-link" href="#op_kind">op_kind<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L795"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">op_kind :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+	END, 
+	<span class="comment">// Substitution ops.</span>
+	PRE_NORMALIZE_DOTTED_CIRCLES, 
+	NORMALIZE, 
+	NORMALIZE_HANGUL, 
+	FLAG_JOINING_LETTERS, 
+	GSUB_FEATURES, 
+	<span class="comment">// Positioning ops.</span>
+	GPOS_METRICS, 
+	GPOS_FEATURES, 
+	POST_GPOS_FIXUP, 
+	STCH_POSTPASS, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="op_list"><span><a class="doc-id-link" href="#op_list">op_list<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1697"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">op_list :: <span class="keyword-type">struct</span> {
+	<span class="comment">// TODO(bill): is this actually a slice? e.g. `op_list :: []op_kind`</span>
+	Ops:    [^]<a class="code-typename" href="/vendor/kb_text_shape/#op_kind">op_kind</a>,
+	Length: <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="op_state"><span><a class="doc-id-link" href="#op_state">op_state<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1682"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">op_state :: <span class="keyword-type">struct</span> {
+	WrittenCount:         <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a>,
+	GlyphIndex:           <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a>,
+	FrameCount:           <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	ResumePoint:          <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	FeatureCount:         <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	FeatureLookupIndices: [16]<a class="code-typename" href="/vendor/kb_text_shape/#lookup_indices">lookup_indices</a>,
+	OpSpecific:           <a class="code-typename" href="/vendor/kb_text_shape/#op_state_op_specific">op_state_op_specific</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="op_state_gsub"><span><a class="doc-id-link" href="#op_state_gsub">op_state_gsub<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1646"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">op_state_gsub :: <span class="keyword-type">struct</span> {
+	LookupIndex: <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a>,
+	GlyphFilter: <a class="code-typename" href="/vendor/kb_text_shape/#glyph_flags">glyph_flags</a>,
+	SkipFlags:   <a class="code-typename" href="/vendor/kb_text_shape/#skip_flags">skip_flags</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="op_state_normalize"><span><a class="doc-id-link" href="#op_state_normalize">op_state_normalize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1634"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">op_state_normalize :: <span class="keyword-type">struct</span> {
+	CodepointsToDecomposeCount: <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a>,
+	AboveBaseGlyphCount:        <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="op_state_normalize_hangul"><span><a class="doc-id-link" href="#op_state_normalize_hangul">op_state_normalize_hangul<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1652"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">op_state_normalize_hangul :: <span class="keyword-type">struct</span> {
+	LvtGlyphs:     [4]<a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a> <span class="string">`fmt:"v,LvtGlyphCount"`</span>,
+	LvtGlyphCount: <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="op_state_op_specific"><span><a class="doc-id-link" href="#op_state_op_specific">op_state_op_specific<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1657"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">op_state_op_specific :: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
+	Normalize:       <a class="code-typename" href="/vendor/kb_text_shape/#op_state_normalize">op_state_normalize</a>,
+	Gsub:            <a class="code-typename" href="/vendor/kb_text_shape/#op_state_gsub">op_state_gsub</a>,
+	NormalizeHangul: <a class="code-typename" href="/vendor/kb_text_shape/#op_state_normalize_hangul">op_state_normalize_hangul</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="orientation"><span><a class="doc-id-link" href="#orientation">orientation<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L891"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">orientation :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+	HORIZONTAL, 
+	VERTICAL, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="reph_encoding"><span><a class="doc-id-link" href="#reph_encoding">reph_encoding<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L39"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">reph_encoding :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+	IMPLICIT, 
+	EXPLICIT, 
+	LOGICAL_REPHA, 
+	VISUAL_REPHA, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="reph_position"><span><a class="doc-id-link" href="#reph_position">reph_position<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L31"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">reph_position :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+	AFTER_POST, 
+	BEFORE_POST, 
+	BEFORE_SUBJOINED, 
+	AFTER_SUBJOINED, 
+	AFTER_MAIN, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="script"><span><a class="doc-id-link" href="#script">script<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1070"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">script :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+	DONT_KNOW, 
+	ADLAM, 
+	AHOM, 
+	ANATOLIAN_HIEROGLYPHS, 
+	ARABIC, 
+	ARMENIAN, 
+	AVESTAN, 
+	BALINESE, 
+	BAMUM, 
+	BASSA_VAH, 
+	BATAK, 
+	BENGALI, 
+	BHAIKSUKI, 
+	BOPOMOFO, 
+	BRAHMI, 
+	BUGINESE, 
+	BUHID, 
+	CANADIAN_SYLLABICS, 
+	CARIAN, 
+	CAUCASIAN_ALBANIAN, 
+	CHAKMA, 
+	CHAM, 
+	CHEROKEE, 
+	CHORASMIAN, 
+	CJK_IDEOGRAPHIC, 
+	COPTIC, 
+	CYPRIOT_SYLLABARY, 
+	CYPRO_MINOAN, 
+	CYRILLIC, 
+	DEFAULT, 
+	DEFAULT2, 
+	DESERET, 
+	DEVANAGARI, 
+	DIVES_AKURU, 
+	DOGRA, 
+	DUPLOYAN, 
+	EGYPTIAN_HIEROGLYPHS, 
+	ELBASAN, 
+	ELYMAIC, 
+	ETHIOPIC, 
+	GARAY, 
+	GEORGIAN, 
+	GLAGOLITIC, 
+	GOTHIC, 
+	GRANTHA, 
+	GREEK, 
+	GUJARATI, 
+	GUNJALA_GONDI, 
+	GURMUKHI, 
+	GURUNG_KHEMA, 
+	HANGUL, 
+	HANIFI_ROHINGYA, 
+	HANUNOO, 
+	HATRAN, 
+	HEBREW, 
+	HIRAGANA, 
+	IMPERIAL_ARAMAIC, 
+	INSCRIPTIONAL_PAHLAVI, 
+	INSCRIPTIONAL_PARTHIAN, 
+	JAVANESE, 
+	KAITHI, 
+	KANNADA, 
+	KATAKANA, 
+	KAWI, 
+	KAYAH_LI, 
+	KHAROSHTHI, 
+	KHITAN_SMALL_SCRIPT, 
+	KHMER, 
+	KHOJKI, 
+	KHUDAWADI, 
+	KIRAT_RAI, 
+	LAO, 
+	LATIN, 
+	LEPCHA, 
+	LIMBU, 
+	LINEAR_A, 
+	LINEAR_B, 
+	LISU, 
+	LYCIAN, 
+	LYDIAN, 
+	MAHAJANI, 
+	MAKASAR, 
+	MALAYALAM, 
+	MANDAIC, 
+	MANICHAEAN, 
+	MARCHEN, 
+	MASARAM_GONDI, 
+	MEDEFAIDRIN, 
+	MEETEI_MAYEK, 
+	MENDE_KIKAKUI, 
+	MEROITIC_CURSIVE, 
+	MEROITIC_HIEROGLYPHS, 
+	MIAO, 
+	MODI, 
+	MONGOLIAN, 
+	MRO, 
+	MULTANI, 
+	MYANMAR, 
+	NABATAEAN, 
+	NAG_MUNDARI, 
+	NANDINAGARI, 
+	NEWA, 
+	NEW_TAI_LUE, 
+	NKO, 
+	NUSHU, 
+	NYIAKENG_PUACHUE_HMONG, 
+	OGHAM, 
+	OL_CHIKI, 
+	OL_ONAL, 
+	OLD_ITALIC, 
+	OLD_HUNGARIAN, 
+	OLD_NORTH_ARABIAN, 
+	OLD_PERMIC, 
+	OLD_PERSIAN_CUNEIFORM, 
+	OLD_SOGDIAN, 
+	OLD_SOUTH_ARABIAN, 
+	OLD_TURKIC, 
+	OLD_UYGHUR, 
+	ODIA, 
+	OSAGE, 
+	OSMANYA, 
+	PAHAWH_HMONG, 
+	PALMYRENE, 
+	PAU_CIN_HAU, 
+	PHAGS_PA, 
+	PHOENICIAN, 
+	PSALTER_PAHLAVI, 
+	REJANG, 
+	RUNIC, 
+	SAMARITAN, 
+	SAURASHTRA, 
+	SHARADA, 
+	SHAVIAN, 
+	SIDDHAM, 
+	SIGN_WRITING, 
+	SOGDIAN, 
+	SINHALA, 
+	SORA_SOMPENG, 
+	SOYOMBO, 
+	SUMERO_AKKADIAN_CUNEIFORM, 
+	SUNDANESE, 
+	SUNUWAR, 
+	SYLOTI_NAGRI, 
+	SYRIAC, 
+	TAGALOG, 
+	TAGBANWA, 
+	TAI_LE, 
+	TAI_THAM, 
+	TAI_VIET, 
+	TAKRI, 
+	TAMIL, 
+	TANGSA, 
+	TANGUT, 
+	TELUGU, 
+	THAANA, 
+	THAI, 
+	TIBETAN, 
+	TIFINAGH, 
+	TIRHUTA, 
+	TODHRI, 
+	TOTO, 
+	TULU_TIGALARI, 
+	UGARITIC_CUNEIFORM, 
+	VAI, 
+	VITHKUQI, 
+	WANCHO, 
+	WARANG_CITI, 
+	YEZIDI, 
+	YI, 
+	ZANABAZAR_SQUARE, 
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#InferScript">InferScript</a></li>
+<li><a href="/vendor/kb_text_shape/#ScriptIsComplex">ScriptIsComplex</a></li>
+<li><a href="/vendor/kb_text_shape/#ShapeConfig">ShapeConfig</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="shape_config"><span><a class="doc-id-link" href="#shape_config">shape_config<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1714"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">shape_config :: <span class="keyword-type">struct</span> {
+	Font:                  ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>,
+	Script:                <a class="code-typename" href="/vendor/kb_text_shape/#script">script</a>,
+	Language:              <a class="code-typename" href="/vendor/kb_text_shape/#language">language</a>,
+	Langsys:               [<a class="code-typename" href="/vendor/kb_text_shape/#shaping_table">shaping_table</a>]^<a class="code-typename" href="/vendor/kb_text_shape/#langsys">langsys</a>,
+	OpLists:               [4]<a class="code-typename" href="/vendor/kb_text_shape/#op_list">op_list</a>,
+	Shaper:                <a class="code-typename" href="/vendor/kb_text_shape/#shaper">shaper</a>,
+	ShaperProperties:      ^<a class="code-typename" href="/vendor/kb_text_shape/#shaper_properties">shaper_properties</a>,
+	IndicScriptProperties: <a class="code-typename" href="/vendor/kb_text_shape/#indic_script_properties">indic_script_properties</a>,
+	Blwf:                  ^<a class="code-typename" href="/vendor/kb_text_shape/#feature">feature</a>,
+	Pref:                  ^<a class="code-typename" href="/vendor/kb_text_shape/#feature">feature</a>,
+	Pstf:                  ^<a class="code-typename" href="/vendor/kb_text_shape/#feature">feature</a>,
+	Locl:                  ^<a class="code-typename" href="/vendor/kb_text_shape/#feature">feature</a>,
+	Rphf:                  ^<a class="code-typename" href="/vendor/kb_text_shape/#feature">feature</a>,
+	Half:                  ^<a class="code-typename" href="/vendor/kb_text_shape/#feature">feature</a>,
+	Vatu:                  ^<a class="code-typename" href="/vendor/kb_text_shape/#feature">feature</a>,
+	<span class="comment">// Indic</span>
+	Virama:                <a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a>,
+	DottedCircle:          <a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a>,
+	Whitespace:            <a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a>,
+	<span class="comment">// Thai</span>
+	Nikhahit:              <a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a>,
+	SaraAa:                <a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a>,
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#Shape">Shape</a></li>
+<li><a href="/vendor/kb_text_shape/#ShapeDynamic">ShapeDynamic</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#ShapeConfig">ShapeConfig</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="shape_state"><span><a class="doc-id-link" href="#shape_state">shape_state<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1744"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">shape_state :: <span class="keyword-type">struct</span> {
+	Op:                                   <a class="code-typename" href="/vendor/kb_text_shape/#op">op</a>,
+	Config:                               ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_config">shape_config</a>,
+	MainDirection:                        <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>,
+	RunDirection:                         <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>,
+	GlyphArray:                           <a class="code-typename" href="/vendor/kb_text_shape/#glyph_array">glyph_array</a>,
+	ClusterGlyphArray:                    <a class="code-typename" href="/vendor/kb_text_shape/#glyph_array">glyph_array</a>,
+	DottedCircleInsertIndex:              <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	GlyphCountStartingFromCurrentCluster: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	At:                                   <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	ResumePoint:                          <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	OpGlyphOffset:                        <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	ClusterGlyphCount:                    <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	Ip:                                   <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	NextGlyphUid:                         <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	RequiredGlyphCapacity:                <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	RealCluster:                          <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	ClusterAtStartOfWord:                 <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	WordBreak:                            <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
+	<span class="comment">// This must always be the last member!</span>
+	OpState:                              <a class="code-typename" href="/vendor/kb_text_shape/#op_state">op_state</a>,
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#FreeShapeState">FreeShapeState</a></li>
+<li><a href="/vendor/kb_text_shape/#ResetShapeState">ResetShapeState</a></li>
+<li><a href="/vendor/kb_text_shape/#Shape">Shape</a></li>
+<li><a href="/vendor/kb_text_shape/#ShapeDynamic">ShapeDynamic</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#CreateShapeState">CreateShapeState</a></li>
+<li><a href="/vendor/kb_text_shape/#PlaceShapeState">PlaceShapeState</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="shaper"><span><a class="doc-id-link" href="#shaper">shaper<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1058"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">shaper :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+	DEFAULT, 
+	ARABIC, 
+	HANGUL, 
+	HEBREW, 
+	INDIC, 
+	KHMER, 
+	MYANMAR, 
+	TIBETAN, 
+	USE, 
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Unicode defines scripts and languages.
+A language belongs to a single script, and a script belongs to a single writing system.
+On top of these, OpenType defines shapers, which are basically just designations for
+specific code paths that are taken depending on which script is being shapen.</p>
+<p>Some scripts, like Latin and Cyrillic, need relatively few operations, while complex
+scripts like Arabic and Indic scripts have specific processing steps that need to happen
+in order to obtain a correct result.</p>
+<p>These sequences of operations are _not_ described in the font file itself. The shaping
+code needs to know which script it is shaping, and implement all of those passes itself.
+That is why you, as a user, have to care about this.</p>
+<p>When creating shape_config, you can either pass in a known script, or you can specify
+SCRIPT_DONT_KNOW and let the library figure it out.
+While SCRIPT_DONT_KNOW may look appealing, it is worth noting that we can only infer
+the _script_, and not the language, of the text you pass in.
+This means that you might miss out on language-specific features when you use it.</p>
+</details>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#ShaperIsComplex">ShaperIsComplex</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="shaper_properties"><span><a class="doc-id-link" href="#shaper_properties">shaper_properties<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1523"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">shaper_properties :: <span class="keyword-type">struct</span> {}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="shaping_table"><span><a class="doc-id-link" href="#shaping_table">shaping_table<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1504"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">shaping_table :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+	GSUB, 
+	GPOS, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="skip_flag"><span><a class="doc-id-link" href="#skip_flag">skip_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1641"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">skip_flag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+	ZWNJ = 0, 
+	ZWJ  = 1, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="skip_flags"><span><a class="doc-id-link" href="#skip_flags">skip_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1640"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">skip_flags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/kb_text_shape/#skip_flag">skip_flag</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="syllabic_position"><span><a class="doc-id-link" href="#syllabic_position">syllabic_position<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L46"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">syllabic_position :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+	NONE, 
+	RA_TO_BECOME_REPH, 
+	PREBASE_MATRA, 
+	PREBASE_CONSONANT, 
+	SYLLABLE_BASE, 
+	AFTER_MAIN, 
+	ABOVEBASE_CONSONANT, 
+	BEFORE_SUBJOINED, 
+	BELOWBASE_CONSONANT, 
+	AFTER_SUBJOINED, 
+	BEFORE_POST, 
+	POSTBASE_CONSONANT, 
+	AFTER_POST, 
+	FINAL_CONSONANT, 
+	SMVD, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="un"><span><a class="doc-id-link" href="#un">un<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L9"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">un :: <span class="keyword-type">distinct</span> <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a></pre>
+</div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#ReadFontData">ReadFontData</a></li>
+<li><a href="/vendor/kb_text_shape/#ReadFontHeader">ReadFontHeader</a></li>
+<li><a href="/vendor/kb_text_shape/#SizeOfShapeState">SizeOfShapeState</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="unicode_bidirectional_class"><span><a class="doc-id-link" href="#unicode_bidirectional_class">unicode_bidirectional_class<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L922"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">unicode_bidirectional_class :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+	NI, 
+	L, 
+	R, 
+	NSM, 
+	AL, 
+	AN, 
+	EN, 
+	ES, 
+	ET, 
+	CS, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="unicode_flag"><span><a class="doc-id-link" href="#unicode_flag">unicode_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L912"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">unicode_flag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+	MODIFIER_COMBINING_MARK = 0, 
+	DEFAULT_IGNORABLE       = 1, 
+	OPEN_BRACKET            = 2, 
+	CLOSE_BRACKET           = 3, 
+	PART_OF_WORD            = 4, 
+	DECIMAL_DIGIT           = 5, 
+	NON_SPACING_MARK        = 6, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="unicode_flags"><span><a class="doc-id-link" href="#unicode_flags">unicode_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L911"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">unicode_flags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/kb_text_shape/#unicode_flag">unicode_flag</a>; <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>]</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="unicode_joining_type"><span><a class="doc-id-link" href="#unicode_joining_type">unicode_joining_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L902"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">unicode_joining_type :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+	NONE, 
+	LEFT, 
+	DUAL, 
+	FORCE, 
+	RIGHT, 
+	TRANSPARENT, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="word_break_class"><span><a class="doc-id-link" href="#word_break_class">word_break_class<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1014"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">word_break_class :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
+	Onep, 
+	Oep, 
+	CR, 
+	LF, 
+	NL, 
+	EX, 
+	ZWJ, 
+	RI, 
+	FO, 
+	KA, 
+	HL, 
+	ALnep, 
+	ALep, 
+	SQ, 
+	DQ, 
+	MNL, 
+	ML, 
+	MN, 
+	NM, 
+	ENL, 
+	WSS, 
+	SOT, 
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>@Cleanup: Merge EX and FO.</p>
+</details>
+</div>
+<h2 id="pkg-Constants" class="pkg-header">Constants</h2>
+<div class="pkg-entity">
+<h3 id="BREAK_FLAGS_ANY"><span><a class="doc-id-link" href="#BREAK_FLAGS_ANY">BREAK_FLAGS_ANY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L792"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BREAK_FLAGS_ANY :: break_flags{.DIRECTION, .SCRIPT, .GRAPHEME, .WORD, .LINE_SOFT, .LINE_HARD}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="BREAK_FLAGS_DIRECTION"><span><a class="doc-id-link" href="#BREAK_FLAGS_DIRECTION">BREAK_FLAGS_DIRECTION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L785"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BREAK_FLAGS_DIRECTION :: break_flags{.DIRECTION}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="BREAK_FLAGS_GRAPHEME"><span><a class="doc-id-link" href="#BREAK_FLAGS_GRAPHEME">BREAK_FLAGS_GRAPHEME<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L787"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BREAK_FLAGS_GRAPHEME :: break_flags{.GRAPHEME}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="BREAK_FLAGS_LINE"><span><a class="doc-id-link" href="#BREAK_FLAGS_LINE">BREAK_FLAGS_LINE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L791"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BREAK_FLAGS_LINE :: break_flags{.LINE_SOFT, .LINE_HARD}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="BREAK_FLAGS_LINE_HARD"><span><a class="doc-id-link" href="#BREAK_FLAGS_LINE_HARD">BREAK_FLAGS_LINE_HARD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L790"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BREAK_FLAGS_LINE_HARD :: break_flags{.LINE_HARD}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="BREAK_FLAGS_LINE_SOFT"><span><a class="doc-id-link" href="#BREAK_FLAGS_LINE_SOFT">BREAK_FLAGS_LINE_SOFT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L789"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BREAK_FLAGS_LINE_SOFT :: break_flags{.LINE_SOFT}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="BREAK_FLAGS_SCRIPT"><span><a class="doc-id-link" href="#BREAK_FLAGS_SCRIPT">BREAK_FLAGS_SCRIPT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L786"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BREAK_FLAGS_SCRIPT :: break_flags{.SCRIPT}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="BREAK_FLAGS_WORD"><span><a class="doc-id-link" href="#BREAK_FLAGS_WORD">BREAK_FLAGS_WORD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L788"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BREAK_FLAGS_WORD :: break_flags{.WORD}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="BREAK_REORDER_BUFFER_FLUSH_THRESHOLD"><span><a class="doc-id-link" href="#BREAK_REORDER_BUFFER_FLUSH_THRESHOLD">BREAK_REORDER_BUFFER_FLUSH_THRESHOLD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1816"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BREAK_REORDER_BUFFER_FLUSH_THRESHOLD: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 4</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>In the worst case, a single call to BreakAddCodepoint would generate 4 breaks.
+We buffer breaks to reorder them before returning them to the user.
+This potentially requires infinite memory, which we don't have, so you may want to tweak this constant,
+although, really, if the defaults don't work, then you have likely found very strange/adversarial text.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="BREAK_REORDER_BUFFER_SIZE"><span><a class="doc-id-link" href="#BREAK_REORDER_BUFFER_SIZE">BREAK_REORDER_BUFFER_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1817"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BREAK_REORDER_BUFFER_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : BREAK_REORDER_BUFFER_FLUSH_THRESHOLD * 2</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GLYPH_FEATURE_MASK"><span><a class="doc-id-link" href="#GLYPH_FEATURE_MASK">GLYPH_FEATURE_MASK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L856"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GLYPH_FEATURE_MASK :: glyph_flags{.ISOL, .FINA, .FIN2, .FIN3, .MEDI, .MED2, .INIT, .LJMO, .VJMO, .TJMO, .RPHF, .BLWF, .HALF, .PSTF, .ABVF, .PREF, .NUMR, .FRAC, .DNOM, .CFAR}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="JOINING_FEATURE_MASK"><span><a class="doc-id-link" href="#JOINING_FEATURE_MASK">JOINING_FEATURE_MASK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L867"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">JOINING_FEATURE_MASK :: glyph_flags{.ISOL, .FINA, .FIN2, .FIN3, .MEDI, .MED2, .INIT}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MAX_SIMULTANEOUS_FEATURES"><span><a class="doc-id-link" href="#MAX_SIMULTANEOUS_FEATURES">MAX_SIMULTANEOUS_FEATURES<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1681"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MAX_SIMULTANEOUS_FEATURES: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 16</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>This needs to be updated when we change the op lists!</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="USE_GLYPH_FEATURE_MASK"><span><a class="doc-id-link" href="#USE_GLYPH_FEATURE_MASK">USE_GLYPH_FEATURE_MASK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L862"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">USE_GLYPH_FEATURE_MASK :: glyph_flags{.ISOL, .FINA, .FIN2, .FIN3, .MEDI, .MED2, .INIT, .NUMR, .DNOM, .FRAC}</pre>
+</div>
+</div>
+<h2 id="pkg-Variables" class="pkg-header">Variables</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+<h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
+<div class="pkg-entity">
+<h3 id="BeginBreak"><span><a class="doc-id-link" href="#BeginBreak">BeginBreak<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L31"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BeginBreak :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (State: ^<a class="code-typename" href="/vendor/kb_text_shape/#break_state">break_state</a>, MainDirection: <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>, JapaneseLineBreakStyle: <a class="code-typename" href="/vendor/kb_text_shape/#japanese_line_break_style">japanese_line_break_style</a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Break"><span><a class="doc-id-link" href="#Break">Break<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L35"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Break :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (State: ^<a class="code-typename" href="/vendor/kb_text_shape/#break_state">break_state</a>, Break: ^<a class="code-typename" href="/vendor/kb_text_shape/#break_type">break_type</a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="BreakAddCodepoint"><span><a class="doc-id-link" href="#BreakAddCodepoint">BreakAddCodepoint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L33"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BreakAddCodepoint :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (State: ^<a class="code-typename" href="/vendor/kb_text_shape/#break_state">break_state</a>, Codepoint: untyped rune, PositionIncrement: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, EndOfText: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="BreakFlush"><span><a class="doc-id-link" href="#BreakFlush">BreakFlush<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L34"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BreakFlush :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (State: ^<a class="code-typename" href="/vendor/kb_text_shape/#break_state">break_state</a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="BreakStateIsValid"><span><a class="doc-id-link" href="#BreakStateIsValid">BreakStateIsValid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L32"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">BreakStateIsValid :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (State: ^<a class="code-typename" href="/vendor/kb_text_shape/#break_state">break_state</a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="CodepointToGlyph"><span><a class="doc-id-link" href="#CodepointToGlyph">CodepointToGlyph<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L36"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CodepointToGlyph :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, Codepoint: untyped rune) -> <a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="CreateShapeState"><span><a class="doc-id-link" href="#CreateShapeState">CreateShapeState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L129"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CreateShapeState :: <span class="keyword-type">proc</span>(Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (Result: ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_state">shape_state</a>, Err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Cursor"><span><a class="doc-id-link" href="#Cursor">Cursor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L30"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Cursor :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Direction: <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#cursor">cursor</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DecodeUtf8"><span><a class="doc-id-link" href="#DecodeUtf8">DecodeUtf8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L51"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DecodeUtf8 :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (String: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> (Codepoint: untyped rune, SourceCharactersConsumed: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, Valid: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FontFromMemory"><span><a class="doc-id-link" href="#FontFromMemory">FontFromMemory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L98"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FontFromMemory :: <span class="keyword-type">proc</span>(Data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (Result: <a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, Err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FontIsValid"><span><a class="doc-id-link" href="#FontIsValid">FontIsValid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L17"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FontIsValid :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FreeFont"><span><a class="doc-id-link" href="#FreeFont">FreeFont<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L122"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FreeFont :: <span class="keyword-type">proc</span>(Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FreeShapeState"><span><a class="doc-id-link" href="#FreeShapeState">FreeShapeState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L135"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FreeShapeState :: <span class="keyword-type">proc</span>(State: ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_state">shape_state</a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="InferScript"><span><a class="doc-id-link" href="#InferScript">InferScript<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L37"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">InferScript :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Direction: ^<a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>, Script: ^<a class="code-typename" href="/vendor/kb_text_shape/#script">script</a>, GlyphScript: <a class="code-typename" href="/vendor/kb_text_shape/#script">script</a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="PlaceShapeState"><span><a class="doc-id-link" href="#PlaceShapeState">PlaceShapeState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L41"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">PlaceShapeState :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Memory: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_state">shape_state</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="PositionGlyph"><span><a class="doc-id-link" href="#PositionGlyph">PositionGlyph<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L140"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">PositionGlyph :: <span class="keyword-type">proc</span>(Cursor: ^<a class="code-typename" href="/vendor/kb_text_shape/#cursor">cursor</a>, Glyph: ^<a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a>) -> (X, Y: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="PostReadFontInitialize"><span><a class="doc-id-link" href="#PostReadFontInitialize">PostReadFontInitialize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L88"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">PostReadFontInitialize :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, Memory: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ReadFontData"><span><a class="doc-id-link" href="#ReadFontData">ReadFontData<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L79"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ReadFontData :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, Scratch: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ReadFontHeader"><span><a class="doc-id-link" href="#ReadFontHeader">ReadFontHeader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L70"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ReadFontHeader :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, Data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ResetShapeState"><span><a class="doc-id-link" href="#ResetShapeState">ResetShapeState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L20"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ResetShapeState :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (State: ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_state">shape_state</a>) ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ScriptIsComplex"><span><a class="doc-id-link" href="#ScriptIsComplex">ScriptIsComplex<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L24"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ScriptIsComplex :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Script: <a class="code-typename" href="/vendor/kb_text_shape/#script">script</a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Shape"><span><a class="doc-id-link" href="#Shape">Shape<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L26"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Shape :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
+	State:                       ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_state">shape_state</a>, 
+	Config:                      ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_config">shape_config</a>, 
+	MainDirection, RunDirection: <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>, 
+	Glyphs:                      [^]<a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a>, 
+	GlyphCount:                  ^<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, 
+	GlyphCapacity:               <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, 
+) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ShapeConfig"><span><a class="doc-id-link" href="#ShapeConfig">ShapeConfig<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L22"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ShapeConfig :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, Script: <a class="code-typename" href="/vendor/kb_text_shape/#script">script</a>, Language: <a class="code-typename" href="/vendor/kb_text_shape/#language">language</a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#shape_config">shape_config</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ShapeDynamic"><span><a class="doc-id-link" href="#ShapeDynamic">ShapeDynamic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L150"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ShapeDynamic :: <span class="keyword-type">proc</span>(State: ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_state">shape_state</a>, Config: ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_config">shape_config</a>, MainDirection, RunDirection: <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>, Glyphs: ^[<span class="keyword">dynamic</span>]<a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ShaperIsComplex"><span><a class="doc-id-link" href="#ShaperIsComplex">ShaperIsComplex<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L23"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ShaperIsComplex :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Shaper: <a class="code-typename" href="/vendor/kb_text_shape/#shaper">shaper</a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="SizeOfShapeState"><span><a class="doc-id-link" href="#SizeOfShapeState">SizeOfShapeState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L18"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">SizeOfShapeState :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a> ---</pre>
+</div>
+</div>
+<h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+</section>
+<h2 id="pkg-source-files">Source Files</h2>
+<ul>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin">kb_text_shape_procs.odin</a></li>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin">kb_text_shape_types.odin</a></li>
+</ul>
+<h2 id="pkg-generation-information">Generation Information</h2>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-20 21:12:46.574219300 +0000 UTC</code></p>
+</article>
+<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
+<nav id="TableOfContents">
+<ul>
+<li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#bracket">bracket</a></li>
+<li><a href="#break_flag">break_flag</a></li>
+<li><a href="#break_flags">break_flags</a></li>
+<li><a href="#break_state">break_state</a></li>
+<li><a href="#break_state_flag">break_state_flag</a></li>
+<li><a href="#break_state_flags">break_state_flags</a></li>
+<li><a href="#break_type">break_type</a></li>
+<li><a href="#cmap_14">cmap_14</a></li>
+<li><a href="#cursor">cursor</a></li>
+<li><a href="#direction">direction</a></li>
+<li><a href="#feature">feature</a></li>
+<li><a href="#feature_id">feature_id</a></li>
+<li><a href="#feature_set">feature_set</a></li>
+<li><a href="#feature_tag">feature_tag</a></li>
+<li><a href="#font">font</a></li>
+<li><a href="#gdef">gdef</a></li>
+<li><a href="#glyph">glyph</a></li>
+<li><a href="#glyph_array">glyph_array</a></li>
+<li><a href="#glyph_classes">glyph_classes</a></li>
+<li><a href="#glyph_flag">glyph_flag</a></li>
+<li><a href="#glyph_flags">glyph_flags</a></li>
+<li><a href="#gsub_gpos">gsub_gpos</a></li>
+<li><a href="#hea">hea</a></li>
+<li><a href="#head">head</a></li>
+<li><a href="#indic_script_properties">indic_script_properties</a></li>
+<li><a href="#iterate_features">iterate_features</a></li>
+<li><a href="#japanese_line_break_style">japanese_line_break_style</a></li>
+<li><a href="#joining_feature">joining_feature</a></li>
+<li><a href="#langsys">langsys</a></li>
+<li><a href="#language">language</a></li>
+<li><a href="#line_break_class">line_break_class</a></li>
+<li><a href="#lookup_indices">lookup_indices</a></li>
+<li><a href="#lookup_info">lookup_info</a></li>
+<li><a href="#lookup_subtable_info">lookup_subtable_info</a></li>
+<li><a href="#maxp">maxp</a></li>
+<li><a href="#op">op</a></li>
+<li><a href="#op_kind">op_kind</a></li>
+<li><a href="#op_list">op_list</a></li>
+<li><a href="#op_state">op_state</a></li>
+<li><a href="#op_state_gsub">op_state_gsub</a></li>
+<li><a href="#op_state_normalize">op_state_normalize</a></li>
+<li><a href="#op_state_normalize_hangul">op_state_normalize_hangul</a></li>
+<li><a href="#op_state_op_specific">op_state_op_specific</a></li>
+<li><a href="#orientation">orientation</a></li>
+<li><a href="#reph_encoding">reph_encoding</a></li>
+<li><a href="#reph_position">reph_position</a></li>
+<li><a href="#script">script</a></li>
+<li><a href="#shape_config">shape_config</a></li>
+<li><a href="#shape_state">shape_state</a></li>
+<li><a href="#shaper">shaper</a></li>
+<li><a href="#shaper_properties">shaper_properties</a></li>
+<li><a href="#shaping_table">shaping_table</a></li>
+<li><a href="#skip_flag">skip_flag</a></li>
+<li><a href="#skip_flags">skip_flags</a></li>
+<li><a href="#syllabic_position">syllabic_position</a></li>
+<li><a href="#un">un</a></li>
+<li><a href="#unicode_bidirectional_class">unicode_bidirectional_class</a></li>
+<li><a href="#unicode_flag">unicode_flag</a></li>
+<li><a href="#unicode_flags">unicode_flags</a></li>
+<li><a href="#unicode_joining_type">unicode_joining_type</a></li>
+<li><a href="#word_break_class">word_break_class</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Constants">Constants</a><ul>
+<li><a href="#BREAK_FLAGS_ANY">BREAK_FLAGS_ANY</a></li>
+<li><a href="#BREAK_FLAGS_DIRECTION">BREAK_FLAGS_DIRECTION</a></li>
+<li><a href="#BREAK_FLAGS_GRAPHEME">BREAK_FLAGS_GRAPHEME</a></li>
+<li><a href="#BREAK_FLAGS_LINE">BREAK_FLAGS_LINE</a></li>
+<li><a href="#BREAK_FLAGS_LINE_HARD">BREAK_FLAGS_LINE_HARD</a></li>
+<li><a href="#BREAK_FLAGS_LINE_SOFT">BREAK_FLAGS_LINE_SOFT</a></li>
+<li><a href="#BREAK_FLAGS_SCRIPT">BREAK_FLAGS_SCRIPT</a></li>
+<li><a href="#BREAK_FLAGS_WORD">BREAK_FLAGS_WORD</a></li>
+<li><a href="#BREAK_REORDER_BUFFER_FLUSH_THRESHOLD">BREAK_REORDER_BUFFER_FLUSH_THRESHOLD</a></li>
+<li><a href="#BREAK_REORDER_BUFFER_SIZE">BREAK_REORDER_BUFFER_SIZE</a></li>
+<li><a href="#GLYPH_FEATURE_MASK">GLYPH_FEATURE_MASK</a></li>
+<li><a href="#JOINING_FEATURE_MASK">JOINING_FEATURE_MASK</a></li>
+<li><a href="#MAX_SIMULTANEOUS_FEATURES">MAX_SIMULTANEOUS_FEATURES</a></li>
+<li><a href="#USE_GLYPH_FEATURE_MASK">USE_GLYPH_FEATURE_MASK</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Procedures">Procedures</a><ul>
+<li><a href="#BeginBreak">BeginBreak</a></li>
+<li><a href="#Break">Break</a></li>
+<li><a href="#BreakAddCodepoint">BreakAddCodepoint</a></li>
+<li><a href="#BreakFlush">BreakFlush</a></li>
+<li><a href="#BreakStateIsValid">BreakStateIsValid</a></li>
+<li><a href="#CodepointToGlyph">CodepointToGlyph</a></li>
+<li><a href="#CreateShapeState">CreateShapeState</a></li>
+<li><a href="#Cursor">Cursor</a></li>
+<li><a href="#DecodeUtf8">DecodeUtf8</a></li>
+<li><a href="#FontFromMemory">FontFromMemory</a></li>
+<li><a href="#FontIsValid">FontIsValid</a></li>
+<li><a href="#FreeFont">FreeFont</a></li>
+<li><a href="#FreeShapeState">FreeShapeState</a></li>
+<li><a href="#InferScript">InferScript</a></li>
+<li><a href="#PlaceShapeState">PlaceShapeState</a></li>
+<li><a href="#PositionGlyph">PositionGlyph</a></li>
+<li><a href="#PostReadFontInitialize">PostReadFontInitialize</a></li>
+<li><a href="#ReadFontData">ReadFontData</a></li>
+<li><a href="#ReadFontHeader">ReadFontHeader</a></li>
+<li><a href="#ResetShapeState">ResetShapeState</a></li>
+<li><a href="#ScriptIsComplex">ScriptIsComplex</a></li>
+<li><a href="#Shape">Shape</a></li>
+<li><a href="#ShapeConfig">ShapeConfig</a></li>
+<li><a href="#ShapeDynamic">ShapeDynamic</a></li>
+<li><a href="#ShaperIsComplex">ShaperIsComplex</a></li>
+<li><a href="#SizeOfShapeState">SizeOfShapeState</a></li>
+</ul>
+</li>
+<li><a href="#pkg-source-files">Source Files</a></ul>
+</nav>
+</div></div>
+<script type="text/javascript">var odin_pkg_name = "vendor_kb_text_shape";</script>
+</div>
+
+</div>
+</main>
+
+<footer class="odin-footer">
+	<div class="container pb-5 pt-5">
+		<div class="row g-4">
+		<div class="col">
+		<a class="navbar-brand" href="https://odin-lang.org">
+		<img class="mb-3" src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+		<p>
+		The Data-Oriented Language for Sane Software Development.
+		</p>
+		</div>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Resources</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://odin-lang.org/docs" class="link-light">Docs</a></li>
+			<li><a href="https://pkg.odin-lang.org/" class="link-light">Packages</a></li>
+			<li><a href="https://odin-lang.org/news" class="link-light">News</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Community</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin" target="_blank" class="link-light">GitHub</a></li>
+			<li><a href="https://forum.odin-lang.org" target="_blank" class="link-light">Forum</a></li>
+			<li><a href="https://discord.com/invite/sVBPHEv" target="_blank" class="link-light">Discord</a></li>
+			<li><a href="https://www.twitch.tv/ginger_bill" target="_blank" class="link-light">Twitch</a></li>
+			<li><a href="https://www.youtube.com/channel/UCUSck1dOH7VKmG4lRW7tZXg" target="_blank" class="link-light">YouTube</a></li>
+			<li><a href="https://odin-lang.org/showcase" target="_blank" class="link-light">Showcase</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Contribute</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin/issues" target="_blank" class="link-light">Issues</a></li>
+			<li><a href="https://www.patreon.com/gingerbill" target="_blank" class="link-light">Donate</a></li>
+			</ul>
+			</nav>
+		</div>
+		<div class="mt-4 text-muted">© 2016–2023 Ginger Bill</div>
+	</div>
+</footer>
+
+<script src="https://odin-lang.org/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://odin-lang.org/js/script.js"></script>
+<script src="/pkg-data.js"></script>
+<script src="/search.js"></script>
+</body>
+</html>
