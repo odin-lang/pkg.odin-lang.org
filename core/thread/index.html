@@ -691,7 +691,7 @@ procedure can be called to create and start the thread immediately.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_and_start"><span><a class="doc-id-link" href="#create_and_start">create_and_start<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L268"><em>Source</em></a></div></h3>
+<h3 id="create_and_start"><span><a class="doc-id-link" href="#create_and_start">create_and_start<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L270"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_and_start :: <span class="keyword-type">proc</span>(fn: <span class="keyword-type">proc</span>(), init_context: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=Context) = nil, priority: <a class="code-typename" href="/core/thread/#Thread_Priority">Thread_Priority</a> = Thread_Priority.Normal, self_cleanup: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = false) -> (t: ^<a class="code-typename" href="/core/thread/#Thread">Thread</a>) {…}</pre>
 </div>
@@ -703,15 +703,16 @@ specified by <code>init_context</code> will be used as the context in which <cod
 to execute. The thread will have priority specified by the <code>priority</code> parameter.</p>
 <p>If <code>self_cleanup</code> is specified, after the thread finishes the execution of the
 <code>fn</code> procedure, the resources associated with the thread are going to be
-automatically freed. <b>Do not</b> dereference the <code>^Thread</code> pointer, if this
-flag is specified.</p>
+automatically freed.</p>
+<p><b>Do not</b> dereference the <code>^Thread</code> pointer, if this flag is specified.
+That includes calling <code>join</code>, which needs to dereference ^Thread`.</p>
 <p><b>IMPORTANT</b>: If <code>init_context</code> is specified and the default temporary allocator
 is used, the thread procedure needs to call <code>runtime.default_temp_allocator_destroy()</code>
 in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_and_start_with_data"><span><a class="doc-id-link" href="#create_and_start_with_data">create_and_start_with_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L301"><em>Source</em></a></div></h3>
+<h3 id="create_and_start_with_data"><span><a class="doc-id-link" href="#create_and_start_with_data">create_and_start_with_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L305"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_and_start_with_data :: <span class="keyword-type">proc</span>(data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, fn: <span class="keyword-type">proc</span>(data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>), init_context: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=Context) = nil, priority: <a class="code-typename" href="/core/thread/#Thread_Priority">Thread_Priority</a> = Thread_Priority.Normal, self_cleanup: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = false) -> (t: ^<a class="code-typename" href="/core/thread/#Thread">Thread</a>) {…}</pre>
 </div>
@@ -723,15 +724,16 @@ specified by <code>init_context</code> will be used as the context in which <cod
 to execute. The thread will have priority specified by the <code>priority</code> parameter.</p>
 <p>If <code>self_cleanup</code> is specified, after the thread finishes the execution of the
 <code>fn</code> procedure, the resources associated with the thread are going to be
-automatically freed. <b>Do not</b> dereference the <code>^Thread</code> pointer, if this
-flag is specified.</p>
+automatically freed.</p>
+<p><b>Do not</b> dereference the <code>^Thread</code> pointer, if this flag is specified.
+That includes calling <code>join</code>, which needs to dereference ^Thread`.</p>
 <p><b>IMPORTANT</b>: If <code>init_context</code> is specified and the default temporary allocator
 is used, the thread procedure needs to call <code>runtime.default_temp_allocator_destroy()</code>
 in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_and_start_with_poly_data"><span><a class="doc-id-link" href="#create_and_start_with_poly_data">create_and_start_with_poly_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L338"><em>Source</em></a></div></h3>
+<h3 id="create_and_start_with_poly_data"><span><a class="doc-id-link" href="#create_and_start_with_poly_data">create_and_start_with_poly_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L344"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_and_start_with_poly_data :: <span class="keyword-type">proc</span>(data: $T, fn: <span class="keyword-type">proc</span>(data: $T), init_context: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=Context) = nil, priority: <a class="code-typename" href="/core/thread/#Thread_Priority">Thread_Priority</a> = Thread_Priority.Normal, self_cleanup: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = false) -> (t: ^<a class="code-typename" href="/core/thread/#Thread">Thread</a>) {…}</pre>
 </div>
@@ -743,15 +745,16 @@ specified by <code>init_context</code> will be used as the context in which <cod
 to execute. The thread will have priority specified by the <code>priority</code> parameter.</p>
 <p>If <code>self_cleanup</code> is specified, after the thread finishes the execution of the
 <code>fn</code> procedure, the resources associated with the thread are going to be
-automatically freed. <b>Do not</b> dereference the <code>^Thread</code> pointer, if this
-flag is specified.</p>
+automatically freed.</p>
+<p><b>Do not</b> dereference the <code>^Thread</code> pointer, if this flag is specified.
+That includes calling <code>join</code>, which needs to dereference ^Thread`.</p>
 <p><b>IMPORTANT</b>: If <code>init_context</code> is specified and the default temporary allocator
 is used, the thread procedure needs to call <code>runtime.default_temp_allocator_destroy()</code>
 in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_and_start_with_poly_data2"><span><a class="doc-id-link" href="#create_and_start_with_poly_data2">create_and_start_with_poly_data2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L381"><em>Source</em></a></div></h3>
+<h3 id="create_and_start_with_poly_data2"><span><a class="doc-id-link" href="#create_and_start_with_poly_data2">create_and_start_with_poly_data2<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L389"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_and_start_with_poly_data2 :: <span class="keyword-type">proc</span>(
 	arg1:         $T1, 
@@ -770,15 +773,16 @@ specified by <code>init_context</code> will be used as the context in which <cod
 to execute. The thread will have priority specified by the <code>priority</code> parameter.</p>
 <p>If <code>self_cleanup</code> is specified, after the thread finishes the execution of the
 <code>fn</code> procedure, the resources associated with the thread are going to be
-automatically freed. <b>Do not</b> dereference the <code>^Thread</code> pointer, if this
-flag is specified.</p>
+automatically freed.</p>
+<p><b>Do not</b> dereference the <code>^Thread</code> pointer, if this flag is specified.
+That includes calling <code>join</code>, which needs to dereference ^Thread`.</p>
 <p><b>IMPORTANT</b>: If <code>init_context</code> is specified and the default temporary allocator
 is used, the thread procedure needs to call <code>runtime.default_temp_allocator_destroy()</code>
 in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_and_start_with_poly_data3"><span><a class="doc-id-link" href="#create_and_start_with_poly_data3">create_and_start_with_poly_data3<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L430"><em>Source</em></a></div></h3>
+<h3 id="create_and_start_with_poly_data3"><span><a class="doc-id-link" href="#create_and_start_with_poly_data3">create_and_start_with_poly_data3<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L440"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_and_start_with_poly_data3 :: <span class="keyword-type">proc</span>(
 	arg1:         $T1, 
@@ -798,15 +802,16 @@ specified by <code>init_context</code> will be used as the context in which <cod
 to execute. The thread will have priority specified by the <code>priority</code> parameter.</p>
 <p>If <code>self_cleanup</code> is specified, after the thread finishes the execution of the
 <code>fn</code> procedure, the resources associated with the thread are going to be
-automatically freed. <b>Do not</b> dereference the <code>^Thread</code> pointer, if this
-flag is specified.</p>
+automatically freed.</p>
+<p><b>Do not</b> dereference the <code>^Thread</code> pointer, if this flag is specified.
+That includes calling <code>join</code>, which needs to dereference ^Thread`.</p>
 <p><b>IMPORTANT</b>: If <code>init_context</code> is specified and the default temporary allocator
 is used, the thread procedure needs to call <code>runtime.default_temp_allocator_destroy()</code>
 in order to free the resources associated with the temporary allocations.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="create_and_start_with_poly_data4"><span><a class="doc-id-link" href="#create_and_start_with_poly_data4">create_and_start_with_poly_data4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L481"><em>Source</em></a></div></h3>
+<h3 id="create_and_start_with_poly_data4"><span><a class="doc-id-link" href="#create_and_start_with_poly_data4">create_and_start_with_poly_data4<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/thread/thread.odin#L493"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">create_and_start_with_poly_data4 :: <span class="keyword-type">proc</span>(
 	arg1:         $T1, 
@@ -827,8 +832,9 @@ specified by <code>init_context</code> will be used as the context in which <cod
 to execute. The thread will have priority specified by the <code>priority</code> parameter.</p>
 <p>If <code>self_cleanup</code> is specified, after the thread finishes the execution of the
 <code>fn</code> procedure, the resources associated with the thread are going to be
-automatically freed. <b>Do not</b> dereference the <code>^Thread</code> pointer, if this
-flag is specified.</p>
+automatically freed.</p>
+<p><b>Do not</b> dereference the <code>^Thread</code> pointer, if this flag is specified.
+That includes calling <code>join</code>, which needs to dereference ^Thread`.</p>
 <p><b>IMPORTANT</b>: If <code>init_context</code> is specified and the default temporary allocator
 is used, the thread procedure needs to call <code>runtime.default_temp_allocator_destroy()</code>
 in order to free the resources associated with the temporary allocations.</p>
@@ -1216,7 +1222,7 @@ in order to free the resources associated with the temporary allocations.</p>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-23 21:15:56.814665500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-06 (vendor "odin") Windows_amd64 @ 2025-06-24 21:14:07.380043900 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
