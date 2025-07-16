@@ -217,7 +217,7 @@
 <div>
 <details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
 <summary id="#doc-index-Types-header">
-Types (61)</summary>
+Types (64)</summary>
 <ul>
 <li><a href="#bracket">bracket</a></li>
 <li><a href="#break_flag">break_flag</a></li>
@@ -231,6 +231,7 @@ Types (61)</summary>
 <li><a href="#direction">direction</a></li>
 <li><a href="#feature">feature</a></li>
 <li><a href="#feature_id">feature_id</a></li>
+<li><a href="#feature_override">feature_override</a></li>
 <li><a href="#feature_set">feature_set</a></li>
 <li><a href="#feature_tag">feature_tag</a></li>
 <li><a href="#font">font</a></li>
@@ -238,6 +239,7 @@ Types (61)</summary>
 <li><a href="#glyph">glyph</a></li>
 <li><a href="#glyph_array">glyph_array</a></li>
 <li><a href="#glyph_classes">glyph_classes</a></li>
+<li><a href="#glyph_config">glyph_config</a></li>
 <li><a href="#glyph_flag">glyph_flag</a></li>
 <li><a href="#glyph_flags">glyph_flags</a></li>
 <li><a href="#gsub_gpos">gsub_gpos</a></li>
@@ -266,6 +268,7 @@ Types (61)</summary>
 <li><a href="#reph_encoding">reph_encoding</a></li>
 <li><a href="#reph_position">reph_position</a></li>
 <li><a href="#script">script</a></li>
+<li><a href="#script_tag">script_tag</a></li>
 <li><a href="#shape_config">shape_config</a></li>
 <li><a href="#shape_state">shape_state</a></li>
 <li><a href="#shaper">shaper</a></li>
@@ -315,7 +318,7 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (26)</summary>
+Procedures (33)</summary>
 <ul>
 <li><a href="#BeginBreak">BeginBreak</a></li>
 <li><a href="#Break">Break</a></li>
@@ -326,10 +329,17 @@ Procedures (26)</summary>
 <li><a href="#CreateShapeState">CreateShapeState</a></li>
 <li><a href="#Cursor">Cursor</a></li>
 <li><a href="#DecodeUtf8">DecodeUtf8</a></li>
+<li><a href="#EmptyGlyphConfig">EmptyGlyphConfig</a></li>
+<li><a href="#FeatureOverride">FeatureOverride</a></li>
+<li><a href="#FeatureOverrideFromTag">FeatureOverrideFromTag</a></li>
+<li><a href="#FeatureTagToId">FeatureTagToId</a></li>
 <li><a href="#FontFromMemory">FontFromMemory</a></li>
 <li><a href="#FontIsValid">FontIsValid</a></li>
 <li><a href="#FreeFont">FreeFont</a></li>
 <li><a href="#FreeShapeState">FreeShapeState</a></li>
+<li><a href="#GlyphConfig">GlyphConfig</a></li>
+<li><a href="#GlyphConfigOverrideFeature">GlyphConfigOverrideFeature</a></li>
+<li><a href="#GlyphConfigOverrideFeatureFromTag">GlyphConfigOverrideFeatureFromTag</a></li>
 <li><a href="#InferScript">InferScript</a></li>
 <li><a href="#PlaceShapeState">PlaceShapeState</a></li>
 <li><a href="#PositionGlyph">PositionGlyph</a></li>
@@ -337,7 +347,7 @@ Procedures (26)</summary>
 <li><a href="#ReadFontData">ReadFontData</a></li>
 <li><a href="#ReadFontHeader">ReadFontHeader</a></li>
 <li><a href="#ResetShapeState">ResetShapeState</a></li>
-<li><a href="#ScriptIsComplex">ScriptIsComplex</a></li>
+<li><a href="#ScriptTagToScript">ScriptTagToScript</a></li>
 <li><a href="#Shape">Shape</a></li>
 <li><a href="#ShapeConfig">ShapeConfig</a></li>
 <li><a href="#ShapeDynamic">ShapeDynamic</a></li>
@@ -358,7 +368,7 @@ Procedure Groups (0)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="bracket"><span><a class="doc-id-link" href="#bracket">bracket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1790"><em>Source</em></a></div></h3>
+<h3 id="bracket"><span><a class="doc-id-link" href="#bracket">bracket<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1996"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">bracket :: <span class="keyword-type">struct</span> {
 	Codepoint:         untyped rune,
@@ -418,7 +428,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="break_state"><span><a class="doc-id-link" href="#break_state">break_state<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1818"><em>Source</em></a></div></h3>
+<h3 id="break_state"><span><a class="doc-id-link" href="#break_state">break_state<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L2024"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">break_state :: <span class="keyword-type">struct</span> {
 	Breaks:                             [8]<a class="code-typename" href="/vendor/kb_text_shape/#break_type">break_type</a> <span class="string">`fmt:"v,Breaks"`</span>,
@@ -508,7 +518,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="break_state_flag"><span><a class="doc-id-link" href="#break_state_flag">break_state_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1801"><em>Source</em></a></div></h3>
+<h3 id="break_state_flag"><span><a class="doc-id-link" href="#break_state_flag">break_state_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L2007"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">break_state_flag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	STARTED                         = 0, 
@@ -522,13 +532,13 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="break_state_flags"><span><a class="doc-id-link" href="#break_state_flags">break_state_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1800"><em>Source</em></a></div></h3>
+<h3 id="break_state_flags"><span><a class="doc-id-link" href="#break_state_flags">break_state_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L2006"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">break_state_flags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/kb_text_shape/#break_state_flag">break_state_flag</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="break_type"><span><a class="doc-id-link" href="#break_type">break_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1781"><em>Source</em></a></div></h3>
+<h3 id="break_type"><span><a class="doc-id-link" href="#break_type">break_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1987"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">break_type :: <span class="keyword-type">struct</span> {
 	<span class="comment">// The break code mostly works in relative positions, but we convert to absolute positions for the user.</span>
@@ -546,13 +556,13 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="cmap_14"><span><a class="doc-id-link" href="#cmap_14">cmap_14<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1518"><em>Source</em></a></div></h3>
+<h3 id="cmap_14"><span><a class="doc-id-link" href="#cmap_14">cmap_14<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1694"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">cmap_14 :: <span class="keyword-type">struct</span> {}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="cursor"><span><a class="doc-id-link" href="#cursor">cursor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1774"><em>Source</em></a></div></h3>
+<h3 id="cursor"><span><a class="doc-id-link" href="#cursor">cursor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1980"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">cursor :: <span class="keyword-type">struct</span> {
 	Direction:    <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>,
@@ -571,7 +581,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="direction"><span><a class="doc-id-link" href="#direction">direction<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L896"><em>Source</em></a></div></h3>
+<h3 id="direction"><span><a class="doc-id-link" href="#direction">direction<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L897"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">direction :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	NONE, 
@@ -589,147 +599,172 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="feature"><span><a class="doc-id-link" href="#feature">feature<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1524"><em>Source</em></a></div></h3>
+<h3 id="feature"><span><a class="doc-id-link" href="#feature">feature<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1700"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">feature :: <span class="keyword-type">struct</span> {}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="feature_id"><span><a class="doc-id-link" href="#feature_id">feature_id<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1373"><em>Source</em></a></div></h3>
+<h3 id="feature_id"><span><a class="doc-id-link" href="#feature_id">feature_id<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1548"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">feature_id :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
-	isol, <span class="comment">// Isolated Forms</span>
-	fina, <span class="comment">// Terminal Forms</span>
-	fin2, <span class="comment">// Terminal Forms #2</span>
-	fin3, <span class="comment">// Terminal Forms #3</span>
-	medi, <span class="comment">// Medial Forms</span>
-	med2, <span class="comment">// Medial Forms #2</span>
-	init, <span class="comment">// Initial Forms</span>
-	ljmo, <span class="comment">// Leading Jamo Forms</span>
-	vjmo, <span class="comment">// Vowel Jamo Forms</span>
-	tjmo, <span class="comment">// Trailing Jamo Forms</span>
-	rphf, <span class="comment">// Reph Form</span>
-	blwf, <span class="comment">// Below-base Forms</span>
-	half, <span class="comment">// Half Forms</span>
-	pstf, <span class="comment">// Post-base Forms</span>
-	abvf, <span class="comment">// Above-base Forms</span>
-	pref, <span class="comment">// Pre-base Forms</span>
-	numr, <span class="comment">// Numerators</span>
-	frac, <span class="comment">// Fractions</span>
-	dnom, <span class="comment">// Denominators</span>
-	cfar, <span class="comment">// Conjunct Form After Ro</span>
-	aalt, <span class="comment">// Access All Alternates</span>
-	abvm, <span class="comment">// Above-base Mark Positioning</span>
-	abvs, <span class="comment">// Above-base Substitutions</span>
-	afrc, <span class="comment">// Alternative Fractions</span>
-	akhn, <span class="comment">// Akhand</span>
-	apkn, <span class="comment">// Kerning for Alternate Proportional Widths</span>
-	blwm, <span class="comment">// Below-base Mark Positioning</span>
-	blws, <span class="comment">// Below-base Substitutions</span>
-	calt, <span class="comment">// Contextual Alternates</span>
-	Case, <span class="comment">// Case-sensitive Forms</span>
-	ccmp, <span class="comment">// Glyph Composition / Decomposition</span>
-	chws, <span class="comment">// Contextual Half-width Spacing</span>
-	cjct, <span class="comment">// Conjunct Forms</span>
-	clig, <span class="comment">// Contextual Ligatures</span>
-	cpct, <span class="comment">// Centered CJK Punctuation</span>
-	cpsp, <span class="comment">// Capital Spacing</span>
-	cswh, <span class="comment">// Contextual Swash</span>
-	curs, <span class="comment">// Cursive Positioning</span>
-	cv01, <span class="comment">//  'cv99'  Character Variant 1 – Character Variant 99</span>
-	c2pc, <span class="comment">// Petite Capitals From Capitals</span>
-	c2sc, <span class="comment">// Small Capitals From Capitals</span>
-	dist, <span class="comment">// Distances</span>
-	dlig, <span class="comment">// Discretionary Ligatures</span>
-	dtls, <span class="comment">// Dotless Forms</span>
-	expt, <span class="comment">// Expert Forms</span>
-	falt, <span class="comment">// Final Glyph on Line Alternates</span>
-	flac, <span class="comment">// Flattened Accent Forms</span>
-	fwid, <span class="comment">// Full Widths</span>
-	haln, <span class="comment">// Halant Forms</span>
-	halt, <span class="comment">// Alternate Half Widths</span>
-	hist, <span class="comment">// Historical Forms</span>
-	hkna, <span class="comment">// Horizontal Kana Alternates</span>
-	hlig, <span class="comment">// Historical Ligatures</span>
-	hngl, <span class="comment">// Hangul</span>
-	hojo, <span class="comment">// Hojo Kanji Forms (JIS X 0212-1990 Kanji Forms)</span>
-	hwid, <span class="comment">// Half Widths</span>
-	ital, <span class="comment">// Italics</span>
-	jalt, <span class="comment">// Justification Alternates</span>
-	jp78, <span class="comment">// JIS78 Forms</span>
-	jp83, <span class="comment">// JIS83 Forms</span>
-	jp90, <span class="comment">// JIS90 Forms</span>
-	jp04, <span class="comment">// JIS2004 Forms</span>
-	kern, <span class="comment">// Kerning</span>
-	lfbd, <span class="comment">// Left Bounds</span>
-	liga, <span class="comment">// Standard Ligatures</span>
-	lnum, <span class="comment">// Lining Figures</span>
-	locl, <span class="comment">// Localized Forms</span>
-	ltra, <span class="comment">// Left-to-right Alternates</span>
-	ltrm, <span class="comment">// Left-to-right Mirrored Forms</span>
-	mark, <span class="comment">// Mark Positioning</span>
-	mgrk, <span class="comment">// Mathematical Greek</span>
-	mkmk, <span class="comment">// Mark to Mark Positioning</span>
-	mset, <span class="comment">// Mark Positioning via Substitution</span>
-	nalt, <span class="comment">// Alternate Annotation Forms</span>
-	nlck, <span class="comment">// NLC Kanji Forms</span>
-	nukt, <span class="comment">// Nukta Forms</span>
-	onum, <span class="comment">// Oldstyle Figures</span>
-	opbd, <span class="comment">// Optical Bounds</span>
-	ordn, <span class="comment">// Ordinals</span>
-	ornm, <span class="comment">// Ornaments</span>
-	palt, <span class="comment">// Proportional Alternate Widths</span>
-	pcap, <span class="comment">// Petite Capitals</span>
-	pkna, <span class="comment">// Proportional Kana</span>
-	pnum, <span class="comment">// Proportional Figures</span>
-	pres, <span class="comment">// Pre-base Substitutions</span>
-	psts, <span class="comment">// Post-base Substitutions</span>
-	pwid, <span class="comment">// Proportional Widths</span>
-	qwid, <span class="comment">// Quarter Widths</span>
-	rand, <span class="comment">// Randomize</span>
-	rclt, <span class="comment">// Required Contextual Alternates</span>
-	rkrf, <span class="comment">// Rakar Forms</span>
-	rlig, <span class="comment">// Required Ligatures</span>
-	rtbd, <span class="comment">// Right Bounds</span>
-	rtla, <span class="comment">// Right-to-left Alternates</span>
-	rtlm, <span class="comment">// Right-to-left Mirrored Forms</span>
-	ruby, <span class="comment">// Ruby Notation Forms</span>
-	rvrn, <span class="comment">// Required Variation Alternates</span>
-	salt, <span class="comment">// Stylistic Alternates</span>
-	sinf, <span class="comment">// Scientific Inferiors</span>
-	size, <span class="comment">// Optical size</span>
-	smcp, <span class="comment">// Small Capitals</span>
-	smpl, <span class="comment">// Simplified Forms</span>
-	ss01, <span class="comment">//  'ss20'  Stylistic Set 1 – Stylistic Set 20</span>
-	ssty, <span class="comment">// Math Script-style Alternates</span>
-	stch, <span class="comment">// Stretching Glyph Decomposition</span>
-	subs, <span class="comment">// Subscript</span>
-	sups, <span class="comment">// Superscript</span>
-	swsh, <span class="comment">// Swash</span>
-	test, <span class="comment">// Test features, only for development</span>
-	titl, <span class="comment">// Titling</span>
-	tnam, <span class="comment">// Traditional Name Forms</span>
-	tnum, <span class="comment">// Tabular Figures</span>
-	trad, <span class="comment">// Traditional Forms</span>
-	twid, <span class="comment">// Third Widths</span>
-	unic, <span class="comment">// Unicase</span>
-	valt, <span class="comment">// Alternate Vertical Metrics</span>
-	vapk, <span class="comment">// Kerning for Alternate Proportional Vertical Metrics</span>
-	vatu, <span class="comment">// Vattu Variants</span>
-	vchw, <span class="comment">// Vertical Contextual Half-width Spacing</span>
-	vert, <span class="comment">// Vertical Alternates</span>
-	vhal, <span class="comment">// Alternate Vertical Half Metrics</span>
-	vkna, <span class="comment">// Vertical Kana Alternates</span>
-	vkrn, <span class="comment">// Vertical Kerning</span>
-	vpal, <span class="comment">// Proportional Alternate Vertical Metrics</span>
-	vrt2, <span class="comment">// Vertical Alternates and Rotation</span>
-	vrtr, <span class="comment">// Vertical Alternates for Rotation</span>
-	zero, <span class="comment">// Slashed Zero</span>
+	UNREGISTERED = 0, 
+	isol,             <span class="comment">// Isolated Forms</span>
+	fina,             <span class="comment">// Terminal Forms</span>
+	fin2,             <span class="comment">// Terminal Forms #2</span>
+	fin3,             <span class="comment">// Terminal Forms #3</span>
+	medi,             <span class="comment">// Medial Forms</span>
+	med2,             <span class="comment">// Medial Forms #2</span>
+	init,             <span class="comment">// Initial Forms</span>
+	ljmo,             <span class="comment">// Leading Jamo Forms</span>
+	vjmo,             <span class="comment">// Vowel Jamo Forms</span>
+	tjmo,             <span class="comment">// Trailing Jamo Forms</span>
+	rphf,             <span class="comment">// Reph Form</span>
+	blwf,             <span class="comment">// Below-base Forms</span>
+	half,             <span class="comment">// Half Forms</span>
+	pstf,             <span class="comment">// Post-base Forms</span>
+	abvf,             <span class="comment">// Above-base Forms</span>
+	pref,             <span class="comment">// Pre-base Forms</span>
+	numr,             <span class="comment">// Numerators</span>
+	frac,             <span class="comment">// Fractions</span>
+	dnom,             <span class="comment">// Denominators</span>
+	cfar,             <span class="comment">// Conjunct Form After Ro</span>
+	aalt,             <span class="comment">// Access All Alternates</span>
+	abvm,             <span class="comment">// Above-base Mark Positioning</span>
+	abvs,             <span class="comment">// Above-base Substitutions</span>
+	afrc,             <span class="comment">// Alternative Fractions</span>
+	akhn,             <span class="comment">// Akhand</span>
+	apkn,             <span class="comment">// Kerning for Alternate Proportional Widths</span>
+	blwm,             <span class="comment">// Below-base Mark Positioning</span>
+	blws,             <span class="comment">// Below-base Substitutions</span>
+	calt,             <span class="comment">// Contextual Alternates</span>
+	Case,             <span class="comment">// Case-sensitive Forms</span>
+	ccmp,             <span class="comment">// Glyph Composition / Decomposition</span>
+	chws,             <span class="comment">// Contextual Half-width Spacing</span>
+	cjct,             <span class="comment">// Conjunct Forms</span>
+	clig,             <span class="comment">// Contextual Ligatures</span>
+	cpct,             <span class="comment">// Centered CJK Punctuation</span>
+	cpsp,             <span class="comment">// Capital Spacing</span>
+	cswh,             <span class="comment">// Contextual Swash</span>
+	curs,             <span class="comment">// Cursive Positioning</span>
+	cv01,             <span class="comment">//  'cv99'  Character Variant 1 – Character Variant 99</span>
+	c2pc,             <span class="comment">// Petite Capitals From Capitals</span>
+	c2sc,             <span class="comment">// Small Capitals From Capitals</span>
+	dist,             <span class="comment">// Distances</span>
+	dlig,             <span class="comment">// Discretionary Ligatures</span>
+	dtls,             <span class="comment">// Dotless Forms</span>
+	expt,             <span class="comment">// Expert Forms</span>
+	falt,             <span class="comment">// Final Glyph on Line Alternates</span>
+	flac,             <span class="comment">// Flattened Accent Forms</span>
+	fwid,             <span class="comment">// Full Widths</span>
+	haln,             <span class="comment">// Halant Forms</span>
+	halt,             <span class="comment">// Alternate Half Widths</span>
+	hist,             <span class="comment">// Historical Forms</span>
+	hkna,             <span class="comment">// Horizontal Kana Alternates</span>
+	hlig,             <span class="comment">// Historical Ligatures</span>
+	hngl,             <span class="comment">// Hangul</span>
+	hojo,             <span class="comment">// Hojo Kanji Forms (JIS X 0212-1990 Kanji Forms)</span>
+	hwid,             <span class="comment">// Half Widths</span>
+	ital,             <span class="comment">// Italics</span>
+	jalt,             <span class="comment">// Justification Alternates</span>
+	jp78,             <span class="comment">// JIS78 Forms</span>
+	jp83,             <span class="comment">// JIS83 Forms</span>
+	jp90,             <span class="comment">// JIS90 Forms</span>
+	jp04,             <span class="comment">// JIS2004 Forms</span>
+	kern,             <span class="comment">// Kerning</span>
+	lfbd,             <span class="comment">// Left Bounds</span>
+	liga,             <span class="comment">// Standard Ligatures</span>
+	lnum,             <span class="comment">// Lining Figures</span>
+	locl,             <span class="comment">// Localized Forms</span>
+	ltra,             <span class="comment">// Left-to-right Alternates</span>
+	ltrm,             <span class="comment">// Left-to-right Mirrored Forms</span>
+	mark,             <span class="comment">// Mark Positioning</span>
+	mgrk,             <span class="comment">// Mathematical Greek</span>
+	mkmk,             <span class="comment">// Mark to Mark Positioning</span>
+	mset,             <span class="comment">// Mark Positioning via Substitution</span>
+	nalt,             <span class="comment">// Alternate Annotation Forms</span>
+	nlck,             <span class="comment">// NLC Kanji Forms</span>
+	nukt,             <span class="comment">// Nukta Forms</span>
+	onum,             <span class="comment">// Oldstyle Figures</span>
+	opbd,             <span class="comment">// Optical Bounds</span>
+	ordn,             <span class="comment">// Ordinals</span>
+	ornm,             <span class="comment">// Ornaments</span>
+	palt,             <span class="comment">// Proportional Alternate Widths</span>
+	pcap,             <span class="comment">// Petite Capitals</span>
+	pkna,             <span class="comment">// Proportional Kana</span>
+	pnum,             <span class="comment">// Proportional Figures</span>
+	pres,             <span class="comment">// Pre-base Substitutions</span>
+	psts,             <span class="comment">// Post-base Substitutions</span>
+	pwid,             <span class="comment">// Proportional Widths</span>
+	qwid,             <span class="comment">// Quarter Widths</span>
+	rand,             <span class="comment">// Randomize</span>
+	rclt,             <span class="comment">// Required Contextual Alternates</span>
+	rkrf,             <span class="comment">// Rakar Forms</span>
+	rlig,             <span class="comment">// Required Ligatures</span>
+	rtbd,             <span class="comment">// Right Bounds</span>
+	rtla,             <span class="comment">// Right-to-left Alternates</span>
+	rtlm,             <span class="comment">// Right-to-left Mirrored Forms</span>
+	ruby,             <span class="comment">// Ruby Notation Forms</span>
+	rvrn,             <span class="comment">// Required Variation Alternates</span>
+	salt,             <span class="comment">// Stylistic Alternates</span>
+	sinf,             <span class="comment">// Scientific Inferiors</span>
+	size,             <span class="comment">// Optical size</span>
+	smcp,             <span class="comment">// Small Capitals</span>
+	smpl,             <span class="comment">// Simplified Forms</span>
+	ss01,             <span class="comment">//  'ss20'  Stylistic Set 1 – Stylistic Set 20</span>
+	ssty,             <span class="comment">// Math Script-style Alternates</span>
+	stch,             <span class="comment">// Stretching Glyph Decomposition</span>
+	subs,             <span class="comment">// Subscript</span>
+	sups,             <span class="comment">// Superscript</span>
+	swsh,             <span class="comment">// Swash</span>
+	test,             <span class="comment">// Test features, only for development</span>
+	titl,             <span class="comment">// Titling</span>
+	tnam,             <span class="comment">// Traditional Name Forms</span>
+	tnum,             <span class="comment">// Tabular Figures</span>
+	trad,             <span class="comment">// Traditional Forms</span>
+	twid,             <span class="comment">// Third Widths</span>
+	unic,             <span class="comment">// Unicase</span>
+	valt,             <span class="comment">// Alternate Vertical Metrics</span>
+	vapk,             <span class="comment">// Kerning for Alternate Proportional Vertical Metrics</span>
+	vatu,             <span class="comment">// Vattu Variants</span>
+	vchw,             <span class="comment">// Vertical Contextual Half-width Spacing</span>
+	vert,             <span class="comment">// Vertical Alternates</span>
+	vhal,             <span class="comment">// Alternate Vertical Half Metrics</span>
+	vkna,             <span class="comment">// Vertical Kana Alternates</span>
+	vkrn,             <span class="comment">// Vertical Kerning</span>
+	vpal,             <span class="comment">// Proportional Alternate Vertical Metrics</span>
+	vrt2,             <span class="comment">// Vertical Alternates and Rotation</span>
+	vrtr,             <span class="comment">// Vertical Alternates for Rotation</span>
+	zero,             <span class="comment">// Slashed Zero</span>
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#FeatureOverride">FeatureOverride</a></li>
+<li><a href="/vendor/kb_text_shape/#GlyphConfigOverrideFeature">GlyphConfigOverrideFeature</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#FeatureTagToId">FeatureTagToId</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="feature_set"><span><a class="doc-id-link" href="#feature_set">feature_set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1671"><em>Source</em></a></div></h3>
+<h3 id="feature_override"><span><a class="doc-id-link" href="#feature_override">feature_override<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1868"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">feature_override :: <span class="keyword-type">struct</span> {
+	Id:                        <a class="code-typename" href="/vendor/kb_text_shape/#feature_id">feature_id</a>,
+	Tag:                       <a class="code-typename" href="/vendor/kb_text_shape/#feature_tag">feature_tag</a>,
+	EnabledOrAlternatePlusOne: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+}</pre>
+</div>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#FeatureOverride">FeatureOverride</a></li>
+<li><a href="/vendor/kb_text_shape/#FeatureOverrideFromTag">FeatureOverrideFromTag</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="feature_set"><span><a class="doc-id-link" href="#feature_set">feature_set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1864"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">feature_set :: <span class="keyword-type">struct</span> {
 	Flags: [2]<a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
@@ -737,144 +772,152 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="feature_tag"><span><a class="doc-id-link" href="#feature_tag">feature_tag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1243"><em>Source</em></a></div></h3>
+<h3 id="feature_tag"><span><a class="doc-id-link" href="#feature_tag">feature_tag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1417"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">feature_tag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
-	isol = 1819243369, <span class="comment">// Isolated Forms</span>
-	fina = 1634625894, <span class="comment">// Terminal Forms</span>
-	fin2 = 846096742,  <span class="comment">// Terminal Forms #2</span>
-	fin3 = 862873958,  <span class="comment">// Terminal Forms #3</span>
-	medi = 1768187245, <span class="comment">// Medial Forms</span>
-	med2 = 845440365,  <span class="comment">// Medial Forms #2</span>
-	init = 1953066601, <span class="comment">// Initial Forms</span>
-	ljmo = 1869441644, <span class="comment">// Leading Jamo Forms</span>
-	vjmo = 1869441654, <span class="comment">// Vowel Jamo Forms</span>
-	tjmo = 1869441652, <span class="comment">// Trailing Jamo Forms</span>
-	rphf = 1718120562, <span class="comment">// Reph Form</span>
-	blwf = 1719102562, <span class="comment">// Below-base Forms</span>
-	half = 1718378856, <span class="comment">// Half Forms</span>
-	pstf = 1718907760, <span class="comment">// Post-base Forms</span>
-	abvf = 1719034465, <span class="comment">// Above-base Forms</span>
-	pref = 1717924464, <span class="comment">// Pre-base Forms</span>
-	numr = 1919776110, <span class="comment">// Numerators</span>
-	frac = 1667330662, <span class="comment">// Fractions</span>
-	dnom = 1836019300, <span class="comment">// Denominators</span>
-	cfar = 1918985827, <span class="comment">// Conjunct Form After Ro</span>
-	aalt = 1953259873, <span class="comment">// Access All Alternates</span>
-	abvm = 1836474977, <span class="comment">// Above-base Mark Positioning</span>
-	abvs = 1937138273, <span class="comment">// Above-base Substitutions</span>
-	afrc = 1668441697, <span class="comment">// Alternative Fractions</span>
-	akhn = 1852336993, <span class="comment">// Akhand</span>
-	apkn = 1852534881, <span class="comment">// Kerning for Alternate Proportional Widths</span>
-	blwm = 1836543074, <span class="comment">// Below-base Mark Positioning</span>
-	blws = 1937206370, <span class="comment">// Below-base Substitutions</span>
-	calt = 1953259875, <span class="comment">// Contextual Alternates</span>
-	Case = 1702060387, <span class="comment">// Case-sensitive Forms</span>
-	ccmp = 1886217059, <span class="comment">// Glyph Composition / Decomposition</span>
-	chws = 1937205347, <span class="comment">// Contextual Half-width Spacing</span>
-	cjct = 1952672355, <span class="comment">// Conjunct Forms</span>
-	clig = 1734962275, <span class="comment">// Contextual Ligatures</span>
-	cpct = 1952673891, <span class="comment">// Centered CJK Punctuation</span>
-	cpsp = 1886613603, <span class="comment">// Capital Spacing</span>
-	cswh = 1752658787, <span class="comment">// Contextual Swash</span>
-	curs = 1936880995, <span class="comment">// Cursive Positioning</span>
-	cv01 = 825259619,  <span class="comment">//  'cv99'  Character Variant 1 – Character Variant 99</span>
-	c2pc = 1668297315, <span class="comment">// Petite Capitals From Capitals</span>
-	c2sc = 1668493923, <span class="comment">// Small Capitals From Capitals</span>
-	dist = 1953720676, <span class="comment">// Distances</span>
-	dlig = 1734962276, <span class="comment">// Discretionary Ligatures</span>
-	dtls = 1936487524, <span class="comment">// Dotless Forms</span>
-	expt = 1953527909, <span class="comment">// Expert Forms</span>
-	falt = 1953259878, <span class="comment">// Final Glyph on Line Alternates</span>
-	flac = 1667329126, <span class="comment">// Flattened Accent Forms</span>
-	fwid = 1684633446, <span class="comment">// Full Widths</span>
-	haln = 1852596584, <span class="comment">// Halant Forms</span>
-	halt = 1953259880, <span class="comment">// Alternate Half Widths</span>
-	hist = 1953720680, <span class="comment">// Historical Forms</span>
-	hkna = 1634626408, <span class="comment">// Horizontal Kana Alternates</span>
-	hlig = 1734962280, <span class="comment">// Historical Ligatures</span>
-	hngl = 1818717800, <span class="comment">// Hangul</span>
-	hojo = 1869246312, <span class="comment">// Hojo Kanji Forms (JIS X 0212-1990 Kanji Forms)</span>
-	hwid = 1684633448, <span class="comment">// Half Widths</span>
-	ital = 1818326121, <span class="comment">// Italics</span>
-	jalt = 1953259882, <span class="comment">// Justification Alternates</span>
-	jp78 = 943157354,  <span class="comment">// JIS78 Forms</span>
-	jp83 = 859336810,  <span class="comment">// JIS83 Forms</span>
-	jp90 = 809070698,  <span class="comment">// JIS90 Forms</span>
-	jp04 = 875589738,  <span class="comment">// JIS2004 Forms</span>
-	kern = 1852990827, <span class="comment">// Kerning</span>
-	lfbd = 1684170348, <span class="comment">// Left Bounds</span>
-	liga = 1634167148, <span class="comment">// Standard Ligatures</span>
-	lnum = 1836412524, <span class="comment">// Lining Figures</span>
-	locl = 1818455916, <span class="comment">// Localized Forms</span>
-	ltra = 1634890860, <span class="comment">// Left-to-right Alternates</span>
-	ltrm = 1836217452, <span class="comment">// Left-to-right Mirrored Forms</span>
-	mark = 1802658157, <span class="comment">// Mark Positioning</span>
-	mgrk = 1802659693, <span class="comment">// Mathematical Greek</span>
-	mkmk = 1802333037, <span class="comment">// Mark to Mark Positioning</span>
-	mset = 1952805741, <span class="comment">// Mark Positioning via Substitution</span>
-	nalt = 1953259886, <span class="comment">// Alternate Annotation Forms</span>
-	nlck = 1801677934, <span class="comment">// NLC Kanji Forms</span>
-	nukt = 1953199470, <span class="comment">// Nukta Forms</span>
-	onum = 1836412527, <span class="comment">// Oldstyle Figures</span>
-	opbd = 1684172911, <span class="comment">// Optical Bounds</span>
-	ordn = 1852076655, <span class="comment">// Ordinals</span>
-	ornm = 1835954799, <span class="comment">// Ornaments</span>
-	palt = 1953259888, <span class="comment">// Proportional Alternate Widths</span>
-	pcap = 1885430640, <span class="comment">// Petite Capitals</span>
-	pkna = 1634626416, <span class="comment">// Proportional Kana</span>
-	pnum = 1836412528, <span class="comment">// Proportional Figures</span>
-	pres = 1936028272, <span class="comment">// Pre-base Substitutions</span>
-	psts = 1937011568, <span class="comment">// Post-base Substitutions</span>
-	pwid = 1684633456, <span class="comment">// Proportional Widths</span>
-	qwid = 1684633457, <span class="comment">// Quarter Widths</span>
-	rand = 1684955506, <span class="comment">// Randomize</span>
-	rclt = 1953260402, <span class="comment">// Required Contextual Alternates</span>
-	rkrf = 1718774642, <span class="comment">// Rakar Forms</span>
-	rlig = 1734962290, <span class="comment">// Required Ligatures</span>
-	rtbd = 1684173938, <span class="comment">// Right Bounds</span>
-	rtla = 1634497650, <span class="comment">// Right-to-left Alternates</span>
-	rtlm = 1835824242, <span class="comment">// Right-to-left Mirrored Forms</span>
-	ruby = 2036495730, <span class="comment">// Ruby Notation Forms</span>
-	rvrn = 1852995186, <span class="comment">// Required Variation Alternates</span>
-	salt = 1953259891, <span class="comment">// Stylistic Alternates</span>
-	sinf = 1718511987, <span class="comment">// Scientific Inferiors</span>
-	size = 1702521203, <span class="comment">// Optical size</span>
-	smcp = 1885564275, <span class="comment">// Small Capitals</span>
-	smpl = 1819307379, <span class="comment">// Simplified Forms</span>
-	ss01 = 825258867,  <span class="comment">//  'ss20'  Stylistic Set 1 – Stylistic Set 20</span>
-	ssty = 2037674867, <span class="comment">// Math Script-style Alternates</span>
-	stch = 1751348339, <span class="comment">// Stretching Glyph Decomposition</span>
-	subs = 1935832435, <span class="comment">// Subscript</span>
-	sups = 1936749939, <span class="comment">// Superscript</span>
-	swsh = 1752397683, <span class="comment">// Swash</span>
-	test = 1953719668, <span class="comment">// Test features, only for development</span>
-	titl = 1819568500, <span class="comment">// Titling</span>
-	tnam = 1835101812, <span class="comment">// Traditional Name Forms</span>
-	tnum = 1836412532, <span class="comment">// Tabular Figures</span>
-	trad = 1684107892, <span class="comment">// Traditional Forms</span>
-	twid = 1684633460, <span class="comment">// Third Widths</span>
-	unic = 1667853941, <span class="comment">// Unicase</span>
-	valt = 1953259894, <span class="comment">// Alternate Vertical Metrics</span>
-	vapk = 1802527094, <span class="comment">// Kerning for Alternate Proportional Vertical Metrics</span>
-	vatu = 1970561398, <span class="comment">// Vattu Variants</span>
-	vchw = 2003329910, <span class="comment">// Vertical Contextual Half-width Spacing</span>
-	vert = 1953654134, <span class="comment">// Vertical Alternates</span>
-	vhal = 1818323062, <span class="comment">// Alternate Vertical Half Metrics</span>
-	vkna = 1634626422, <span class="comment">// Vertical Kana Alternates</span>
-	vkrn = 1852992374, <span class="comment">// Vertical Kerning</span>
-	vpal = 1818325110, <span class="comment">// Proportional Alternate Vertical Metrics</span>
-	vrt2 = 846492278,  <span class="comment">// Vertical Alternates and Rotation</span>
-	vrtr = 1920234102, <span class="comment">// Vertical Alternates for Rotation</span>
-	zero = 1869768058, <span class="comment">// Slashed Zero</span>
+	UNREGISTERED = 0, 
+	isol         = 1819243369, <span class="comment">// Isolated Forms</span>
+	fina         = 1634625894, <span class="comment">// Terminal Forms</span>
+	fin2         = 846096742,  <span class="comment">// Terminal Forms #2</span>
+	fin3         = 862873958,  <span class="comment">// Terminal Forms #3</span>
+	medi         = 1768187245, <span class="comment">// Medial Forms</span>
+	med2         = 845440365,  <span class="comment">// Medial Forms #2</span>
+	init         = 1953066601, <span class="comment">// Initial Forms</span>
+	ljmo         = 1869441644, <span class="comment">// Leading Jamo Forms</span>
+	vjmo         = 1869441654, <span class="comment">// Vowel Jamo Forms</span>
+	tjmo         = 1869441652, <span class="comment">// Trailing Jamo Forms</span>
+	rphf         = 1718120562, <span class="comment">// Reph Form</span>
+	blwf         = 1719102562, <span class="comment">// Below-base Forms</span>
+	half         = 1718378856, <span class="comment">// Half Forms</span>
+	pstf         = 1718907760, <span class="comment">// Post-base Forms</span>
+	abvf         = 1719034465, <span class="comment">// Above-base Forms</span>
+	pref         = 1717924464, <span class="comment">// Pre-base Forms</span>
+	numr         = 1919776110, <span class="comment">// Numerators</span>
+	frac         = 1667330662, <span class="comment">// Fractions</span>
+	dnom         = 1836019300, <span class="comment">// Denominators</span>
+	cfar         = 1918985827, <span class="comment">// Conjunct Form After Ro</span>
+	aalt         = 1953259873, <span class="comment">// Access All Alternates</span>
+	abvm         = 1836474977, <span class="comment">// Above-base Mark Positioning</span>
+	abvs         = 1937138273, <span class="comment">// Above-base Substitutions</span>
+	afrc         = 1668441697, <span class="comment">// Alternative Fractions</span>
+	akhn         = 1852336993, <span class="comment">// Akhand</span>
+	apkn         = 1852534881, <span class="comment">// Kerning for Alternate Proportional Widths</span>
+	blwm         = 1836543074, <span class="comment">// Below-base Mark Positioning</span>
+	blws         = 1937206370, <span class="comment">// Below-base Substitutions</span>
+	calt         = 1953259875, <span class="comment">// Contextual Alternates</span>
+	Case         = 1702060387, <span class="comment">// Case-sensitive Forms</span>
+	ccmp         = 1886217059, <span class="comment">// Glyph Composition / Decomposition</span>
+	chws         = 1937205347, <span class="comment">// Contextual Half-width Spacing</span>
+	cjct         = 1952672355, <span class="comment">// Conjunct Forms</span>
+	clig         = 1734962275, <span class="comment">// Contextual Ligatures</span>
+	cpct         = 1952673891, <span class="comment">// Centered CJK Punctuation</span>
+	cpsp         = 1886613603, <span class="comment">// Capital Spacing</span>
+	cswh         = 1752658787, <span class="comment">// Contextual Swash</span>
+	curs         = 1936880995, <span class="comment">// Cursive Positioning</span>
+	cv01         = 825259619,  <span class="comment">//  'cv99'  Character Variant 1 – Character Variant 99</span>
+	c2pc         = 1668297315, <span class="comment">// Petite Capitals From Capitals</span>
+	c2sc         = 1668493923, <span class="comment">// Small Capitals From Capitals</span>
+	dist         = 1953720676, <span class="comment">// Distances</span>
+	dlig         = 1734962276, <span class="comment">// Discretionary Ligatures</span>
+	dtls         = 1936487524, <span class="comment">// Dotless Forms</span>
+	expt         = 1953527909, <span class="comment">// Expert Forms</span>
+	falt         = 1953259878, <span class="comment">// Final Glyph on Line Alternates</span>
+	flac         = 1667329126, <span class="comment">// Flattened Accent Forms</span>
+	fwid         = 1684633446, <span class="comment">// Full Widths</span>
+	haln         = 1852596584, <span class="comment">// Halant Forms</span>
+	halt         = 1953259880, <span class="comment">// Alternate Half Widths</span>
+	hist         = 1953720680, <span class="comment">// Historical Forms</span>
+	hkna         = 1634626408, <span class="comment">// Horizontal Kana Alternates</span>
+	hlig         = 1734962280, <span class="comment">// Historical Ligatures</span>
+	hngl         = 1818717800, <span class="comment">// Hangul</span>
+	hojo         = 1869246312, <span class="comment">// Hojo Kanji Forms (JIS X 0212-1990 Kanji Forms)</span>
+	hwid         = 1684633448, <span class="comment">// Half Widths</span>
+	ital         = 1818326121, <span class="comment">// Italics</span>
+	jalt         = 1953259882, <span class="comment">// Justification Alternates</span>
+	jp78         = 943157354,  <span class="comment">// JIS78 Forms</span>
+	jp83         = 859336810,  <span class="comment">// JIS83 Forms</span>
+	jp90         = 809070698,  <span class="comment">// JIS90 Forms</span>
+	jp04         = 875589738,  <span class="comment">// JIS2004 Forms</span>
+	kern         = 1852990827, <span class="comment">// Kerning</span>
+	lfbd         = 1684170348, <span class="comment">// Left Bounds</span>
+	liga         = 1634167148, <span class="comment">// Standard Ligatures</span>
+	lnum         = 1836412524, <span class="comment">// Lining Figures</span>
+	locl         = 1818455916, <span class="comment">// Localized Forms</span>
+	ltra         = 1634890860, <span class="comment">// Left-to-right Alternates</span>
+	ltrm         = 1836217452, <span class="comment">// Left-to-right Mirrored Forms</span>
+	mark         = 1802658157, <span class="comment">// Mark Positioning</span>
+	mgrk         = 1802659693, <span class="comment">// Mathematical Greek</span>
+	mkmk         = 1802333037, <span class="comment">// Mark to Mark Positioning</span>
+	mset         = 1952805741, <span class="comment">// Mark Positioning via Substitution</span>
+	nalt         = 1953259886, <span class="comment">// Alternate Annotation Forms</span>
+	nlck         = 1801677934, <span class="comment">// NLC Kanji Forms</span>
+	nukt         = 1953199470, <span class="comment">// Nukta Forms</span>
+	onum         = 1836412527, <span class="comment">// Oldstyle Figures</span>
+	opbd         = 1684172911, <span class="comment">// Optical Bounds</span>
+	ordn         = 1852076655, <span class="comment">// Ordinals</span>
+	ornm         = 1835954799, <span class="comment">// Ornaments</span>
+	palt         = 1953259888, <span class="comment">// Proportional Alternate Widths</span>
+	pcap         = 1885430640, <span class="comment">// Petite Capitals</span>
+	pkna         = 1634626416, <span class="comment">// Proportional Kana</span>
+	pnum         = 1836412528, <span class="comment">// Proportional Figures</span>
+	pres         = 1936028272, <span class="comment">// Pre-base Substitutions</span>
+	psts         = 1937011568, <span class="comment">// Post-base Substitutions</span>
+	pwid         = 1684633456, <span class="comment">// Proportional Widths</span>
+	qwid         = 1684633457, <span class="comment">// Quarter Widths</span>
+	rand         = 1684955506, <span class="comment">// Randomize</span>
+	rclt         = 1953260402, <span class="comment">// Required Contextual Alternates</span>
+	rkrf         = 1718774642, <span class="comment">// Rakar Forms</span>
+	rlig         = 1734962290, <span class="comment">// Required Ligatures</span>
+	rtbd         = 1684173938, <span class="comment">// Right Bounds</span>
+	rtla         = 1634497650, <span class="comment">// Right-to-left Alternates</span>
+	rtlm         = 1835824242, <span class="comment">// Right-to-left Mirrored Forms</span>
+	ruby         = 2036495730, <span class="comment">// Ruby Notation Forms</span>
+	rvrn         = 1852995186, <span class="comment">// Required Variation Alternates</span>
+	salt         = 1953259891, <span class="comment">// Stylistic Alternates</span>
+	sinf         = 1718511987, <span class="comment">// Scientific Inferiors</span>
+	size         = 1702521203, <span class="comment">// Optical size</span>
+	smcp         = 1885564275, <span class="comment">// Small Capitals</span>
+	smpl         = 1819307379, <span class="comment">// Simplified Forms</span>
+	ss01         = 825258867,  <span class="comment">//  'ss20'  Stylistic Set 1 – Stylistic Set 20</span>
+	ssty         = 2037674867, <span class="comment">// Math Script-style Alternates</span>
+	stch         = 1751348339, <span class="comment">// Stretching Glyph Decomposition</span>
+	subs         = 1935832435, <span class="comment">// Subscript</span>
+	sups         = 1936749939, <span class="comment">// Superscript</span>
+	swsh         = 1752397683, <span class="comment">// Swash</span>
+	test         = 1953719668, <span class="comment">// Test features, only for development</span>
+	titl         = 1819568500, <span class="comment">// Titling</span>
+	tnam         = 1835101812, <span class="comment">// Traditional Name Forms</span>
+	tnum         = 1836412532, <span class="comment">// Tabular Figures</span>
+	trad         = 1684107892, <span class="comment">// Traditional Forms</span>
+	twid         = 1684633460, <span class="comment">// Third Widths</span>
+	unic         = 1667853941, <span class="comment">// Unicase</span>
+	valt         = 1953259894, <span class="comment">// Alternate Vertical Metrics</span>
+	vapk         = 1802527094, <span class="comment">// Kerning for Alternate Proportional Vertical Metrics</span>
+	vatu         = 1970561398, <span class="comment">// Vattu Variants</span>
+	vchw         = 2003329910, <span class="comment">// Vertical Contextual Half-width Spacing</span>
+	vert         = 1953654134, <span class="comment">// Vertical Alternates</span>
+	vhal         = 1818323062, <span class="comment">// Alternate Vertical Half Metrics</span>
+	vkna         = 1634626422, <span class="comment">// Vertical Kana Alternates</span>
+	vkrn         = 1852992374, <span class="comment">// Vertical Kerning</span>
+	vpal         = 1818325110, <span class="comment">// Proportional Alternate Vertical Metrics</span>
+	vrt2         = 846492278,  <span class="comment">// Vertical Alternates and Rotation</span>
+	vrtr         = 1920234102, <span class="comment">// Vertical Alternates for Rotation</span>
+	zero         = 1869768058, <span class="comment">// Slashed Zero</span>
 }</pre>
 </div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#FeatureOverrideFromTag">FeatureOverrideFromTag</a></li>
+<li><a href="/vendor/kb_text_shape/#FeatureTagToId">FeatureTagToId</a></li>
+<li><a href="/vendor/kb_text_shape/#GlyphConfigOverrideFeatureFromTag">GlyphConfigOverrideFeatureFromTag</a></li>
+</ul>
 </div>
 <div class="pkg-entity">
-<h3 id="font"><span><a class="doc-id-link" href="#font">font<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1532"><em>Source</em></a></div></h3>
+<h3 id="font"><span><a class="doc-id-link" href="#font">font<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1708"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">font :: <span class="keyword-type">struct</span> {
 	FileBase:                   [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	FileSize:                   <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a>,
 	Head:                       ^<a class="code-typename" href="/vendor/kb_text_shape/#head">head</a>,
 	Cmap:                       ^<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
 	Gdef:                       ^<a class="code-typename" href="/vendor/kb_text_shape/#gdef">gdef</a>,
@@ -918,21 +961,26 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="gdef"><span><a class="doc-id-link" href="#gdef">gdef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1517"><em>Source</em></a></div></h3>
+<h3 id="gdef"><span><a class="doc-id-link" href="#gdef">gdef<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1693"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">gdef :: <span class="keyword-type">struct</span> {}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="glyph"><span><a class="doc-id-link" href="#glyph">glyph<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1566"><em>Source</em></a></div></h3>
+<h3 id="glyph"><span><a class="doc-id-link" href="#glyph">glyph<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1752"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">glyph :: <span class="keyword-type">struct</span> {
 	Codepoint:                     untyped rune,
 	Id:                            <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	<span class="comment">// Glyph index. This is what you want to use to query outline data.</span>
 	Uid:                           <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
 	Classes:                       <a class="code-typename" href="/vendor/kb_text_shape/#glyph_classes">glyph_classes</a>,
 	Decomposition:                 <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+	Config:                        ^<a class="code-typename" href="/vendor/kb_text_shape/#glyph_config">glyph_config</a>,
 	Flags:                         <a class="code-typename" href="/vendor/kb_text_shape/#glyph_flags">glyph_flags</a>,
+	<span class="comment">// These fields are the glyph's final positioning data.</span>
+	<span class="comment">// For normal usage, you should not have to use these directly yourself.</span>
+	<span class="comment">// In case you are curious or have a specific need, see kbts_PositionGlyph() to see how these are used.</span>
 	OffsetX:                       <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
 	OffsetY:                       <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
 	AdvanceX:                      <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
@@ -988,7 +1036,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="glyph_array"><span><a class="doc-id-link" href="#glyph_array">glyph_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1626"><em>Source</em></a></div></h3>
+<h3 id="glyph_array"><span><a class="doc-id-link" href="#glyph_array">glyph_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1817"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">glyph_array :: <span class="keyword-type">struct</span> {
 	Glyphs:           [^]<a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a> <span class="string">`fmt:"v,Count"`</span>,
@@ -1000,7 +1048,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="glyph_classes"><span><a class="doc-id-link" href="#glyph_classes">glyph_classes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1561"><em>Source</em></a></div></h3>
+<h3 id="glyph_classes"><span><a class="doc-id-link" href="#glyph_classes">glyph_classes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1738"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">glyph_classes :: <span class="keyword-type">struct</span> {
 	Class:               <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
@@ -1009,7 +1057,30 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="glyph_flag"><span><a class="doc-id-link" href="#glyph_flag">glyph_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L816"><em>Source</em></a></div></h3>
+<h3 id="glyph_config"><span><a class="doc-id-link" href="#glyph_config">glyph_config<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1743"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">glyph_config :: <span class="keyword-type">struct</span> {
+	EnabledFeatures:                 <a class="code-typename" href="/vendor/kb_text_shape/#feature_set">feature_set</a>,
+	DisabledFeatures:                <a class="code-typename" href="/vendor/kb_text_shape/#feature_set">feature_set</a>,
+	FeatureOverrideCount:            <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	FeatureOverrideCapacity:         <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	RequiredFeatureOverrideCapacity: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	FeatureOverrides:                [^]<a class="code-typename" href="/vendor/kb_text_shape/#feature_override">feature_override</a> <span class="string">`fmt:"v,FeatureOverrideCount"`</span>,
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#GlyphConfigOverrideFeature">GlyphConfigOverrideFeature</a></li>
+<li><a href="/vendor/kb_text_shape/#GlyphConfigOverrideFeatureFromTag">GlyphConfigOverrideFeatureFromTag</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#EmptyGlyphConfig">EmptyGlyphConfig</a></li>
+<li><a href="/vendor/kb_text_shape/#GlyphConfig">GlyphConfig</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="glyph_flag"><span><a class="doc-id-link" href="#glyph_flag">glyph_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L817"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">glyph_flag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	<span class="comment">// These feature flags must coincide with joining_feature _and_ FEATURE_FLAG!</span>
@@ -1049,7 +1120,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="glyph_flags"><span><a class="doc-id-link" href="#glyph_flags">glyph_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L815"><em>Source</em></a></div></h3>
+<h3 id="glyph_flags"><span><a class="doc-id-link" href="#glyph_flags">glyph_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L816"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">glyph_flags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/kb_text_shape/#glyph_flag">glyph_flag</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
 </div>
@@ -1061,25 +1132,25 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="gsub_gpos"><span><a class="doc-id-link" href="#gsub_gpos">gsub_gpos<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1519"><em>Source</em></a></div></h3>
+<h3 id="gsub_gpos"><span><a class="doc-id-link" href="#gsub_gpos">gsub_gpos<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1695"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">gsub_gpos :: <span class="keyword-type">struct</span> {}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="hea"><span><a class="doc-id-link" href="#hea">hea<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1521"><em>Source</em></a></div></h3>
+<h3 id="hea"><span><a class="doc-id-link" href="#hea">hea<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1697"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">hea :: <span class="keyword-type">struct</span> {}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="head"><span><a class="doc-id-link" href="#head">head<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1525"><em>Source</em></a></div></h3>
+<h3 id="head"><span><a class="doc-id-link" href="#head">head<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1701"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">head :: <span class="keyword-type">struct</span> {}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="indic_script_properties"><span><a class="doc-id-link" href="#indic_script_properties">indic_script_properties<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1702"><em>Source</em></a></div></h3>
+<h3 id="indic_script_properties"><span><a class="doc-id-link" href="#indic_script_properties">indic_script_properties<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1904"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">indic_script_properties :: <span class="keyword-type">struct</span> {
 	ViramaCodepoint:        untyped rune,
@@ -1094,13 +1165,13 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="iterate_features"><span><a class="doc-id-link" href="#iterate_features">iterate_features<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1522"><em>Source</em></a></div></h3>
+<h3 id="iterate_features"><span><a class="doc-id-link" href="#iterate_features">iterate_features<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1698"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">iterate_features :: <span class="keyword-type">struct</span> {}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="japanese_line_break_style"><span><a class="doc-id-link" href="#japanese_line_break_style">japanese_line_break_style<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L878"><em>Source</em></a></div></h3>
+<h3 id="japanese_line_break_style"><span><a class="doc-id-link" href="#japanese_line_break_style">japanese_line_break_style<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L879"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">japanese_line_break_style :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
 	<span class="comment">// The Unicode standard does not define what strict style is used for.</span>
@@ -1144,7 +1215,7 @@ As such, normal and loose styles currently behave the same.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="langsys"><span><a class="doc-id-link" href="#langsys">langsys<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1712"><em>Source</em></a></div></h3>
+<h3 id="langsys"><span><a class="doc-id-link" href="#langsys">langsys<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1914"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">langsys :: <span class="keyword-type">struct</span> {}</pre>
 </div>
@@ -1845,7 +1916,7 @@ As such, normal and loose styles currently behave the same.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="line_break_class"><span><a class="doc-id-link" href="#line_break_class">line_break_class<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L935"><em>Source</em></a></div></h3>
+<h3 id="line_break_class"><span><a class="doc-id-link" href="#line_break_class">line_break_class<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L936"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">line_break_class :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
 	Onea, 
@@ -1920,9 +1991,10 @@ As such, normal and loose styles currently behave the same.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="lookup_indices"><span><a class="doc-id-link" href="#lookup_indices">lookup_indices<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1663"><em>Source</em></a></div></h3>
+<h3 id="lookup_indices"><span><a class="doc-id-link" href="#lookup_indices">lookup_indices<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1855"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">lookup_indices :: <span class="keyword-type">struct</span> {
+	FeatureTag:  <a class="code-typename" href="/vendor/kb_text_shape/#feature_tag">feature_tag</a>,
 	FeatureId:   <a class="code-typename" href="/vendor/kb_text_shape/#feature_id">feature_id</a>,
 	SkipFlags:   <a class="code-typename" href="/vendor/kb_text_shape/#skip_flags">skip_flags</a>,
 	GlyphFilter: <a class="code-typename" href="/vendor/kb_text_shape/#glyph_flags">glyph_flags</a>,
@@ -1932,7 +2004,7 @@ As such, normal and loose styles currently behave the same.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="lookup_info"><span><a class="doc-id-link" href="#lookup_info">lookup_info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1509"><em>Source</em></a></div></h3>
+<h3 id="lookup_info"><span><a class="doc-id-link" href="#lookup_info">lookup_info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1685"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">lookup_info :: <span class="keyword-type">struct</span> {
 	MaximumBacktrackWithoutSkippingGlyphs: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
@@ -1944,7 +2016,7 @@ As such, normal and loose styles currently behave the same.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="lookup_subtable_info"><span><a class="doc-id-link" href="#lookup_subtable_info">lookup_subtable_info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1527"><em>Source</em></a></div></h3>
+<h3 id="lookup_subtable_info"><span><a class="doc-id-link" href="#lookup_subtable_info">lookup_subtable_info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1703"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">lookup_subtable_info :: <span class="keyword-type">struct</span> {
 	MinimumBacktrackPlusOne: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
@@ -1953,13 +2025,13 @@ As such, normal and loose styles currently behave the same.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="maxp"><span><a class="doc-id-link" href="#maxp">maxp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1520"><em>Source</em></a></div></h3>
+<h3 id="maxp"><span><a class="doc-id-link" href="#maxp">maxp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1696"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">maxp :: <span class="keyword-type">struct</span> {}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="op"><span><a class="doc-id-link" href="#op">op<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1675"><em>Source</em></a></div></h3>
+<h3 id="op"><span><a class="doc-id-link" href="#op">op<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1874"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">op :: <span class="keyword-type">struct</span> {
 	Kind:     <a class="code-typename" href="/vendor/kb_text_shape/#op_kind">op_kind</a>,
@@ -1978,6 +2050,7 @@ As such, normal and loose styles currently behave the same.</p>
 	NORMALIZE_HANGUL, 
 	FLAG_JOINING_LETTERS, 
 	GSUB_FEATURES, 
+	GSUB_FEATURES_WITH_USER, 
 	<span class="comment">// Positioning ops.</span>
 	GPOS_METRICS, 
 	GPOS_FEATURES, 
@@ -1987,7 +2060,7 @@ As such, normal and loose styles currently behave the same.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="op_list"><span><a class="doc-id-link" href="#op_list">op_list<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1697"><em>Source</em></a></div></h3>
+<h3 id="op_list"><span><a class="doc-id-link" href="#op_list">op_list<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1899"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">op_list :: <span class="keyword-type">struct</span> {
 	<span class="comment">// TODO(bill): is this actually a slice? e.g. `op_list :: []op_kind`</span>
@@ -1997,31 +2070,34 @@ As such, normal and loose styles currently behave the same.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="op_state"><span><a class="doc-id-link" href="#op_state">op_state<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1682"><em>Source</em></a></div></h3>
+<h3 id="op_state"><span><a class="doc-id-link" href="#op_state">op_state<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1881"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">op_state :: <span class="keyword-type">struct</span> {
-	WrittenCount:         <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a>,
-	GlyphIndex:           <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a>,
-	FrameCount:           <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
-	ResumePoint:          <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
-	FeatureCount:         <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
-	FeatureLookupIndices: [16]<a class="code-typename" href="/vendor/kb_text_shape/#lookup_indices">lookup_indices</a>,
-	OpSpecific:           <a class="code-typename" href="/vendor/kb_text_shape/#op_state_op_specific">op_state_op_specific</a>,
+	WrittenCount:             <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a>,
+	GlyphIndex:               <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a>,
+	FrameCount:               <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	ResumePoint:              <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	FeatureCount:             <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	FeatureLookupIndices:     [16]<a class="code-typename" href="/vendor/kb_text_shape/#lookup_indices">lookup_indices</a> <span class="string">`fmt:"v,FeatureCount"`</span>,
+	UnregisteredFeatureCount: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	UnregisteredFeatureTags:  [16]<a class="code-typename" href="/vendor/kb_text_shape/#feature_tag">feature_tag</a> <span class="string">`fmt:"v,UnregisteredFeatureCount"`</span>,
+	OpSpecific:               <a class="code-typename" href="/vendor/kb_text_shape/#op_state_op_specific">op_state_op_specific</a>,
 }</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="op_state_gsub"><span><a class="doc-id-link" href="#op_state_gsub">op_state_gsub<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1646"><em>Source</em></a></div></h3>
+<h3 id="op_state_gsub"><span><a class="doc-id-link" href="#op_state_gsub">op_state_gsub<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1837"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">op_state_gsub :: <span class="keyword-type">struct</span> {
-	LookupIndex: <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a>,
-	GlyphFilter: <a class="code-typename" href="/vendor/kb_text_shape/#glyph_flags">glyph_flags</a>,
-	SkipFlags:   <a class="code-typename" href="/vendor/kb_text_shape/#skip_flags">skip_flags</a>,
+	LookupFeatures: <a class="code-typename" href="/vendor/kb_text_shape/#feature_set">feature_set</a>,
+	LookupIndex:    <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a>,
+	GlyphFilter:    <a class="code-typename" href="/vendor/kb_text_shape/#glyph_flags">glyph_flags</a>,
+	SkipFlags:      <a class="code-typename" href="/vendor/kb_text_shape/#skip_flags">skip_flags</a>,
 }</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="op_state_normalize"><span><a class="doc-id-link" href="#op_state_normalize">op_state_normalize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1634"><em>Source</em></a></div></h3>
+<h3 id="op_state_normalize"><span><a class="doc-id-link" href="#op_state_normalize">op_state_normalize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1825"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">op_state_normalize :: <span class="keyword-type">struct</span> {
 	CodepointsToDecomposeCount: <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a>,
@@ -2030,7 +2106,7 @@ As such, normal and loose styles currently behave the same.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="op_state_normalize_hangul"><span><a class="doc-id-link" href="#op_state_normalize_hangul">op_state_normalize_hangul<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1652"><em>Source</em></a></div></h3>
+<h3 id="op_state_normalize_hangul"><span><a class="doc-id-link" href="#op_state_normalize_hangul">op_state_normalize_hangul<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1844"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">op_state_normalize_hangul :: <span class="keyword-type">struct</span> {
 	LvtGlyphs:     [4]<a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a> <span class="string">`fmt:"v,LvtGlyphCount"`</span>,
@@ -2039,7 +2115,7 @@ As such, normal and loose styles currently behave the same.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="op_state_op_specific"><span><a class="doc-id-link" href="#op_state_op_specific">op_state_op_specific<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1657"><em>Source</em></a></div></h3>
+<h3 id="op_state_op_specific"><span><a class="doc-id-link" href="#op_state_op_specific">op_state_op_specific<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1849"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">op_state_op_specific :: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
 	Normalize:       <a class="code-typename" href="/vendor/kb_text_shape/#op_state_normalize">op_state_normalize</a>,
@@ -2049,7 +2125,7 @@ As such, normal and loose styles currently behave the same.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="orientation"><span><a class="doc-id-link" href="#orientation">orientation<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L891"><em>Source</em></a></div></h3>
+<h3 id="orientation"><span><a class="doc-id-link" href="#orientation">orientation<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L892"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">orientation :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	HORIZONTAL, 
@@ -2081,7 +2157,7 @@ As such, normal and loose styles currently behave the same.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="script"><span><a class="doc-id-link" href="#script">script<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1070"><em>Source</em></a></div></h3>
+<h3 id="script"><span><a class="doc-id-link" href="#script">script<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1244"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">script :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	DONT_KNOW, 
@@ -2259,12 +2335,196 @@ As such, normal and loose styles currently behave the same.</p>
 <h5>Related Procedures With Parameters</h5>
 <ul>
 <li><a href="/vendor/kb_text_shape/#InferScript">InferScript</a></li>
-<li><a href="/vendor/kb_text_shape/#ScriptIsComplex">ScriptIsComplex</a></li>
 <li><a href="/vendor/kb_text_shape/#ShapeConfig">ShapeConfig</a></li>
+</ul>
+<h5>Related Procedures With Returns</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#ScriptTagToScript">ScriptTagToScript</a></li>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="shape_config"><span><a class="doc-id-link" href="#shape_config">shape_config<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1714"><em>Source</em></a></div></h3>
+<h3 id="script_tag"><span><a class="doc-id-link" href="#script_tag">script_tag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1071"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">script_tag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
+	DONT_KNOW                 = 538976288, 
+	ADLAM                     = 1835820129, 
+	AHOM                      = 1836017761, 
+	ANATOLIAN_HIEROGLYPHS     = 2004184168, 
+	ARABIC                    = 1650553441, 
+	ARMENIAN                  = 1852666465, 
+	AVESTAN                   = 1953724001, 
+	BALINESE                  = 1768710498, 
+	BAMUM                     = 1970102626, 
+	BASSA_VAH                 = 1936941410, 
+	BATAK                     = 1802789218, 
+	BENGALI                   = 845639266, 
+	BHAIKSUKI                 = 1936418914, 
+	BOPOMOFO                  = 1869639522, 
+	BRAHMI                    = 1751216738, 
+	BUGINESE                  = 1768387938, 
+	BUHID                     = 1684567394, 
+	CANADIAN_SYLLABICS        = 1936613731, 
+	CARIAN                    = 1769103715, 
+	CAUCASIAN_ALBANIAN        = 1651009377, 
+	CHAKMA                    = 1835753827, 
+	CHAM                      = 1835100259, 
+	CHEROKEE                  = 1919248483, 
+	CHORASMIAN                = 1936877667, 
+	CJK_IDEOGRAPHIC           = 1768841576, 
+	COPTIC                    = 1953525603, 
+	CYPRIOT_SYLLABARY         = 1953656931, 
+	CYPRO_MINOAN              = 1852665955, 
+	CYRILLIC                  = 1819441507, 
+	DEFAULT                   = 1414284868, 
+	DEFAULT2                  = 1414284868, 
+	DESERET                   = 1953657700, 
+	DEVANAGARI                = 846620004, 
+	DIVES_AKURU               = 1801546084, 
+	DOGRA                     = 1919381348, 
+	DUPLOYAN                  = 1819309412, 
+	EGYPTIAN_HIEROGLYPHS      = 1887004517, 
+	ELBASAN                   = 1633840229, 
+	ELYMAIC                   = 1836674149, 
+	ETHIOPIC                  = 1768453221, 
+	GARAY                     = 1634885991, 
+	GEORGIAN                  = 1919903079, 
+	GLAGOLITIC                = 1734437991, 
+	GOTHIC                    = 1752461159, 
+	GRANTHA                   = 1851880039, 
+	GREEK                     = 1801810535, 
+	GUJARATI                  = 846359143, 
+	GUNJALA_GONDI             = 1735290727, 
+	GURMUKHI                  = 846361959, 
+	GURUNG_KHEMA              = 1751872871, 
+	HANGUL                    = 1735287144, 
+	HANIFI_ROHINGYA           = 1734897522, 
+	HANUNOO                   = 1869504872, 
+	HATRAN                    = 1920229736, 
+	HEBREW                    = 1919051112, 
+	HIRAGANA                  = 1634623851, 
+	IMPERIAL_ARAMAIC          = 1768780385, 
+	INSCRIPTIONAL_PAHLAVI     = 1768712304, 
+	INSCRIPTIONAL_PARTHIAN    = 1769239152, 
+	JAVANESE                  = 1635148138, 
+	KAITHI                    = 1768453227, 
+	KANNADA                   = 845442667, 
+	KATAKANA                  = 1634623851, 
+	KAWI                      = 1769431403, 
+	KAYAH_LI                  = 1768710507, 
+	KHAROSHTHI                = 1918986347, 
+	KHITAN_SMALL_SCRIPT       = 1937009003, 
+	KHMER                     = 1919772779, 
+	KHOJKI                    = 1785686123, 
+	KHUDAWADI                 = 1684957555, 
+	KIRAT_RAI                 = 1767993963, 
+	LAO                       = 544170348, 
+	LATIN                     = 1853120876, 
+	LEPCHA                    = 1668310380, 
+	LIMBU                     = 1651337580, 
+	LINEAR_A                  = 1634625900, 
+	LINEAR_B                  = 1651403116, 
+	LISU                      = 1970497900, 
+	LYCIAN                    = 1768126828, 
+	LYDIAN                    = 1768192364, 
+	MAHAJANI                  = 1785225581, 
+	MAKASAR                   = 1634427245, 
+	MALAYALAM                 = 846031981, 
+	MANDAIC                   = 1684955501, 
+	MANICHAEAN                = 1768841581, 
+	MARCHEN                   = 1668440429, 
+	MASARAM_GONDI             = 1835954023, 
+	MEDEFAIDRIN               = 1717855597, 
+	MEETEI_MAYEK              = 1768256621, 
+	MENDE_KIKAKUI             = 1684956525, 
+	MEROITIC_CURSIVE          = 1668441453, 
+	MEROITIC_HIEROGLYPHS      = 1869768045, 
+	MIAO                      = 1685220464, 
+	MODI                      = 1768189805, 
+	MONGOLIAN                 = 1735290733, 
+	MRO                       = 1869574765, 
+	MULTANI                   = 1953265005, 
+	MYANMAR                   = 846035309, 
+	NABATAEAN                 = 1952539246, 
+	NAG_MUNDARI               = 1835491694, 
+	NANDINAGARI               = 1684955502, 
+	NEWA                      = 1635214702, 
+	NEW_TAI_LUE               = 1970037108, 
+	NKO                       = 544172910, 
+	NUSHU                     = 1969779566, 
+	NYIAKENG_PUACHUE_HMONG    = 1886285160, 
+	OGHAM                     = 1835100015, 
+	OL_CHIKI                  = 1801677935, 
+	OL_ONAL                   = 1868656239, 
+	OLD_ITALIC                = 1818326121, 
+	OLD_HUNGARIAN             = 1735292264, 
+	OLD_NORTH_ARABIAN         = 1651663214, 
+	OLD_PERMIC                = 1836213616, 
+	OLD_PERSIAN_CUNEIFORM     = 1868918904, 
+	OLD_SOGDIAN               = 1869049715, 
+	OLD_SOUTH_ARABIAN         = 1651663219, 
+	OLD_TURKIC                = 1751872111, 
+	OLD_UYGHUR                = 1919382895, 
+	ODIA                      = 846819951, 
+	OSAGE                     = 1701278575, 
+	OSMANYA                   = 1634562927, 
+	PAHAWH_HMONG              = 1735290216, 
+	PALMYRENE                 = 1835819376, 
+	PAU_CIN_HAU               = 1668637040, 
+	PHAGS_PA                  = 1734436976, 
+	PHOENICIAN                = 2020501616, 
+	PSALTER_PAHLAVI           = 1886152816, 
+	REJANG                    = 1735289458, 
+	RUNIC                     = 1919841650, 
+	SAMARITAN                 = 1919770995, 
+	SAURASHTRA                = 1920295283, 
+	SHARADA                   = 1685219443, 
+	SHAVIAN                   = 2002872435, 
+	SIDDHAM                   = 1684302195, 
+	SIGN_WRITING              = 2003724147, 
+	SOGDIAN                   = 1684500339, 
+	SINHALA                   = 1752066419, 
+	SORA_SOMPENG              = 1634889587, 
+	SOYOMBO                   = 1870229363, 
+	SUMERO_AKKADIAN_CUNEIFORM = 2020963192, 
+	SUNDANESE                 = 1684960627, 
+	SUNUWAR                   = 1970173299, 
+	SYLOTI_NAGRI              = 1869379955, 
+	SYRIAC                    = 1668446579, 
+	TAGALOG                   = 1735157620, 
+	TAGBANWA                  = 1650942324, 
+	TAI_LE                    = 1701601652, 
+	TAI_THAM                  = 1634623852, 
+	TAI_VIET                  = 1953915252, 
+	TAKRI                     = 1919639924, 
+	TAMIL                     = 845966708, 
+	TANGSA                    = 1634954868, 
+	TANGUT                    = 1735287156, 
+	TELUGU                    = 845964660, 
+	THAANA                    = 1633773684, 
+	THAI                      = 1767991412, 
+	TIBETAN                   = 1952606580, 
+	TIFINAGH                  = 1735288436, 
+	TIRHUTA                   = 1752328564, 
+	TODHRI                    = 1919184756, 
+	TOTO                      = 1869901684, 
+	TULU_TIGALARI             = 1735685492, 
+	UGARITIC_CUNEIFORM        = 1918986101, 
+	VAI                       = 543777142, 
+	VITHKUQI                  = 1752459638, 
+	WANCHO                    = 1869112183, 
+	WARANG_CITI               = 1634886007, 
+	YEZIDI                    = 1769629049, 
+	YI                        = 538995065, 
+	ZANABAZAR_SQUARE          = 1651401082, 
+}</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/kb_text_shape/#ScriptTagToScript">ScriptTagToScript</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="shape_config"><span><a class="doc-id-link" href="#shape_config">shape_config<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1916"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">shape_config :: <span class="keyword-type">struct</span> {
 	Font:                  ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>,
@@ -2272,6 +2532,7 @@ As such, normal and loose styles currently behave the same.</p>
 	Language:              <a class="code-typename" href="/vendor/kb_text_shape/#language">language</a>,
 	Langsys:               [<a class="code-typename" href="/vendor/kb_text_shape/#shaping_table">shaping_table</a>]^<a class="code-typename" href="/vendor/kb_text_shape/#langsys">langsys</a>,
 	OpLists:               [4]<a class="code-typename" href="/vendor/kb_text_shape/#op_list">op_list</a>,
+	Features:              ^<a class="code-typename" href="/vendor/kb_text_shape/#feature_set">feature_set</a>,
 	Shaper:                <a class="code-typename" href="/vendor/kb_text_shape/#shaper">shaper</a>,
 	ShaperProperties:      ^<a class="code-typename" href="/vendor/kb_text_shape/#shaper_properties">shaper_properties</a>,
 	IndicScriptProperties: <a class="code-typename" href="/vendor/kb_text_shape/#indic_script_properties">indic_script_properties</a>,
@@ -2302,13 +2563,14 @@ As such, normal and loose styles currently behave the same.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="shape_state"><span><a class="doc-id-link" href="#shape_state">shape_state<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1744"><em>Source</em></a></div></h3>
+<h3 id="shape_state"><span><a class="doc-id-link" href="#shape_state">shape_state<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1948"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">shape_state :: <span class="keyword-type">struct</span> {
 	Op:                                   <a class="code-typename" href="/vendor/kb_text_shape/#op">op</a>,
 	Config:                               ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_config">shape_config</a>,
 	MainDirection:                        <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>,
 	RunDirection:                         <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>,
+	UserFeatures:                         <a class="code-typename" href="/vendor/kb_text_shape/#feature_set">feature_set</a>,
 	GlyphArray:                           <a class="code-typename" href="/vendor/kb_text_shape/#glyph_array">glyph_array</a>,
 	ClusterGlyphArray:                    <a class="code-typename" href="/vendor/kb_text_shape/#glyph_array">glyph_array</a>,
 	DottedCircleInsertIndex:              <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
@@ -2341,7 +2603,7 @@ As such, normal and loose styles currently behave the same.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="shaper"><span><a class="doc-id-link" href="#shaper">shaper<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1058"><em>Source</em></a></div></h3>
+<h3 id="shaper"><span><a class="doc-id-link" href="#shaper">shaper<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1059"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">shaper :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	DEFAULT, 
@@ -2379,13 +2641,13 @@ This means that you might miss out on language-specific features when you use it
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="shaper_properties"><span><a class="doc-id-link" href="#shaper_properties">shaper_properties<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1523"><em>Source</em></a></div></h3>
+<h3 id="shaper_properties"><span><a class="doc-id-link" href="#shaper_properties">shaper_properties<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1699"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">shaper_properties :: <span class="keyword-type">struct</span> {}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="shaping_table"><span><a class="doc-id-link" href="#shaping_table">shaping_table<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1504"><em>Source</em></a></div></h3>
+<h3 id="shaping_table"><span><a class="doc-id-link" href="#shaping_table">shaping_table<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1680"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">shaping_table :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
 	GSUB, 
@@ -2394,7 +2656,7 @@ This means that you might miss out on language-specific features when you use it
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="skip_flag"><span><a class="doc-id-link" href="#skip_flag">skip_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1641"><em>Source</em></a></div></h3>
+<h3 id="skip_flag"><span><a class="doc-id-link" href="#skip_flag">skip_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1832"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">skip_flag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	ZWNJ = 0, 
@@ -2403,7 +2665,7 @@ This means that you might miss out on language-specific features when you use it
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="skip_flags"><span><a class="doc-id-link" href="#skip_flags">skip_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1640"><em>Source</em></a></div></h3>
+<h3 id="skip_flags"><span><a class="doc-id-link" href="#skip_flags">skip_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1831"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">skip_flags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/kb_text_shape/#skip_flag">skip_flag</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
 </div>
@@ -2443,7 +2705,7 @@ This means that you might miss out on language-specific features when you use it
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="unicode_bidirectional_class"><span><a class="doc-id-link" href="#unicode_bidirectional_class">unicode_bidirectional_class<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L922"><em>Source</em></a></div></h3>
+<h3 id="unicode_bidirectional_class"><span><a class="doc-id-link" href="#unicode_bidirectional_class">unicode_bidirectional_class<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L923"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">unicode_bidirectional_class :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
 	NI, 
@@ -2460,7 +2722,7 @@ This means that you might miss out on language-specific features when you use it
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="unicode_flag"><span><a class="doc-id-link" href="#unicode_flag">unicode_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L912"><em>Source</em></a></div></h3>
+<h3 id="unicode_flag"><span><a class="doc-id-link" href="#unicode_flag">unicode_flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L913"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">unicode_flag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
 	MODIFIER_COMBINING_MARK = 0, 
@@ -2474,13 +2736,13 @@ This means that you might miss out on language-specific features when you use it
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="unicode_flags"><span><a class="doc-id-link" href="#unicode_flags">unicode_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L911"><em>Source</em></a></div></h3>
+<h3 id="unicode_flags"><span><a class="doc-id-link" href="#unicode_flags">unicode_flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L912"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">unicode_flags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/kb_text_shape/#unicode_flag">unicode_flag</a>; <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>]</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="unicode_joining_type"><span><a class="doc-id-link" href="#unicode_joining_type">unicode_joining_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L902"><em>Source</em></a></div></h3>
+<h3 id="unicode_joining_type"><span><a class="doc-id-link" href="#unicode_joining_type">unicode_joining_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L903"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">unicode_joining_type :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
 	NONE, 
@@ -2493,7 +2755,7 @@ This means that you might miss out on language-specific features when you use it
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="word_break_class"><span><a class="doc-id-link" href="#word_break_class">word_break_class<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1014"><em>Source</em></a></div></h3>
+<h3 id="word_break_class"><span><a class="doc-id-link" href="#word_break_class">word_break_class<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1015"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">word_break_class :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
 	Onep, 
@@ -2575,7 +2837,7 @@ This means that you might miss out on language-specific features when you use it
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BREAK_REORDER_BUFFER_FLUSH_THRESHOLD"><span><a class="doc-id-link" href="#BREAK_REORDER_BUFFER_FLUSH_THRESHOLD">BREAK_REORDER_BUFFER_FLUSH_THRESHOLD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1816"><em>Source</em></a></div></h3>
+<h3 id="BREAK_REORDER_BUFFER_FLUSH_THRESHOLD"><span><a class="doc-id-link" href="#BREAK_REORDER_BUFFER_FLUSH_THRESHOLD">BREAK_REORDER_BUFFER_FLUSH_THRESHOLD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L2022"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BREAK_REORDER_BUFFER_FLUSH_THRESHOLD: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 4</pre>
 </div>
@@ -2588,25 +2850,25 @@ although, really, if the defaults don't work, then you have likely found very st
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="BREAK_REORDER_BUFFER_SIZE"><span><a class="doc-id-link" href="#BREAK_REORDER_BUFFER_SIZE">BREAK_REORDER_BUFFER_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1817"><em>Source</em></a></div></h3>
+<h3 id="BREAK_REORDER_BUFFER_SIZE"><span><a class="doc-id-link" href="#BREAK_REORDER_BUFFER_SIZE">BREAK_REORDER_BUFFER_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L2023"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BREAK_REORDER_BUFFER_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : BREAK_REORDER_BUFFER_FLUSH_THRESHOLD * 2</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GLYPH_FEATURE_MASK"><span><a class="doc-id-link" href="#GLYPH_FEATURE_MASK">GLYPH_FEATURE_MASK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L856"><em>Source</em></a></div></h3>
+<h3 id="GLYPH_FEATURE_MASK"><span><a class="doc-id-link" href="#GLYPH_FEATURE_MASK">GLYPH_FEATURE_MASK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L857"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GLYPH_FEATURE_MASK :: glyph_flags{.ISOL, .FINA, .FIN2, .FIN3, .MEDI, .MED2, .INIT, .LJMO, .VJMO, .TJMO, .RPHF, .BLWF, .HALF, .PSTF, .ABVF, .PREF, .NUMR, .FRAC, .DNOM, .CFAR}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="JOINING_FEATURE_MASK"><span><a class="doc-id-link" href="#JOINING_FEATURE_MASK">JOINING_FEATURE_MASK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L867"><em>Source</em></a></div></h3>
+<h3 id="JOINING_FEATURE_MASK"><span><a class="doc-id-link" href="#JOINING_FEATURE_MASK">JOINING_FEATURE_MASK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L868"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">JOINING_FEATURE_MASK :: glyph_flags{.ISOL, .FINA, .FIN2, .FIN3, .MEDI, .MED2, .INIT}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="MAX_SIMULTANEOUS_FEATURES"><span><a class="doc-id-link" href="#MAX_SIMULTANEOUS_FEATURES">MAX_SIMULTANEOUS_FEATURES<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1681"><em>Source</em></a></div></h3>
+<h3 id="MAX_SIMULTANEOUS_FEATURES"><span><a class="doc-id-link" href="#MAX_SIMULTANEOUS_FEATURES">MAX_SIMULTANEOUS_FEATURES<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L1880"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MAX_SIMULTANEOUS_FEATURES: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 16</pre>
 </div>
@@ -2616,7 +2878,7 @@ although, really, if the defaults don't work, then you have likely found very st
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="USE_GLYPH_FEATURE_MASK"><span><a class="doc-id-link" href="#USE_GLYPH_FEATURE_MASK">USE_GLYPH_FEATURE_MASK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L862"><em>Source</em></a></div></h3>
+<h3 id="USE_GLYPH_FEATURE_MASK"><span><a class="doc-id-link" href="#USE_GLYPH_FEATURE_MASK">USE_GLYPH_FEATURE_MASK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin#L863"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">USE_GLYPH_FEATURE_MASK :: glyph_flags{.ISOL, .FINA, .FIN2, .FIN3, .MEDI, .MED2, .INIT, .NUMR, .DNOM, .FRAC}</pre>
 </div>
@@ -2625,133 +2887,175 @@ although, really, if the defaults don't work, then you have likely found very st
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="BeginBreak"><span><a class="doc-id-link" href="#BeginBreak">BeginBreak<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L31"><em>Source</em></a></div></h3>
+<h3 id="BeginBreak"><span><a class="doc-id-link" href="#BeginBreak">BeginBreak<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L37"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BeginBreak :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (State: ^<a class="code-typename" href="/vendor/kb_text_shape/#break_state">break_state</a>, MainDirection: <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>, JapaneseLineBreakStyle: <a class="code-typename" href="/vendor/kb_text_shape/#japanese_line_break_style">japanese_line_break_style</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Break"><span><a class="doc-id-link" href="#Break">Break<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L35"><em>Source</em></a></div></h3>
+<h3 id="Break"><span><a class="doc-id-link" href="#Break">Break<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L41"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Break :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (State: ^<a class="code-typename" href="/vendor/kb_text_shape/#break_state">break_state</a>, Break: ^<a class="code-typename" href="/vendor/kb_text_shape/#break_type">break_type</a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BreakAddCodepoint"><span><a class="doc-id-link" href="#BreakAddCodepoint">BreakAddCodepoint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L33"><em>Source</em></a></div></h3>
+<h3 id="BreakAddCodepoint"><span><a class="doc-id-link" href="#BreakAddCodepoint">BreakAddCodepoint<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L39"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BreakAddCodepoint :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (State: ^<a class="code-typename" href="/vendor/kb_text_shape/#break_state">break_state</a>, Codepoint: untyped rune, PositionIncrement: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, EndOfText: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BreakFlush"><span><a class="doc-id-link" href="#BreakFlush">BreakFlush<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L34"><em>Source</em></a></div></h3>
+<h3 id="BreakFlush"><span><a class="doc-id-link" href="#BreakFlush">BreakFlush<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L40"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BreakFlush :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (State: ^<a class="code-typename" href="/vendor/kb_text_shape/#break_state">break_state</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BreakStateIsValid"><span><a class="doc-id-link" href="#BreakStateIsValid">BreakStateIsValid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L32"><em>Source</em></a></div></h3>
+<h3 id="BreakStateIsValid"><span><a class="doc-id-link" href="#BreakStateIsValid">BreakStateIsValid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L38"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BreakStateIsValid :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (State: ^<a class="code-typename" href="/vendor/kb_text_shape/#break_state">break_state</a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CodepointToGlyph"><span><a class="doc-id-link" href="#CodepointToGlyph">CodepointToGlyph<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L36"><em>Source</em></a></div></h3>
+<h3 id="CodepointToGlyph"><span><a class="doc-id-link" href="#CodepointToGlyph">CodepointToGlyph<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L42"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CodepointToGlyph :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, Codepoint: untyped rune) -> <a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CreateShapeState"><span><a class="doc-id-link" href="#CreateShapeState">CreateShapeState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L129"><em>Source</em></a></div></h3>
+<h3 id="CreateShapeState"><span><a class="doc-id-link" href="#CreateShapeState">CreateShapeState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L155"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CreateShapeState :: <span class="keyword-type">proc</span>(Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (Result: ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_state">shape_state</a>, Err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Cursor"><span><a class="doc-id-link" href="#Cursor">Cursor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L30"><em>Source</em></a></div></h3>
+<h3 id="Cursor"><span><a class="doc-id-link" href="#Cursor">Cursor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L36"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Cursor :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Direction: <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#cursor">cursor</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DecodeUtf8"><span><a class="doc-id-link" href="#DecodeUtf8">DecodeUtf8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L51"><em>Source</em></a></div></h3>
+<h3 id="DecodeUtf8"><span><a class="doc-id-link" href="#DecodeUtf8">DecodeUtf8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L77"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DecodeUtf8 :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (String: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> (Codepoint: untyped rune, SourceCharactersConsumed: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, Valid: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="FontFromMemory"><span><a class="doc-id-link" href="#FontFromMemory">FontFromMemory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L98"><em>Source</em></a></div></h3>
+<h3 id="EmptyGlyphConfig"><span><a class="doc-id-link" href="#EmptyGlyphConfig">EmptyGlyphConfig<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L58"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">EmptyGlyphConfig :: <span class="keyword-type">proc</span>(FeatureOverrides: []<a class="code-typename" href="/vendor/kb_text_shape/#feature_override">feature_override</a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#glyph_config">glyph_config</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FeatureOverride"><span><a class="doc-id-link" href="#FeatureOverride">FeatureOverride<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L18"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FeatureOverride :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Id: <a class="code-typename" href="/vendor/kb_text_shape/#feature_id">feature_id</a>, Alternate: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>, Value: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#feature_override">feature_override</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FeatureOverrideFromTag"><span><a class="doc-id-link" href="#FeatureOverrideFromTag">FeatureOverrideFromTag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L19"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FeatureOverrideFromTag :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Tag: <a class="code-typename" href="/vendor/kb_text_shape/#feature_tag">feature_tag</a>, Alternate: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>, Value: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#feature_override">feature_override</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FeatureTagToId"><span><a class="doc-id-link" href="#FeatureTagToId">FeatureTagToId<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L17"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">FeatureTagToId :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Tag: <a class="code-typename" href="/vendor/kb_text_shape/#feature_tag">feature_tag</a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#feature_id">feature_id</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="FontFromMemory"><span><a class="doc-id-link" href="#FontFromMemory">FontFromMemory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L124"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">FontFromMemory :: <span class="keyword-type">proc</span>(Data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (Result: <a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, Err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="FontIsValid"><span><a class="doc-id-link" href="#FontIsValid">FontIsValid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L17"><em>Source</em></a></div></h3>
+<h3 id="FontIsValid"><span><a class="doc-id-link" href="#FontIsValid">FontIsValid<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L23"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">FontIsValid :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="FreeFont"><span><a class="doc-id-link" href="#FreeFont">FreeFont<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L122"><em>Source</em></a></div></h3>
+<h3 id="FreeFont"><span><a class="doc-id-link" href="#FreeFont">FreeFont<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L148"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">FreeFont :: <span class="keyword-type">proc</span>(Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="FreeShapeState"><span><a class="doc-id-link" href="#FreeShapeState">FreeShapeState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L135"><em>Source</em></a></div></h3>
+<h3 id="FreeShapeState"><span><a class="doc-id-link" href="#FreeShapeState">FreeShapeState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L161"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">FreeShapeState :: <span class="keyword-type">proc</span>(State: ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_state">shape_state</a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="InferScript"><span><a class="doc-id-link" href="#InferScript">InferScript<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L37"><em>Source</em></a></div></h3>
+<h3 id="GlyphConfig"><span><a class="doc-id-link" href="#GlyphConfig">GlyphConfig<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L48"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GlyphConfig :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (FeatureOverrides: []<a class="code-typename" href="/vendor/kb_text_shape/#feature_override">feature_override</a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#glyph_config">glyph_config</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GlyphConfigOverrideFeature"><span><a class="doc-id-link" href="#GlyphConfigOverrideFeature">GlyphConfigOverrideFeature<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L20"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GlyphConfigOverrideFeature :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Config: ^<a class="code-typename" href="/vendor/kb_text_shape/#glyph_config">glyph_config</a>, Id: <a class="code-typename" href="/vendor/kb_text_shape/#feature_id">feature_id</a>, Alternate: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>, Value: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="GlyphConfigOverrideFeatureFromTag"><span><a class="doc-id-link" href="#GlyphConfigOverrideFeatureFromTag">GlyphConfigOverrideFeatureFromTag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L21"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">GlyphConfigOverrideFeatureFromTag :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Config: ^<a class="code-typename" href="/vendor/kb_text_shape/#glyph_config">glyph_config</a>, Tag: <a class="code-typename" href="/vendor/kb_text_shape/#feature_tag">feature_tag</a>, Alternate: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>, Value: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="InferScript"><span><a class="doc-id-link" href="#InferScript">InferScript<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L43"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">InferScript :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Direction: ^<a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>, Script: ^<a class="code-typename" href="/vendor/kb_text_shape/#script">script</a>, GlyphScript: <a class="code-typename" href="/vendor/kb_text_shape/#script">script</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PlaceShapeState"><span><a class="doc-id-link" href="#PlaceShapeState">PlaceShapeState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L41"><em>Source</em></a></div></h3>
+<h3 id="PlaceShapeState"><span><a class="doc-id-link" href="#PlaceShapeState">PlaceShapeState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L67"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PlaceShapeState :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Memory: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_state">shape_state</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PositionGlyph"><span><a class="doc-id-link" href="#PositionGlyph">PositionGlyph<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L140"><em>Source</em></a></div></h3>
+<h3 id="PositionGlyph"><span><a class="doc-id-link" href="#PositionGlyph">PositionGlyph<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L166"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PositionGlyph :: <span class="keyword-type">proc</span>(Cursor: ^<a class="code-typename" href="/vendor/kb_text_shape/#cursor">cursor</a>, Glyph: ^<a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a>) -> (X, Y: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PostReadFontInitialize"><span><a class="doc-id-link" href="#PostReadFontInitialize">PostReadFontInitialize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L88"><em>Source</em></a></div></h3>
+<h3 id="PostReadFontInitialize"><span><a class="doc-id-link" href="#PostReadFontInitialize">PostReadFontInitialize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L114"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PostReadFontInitialize :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, Memory: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ReadFontData"><span><a class="doc-id-link" href="#ReadFontData">ReadFontData<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L79"><em>Source</em></a></div></h3>
+<h3 id="ReadFontData"><span><a class="doc-id-link" href="#ReadFontData">ReadFontData<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L105"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ReadFontData :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, Scratch: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ReadFontHeader"><span><a class="doc-id-link" href="#ReadFontHeader">ReadFontHeader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L70"><em>Source</em></a></div></h3>
+<h3 id="ReadFontHeader"><span><a class="doc-id-link" href="#ReadFontHeader">ReadFontHeader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L96"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ReadFontHeader :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, Data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ResetShapeState"><span><a class="doc-id-link" href="#ResetShapeState">ResetShapeState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L20"><em>Source</em></a></div></h3>
+<h3 id="ResetShapeState"><span><a class="doc-id-link" href="#ResetShapeState">ResetShapeState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L26"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ResetShapeState :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (State: ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_state">shape_state</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ScriptIsComplex"><span><a class="doc-id-link" href="#ScriptIsComplex">ScriptIsComplex<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L24"><em>Source</em></a></div></h3>
+<h3 id="ScriptTagToScript"><span><a class="doc-id-link" href="#ScriptTagToScript">ScriptTagToScript<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L30"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">ScriptIsComplex :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Script: <a class="code-typename" href="/vendor/kb_text_shape/#script">script</a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> ---</pre>
+<pre class="doc-code">ScriptTagToScript :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Tag: <a class="code-typename" href="/vendor/kb_text_shape/#script_tag">script_tag</a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#script">script</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Shape"><span><a class="doc-id-link" href="#Shape">Shape<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L26"><em>Source</em></a></div></h3>
+<h3 id="Shape"><span><a class="doc-id-link" href="#Shape">Shape<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L32"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Shape :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
 	State:                       ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_state">shape_state</a>, 
@@ -2764,25 +3068,25 @@ although, really, if the defaults don't work, then you have likely found very st
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ShapeConfig"><span><a class="doc-id-link" href="#ShapeConfig">ShapeConfig<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L22"><em>Source</em></a></div></h3>
+<h3 id="ShapeConfig"><span><a class="doc-id-link" href="#ShapeConfig">ShapeConfig<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L28"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ShapeConfig :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>, Script: <a class="code-typename" href="/vendor/kb_text_shape/#script">script</a>, Language: <a class="code-typename" href="/vendor/kb_text_shape/#language">language</a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#shape_config">shape_config</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ShapeDynamic"><span><a class="doc-id-link" href="#ShapeDynamic">ShapeDynamic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L150"><em>Source</em></a></div></h3>
+<h3 id="ShapeDynamic"><span><a class="doc-id-link" href="#ShapeDynamic">ShapeDynamic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L176"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ShapeDynamic :: <span class="keyword-type">proc</span>(State: ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_state">shape_state</a>, Config: ^<a class="code-typename" href="/vendor/kb_text_shape/#shape_config">shape_config</a>, MainDirection, RunDirection: <a class="code-typename" href="/vendor/kb_text_shape/#direction">direction</a>, Glyphs: ^[<span class="keyword">dynamic</span>]<a class="code-typename" href="/vendor/kb_text_shape/#glyph">glyph</a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ShaperIsComplex"><span><a class="doc-id-link" href="#ShaperIsComplex">ShaperIsComplex<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L23"><em>Source</em></a></div></h3>
+<h3 id="ShaperIsComplex"><span><a class="doc-id-link" href="#ShaperIsComplex">ShaperIsComplex<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L29"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ShaperIsComplex :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Shaper: <a class="code-typename" href="/vendor/kb_text_shape/#shaper">shaper</a>) -> <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SizeOfShapeState"><span><a class="doc-id-link" href="#SizeOfShapeState">SizeOfShapeState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L18"><em>Source</em></a></div></h3>
+<h3 id="SizeOfShapeState"><span><a class="doc-id-link" href="#SizeOfShapeState">SizeOfShapeState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_procs.odin#L24"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SizeOfShapeState :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (Font: ^<a class="code-typename" href="/vendor/kb_text_shape/#font">font</a>) -> <a class="code-typename" href="/vendor/kb_text_shape/#un">un</a> ---</pre>
 </div>
@@ -2796,7 +3100,7 @@ although, really, if the defaults don't work, then you have likely found very st
 <li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/kb_text_shape/kb_text_shape_types.odin">kb_text_shape_types.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-07 (vendor "odin") Windows_amd64 @ 2025-07-15 21:12:57.666145900 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-07 (vendor "odin") Windows_amd64 @ 2025-07-16 21:13:58.380591900 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -2814,6 +3118,7 @@ although, really, if the defaults don't work, then you have likely found very st
 <li><a href="#direction">direction</a></li>
 <li><a href="#feature">feature</a></li>
 <li><a href="#feature_id">feature_id</a></li>
+<li><a href="#feature_override">feature_override</a></li>
 <li><a href="#feature_set">feature_set</a></li>
 <li><a href="#feature_tag">feature_tag</a></li>
 <li><a href="#font">font</a></li>
@@ -2821,6 +3126,7 @@ although, really, if the defaults don't work, then you have likely found very st
 <li><a href="#glyph">glyph</a></li>
 <li><a href="#glyph_array">glyph_array</a></li>
 <li><a href="#glyph_classes">glyph_classes</a></li>
+<li><a href="#glyph_config">glyph_config</a></li>
 <li><a href="#glyph_flag">glyph_flag</a></li>
 <li><a href="#glyph_flags">glyph_flags</a></li>
 <li><a href="#gsub_gpos">gsub_gpos</a></li>
@@ -2849,6 +3155,7 @@ although, really, if the defaults don't work, then you have likely found very st
 <li><a href="#reph_encoding">reph_encoding</a></li>
 <li><a href="#reph_position">reph_position</a></li>
 <li><a href="#script">script</a></li>
+<li><a href="#script_tag">script_tag</a></li>
 <li><a href="#shape_config">shape_config</a></li>
 <li><a href="#shape_state">shape_state</a></li>
 <li><a href="#shaper">shaper</a></li>
@@ -2892,10 +3199,17 @@ although, really, if the defaults don't work, then you have likely found very st
 <li><a href="#CreateShapeState">CreateShapeState</a></li>
 <li><a href="#Cursor">Cursor</a></li>
 <li><a href="#DecodeUtf8">DecodeUtf8</a></li>
+<li><a href="#EmptyGlyphConfig">EmptyGlyphConfig</a></li>
+<li><a href="#FeatureOverride">FeatureOverride</a></li>
+<li><a href="#FeatureOverrideFromTag">FeatureOverrideFromTag</a></li>
+<li><a href="#FeatureTagToId">FeatureTagToId</a></li>
 <li><a href="#FontFromMemory">FontFromMemory</a></li>
 <li><a href="#FontIsValid">FontIsValid</a></li>
 <li><a href="#FreeFont">FreeFont</a></li>
 <li><a href="#FreeShapeState">FreeShapeState</a></li>
+<li><a href="#GlyphConfig">GlyphConfig</a></li>
+<li><a href="#GlyphConfigOverrideFeature">GlyphConfigOverrideFeature</a></li>
+<li><a href="#GlyphConfigOverrideFeatureFromTag">GlyphConfigOverrideFeatureFromTag</a></li>
 <li><a href="#InferScript">InferScript</a></li>
 <li><a href="#PlaceShapeState">PlaceShapeState</a></li>
 <li><a href="#PositionGlyph">PositionGlyph</a></li>
@@ -2903,7 +3217,7 @@ although, really, if the defaults don't work, then you have likely found very st
 <li><a href="#ReadFontData">ReadFontData</a></li>
 <li><a href="#ReadFontHeader">ReadFontHeader</a></li>
 <li><a href="#ResetShapeState">ResetShapeState</a></li>
-<li><a href="#ScriptIsComplex">ScriptIsComplex</a></li>
+<li><a href="#ScriptTagToScript">ScriptTagToScript</a></li>
 <li><a href="#Shape">Shape</a></li>
 <li><a href="#ShapeConfig">ShapeConfig</a></li>
 <li><a href="#ShapeDynamic">ShapeDynamic</a></li>
