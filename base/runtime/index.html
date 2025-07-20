@@ -259,7 +259,7 @@ Types (98)</summary>
 <div>
 <details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
 <summary id="#doc-index-Constants-header">
-Constants (23)</summary>
+Constants (24)</summary>
 <ul>
 <li><a href="#ALL_ODIN_ARCH_TYPES">ALL_ODIN_ARCH_TYPES</a></li>
 <li><a href="#ALL_ODIN_OS_TYPES">ALL_ODIN_OS_TYPES</a></li>
@@ -280,6 +280,7 @@ Constants (23)</summary>
 <li><a href="#MAP_MIN_LOG2_CAPACITY">MAP_MIN_LOG2_CAPACITY</a></li>
 <li><a href="#Megabyte">Megabyte</a></li>
 <li><a href="#NO_DEFAULT_TEMP_ALLOCATOR">NO_DEFAULT_TEMP_ALLOCATOR</a></li>
+<li><a href="#ODIN_PLATFORM_SUBTARGET_IOS">ODIN_PLATFORM_SUBTARGET_IOS</a></li>
 <li><a href="#Petabyte">Petabyte</a></li>
 <li><a href="#RUNTIME_REQUIRE">RUNTIME_REQUIRE</a></li>
 <li><a href="#TOMBSTONE_MASK">TOMBSTONE_MASK</a></li>
@@ -1333,7 +1334,7 @@ Freestanding,
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Odin_Optimization_Mode"><span><a class="doc-id-link" href="#Odin_Optimization_Mode">Odin_Optimization_Mode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L595"><em>Source</em></a></div></h3>
+<h3 id="Odin_Optimization_Mode"><span><a class="doc-id-link" href="#Odin_Optimization_Mode">Odin_Optimization_Mode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L597"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Odin_Optimization_Mode :: .<a class="code-typename" href="//#Odin_Optimization_Mode">Odin_Optimization_Mode</a></pre>
 </div>
@@ -1361,7 +1362,7 @@ Aggressive =  3,
 <p>// Defined internally by the compiler
 Odin_Platform_Subtarget_Type :: enum int {</p>
 <pre>Default,
-iOS,
+iPhone,
 iPhoneSimulator
 Android,
 </pre>
@@ -1375,7 +1376,7 @@ Android,
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Odin_Sanitizer_Flags"><span><a class="doc-id-link" href="#Odin_Sanitizer_Flags">Odin_Sanitizer_Flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L581"><em>Source</em></a></div></h3>
+<h3 id="Odin_Sanitizer_Flags"><span><a class="doc-id-link" href="#Odin_Sanitizer_Flags">Odin_Sanitizer_Flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L583"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Odin_Sanitizer_Flags :: .<a class="code-typename" href="//#Odin_Sanitizer_Flags">Odin_Sanitizer_Flags</a></pre>
 </div>
@@ -2353,6 +2354,12 @@ be six though. Higher cache line sizes are permitted.</p>
 </div>
 </div>
 <div class="pkg-entity">
+<h3 id="ODIN_PLATFORM_SUBTARGET_IOS"><span><a class="doc-id-link" href="#ODIN_PLATFORM_SUBTARGET_IOS">ODIN_PLATFORM_SUBTARGET_IOS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L570"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ODIN_PLATFORM_SUBTARGET_IOS: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : ODIN_PLATFORM_SUBTARGET == .iPhone || ODIN_PLATFORM_SUBTARGET == .iPhoneSimulator</pre>
+</div>
+</div>
+<div class="pkg-entity">
 <h3 id="Petabyte"><span><a class="doc-id-link" href="#Petabyte">Petabyte<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L323"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Petabyte: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1024 * Terabyte</pre>
@@ -2890,19 +2897,19 @@ of len(src) and len(dst).</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="default_assertion_contextless_failure_proc"><span><a class="doc-id-link" href="#default_assertion_contextless_failure_proc">default_assertion_contextless_failure_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L743"><em>Source</em></a></div></h3>
+<h3 id="default_assertion_contextless_failure_proc"><span><a class="doc-id-link" href="#default_assertion_contextless_failure_proc">default_assertion_contextless_failure_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L745"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">default_assertion_contextless_failure_proc :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (prefix, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, loc: <a class="code-typename" href="/base/runtime/#Source_Code_Location">Source_Code_Location</a>) -> ! {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="default_assertion_failure_proc"><span><a class="doc-id-link" href="#default_assertion_failure_proc">default_assertion_failure_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L739"><em>Source</em></a></div></h3>
+<h3 id="default_assertion_failure_proc"><span><a class="doc-id-link" href="#default_assertion_failure_proc">default_assertion_failure_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L741"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">default_assertion_failure_proc :: <span class="keyword-type">proc</span>(prefix, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, loc: <a class="code-typename" href="/base/runtime/#Source_Code_Location">Source_Code_Location</a>) -> ! {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="default_context"><span><a class="doc-id-link" href="#default_context">default_context<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L698"><em>Source</em></a></div></h3>
+<h3 id="default_context"><span><a class="doc-id-link" href="#default_context">default_context<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L700"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">default_context :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> <a class="code-typename" href="/base/runtime/#Context">Context</a> {…}</pre>
 </div>
@@ -2944,13 +2951,13 @@ of len(src) and len(dst).</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="default_logger"><span><a class="doc-id-link" href="#default_logger">default_logger<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L693"><em>Source</em></a></div></h3>
+<h3 id="default_logger"><span><a class="doc-id-link" href="#default_logger">default_logger<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L695"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">default_logger :: <span class="keyword-type">proc</span>() -> <a class="code-typename" href="/base/runtime/#Logger">Logger</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="default_logger_proc"><span><a class="doc-id-link" href="#default_logger_proc">default_logger_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L689"><em>Source</em></a></div></h3>
+<h3 id="default_logger_proc"><span><a class="doc-id-link" href="#default_logger_proc">default_logger_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L691"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">default_logger_proc :: <span class="keyword-type">proc</span>(data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, level: <a class="code-typename" href="/base/runtime/#Logger_Level">Logger_Level</a>, text: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, options: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/base/runtime/#Logger_Option">Logger_Option</a>], location := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
@@ -4563,37 +4570,37 @@ thread's lifetime.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="type_info_base"><span><a class="doc-id-link" href="#type_info_base">type_info_base<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L621"><em>Source</em></a></div></h3>
+<h3 id="type_info_base"><span><a class="doc-id-link" href="#type_info_base">type_info_base<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L623"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">type_info_base :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (info: ^<a class="code-typename" href="/base/runtime/#Type_Info">Type_Info</a>) -> ^<a class="code-typename" href="/base/runtime/#Type_Info">Type_Info</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="type_info_base_without_enum"><span><a class="doc-id-link" href="#type_info_base_without_enum">type_info_base_without_enum<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L637"><em>Source</em></a></div></h3>
+<h3 id="type_info_base_without_enum"><span><a class="doc-id-link" href="#type_info_base_without_enum">type_info_base_without_enum<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L639"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">type_info_base_without_enum :: <a class="code-procedure" href="/base/runtime/#type_info_core">type_info_core</a></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="type_info_core"><span><a class="doc-id-link" href="#type_info_core">type_info_core<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L637"><em>Source</em></a></div></h3>
+<h3 id="type_info_core"><span><a class="doc-id-link" href="#type_info_core">type_info_core<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L639"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">type_info_core :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (info: ^<a class="code-typename" href="/base/runtime/#Type_Info">Type_Info</a>) -> ^<a class="code-typename" href="/base/runtime/#Type_Info">Type_Info</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="typeid_base"><span><a class="doc-id-link" href="#typeid_base">typeid_base<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L669"><em>Source</em></a></div></h3>
+<h3 id="typeid_base"><span><a class="doc-id-link" href="#typeid_base">typeid_base<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L671"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">typeid_base :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (id: <a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a>) -> <a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="typeid_base_without_enum"><span><a class="doc-id-link" href="#typeid_base_without_enum">typeid_base_without_enum<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L674"><em>Source</em></a></div></h3>
+<h3 id="typeid_base_without_enum"><span><a class="doc-id-link" href="#typeid_base_without_enum">typeid_base_without_enum<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L676"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">typeid_base_without_enum :: <a class="code-procedure" href="/base/runtime/#typeid_core">typeid_core</a></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="typeid_core"><span><a class="doc-id-link" href="#typeid_core">typeid_core<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L674"><em>Source</em></a></div></h3>
+<h3 id="typeid_core"><span><a class="doc-id-link" href="#typeid_core">typeid_core<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core.odin#L676"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">typeid_core :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (id: <a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a>) -> <a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a> {…}</pre>
 </div>
@@ -4983,7 +4990,7 @@ Make uses the specified allocator, default is context.allocator.</p>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-07 (vendor "odin") Windows_amd64 @ 2025-07-19 21:13:00.890482200 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-07 (vendor "odin") Windows_amd64 @ 2025-07-20 21:14:17.351508200 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -5109,6 +5116,7 @@ Make uses the specified allocator, default is context.allocator.</p>
 <li><a href="#MAP_MIN_LOG2_CAPACITY">MAP_MIN_LOG2_CAPACITY</a></li>
 <li><a href="#Megabyte">Megabyte</a></li>
 <li><a href="#NO_DEFAULT_TEMP_ALLOCATOR">NO_DEFAULT_TEMP_ALLOCATOR</a></li>
+<li><a href="#ODIN_PLATFORM_SUBTARGET_IOS">ODIN_PLATFORM_SUBTARGET_IOS</a></li>
 <li><a href="#Petabyte">Petabyte</a></li>
 <li><a href="#RUNTIME_REQUIRE">RUNTIME_REQUIRE</a></li>
 <li><a href="#TOMBSTONE_MASK">TOMBSTONE_MASK</a></li>
