@@ -1270,7 +1270,7 @@ Variables (14)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (414)</summary>
+Procedures (416)</summary>
 <ul>
 <li><a href="#CMSG_DATA">CMSG_DATA</a></li>
 <li><a href="#CMSG_FIRSTHDR">CMSG_FIRSTHDR</a></li>
@@ -1508,6 +1508,8 @@ Procedures (414)</summary>
 <li><a href="#posix_madvise">posix_madvise</a></li>
 <li><a href="#posix_memalign">posix_memalign</a></li>
 <li><a href="#posix_openpt">posix_openpt</a></li>
+<li><a href="#posix_spawn">posix_spawn</a></li>
+<li><a href="#posix_spawnp">posix_spawnp</a></li>
 <li><a href="#pread">pread</a></li>
 <li><a href="#pselect">pselect</a></li>
 <li><a href="#psignal">psignal</a></li>
@@ -2194,6 +2196,8 @@ Procedure Groups (1)</summary>
 <li><a href="/core/sys/posix/#getpwuid_r">getpwuid_r</a></li>
 <li><a href="/core/sys/posix/#posix_madvise">posix_madvise</a></li>
 <li><a href="/core/sys/posix/#posix_memalign">posix_memalign</a></li>
+<li><a href="/core/sys/posix/#posix_spawn">posix_spawn</a></li>
+<li><a href="/core/sys/posix/#posix_spawnp">posix_spawnp</a></li>
 <li><a href="/core/sys/posix/#pthread_atfork">pthread_atfork</a></li>
 <li><a href="/core/sys/posix/#pthread_attr_destroy">pthread_attr_destroy</a></li>
 <li><a href="/core/sys/posix/#pthread_attr_getdetachstate">pthread_attr_getdetachstate</a></li>
@@ -4458,6 +4462,8 @@ Procedure Groups (1)</summary>
 <li><a href="/core/sys/posix/#getsid">getsid</a></li>
 <li><a href="/core/sys/posix/#kill">kill</a></li>
 <li><a href="/core/sys/posix/#killpg">killpg</a></li>
+<li><a href="/core/sys/posix/#posix_spawn">posix_spawn</a></li>
+<li><a href="/core/sys/posix/#posix_spawnp">posix_spawnp</a></li>
 <li><a href="/core/sys/posix/#setpgid">setpgid</a></li>
 <li><a href="/core/sys/posix/#tcsetpgrp">tcsetpgrp</a></li>
 <li><a href="/core/sys/posix/#waitpid">waitpid</a></li>
@@ -12915,6 +12921,39 @@ to the allocated memory in memptr.</p>
 </details>
 </div>
 <div class="pkg-entity">
+<h3 id="posix_spawn"><span><a class="doc-id-link" href="#posix_spawn">posix_spawn<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/spawn.odin#L18"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">posix_spawn :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
+	pid:          ^<a class="code-typename" href="/core/sys/posix/#pid_t">pid_t</a>, 
+	path:         <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, 
+	file_actions: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
+	attrp:        <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
+	argv:         [^]<a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, 
+	envp:         [^]<a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, 
+) -> <a class="code-typename" href="/core/sys/posix/#Errno">Errno</a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Creates a child process from a provided filepath
+spawnp searches directories on the path for the file</p>
+<p><b>Returns:</b><br>0 on success, with the child pid returned in the pid argument, or error values on failure.</p>
+<p><a href="https://pubs.opengroup.org/onlinepubs/9699919799/functions/posix_spawn.html">More</a></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="posix_spawnp"><span><a class="doc-id-link" href="#posix_spawnp">posix_spawnp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/spawn.odin#L19"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">posix_spawnp :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
+	pid:          ^<a class="code-typename" href="/core/sys/posix/#pid_t">pid_t</a>, 
+	file:         <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, 
+	file_actions: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
+	attrp:        <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
+	argv:         [^]<a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, 
+	envp:         [^]<a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, 
+) -> <a class="code-typename" href="/core/sys/posix/#Errno">Errno</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
 <h3 id="pread"><span><a class="doc-id-link" href="#pread">pread<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/unistd.odin#L727"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pread :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (fd: <a class="code-typename" href="/core/sys/posix/#FD">FD</a>, buf: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, nbyte: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, offset: <a class="code-typename" href="/core/sys/posix/#off_t">off_t</a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> ---</pre>
@@ -15210,6 +15249,7 @@ case:
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/setjmp_libc.odin">setjmp_libc.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal.odin">signal.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/signal_libc.odin">signal_libc.odin</a></li>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/spawn.odin">spawn.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/stdio.odin">stdio.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/stdio_libc.odin">stdio_libc.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/stdlib.odin">stdlib.odin</a></li>
@@ -15241,7 +15281,7 @@ case:
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/wordexp.odin">wordexp.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-07 (vendor "odin") Windows_amd64 @ 2025-07-28 21:13:52.195758500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-07 (vendor "odin") Windows_amd64 @ 2025-07-29 21:14:14.308563700 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -16345,6 +16385,8 @@ case:
 <li><a href="#posix_madvise">posix_madvise</a></li>
 <li><a href="#posix_memalign">posix_memalign</a></li>
 <li><a href="#posix_openpt">posix_openpt</a></li>
+<li><a href="#posix_spawn">posix_spawn</a></li>
+<li><a href="#posix_spawnp">posix_spawnp</a></li>
 <li><a href="#pread">pread</a></li>
 <li><a href="#pselect">pselect</a></li>
 <li><a href="#psignal">psignal</a></li>
