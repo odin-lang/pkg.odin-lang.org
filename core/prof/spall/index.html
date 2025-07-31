@@ -398,14 +398,16 @@ spall_exit :: proc "contextless" (proc_address, call_site_return_address: rawptr
 <div>
 <details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
 <summary id="#doc-index-Types-header">
-Types (7)</summary>
+Types (9)</summary>
 <ul>
 <li><a href="#Begin_Event">Begin_Event</a></li>
 <li><a href="#Buffer">Buffer</a></li>
 <li><a href="#Context">Context</a></li>
 <li><a href="#End_Event">End_Event</a></li>
+<li><a href="#Manual_Buffer_Header">Manual_Buffer_Header</a></li>
 <li><a href="#Manual_Event_Type">Manual_Event_Type</a></li>
-<li><a href="#Manual_Header">Manual_Header</a></li>
+<li><a href="#Manual_Stream_Header">Manual_Stream_Header</a></li>
+<li><a href="#Name_Event">Name_Event</a></li>
 <li><a href="#Pad_Skip">Pad_Skip</a></li>
 </ul>
 </details>
@@ -413,11 +415,12 @@ Types (7)</summary>
 <div>
 <details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
 <summary id="#doc-index-Constants-header">
-Constants (3)</summary>
+Constants (4)</summary>
 <ul>
 <li><a href="#BEGIN_EVENT_MAX">BEGIN_EVENT_MAX</a></li>
 <li><a href="#BUFFER_DEFAULT_SIZE">BUFFER_DEFAULT_SIZE</a></li>
 <li><a href="#MANUAL_MAGIC">MANUAL_MAGIC</a></li>
+<li><a href="#NAME_EVENT_MAX">NAME_EVENT_MAX</a></li>
 </ul>
 </details>
 </div>
@@ -459,27 +462,25 @@ Procedure Groups (1)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Begin_Event"><span><a class="doc-id-link" href="#Begin_Event">Begin_Event<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L28"><em>Source</em></a></div></h3>
+<h3 id="Begin_Event"><span><a class="doc-id-link" href="#Begin_Event">Begin_Event<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L38"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Begin_Event :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
 	type:     <a class="code-typename" href="/core/prof/spall/#Manual_Event_Type">Manual_Event_Type</a>,
-	category: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
-	pid:      <a href="/base/builtin#u32le"><span class="doc-builtin">u32le</span></a>,
-	tid:      <a href="/base/builtin#u32le"><span class="doc-builtin">u32le</span></a>,
-	ts:       <a href="/base/builtin#f64le"><span class="doc-builtin">f64le</span></a>,
+	ts:       <a href="/base/builtin#u64le"><span class="doc-builtin">u64le</span></a>,
 	name_len: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
 	args_len: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
 }</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Buffer"><span><a class="doc-id-link" href="#Buffer">Buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L59"><em>Source</em></a></div></h3>
+<h3 id="Buffer"><span><a class="doc-id-link" href="#Buffer">Buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L70"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Buffer :: <span class="keyword-type">struct</span> {
-	data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
-	head: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
-	tid:  <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
-	pid:  <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	data:     []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	head:     <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	tid:      <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	pid:      <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	first_ts: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
 }</pre>
 </div>
 <h5>Related Procedures With Parameters</h5>
@@ -494,7 +495,7 @@ Procedure Groups (1)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Context"><span><a class="doc-id-link" href="#Context">Context<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L53"><em>Source</em></a></div></h3>
+<h3 id="Context"><span><a class="doc-id-link" href="#Context">Context<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L64"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Context :: <span class="keyword-type">struct</span> {
 	precise_time:    <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
@@ -517,32 +518,43 @@ Procedure Groups (1)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="End_Event"><span><a class="doc-id-link" href="#End_Event">End_Event<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L39"><em>Source</em></a></div></h3>
+<h3 id="End_Event"><span><a class="doc-id-link" href="#End_Event">End_Event<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L46"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">End_Event :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
 	type: <a class="code-typename" href="/core/prof/spall/#Manual_Event_Type">Manual_Event_Type</a>,
-	pid:  <a href="/base/builtin#u32le"><span class="doc-builtin">u32le</span></a>,
-	tid:  <a href="/base/builtin#u32le"><span class="doc-builtin">u32le</span></a>,
-	ts:   <a href="/base/builtin#f64le"><span class="doc-builtin">f64le</span></a>,
+	ts:   <a href="/base/builtin#u64le"><span class="doc-builtin">u64le</span></a>,
 }</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Manual_Event_Type"><span><a class="doc-id-link" href="#Manual_Event_Type">Manual_Event_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L18"><em>Source</em></a></div></h3>
+<h3 id="Manual_Buffer_Header"><span><a class="doc-id-link" href="#Manual_Buffer_Header">Manual_Buffer_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L18"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Manual_Buffer_Header :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
+	size:     <a href="/base/builtin#u32le"><span class="doc-builtin">u32le</span></a>,
+	tid:      <a href="/base/builtin#u32le"><span class="doc-builtin">u32le</span></a>,
+	pid:      <a href="/base/builtin#u32le"><span class="doc-builtin">u32le</span></a>,
+	first_ts: <a href="/base/builtin#u64le"><span class="doc-builtin">u64le</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Manual_Event_Type"><span><a class="doc-id-link" href="#Manual_Event_Type">Manual_Event_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L25"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Manual_Event_Type :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
-	Invalid  = 0, 
-	Begin    = 3, 
-	End      = 4, 
-	Instant  = 5, 
-	Pad_Skip = 7, 
+	Invalid      = 0, 
+	Begin        = 3, 
+	End          = 4, 
+	Instant      = 5, 
+	Pad_Skip     = 7, 
+	Name_Process = 8, 
+	Name_Thread  = 9, 
 }</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Manual_Header"><span><a class="doc-id-link" href="#Manual_Header">Manual_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L11"><em>Source</em></a></div></h3>
+<h3 id="Manual_Stream_Header"><span><a class="doc-id-link" href="#Manual_Stream_Header">Manual_Stream_Header<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L11"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">Manual_Header :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
+<pre class="doc-code">Manual_Stream_Header :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
 	magic:           <a href="/base/builtin#u64le"><span class="doc-builtin">u64le</span></a>,
 	version:         <a href="/base/builtin#u64le"><span class="doc-builtin">u64le</span></a>,
 	timestamp_scale: <a href="/base/builtin#f64le"><span class="doc-builtin">f64le</span></a>,
@@ -551,7 +563,16 @@ Procedure Groups (1)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Pad_Skip"><span><a class="doc-id-link" href="#Pad_Skip">Pad_Skip<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L46"><em>Source</em></a></div></h3>
+<h3 id="Name_Event"><span><a class="doc-id-link" href="#Name_Event">Name_Event<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L56"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Name_Event :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
+	type:     <a class="code-typename" href="/core/prof/spall/#Manual_Event_Type">Manual_Event_Type</a>,
+	name_len: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="Pad_Skip"><span><a class="doc-id-link" href="#Pad_Skip">Pad_Skip<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L51"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Pad_Skip :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
 	type: <a class="code-typename" href="/core/prof/spall/#Manual_Event_Type">Manual_Event_Type</a>,
@@ -561,13 +582,13 @@ Procedure Groups (1)</summary>
 </div>
 <h2 id="pkg-Constants" class="pkg-header">Constants</h2>
 <div class="pkg-entity">
-<h3 id="BEGIN_EVENT_MAX"><span><a class="doc-id-link" href="#BEGIN_EVENT_MAX">BEGIN_EVENT_MAX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L37"><em>Source</em></a></div></h3>
+<h3 id="BEGIN_EVENT_MAX"><span><a class="doc-id-link" href="#BEGIN_EVENT_MAX">BEGIN_EVENT_MAX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L44"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BEGIN_EVENT_MAX: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : size_of(Begin_Event) + 255 + 255</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BUFFER_DEFAULT_SIZE"><span><a class="doc-id-link" href="#BUFFER_DEFAULT_SIZE">BUFFER_DEFAULT_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L66"><em>Source</em></a></div></h3>
+<h3 id="BUFFER_DEFAULT_SIZE"><span><a class="doc-id-link" href="#BUFFER_DEFAULT_SIZE">BUFFER_DEFAULT_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L78"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BUFFER_DEFAULT_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x10_0000</pre>
 </div>
@@ -578,66 +599,72 @@ Procedure Groups (1)</summary>
 <pre class="doc-code">MANUAL_MAGIC :: u64le(0x0BADF00D)</pre>
 </div>
 </div>
+<div class="pkg-entity">
+<h3 id="NAME_EVENT_MAX"><span><a class="doc-id-link" href="#NAME_EVENT_MAX">NAME_EVENT_MAX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L60"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">NAME_EVENT_MAX: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : size_of(Name_Event) + 255</pre>
+</div>
+</div>
 <h2 id="pkg-Variables" class="pkg-header">Variables</h2>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="SCOPED_EVENT"><span><a class="doc-id-link" href="#SCOPED_EVENT">SCOPED_EVENT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L133"><em>Source</em></a></div></h3>
+<h3 id="SCOPED_EVENT"><span><a class="doc-id-link" href="#SCOPED_EVENT">SCOPED_EVENT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L158"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SCOPED_EVENT :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/core/prof/spall/#Context">Context</a>, buffer: ^<a class="code-typename" href="/core/prof/spall/#Buffer">Buffer</a>, name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, args: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = "", location := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="buffer_create"><span><a class="doc-id-link" href="#buffer_create">buffer_create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L103"><em>Source</em></a></div></h3>
+<h3 id="buffer_create"><span><a class="doc-id-link" href="#buffer_create">buffer_create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L115"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buffer_create :: <span class="keyword-type">proc</span>(data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, tid: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> = 0, pid: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> = 0) -> (buffer: <a class="code-typename" href="/core/prof/spall/#Buffer">Buffer</a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="buffer_destroy"><span><a class="doc-id-link" href="#buffer_destroy">buffer_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L124"><em>Source</em></a></div></h3>
+<h3 id="buffer_destroy"><span><a class="doc-id-link" href="#buffer_destroy">buffer_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L149"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buffer_destroy :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/core/prof/spall/#Context">Context</a>, buffer: ^<a class="code-typename" href="/core/prof/spall/#Buffer">Buffer</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="buffer_flush"><span><a class="doc-id-link" href="#buffer_flush">buffer_flush<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L114"><em>Source</em></a></div></h3>
+<h3 id="buffer_flush"><span><a class="doc-id-link" href="#buffer_flush">buffer_flush<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L127"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">buffer_flush :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ctx: ^<a class="code-typename" href="/core/prof/spall/#Context">Context</a>, buffer: ^<a class="code-typename" href="/core/prof/spall/#Buffer">Buffer</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="context_create_with_scale"><span><a class="doc-id-link" href="#context_create_with_scale">context_create_with_scale<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L69"><em>Source</em></a></div></h3>
+<h3 id="context_create_with_scale"><span><a class="doc-id-link" href="#context_create_with_scale">context_create_with_scale<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L81"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">context_create_with_scale :: <span class="keyword-type">proc</span>(filename: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, precise_time: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, timestamp_scale: <a href="/base/builtin#f64"><span class="doc-builtin">f64</span></a>) -> (ctx: <a class="code-typename" href="/core/prof/spall/#Context">Context</a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="context_create_with_sleep"><span><a class="doc-id-link" href="#context_create_with_sleep">context_create_with_sleep<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L86"><em>Source</em></a></div></h3>
+<h3 id="context_create_with_sleep"><span><a class="doc-id-link" href="#context_create_with_sleep">context_create_with_sleep<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L98"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">context_create_with_sleep :: <span class="keyword-type">proc</span>(filename: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, sleep: time.<a class="code-typename" href="/core/time/#Duration">Duration</a> = 2 * time.Second) -> (ctx: <a class="code-typename" href="/core/prof/spall/#Context">Context</a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="context_destroy"><span><a class="doc-id-link" href="#context_destroy">context_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L94"><em>Source</em></a></div></h3>
+<h3 id="context_destroy"><span><a class="doc-id-link" href="#context_destroy">context_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L106"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">context_destroy :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/core/prof/spall/#Context">Context</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="tick_now"><span><a class="doc-id-link" href="#tick_now">tick_now<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L235"><em>Source</em></a></div></h3>
+<h3 id="tick_now"><span><a class="doc-id-link" href="#tick_now">tick_now<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L293"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">tick_now :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> () -> (ns: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="write"><span><a class="doc-id-link" href="#write">write<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L230"><em>Source</em></a></div></h3>
+<h3 id="write"><span><a class="doc-id-link" href="#write">write<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L288"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (fd: os.<a class="code-typename" href="/core/os/#Handle">Handle</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: os.<a class="code-typename" href="/core/os/#Error">Error</a>) {…}</pre>
 </div>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="context_create"><span><a class="doc-id-link" href="#context_create">context_create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L92"><em>Source</em></a></div></h3>
+<h3 id="context_create"><span><a class="doc-id-link" href="#context_create">context_create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/prof/spall/spall.odin#L104"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">context_create :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/prof/spall/#context_create_with_scale">context_create_with_scale</a>,
@@ -654,7 +681,7 @@ Procedure Groups (1)</summary>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-07 (vendor "odin") Windows_amd64 @ 2025-07-30 21:13:39.314127400 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-07 (vendor "odin") Windows_amd64 @ 2025-07-31 21:14:14.903332400 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -664,8 +691,10 @@ Procedure Groups (1)</summary>
 <li><a href="#Buffer">Buffer</a></li>
 <li><a href="#Context">Context</a></li>
 <li><a href="#End_Event">End_Event</a></li>
+<li><a href="#Manual_Buffer_Header">Manual_Buffer_Header</a></li>
 <li><a href="#Manual_Event_Type">Manual_Event_Type</a></li>
-<li><a href="#Manual_Header">Manual_Header</a></li>
+<li><a href="#Manual_Stream_Header">Manual_Stream_Header</a></li>
+<li><a href="#Name_Event">Name_Event</a></li>
 <li><a href="#Pad_Skip">Pad_Skip</a></li>
 </ul>
 </li>
@@ -673,6 +702,7 @@ Procedure Groups (1)</summary>
 <li><a href="#BEGIN_EVENT_MAX">BEGIN_EVENT_MAX</a></li>
 <li><a href="#BUFFER_DEFAULT_SIZE">BUFFER_DEFAULT_SIZE</a></li>
 <li><a href="#MANUAL_MAGIC">MANUAL_MAGIC</a></li>
+<li><a href="#NAME_EVENT_MAX">NAME_EVENT_MAX</a></li>
 </ul>
 </li>
 <li><a href="#pkg-Procedures">Procedures</a><ul>

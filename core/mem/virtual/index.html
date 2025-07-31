@@ -392,7 +392,7 @@ Variables (1)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (34)</summary>
+Procedures (35)</summary>
 <ul>
 <li><a href="#alloc_from_memory_block">alloc_from_memory_block</a></li>
 <li><a href="#arena_alloc">arena_alloc</a></li>
@@ -424,6 +424,7 @@ Procedures (34)</summary>
 <li><a href="#memory_block_dealloc">memory_block_dealloc</a></li>
 <li><a href="#new">new</a></li>
 <li><a href="#new_aligned">new_aligned</a></li>
+<li><a href="#new_clone">new_clone</a></li>
 <li><a href="#protect">protect</a></li>
 <li><a href="#release">release</a></li>
 <li><a href="#reserve">reserve</a></li>
@@ -494,6 +495,7 @@ Buffer: A single <code>Memory_Block</code> created from a user provided []byte.<
 <li><a href="/core/mem/virtual/#make_slice">make_slice</a></li>
 <li><a href="/core/mem/virtual/#new">new</a></li>
 <li><a href="/core/mem/virtual/#new_aligned">new_aligned</a></li>
+<li><a href="/core/mem/virtual/#new_clone">new_clone</a></li>
 <li><a href="/core/mem/virtual/#make">make</a>&nbsp;<em>(procedure groups)</em></li>
 </ul>
 </div>
@@ -891,7 +893,7 @@ A static arena contains a single <code>Memory_Block</code> allocated with virtua
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="make_aligned"><span><a class="doc-id-link" href="#make_aligned">make_aligned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena_util.odin#L37"><em>Source</em></a></div></h3>
+<h3 id="make_aligned"><span><a class="doc-id-link" href="#make_aligned">make_aligned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena_util.odin#L48"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">make_aligned :: <span class="keyword-type">proc</span>(arena: ^<a class="code-typename" href="/core/mem/virtual/#Arena">Arena</a>, $T: <span class="keyword-type">typeid</span>/[]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, alignment: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (T, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -903,7 +905,7 @@ Unlike <code>new</code>, <code>make</code>'s return value is the same as the typ
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="make_multi_pointer"><span><a class="doc-id-link" href="#make_multi_pointer">make_multi_pointer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena_util.odin#L55"><em>Source</em></a></div></h3>
+<h3 id="make_multi_pointer"><span><a class="doc-id-link" href="#make_multi_pointer">make_multi_pointer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena_util.odin#L66"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">make_multi_pointer :: <span class="keyword-type">proc</span>(arena: ^<a class="code-typename" href="/core/mem/virtual/#Arena">Arena</a>, $T: <span class="keyword-type">typeid</span>/[^]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ($/[^]$E, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -916,7 +918,7 @@ Unlike <code>new</code>, <code>make</code>'s return value is the same as the typ
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="make_slice"><span><a class="doc-id-link" href="#make_slice">make_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena_util.odin#L28"><em>Source</em></a></div></h3>
+<h3 id="make_slice"><span><a class="doc-id-link" href="#make_slice">make_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena_util.odin#L39"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">make_slice :: <span class="keyword-type">proc</span>(arena: ^<a class="code-typename" href="/core/mem/virtual/#Arena">Arena</a>, $T: <span class="keyword-type">typeid</span>/[]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (T, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
@@ -975,6 +977,17 @@ that type using the specified allocator.</p>
 </details>
 </div>
 <div class="pkg-entity">
+<h3 id="new_clone"><span><a class="doc-id-link" href="#new_clone">new_clone<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena_util.odin#L26"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">new_clone :: <span class="keyword-type">proc</span>(arena: ^<a class="code-typename" href="/core/mem/virtual/#Arena">Arena</a>, data: $T, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (ptr: ^$T, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>The <code>new_clone</code> procedure allocates memory for a type <code>T</code> from a <code>virtual.Arena</code>. The second argument is a value that
+is to be copied to the allocated data. The value returned is a pointer to a newly allocated value of that type using the specified allocator.</p>
+</details>
+</div>
+<div class="pkg-entity">
 <h3 id="protect"><span><a class="doc-id-link" href="#protect">protect<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/virtual.odin#L57"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">protect :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, flags: <a class="code-typename" href="/core/mem/virtual/#Protect_Flags">Protect_Flags</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
@@ -1028,7 +1041,7 @@ that type using the specified allocator.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="make"><span><a class="doc-id-link" href="#make">make<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena_util.odin#L64"><em>Source</em></a></div></h3>
+<h3 id="make"><span><a class="doc-id-link" href="#make">make<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/virtual/arena_util.odin#L75"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">make :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/mem/virtual/#make_slice">make_slice</a>,
@@ -1058,7 +1071,7 @@ that type using the specified allocator.</p>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-07 (vendor "odin") Windows_amd64 @ 2025-07-30 21:13:39.278390100 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-07 (vendor "odin") Windows_amd64 @ 2025-07-31 21:14:14.842258300 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -1121,6 +1134,7 @@ that type using the specified allocator.</p>
 <li><a href="#memory_block_dealloc">memory_block_dealloc</a></li>
 <li><a href="#new">new</a></li>
 <li><a href="#new_aligned">new_aligned</a></li>
+<li><a href="#new_clone">new_clone</a></li>
 <li><a href="#protect">protect</a></li>
 <li><a href="#release">release</a></li>
 <li><a href="#reserve">reserve</a></li>
