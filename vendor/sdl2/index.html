@@ -217,8 +217,10 @@
 <div>
 <details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
 <summary id="#doc-index-Types-header">
-Types (176)</summary>
+Types (178)</summary>
 <ul>
+<li><a href="#AudioAllowChangeFlag">AudioAllowChangeFlag</a></li>
+<li><a href="#AudioAllowChangeFlags">AudioAllowChangeFlags</a></li>
 <li><a href="#AudioCVT">AudioCVT</a></li>
 <li><a href="#AudioCallback">AudioCallback</a></li>
 <li><a href="#AudioDeviceEvent">AudioDeviceEvent</a></li>
@@ -401,7 +403,7 @@ Types (176)</summary>
 <div>
 <details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
 <summary id="#doc-index-Constants-header">
-Constants (592)</summary>
+Constants (588)</summary>
 <ul>
 <li><a href="#ALPHA_OPAQUE">ALPHA_OPAQUE</a></li>
 <li><a href="#ALPHA_TRANSPARENT">ALPHA_TRANSPARENT</a></li>
@@ -416,10 +418,6 @@ Constants (592)</summary>
 <li><a href="#ARRAYORDER_RGBA">ARRAYORDER_RGBA</a></li>
 <li><a href="#AUDIOCVT_MAX_FILTERS">AUDIOCVT_MAX_FILTERS</a></li>
 <li><a href="#AUDIO_ALLOW_ANY_CHANGE">AUDIO_ALLOW_ANY_CHANGE</a></li>
-<li><a href="#AUDIO_ALLOW_CHANNELS_CHANGE">AUDIO_ALLOW_CHANNELS_CHANGE</a></li>
-<li><a href="#AUDIO_ALLOW_FORMAT_CHANGE">AUDIO_ALLOW_FORMAT_CHANGE</a></li>
-<li><a href="#AUDIO_ALLOW_FREQUENCY_CHANGE">AUDIO_ALLOW_FREQUENCY_CHANGE</a></li>
-<li><a href="#AUDIO_ALLOW_SAMPLES_CHANGE">AUDIO_ALLOW_SAMPLES_CHANGE</a></li>
 <li><a href="#AUDIO_F32">AUDIO_F32</a></li>
 <li><a href="#AUDIO_F32LSB">AUDIO_F32LSB</a></li>
 <li><a href="#AUDIO_F32MSB">AUDIO_F32MSB</a></li>
@@ -1796,7 +1794,32 @@ Procedure Groups (0)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="AudioCVT"><span><a class="doc-id-link" href="#AudioCVT">AudioCVT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L115"><em>Source</em></a></div></h3>
+<h3 id="AudioAllowChangeFlag"><span><a class="doc-id-link" href="#AudioAllowChangeFlag">AudioAllowChangeFlag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L78"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">AudioAllowChangeFlag :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	FREQUENCY = 0, 
+	FORMAT    = 1, 
+	CHANNELS  = 2, 
+	SAMPLES   = 3, 
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="AudioAllowChangeFlags"><span><a class="doc-id-link" href="#AudioAllowChangeFlags">AudioAllowChangeFlags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L77"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">AudioAllowChangeFlags :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/sdl2/#AudioAllowChangeFlag">AudioAllowChangeFlag</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/vendor/sdl2/#OpenAudioDevice">OpenAudioDevice</a></li>
+</ul>
+<h5>Related Constants</h5>
+<ul>
+<li><a href="/vendor/sdl2/#AUDIO_ALLOW_ANY_CHANGE">AUDIO_ALLOW_ANY_CHANGE</a></li>
+</ul>
+</div>
+<div class="pkg-entity">
+<h3 id="AudioCVT"><span><a class="doc-id-link" href="#AudioCVT">AudioCVT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L117"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AudioCVT :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
 	needed:       <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
@@ -1829,7 +1852,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="AudioCallback"><span><a class="doc-id-link" href="#AudioCallback">AudioCallback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L84"><em>Source</em></a></div></h3>
+<h3 id="AudioCallback"><span><a class="doc-id-link" href="#AudioCallback">AudioCallback<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L86"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AudioCallback :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (userdata: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, stream: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, len: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>)</pre>
 </div>
@@ -1853,7 +1876,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="AudioDeviceID"><span><a class="doc-id-link" href="#AudioDeviceID">AudioDeviceID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L131"><em>Source</em></a></div></h3>
+<h3 id="AudioDeviceID"><span><a class="doc-id-link" href="#AudioDeviceID">AudioDeviceID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L133"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AudioDeviceID :: <span class="keyword-type">distinct</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a></pre>
 </div>
@@ -1875,7 +1898,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="AudioFilter"><span><a class="doc-id-link" href="#AudioFilter">AudioFilter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L111"><em>Source</em></a></div></h3>
+<h3 id="AudioFilter"><span><a class="doc-id-link" href="#AudioFilter">AudioFilter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L113"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AudioFilter :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (cvt: ^<a class="code-typename" href="/vendor/sdl2/#AudioCVT">AudioCVT</a>, format: <a class="code-typename" href="/vendor/sdl2/#AudioFormat">AudioFormat</a>)</pre>
 </div>
@@ -1922,7 +1945,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="AudioSpec"><span><a class="doc-id-link" href="#AudioSpec">AudioSpec<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L98"><em>Source</em></a></div></h3>
+<h3 id="AudioSpec"><span><a class="doc-id-link" href="#AudioSpec">AudioSpec<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L100"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AudioSpec :: <span class="keyword-type">struct</span> {
 	freq:     <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
@@ -1968,7 +1991,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="AudioStatus"><span><a class="doc-id-link" href="#AudioStatus">AudioStatus<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L159"><em>Source</em></a></div></h3>
+<h3 id="AudioStatus"><span><a class="doc-id-link" href="#AudioStatus">AudioStatus<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L161"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AudioStatus :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	STOPPED = 0, 
@@ -1983,7 +2006,7 @@ Procedure Groups (0)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="AudioStream"><span><a class="doc-id-link" href="#AudioStream">AudioStream<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L172"><em>Source</em></a></div></h3>
+<h3 id="AudioStream"><span><a class="doc-id-link" href="#AudioStream">AudioStream<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L174"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AudioStream :: <span class="keyword-type">struct</span> {}</pre>
 </div>
@@ -6545,39 +6568,15 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="AUDIOCVT_MAX_FILTERS"><span><a class="doc-id-link" href="#AUDIOCVT_MAX_FILTERS">AUDIOCVT_MAX_FILTERS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L113"><em>Source</em></a></div></h3>
+<h3 id="AUDIOCVT_MAX_FILTERS"><span><a class="doc-id-link" href="#AUDIOCVT_MAX_FILTERS">AUDIOCVT_MAX_FILTERS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L115"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AUDIOCVT_MAX_FILTERS: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 9</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="AUDIO_ALLOW_ANY_CHANGE"><span><a class="doc-id-link" href="#AUDIO_ALLOW_ANY_CHANGE">AUDIO_ALLOW_ANY_CHANGE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L82"><em>Source</em></a></div></h3>
+<h3 id="AUDIO_ALLOW_ANY_CHANGE"><span><a class="doc-id-link" href="#AUDIO_ALLOW_ANY_CHANGE">AUDIO_ALLOW_ANY_CHANGE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L84"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">AUDIO_ALLOW_ANY_CHANGE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : AUDIO_ALLOW_FREQUENCY_CHANGE | AUDIO_ALLOW_FORMAT_CHANGE | AUDIO_ALLOW_CHANNELS_CHANGE | AUDIO_ALLOW_SAMPLES_CHANGE</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="AUDIO_ALLOW_CHANNELS_CHANGE"><span><a class="doc-id-link" href="#AUDIO_ALLOW_CHANNELS_CHANGE">AUDIO_ALLOW_CHANNELS_CHANGE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L80"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">AUDIO_ALLOW_CHANNELS_CHANGE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00000004</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="AUDIO_ALLOW_FORMAT_CHANGE"><span><a class="doc-id-link" href="#AUDIO_ALLOW_FORMAT_CHANGE">AUDIO_ALLOW_FORMAT_CHANGE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L79"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">AUDIO_ALLOW_FORMAT_CHANGE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00000002</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="AUDIO_ALLOW_FREQUENCY_CHANGE"><span><a class="doc-id-link" href="#AUDIO_ALLOW_FREQUENCY_CHANGE">AUDIO_ALLOW_FREQUENCY_CHANGE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L78"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">AUDIO_ALLOW_FREQUENCY_CHANGE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00000001</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="AUDIO_ALLOW_SAMPLES_CHANGE"><span><a class="doc-id-link" href="#AUDIO_ALLOW_SAMPLES_CHANGE">AUDIO_ALLOW_SAMPLES_CHANGE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L81"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">AUDIO_ALLOW_SAMPLES_CHANGE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x00000008</pre>
+<pre class="doc-code">AUDIO_ALLOW_ANY_CHANGE :: AudioAllowChangeFlags{.FREQUENCY, .FORMAT, .CHANNELS, .SAMPLES}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -8080,7 +8079,7 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="MIX_MAXVOLUME"><span><a class="doc-id-link" href="#MIX_MAXVOLUME">MIX_MAXVOLUME<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L227"><em>Source</em></a></div></h3>
+<h3 id="MIX_MAXVOLUME"><span><a class="doc-id-link" href="#MIX_MAXVOLUME">MIX_MAXVOLUME<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L229"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MIX_MAXVOLUME: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 128</pre>
 </div>
@@ -10371,43 +10370,43 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="AudioInit"><span><a class="doc-id-link" href="#AudioInit">AudioInit<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L138"><em>Source</em></a></div></h3>
+<h3 id="AudioInit"><span><a class="doc-id-link" href="#AudioInit">AudioInit<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L140"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AudioInit :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (driver_name: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="AudioQuit"><span><a class="doc-id-link" href="#AudioQuit">AudioQuit<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L139"><em>Source</em></a></div></h3>
+<h3 id="AudioQuit"><span><a class="doc-id-link" href="#AudioQuit">AudioQuit<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L141"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AudioQuit :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="AudioStreamAvailable"><span><a class="doc-id-link" href="#AudioStreamAvailable">AudioStreamAvailable<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L219"><em>Source</em></a></div></h3>
+<h3 id="AudioStreamAvailable"><span><a class="doc-id-link" href="#AudioStreamAvailable">AudioStreamAvailable<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L221"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AudioStreamAvailable :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (stream: ^<a class="code-typename" href="/vendor/sdl2/#AudioStream">AudioStream</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="AudioStreamClear"><span><a class="doc-id-link" href="#AudioStreamClear">AudioStreamClear<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L221"><em>Source</em></a></div></h3>
+<h3 id="AudioStreamClear"><span><a class="doc-id-link" href="#AudioStreamClear">AudioStreamClear<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L223"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AudioStreamClear :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (stream: ^<a class="code-typename" href="/vendor/sdl2/#AudioStream">AudioStream</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="AudioStreamFlush"><span><a class="doc-id-link" href="#AudioStreamFlush">AudioStreamFlush<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L220"><em>Source</em></a></div></h3>
+<h3 id="AudioStreamFlush"><span><a class="doc-id-link" href="#AudioStreamFlush">AudioStreamFlush<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L222"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AudioStreamFlush :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (stream: ^<a class="code-typename" href="/vendor/sdl2/#AudioStream">AudioStream</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="AudioStreamGet"><span><a class="doc-id-link" href="#AudioStreamGet">AudioStreamGet<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L217"><em>Source</em></a></div></h3>
+<h3 id="AudioStreamGet"><span><a class="doc-id-link" href="#AudioStreamGet">AudioStreamGet<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L219"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AudioStreamGet :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (stream: ^<a class="code-typename" href="/vendor/sdl2/#AudioStream">AudioStream</a>, buf: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="AudioStreamPut"><span><a class="doc-id-link" href="#AudioStreamPut">AudioStreamPut<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L216"><em>Source</em></a></div></h3>
+<h3 id="AudioStreamPut"><span><a class="doc-id-link" href="#AudioStreamPut">AudioStreamPut<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L218"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">AudioStreamPut :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (stream: ^<a class="code-typename" href="/vendor/sdl2/#AudioStream">AudioStream</a>, buf: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
@@ -10431,7 +10430,7 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="BuildAudioCVT"><span><a class="doc-id-link" href="#BuildAudioCVT">BuildAudioCVT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L199"><em>Source</em></a></div></h3>
+<h3 id="BuildAudioCVT"><span><a class="doc-id-link" href="#BuildAudioCVT">BuildAudioCVT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L201"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BuildAudioCVT :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
 	cvt:          ^<a class="code-typename" href="/vendor/sdl2/#AudioCVT">AudioCVT</a>, 
@@ -10469,19 +10468,19 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ClearQueuedAudio"><span><a class="doc-id-link" href="#ClearQueuedAudio">ClearQueuedAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L236"><em>Source</em></a></div></h3>
+<h3 id="ClearQueuedAudio"><span><a class="doc-id-link" href="#ClearQueuedAudio">ClearQueuedAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L238"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ClearQueuedAudio :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (dev: <a class="code-typename" href="/vendor/sdl2/#AudioDeviceID">AudioDeviceID</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CloseAudio"><span><a class="doc-id-link" href="#CloseAudio">CloseAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L243"><em>Source</em></a></div></h3>
+<h3 id="CloseAudio"><span><a class="doc-id-link" href="#CloseAudio">CloseAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L245"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CloseAudio :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="CloseAudioDevice"><span><a class="doc-id-link" href="#CloseAudioDevice">CloseAudioDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L244"><em>Source</em></a></div></h3>
+<h3 id="CloseAudioDevice"><span><a class="doc-id-link" href="#CloseAudioDevice">CloseAudioDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L246"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">CloseAudioDevice :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (dev: <a class="code-typename" href="/vendor/sdl2/#AudioDeviceID">AudioDeviceID</a>) ---</pre>
 </div>
@@ -10522,7 +10521,7 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ConvertAudio"><span><a class="doc-id-link" href="#ConvertAudio">ConvertAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L207"><em>Source</em></a></div></h3>
+<h3 id="ConvertAudio"><span><a class="doc-id-link" href="#ConvertAudio">ConvertAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L209"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ConvertAudio :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (cvt: ^<a class="code-typename" href="/vendor/sdl2/#AudioCVT">AudioCVT</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
@@ -10737,7 +10736,7 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DequeueAudio"><span><a class="doc-id-link" href="#DequeueAudio">DequeueAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L234"><em>Source</em></a></div></h3>
+<h3 id="DequeueAudio"><span><a class="doc-id-link" href="#DequeueAudio">DequeueAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L236"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DequeueAudio :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (dev: <a class="code-typename" href="/vendor/sdl2/#AudioDeviceID">AudioDeviceID</a>, data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> ---</pre>
 </div>
@@ -10873,7 +10872,7 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="FreeAudioStream"><span><a class="doc-id-link" href="#FreeAudioStream">FreeAudioStream<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L222"><em>Source</em></a></div></h3>
+<h3 id="FreeAudioStream"><span><a class="doc-id-link" href="#FreeAudioStream">FreeAudioStream<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L224"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">FreeAudioStream :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (stream: ^<a class="code-typename" href="/vendor/sdl2/#AudioStream">AudioStream</a>) ---</pre>
 </div>
@@ -10909,7 +10908,7 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="FreeWAV"><span><a class="doc-id-link" href="#FreeWAV">FreeWAV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L192"><em>Source</em></a></div></h3>
+<h3 id="FreeWAV"><span><a class="doc-id-link" href="#FreeWAV">FreeWAV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L194"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">FreeWAV :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (audio_buf: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) ---</pre>
 </div>
@@ -11330,19 +11329,19 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GetAudioDeviceName"><span><a class="doc-id-link" href="#GetAudioDeviceName">GetAudioDeviceName<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L147"><em>Source</em></a></div></h3>
+<h3 id="GetAudioDeviceName"><span><a class="doc-id-link" href="#GetAudioDeviceName">GetAudioDeviceName<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L149"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GetAudioDeviceName :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (index: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, iscapture: <a class="code-typename" href="/vendor/sdl2/#bool">bool</a>) -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GetAudioDeviceSpec"><span><a class="doc-id-link" href="#GetAudioDeviceSpec">GetAudioDeviceSpec<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L148"><em>Source</em></a></div></h3>
+<h3 id="GetAudioDeviceSpec"><span><a class="doc-id-link" href="#GetAudioDeviceSpec">GetAudioDeviceSpec<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L150"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GetAudioDeviceSpec :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (index: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, iscapture: <a class="code-typename" href="/vendor/sdl2/#bool">bool</a>, spec: ^<a class="code-typename" href="/vendor/sdl2/#AudioSpec">AudioSpec</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GetAudioDeviceStatus"><span><a class="doc-id-link" href="#GetAudioDeviceStatus">GetAudioDeviceStatus<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L167"><em>Source</em></a></div></h3>
+<h3 id="GetAudioDeviceStatus"><span><a class="doc-id-link" href="#GetAudioDeviceStatus">GetAudioDeviceStatus<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L169"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GetAudioDeviceStatus :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (dev: <a class="code-typename" href="/vendor/sdl2/#AudioDeviceID">AudioDeviceID</a>) -> <a class="code-typename" href="/vendor/sdl2/#AudioStatus">AudioStatus</a> ---</pre>
 </div>
@@ -11352,13 +11351,13 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="GetAudioDriver"><span><a class="doc-id-link" href="#GetAudioDriver">GetAudioDriver<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L136"><em>Source</em></a></div></h3>
+<h3 id="GetAudioDriver"><span><a class="doc-id-link" href="#GetAudioDriver">GetAudioDriver<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L138"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GetAudioDriver :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (index: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GetAudioStatus"><span><a class="doc-id-link" href="#GetAudioStatus">GetAudioStatus<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L166"><em>Source</em></a></div></h3>
+<h3 id="GetAudioStatus"><span><a class="doc-id-link" href="#GetAudioStatus">GetAudioStatus<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L168"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GetAudioStatus :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a class="code-typename" href="/vendor/sdl2/#AudioStatus">AudioStatus</a> ---</pre>
 </div>
@@ -11406,7 +11405,7 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GetCurrentAudioDriver"><span><a class="doc-id-link" href="#GetCurrentAudioDriver">GetCurrentAudioDriver<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L141"><em>Source</em></a></div></h3>
+<h3 id="GetCurrentAudioDriver"><span><a class="doc-id-link" href="#GetCurrentAudioDriver">GetCurrentAudioDriver<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L143"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GetCurrentAudioDriver :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
 </div>
@@ -11604,13 +11603,13 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GetNumAudioDevices"><span><a class="doc-id-link" href="#GetNumAudioDevices">GetNumAudioDevices<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L145"><em>Source</em></a></div></h3>
+<h3 id="GetNumAudioDevices"><span><a class="doc-id-link" href="#GetNumAudioDevices">GetNumAudioDevices<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L147"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GetNumAudioDevices :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (iscapture: <a class="code-typename" href="/vendor/sdl2/#bool">bool</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GetNumAudioDrivers"><span><a class="doc-id-link" href="#GetNumAudioDrivers">GetNumAudioDrivers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L135"><em>Source</em></a></div></h3>
+<h3 id="GetNumAudioDrivers"><span><a class="doc-id-link" href="#GetNumAudioDrivers">GetNumAudioDrivers<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L137"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GetNumAudioDrivers :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
@@ -11694,7 +11693,7 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GetQueuedAudioSize"><span><a class="doc-id-link" href="#GetQueuedAudioSize">GetQueuedAudioSize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L235"><em>Source</em></a></div></h3>
+<h3 id="GetQueuedAudioSize"><span><a class="doc-id-link" href="#GetQueuedAudioSize">GetQueuedAudioSize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L237"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GetQueuedAudioSize :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (dev: <a class="code-typename" href="/vendor/sdl2/#AudioDeviceID">AudioDeviceID</a>) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> ---</pre>
 </div>
@@ -12761,7 +12760,7 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="LoadWAV"><span><a class="doc-id-link" href="#LoadWAV">LoadWAV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L185"><em>Source</em></a></div></h3>
+<h3 id="LoadWAV"><span><a class="doc-id-link" href="#LoadWAV">LoadWAV<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L187"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">LoadWAV :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (file: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, spec: ^<a class="code-typename" href="/vendor/sdl2/#AudioSpec">AudioSpec</a>, audio_buf: ^[^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, audio_len: ^<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^<a class="code-typename" href="/vendor/sdl2/#AudioSpec">AudioSpec</a> {…}</pre>
 </div>
@@ -12773,19 +12772,19 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="LoadWAV_RW"><span><a class="doc-id-link" href="#LoadWAV_RW">LoadWAV_RW<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L191"><em>Source</em></a></div></h3>
+<h3 id="LoadWAV_RW"><span><a class="doc-id-link" href="#LoadWAV_RW">LoadWAV_RW<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L193"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">LoadWAV_RW :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src: ^<a class="code-typename" href="/vendor/sdl2/#RWops">RWops</a>, freesrc: <a class="code-typename" href="/vendor/sdl2/#bool">bool</a>, spec: ^<a class="code-typename" href="/vendor/sdl2/#AudioSpec">AudioSpec</a>, audio_buf: ^[^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, audio_len: ^<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> ^<a class="code-typename" href="/vendor/sdl2/#AudioSpec">AudioSpec</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="LockAudio"><span><a class="doc-id-link" href="#LockAudio">LockAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L238"><em>Source</em></a></div></h3>
+<h3 id="LockAudio"><span><a class="doc-id-link" href="#LockAudio">LockAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L240"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">LockAudio :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="LockAudioDevice"><span><a class="doc-id-link" href="#LockAudioDevice">LockAudioDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L239"><em>Source</em></a></div></h3>
+<h3 id="LockAudioDevice"><span><a class="doc-id-link" href="#LockAudioDevice">LockAudioDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L241"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">LockAudioDevice :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (dev: <a class="code-typename" href="/vendor/sdl2/#AudioDeviceID">AudioDeviceID</a>) ---</pre>
 </div>
@@ -12999,13 +12998,13 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="MixAudio"><span><a class="doc-id-link" href="#MixAudio">MixAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L231"><em>Source</em></a></div></h3>
+<h3 id="MixAudio"><span><a class="doc-id-link" href="#MixAudio">MixAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L233"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MixAudio :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (dst: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, src: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, len: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, volume: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="MixAudioFormat"><span><a class="doc-id-link" href="#MixAudioFormat">MixAudioFormat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L232"><em>Source</em></a></div></h3>
+<h3 id="MixAudioFormat"><span><a class="doc-id-link" href="#MixAudioFormat">MixAudioFormat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L234"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">MixAudioFormat :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (dst: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, src: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, format: <a class="code-typename" href="/vendor/sdl2/#AudioFormat">AudioFormat</a>, len: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, volume: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) ---</pre>
 </div>
@@ -13027,7 +13026,7 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="NewAudioStream"><span><a class="doc-id-link" href="#NewAudioStream">NewAudioStream<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L209"><em>Source</em></a></div></h3>
+<h3 id="NewAudioStream"><span><a class="doc-id-link" href="#NewAudioStream">NewAudioStream<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L211"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">NewAudioStream :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
 	src_format:   <a class="code-typename" href="/vendor/sdl2/#AudioFormat">AudioFormat</a>, 
@@ -13108,15 +13107,15 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="OpenAudio"><span><a class="doc-id-link" href="#OpenAudio">OpenAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L143"><em>Source</em></a></div></h3>
+<h3 id="OpenAudio"><span><a class="doc-id-link" href="#OpenAudio">OpenAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L145"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">OpenAudio :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (desired, obtained: ^<a class="code-typename" href="/vendor/sdl2/#AudioSpec">AudioSpec</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="OpenAudioDevice"><span><a class="doc-id-link" href="#OpenAudioDevice">OpenAudioDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L150"><em>Source</em></a></div></h3>
+<h3 id="OpenAudioDevice"><span><a class="doc-id-link" href="#OpenAudioDevice">OpenAudioDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L152"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">OpenAudioDevice :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, iscapture: <a class="code-typename" href="/vendor/sdl2/#bool">bool</a>, desired: ^<a class="code-typename" href="/vendor/sdl2/#AudioSpec">AudioSpec</a>, obtained: ^<a class="code-typename" href="/vendor/sdl2/#AudioSpec">AudioSpec</a>, allowed_changes: <a class="code-typename" href="/vendor/sdl2/#bool">bool</a>) -> <a class="code-typename" href="/vendor/sdl2/#AudioDeviceID">AudioDeviceID</a> ---</pre>
+<pre class="doc-code">OpenAudioDevice :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (device: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, iscapture: <a class="code-typename" href="/vendor/sdl2/#bool">bool</a>, desired: ^<a class="code-typename" href="/vendor/sdl2/#AudioSpec">AudioSpec</a>, obtained: ^<a class="code-typename" href="/vendor/sdl2/#AudioSpec">AudioSpec</a>, allowed_changes: <a class="code-typename" href="/vendor/sdl2/#AudioAllowChangeFlags">AudioAllowChangeFlags</a>) -> <a class="code-typename" href="/vendor/sdl2/#AudioDeviceID">AudioDeviceID</a> ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -13140,13 +13139,13 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="PauseAudio"><span><a class="doc-id-link" href="#PauseAudio">PauseAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L176"><em>Source</em></a></div></h3>
+<h3 id="PauseAudio"><span><a class="doc-id-link" href="#PauseAudio">PauseAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L178"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PauseAudio :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (pause_on: <a class="code-typename" href="/vendor/sdl2/#bool">bool</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="PauseAudioDevice"><span><a class="doc-id-link" href="#PauseAudioDevice">PauseAudioDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L177"><em>Source</em></a></div></h3>
+<h3 id="PauseAudioDevice"><span><a class="doc-id-link" href="#PauseAudioDevice">PauseAudioDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L179"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">PauseAudioDevice :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (dev: <a class="code-typename" href="/vendor/sdl2/#AudioDeviceID">AudioDeviceID</a>, pause_on: <a class="code-typename" href="/vendor/sdl2/#bool">bool</a>) ---</pre>
 </div>
@@ -13211,7 +13210,7 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="QueueAudio"><span><a class="doc-id-link" href="#QueueAudio">QueueAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L233"><em>Source</em></a></div></h3>
+<h3 id="QueueAudio"><span><a class="doc-id-link" href="#QueueAudio">QueueAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L235"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">QueueAudio :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (dev: <a class="code-typename" href="/vendor/sdl2/#AudioDeviceID">AudioDeviceID</a>, data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
@@ -14211,13 +14210,13 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="UnlockAudio"><span><a class="doc-id-link" href="#UnlockAudio">UnlockAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L240"><em>Source</em></a></div></h3>
+<h3 id="UnlockAudio"><span><a class="doc-id-link" href="#UnlockAudio">UnlockAudio<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L242"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">UnlockAudio :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="UnlockAudioDevice"><span><a class="doc-id-link" href="#UnlockAudioDevice">UnlockAudioDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L241"><em>Source</em></a></div></h3>
+<h3 id="UnlockAudioDevice"><span><a class="doc-id-link" href="#UnlockAudioDevice">UnlockAudioDevice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_audio.odin#L243"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">UnlockAudioDevice :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (dev: <a class="code-typename" href="/vendor/sdl2/#AudioDeviceID">AudioDeviceID</a>) ---</pre>
 </div>
@@ -15017,12 +15016,14 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/sdl2/sdl_vulkan.odin">sdl_vulkan.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-08 (vendor "odin") Windows_amd64 @ 2025-08-01 21:13:45.944542700 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-08 (vendor "odin") Windows_amd64 @ 2025-08-02 21:13:20.642293400 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
 <ul>
 <li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#AudioAllowChangeFlag">AudioAllowChangeFlag</a></li>
+<li><a href="#AudioAllowChangeFlags">AudioAllowChangeFlags</a></li>
 <li><a href="#AudioCVT">AudioCVT</a></li>
 <li><a href="#AudioCallback">AudioCallback</a></li>
 <li><a href="#AudioDeviceEvent">AudioDeviceEvent</a></li>
@@ -15215,10 +15216,6 @@ NOTE: Prefer the intrinsics built into Odin 'package intrinsics'</p>
 <li><a href="#ARRAYORDER_RGBA">ARRAYORDER_RGBA</a></li>
 <li><a href="#AUDIOCVT_MAX_FILTERS">AUDIOCVT_MAX_FILTERS</a></li>
 <li><a href="#AUDIO_ALLOW_ANY_CHANGE">AUDIO_ALLOW_ANY_CHANGE</a></li>
-<li><a href="#AUDIO_ALLOW_CHANNELS_CHANGE">AUDIO_ALLOW_CHANNELS_CHANGE</a></li>
-<li><a href="#AUDIO_ALLOW_FORMAT_CHANGE">AUDIO_ALLOW_FORMAT_CHANGE</a></li>
-<li><a href="#AUDIO_ALLOW_FREQUENCY_CHANGE">AUDIO_ALLOW_FREQUENCY_CHANGE</a></li>
-<li><a href="#AUDIO_ALLOW_SAMPLES_CHANGE">AUDIO_ALLOW_SAMPLES_CHANGE</a></li>
 <li><a href="#AUDIO_F32">AUDIO_F32</a></li>
 <li><a href="#AUDIO_F32LSB">AUDIO_F32LSB</a></li>
 <li><a href="#AUDIO_F32MSB">AUDIO_F32MSB</a></li>
