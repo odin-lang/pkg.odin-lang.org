@@ -314,20 +314,9 @@ Procedures (107)</summary>
 <li><a href="/base/runtime">runtime</a>.<a href="#non_zero_reserve_dynamic_array">non_zero_reserve_dynamic_array</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#resize_dynamic_array">resize_dynamic_array</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#non_zero_resize_dynamic_array">non_zero_resize_dynamic_array</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#map_insert">map_insert</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#map_upsert">map_upsert</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#map_entry">map_entry</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#card">card</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#assert">assert</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#ensure">ensure</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#panic">panic</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#unimplemented">unimplemented</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#assert_contextless">assert_contextless</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#ensure_contextless">ensure_contextless</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#panic_contextless">panic_contextless</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#unimplemented_contextless">unimplemented_contextless</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#raw_soa_footer_slice">raw_soa_footer_slice</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#raw_soa_footer_dynamic_array">raw_soa_footer_dynamic_array</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#map_insert">map_insert</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#make_soa_aligned">make_soa_aligned</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#make_soa_slice">make_soa_slice</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#make_soa_dynamic_array">make_soa_dynamic_array</a></li>
@@ -343,6 +332,17 @@ Procedures (107)</summary>
 <li><a href="/base/runtime">runtime</a>.<a href="#non_zero_append_soa_elems">non_zero_append_soa_elems</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#unordered_remove_soa">unordered_remove_soa</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#ordered_remove_soa">ordered_remove_soa</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#map_upsert">map_upsert</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#map_entry">map_entry</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#card">card</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#assert">assert</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#ensure">ensure</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#panic">panic</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#unimplemented">unimplemented</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#assert_contextless">assert_contextless</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#ensure_contextless">ensure_contextless</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#panic_contextless">panic_contextless</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#unimplemented_contextless">unimplemented_contextless</a></li>
 </ul>
 </details>
 </div>
@@ -1637,7 +1637,7 @@ Note: If the range is out of bounds, this procedure will panic.</p>
 <div class="pkg-entity">
 <h3 id="pop"><span><a class="doc-id-link" href="#pop">pop<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L167"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">pop :: <span class="keyword-type">proc</span>(array: ^$T/[<span class="keyword">dynamic</span>]$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (res: $E) {…}</pre>
+<pre class="doc-code">pop :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (res: $E) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1648,7 +1648,7 @@ Note: If the range is out of bounds, this procedure will panic.</p>
 <div class="pkg-entity">
 <h3 id="pop_safe"><span><a class="doc-id-link" href="#pop_safe">pop_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L178"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">pop_safe :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (array: ^$T/[<span class="keyword">dynamic</span>]$E) -> (res: $E, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+<pre class="doc-code">pop_safe :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (array: ^[<span class="keyword">dynamic</span>]$E) -> (res: $E, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1659,7 +1659,7 @@ If the operation is not possible, it will return false.</p>
 <div class="pkg-entity">
 <h3 id="pop_front"><span><a class="doc-id-link" href="#pop_front">pop_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L191"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">pop_front :: <span class="keyword-type">proc</span>(array: ^$T/[<span class="keyword">dynamic</span>]$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (res: $E) {…}</pre>
+<pre class="doc-code">pop_front :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (res: $E) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1670,7 +1670,7 @@ If the operation is not possible, it will return false.</p>
 <div class="pkg-entity">
 <h3 id="pop_front_safe"><span><a class="doc-id-link" href="#pop_front_safe">pop_front_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L204"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">pop_front_safe :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (array: ^$T/[<span class="keyword">dynamic</span>]$E) -> (res: $E, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+<pre class="doc-code">pop_front_safe :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (array: ^[<span class="keyword">dynamic</span>]$E) -> (res: $E, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1703,7 +1703,7 @@ If the operation is not possible, it will return false.</p>
 <div class="pkg-entity">
 <h3 id="delete_dynamic_array"><span><a class="doc-id-link" href="#delete_dynamic_array">delete_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L289"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">delete_dynamic_array :: <span class="keyword-type">proc</span>(array: $T/[<span class="keyword">dynamic</span>]$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
+<pre class="doc-code">delete_dynamic_array :: <span class="keyword-type">proc</span>(array: [<span class="keyword">dynamic</span>]$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1777,7 +1777,7 @@ Unlike <code>new</code>, <code>make</code>'s return value is the same as the typ
 <div class="pkg-entity">
 <h3 id="make_dynamic_array"><span><a class="doc-id-link" href="#make_dynamic_array">make_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L383"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_dynamic_array :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[<span class="keyword">dynamic</span>]$E, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (T, <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">make_dynamic_array :: <span class="keyword-type">proc</span>($T: [<span class="keyword">dynamic</span>]$E, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([<span class="keyword">dynamic</span>]$E, <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1789,7 +1789,7 @@ Unlike <code>new</code>, <code>make</code>'s return value is the same as the typ
 <div class="pkg-entity">
 <h3 id="make_dynamic_array_len"><span><a class="doc-id-link" href="#make_dynamic_array_len">make_dynamic_array_len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L391"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_dynamic_array_len :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (T, <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">make_dynamic_array_len :: <span class="keyword-type">proc</span>($T: [<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([<span class="keyword">dynamic</span>]$E, <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1801,7 +1801,7 @@ Unlike <code>new</code>, <code>make</code>'s return value is the same as the typ
 <div class="pkg-entity">
 <h3 id="make_dynamic_array_len_cap"><span><a class="doc-id-link" href="#make_dynamic_array_len_cap">make_dynamic_array_len_cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L399"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_dynamic_array_len_cap :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">#any_int</span> cap: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">make_dynamic_array_len_cap :: <span class="keyword-type">proc</span>($T: [<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">#any_int</span> cap: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: [<span class="keyword">dynamic</span>]$E, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1895,25 +1895,25 @@ If m is nil, or there is no such element, this procedure is a no-op</p>
 <div class="pkg-entity">
 <h3 id="append_elem"><span><a class="doc-id-link" href="#append_elem">append_elem<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L550"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">append_elem :: <span class="keyword-type">proc</span>(array: ^$T/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#no_broadcast</span> arg: $E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">append_elem :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#no_broadcast</span> arg: $E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="non_zero_append_elem"><span><a class="doc-id-link" href="#non_zero_append_elem">non_zero_append_elem<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L561"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">non_zero_append_elem :: <span class="keyword-type">proc</span>(array: ^$T/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#no_broadcast</span> arg: $E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">non_zero_append_elem :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#no_broadcast</span> arg: $E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="append_elems"><span><a class="doc-id-link" href="#append_elems">append_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L599"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">append_elems :: <span class="keyword-type">proc</span>(array: ^$T/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">..</span> <span class="keyword-type">#no_broadcast</span> args: $T/..$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">append_elems :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">..</span> <span class="keyword-type">#no_broadcast</span> args: $T/..$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="non_zero_append_elems"><span><a class="doc-id-link" href="#non_zero_append_elems">non_zero_append_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L610"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">non_zero_append_elems :: <span class="keyword-type">proc</span>(array: ^$T/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">..</span> <span class="keyword-type">#no_broadcast</span> args: $T/..$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">non_zero_append_elems :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">..</span> <span class="keyword-type">#no_broadcast</span> args: $T/..$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1941,19 +1941,19 @@ If m is nil, or there is no such element, this procedure is a no-op</p>
 <div class="pkg-entity">
 <h3 id="append_nothing"><span><a class="doc-id-link" href="#append_nothing">append_nothing<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L670"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">append_nothing :: <span class="keyword-type">proc</span>(array: ^$T/[<span class="keyword">dynamic</span>]$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">append_nothing :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="inject_at_elem"><span><a class="doc-id-link" href="#inject_at_elem">inject_at_elem<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L681"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">inject_at_elem :: <span class="keyword-type">proc</span>(array: ^$T/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">#no_broadcast</span> arg: $E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">inject_at_elem :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">#no_broadcast</span> arg: $E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="inject_at_elems"><span><a class="doc-id-link" href="#inject_at_elems">inject_at_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L702"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">inject_at_elems :: <span class="keyword-type">proc</span>(array: ^$T/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">..</span> <span class="keyword-type">#no_broadcast</span> args: $T/..$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">inject_at_elems :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">..</span> <span class="keyword-type">#no_broadcast</span> args: $T/..$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1965,13 +1965,13 @@ If m is nil, or there is no such element, this procedure is a no-op</p>
 <div class="pkg-entity">
 <h3 id="assign_at_elem"><span><a class="doc-id-link" href="#assign_at_elem">assign_at_elem<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L756"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">assign_at_elem :: <span class="keyword-type">proc</span>(array: ^$T/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">#no_broadcast</span> arg: $E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">assign_at_elem :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">#no_broadcast</span> arg: $E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="assign_at_elems"><span><a class="doc-id-link" href="#assign_at_elems">assign_at_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L770"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">assign_at_elems :: <span class="keyword-type">proc</span>(array: ^$T/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">..</span> <span class="keyword-type">#no_broadcast</span> args: $T/..$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">assign_at_elems :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">..</span> <span class="keyword-type">#no_broadcast</span> args: $T/..$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1983,7 +1983,7 @@ If m is nil, or there is no such element, this procedure is a no-op</p>
 <div class="pkg-entity">
 <h3 id="clear_dynamic_array"><span><a class="doc-id-link" href="#clear_dynamic_array">clear_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L811"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">clear_dynamic_array :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (array: ^$T/[<span class="keyword">dynamic</span>]$E) {…}</pre>
+<pre class="doc-code">clear_dynamic_array :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (array: ^[<span class="keyword">dynamic</span>]$E) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1994,19 +1994,19 @@ If m is nil, or there is no such element, this procedure is a no-op</p>
 <div class="pkg-entity">
 <h3 id="reserve_dynamic_array"><span><a class="doc-id-link" href="#reserve_dynamic_array">reserve_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L854"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">reserve_dynamic_array :: <span class="keyword-type">proc</span>(array: ^$T/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
+<pre class="doc-code">reserve_dynamic_array :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="non_zero_reserve_dynamic_array"><span><a class="doc-id-link" href="#non_zero_reserve_dynamic_array">non_zero_reserve_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L859"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">non_zero_reserve_dynamic_array :: <span class="keyword-type">proc</span>(array: ^$T/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
+<pre class="doc-code">non_zero_reserve_dynamic_array :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="resize_dynamic_array"><span><a class="doc-id-link" href="#resize_dynamic_array">resize_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L908"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">resize_dynamic_array :: <span class="keyword-type">proc</span>(array: ^$T/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
+<pre class="doc-code">resize_dynamic_array :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -2017,102 +2017,7 @@ If m is nil, or there is no such element, this procedure is a no-op</p>
 <div class="pkg-entity">
 <h3 id="non_zero_resize_dynamic_array"><span><a class="doc-id-link" href="#non_zero_resize_dynamic_array">non_zero_resize_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L913"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">non_zero_resize_dynamic_array :: <span class="keyword-type">proc</span>(array: ^$T/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="map_insert"><span><a class="doc-id-link" href="#map_insert">map_insert<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L960"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">map_insert :: <span class="keyword-type">proc</span>(m: ^$T/<span class="keyword-type">map</span>[$K]$V, key: $K, value: $V, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (ptr: ^$V) {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="map_upsert"><span><a class="doc-id-link" href="#map_upsert">map_upsert<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L970"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">map_upsert :: <span class="keyword-type">proc</span>(m: ^$T/<span class="keyword-type">map</span>[$K]$V, key: $K, value: $V, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (prev_key: $K, value_ptr: ^$V, found_previous: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
-</div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>Explicitly inserts a key and value into a map <code>m</code>, the same as <code>map_insert</code>, but the return values differ.
-<span class="doc-list"><code>prev_key</code> will return the previous pointer of a key if it exists, check <code>found_previous</code> if was previously found</span>
-<span class="doc-list"><code>value_ptr</code> will return the pointer of the memory where the insertion happens, and <code>nil</code> if the map failed to resize</span>
-<span class="doc-list"><code>found_previous</code> will be true a previous key was found</span></p>
-</details>
-</div>
-<div class="pkg-entity">
-<h3 id="map_entry"><span><a class="doc-id-link" href="#map_entry">map_entry<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L995"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">map_entry :: <span class="keyword-type">proc</span>(m: ^$T/<span class="keyword-type">map</span>[$K]$V, key: $K, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (key_ptr: ^$K, value_ptr: ^$V, just_inserted: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
-</div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>Retrieves a pointer to the key and value for a possibly just inserted entry into the map.</p>
-<p>If the <code>key</code> was not in the map <code>m</code>, an entry is inserted with the zero value and <code>just_inserted</code> will be <code>true</code>.
-Otherwise the existing entry is left untouched and pointers to its key and value are returned.</p>
-<p>If the map has to grow in order to insert the entry and the allocation fails, <code>err</code> is set and returned.</p>
-<p>If <code>err</code> is <code>nil</code>, <code>key_ptr</code> and <code>value_ptr</code> are valid pointers and will not be <code>nil</code>.</p>
-<p>WARN: User modification of the key pointed at by <code>key_ptr</code> should only be done if the new key is equal to (in hash) the old key.
-If that is not the case you will corrupt the map.</p>
-</details>
-</div>
-<div class="pkg-entity">
-<h3 id="card"><span><a class="doc-id-link" href="#card">card<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1009"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">card :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (s: $T/<span class="keyword-type">bit_set</span>[$E]) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="assert"><span><a class="doc-id-link" href="#assert">assert<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1017"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">assert :: <span class="keyword-type">proc</span>(condition: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = #caller_expression(condition), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="ensure"><span><a class="doc-id-link" href="#ensure">ensure<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1039"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">ensure :: <span class="keyword-type">proc</span>(condition: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = #caller_expression(condition), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
-</div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>Evaluates the condition and aborts the program iff the condition is
-false.  This routine ignores <code>ODIN_DISABLE_ASSERT</code>, and will always
-execute.</p>
-</details>
-</div>
-<div class="pkg-entity">
-<h3 id="panic"><span><a class="doc-id-link" href="#panic">panic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1054"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">panic :: <span class="keyword-type">proc</span>(message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ! {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="unimplemented"><span><a class="doc-id-link" href="#unimplemented">unimplemented<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1063"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">unimplemented :: <span class="keyword-type">proc</span>(message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = "", loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ! {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="assert_contextless"><span><a class="doc-id-link" href="#assert_contextless">assert_contextless<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1074"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">assert_contextless :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (condition: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = #caller_expression(condition), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="ensure_contextless"><span><a class="doc-id-link" href="#ensure_contextless">ensure_contextless<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1089"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">ensure_contextless :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (condition: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = #caller_expression(condition), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="panic_contextless"><span><a class="doc-id-link" href="#panic_contextless">panic_contextless<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1100"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">panic_contextless :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ! {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="unimplemented_contextless"><span><a class="doc-id-link" href="#unimplemented_contextless">unimplemented_contextless<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1105"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">unimplemented_contextless :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = "", loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ! {…}</pre>
+<pre class="doc-code">non_zero_resize_dynamic_array :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -2125,6 +2030,12 @@ execute.</p>
 <h3 id="raw_soa_footer_dynamic_array"><span><a class="doc-id-link" href="#raw_soa_footer_dynamic_array">raw_soa_footer_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L63"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">raw_soa_footer_dynamic_array :: <span class="keyword-type">proc</span>(array: ^$T/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E) -> (footer: ^<a class="code-typename" href="/base/runtime/#Raw_SOA_Footer_Dynamic_Array">Raw_SOA_Footer_Dynamic_Array</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="map_insert"><span><a class="doc-id-link" href="#map_insert">map_insert<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L960"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">map_insert :: <span class="keyword-type">proc</span>(m: ^$T/<span class="keyword-type">map</span>[$K]$V, key: $K, value: $V, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (ptr: ^$V) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -2231,6 +2142,95 @@ Note: If the index is out of bounds, this procedure will panic.</p>
 Note: If you the elements do not have to remain in their order, prefer <code>unordered_remove_soa</code>.
 Note: If the index is out of bounds, this procedure will panic.</p>
 </details>
+</div>
+<div class="pkg-entity">
+<h3 id="map_upsert"><span><a class="doc-id-link" href="#map_upsert">map_upsert<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L970"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">map_upsert :: <span class="keyword-type">proc</span>(m: ^$T/<span class="keyword-type">map</span>[$K]$V, key: $K, value: $V, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (prev_key: $K, value_ptr: ^$V, found_previous: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Explicitly inserts a key and value into a map <code>m</code>, the same as <code>map_insert</code>, but the return values differ.
+<span class="doc-list"><code>prev_key</code> will return the previous pointer of a key if it exists, check <code>found_previous</code> if was previously found</span>
+<span class="doc-list"><code>value_ptr</code> will return the pointer of the memory where the insertion happens, and <code>nil</code> if the map failed to resize</span>
+<span class="doc-list"><code>found_previous</code> will be true a previous key was found</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="map_entry"><span><a class="doc-id-link" href="#map_entry">map_entry<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L995"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">map_entry :: <span class="keyword-type">proc</span>(m: ^$T/<span class="keyword-type">map</span>[$K]$V, key: $K, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (key_ptr: ^$K, value_ptr: ^$V, just_inserted: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Retrieves a pointer to the key and value for a possibly just inserted entry into the map.</p>
+<p>If the <code>key</code> was not in the map <code>m</code>, an entry is inserted with the zero value and <code>just_inserted</code> will be <code>true</code>.
+Otherwise the existing entry is left untouched and pointers to its key and value are returned.</p>
+<p>If the map has to grow in order to insert the entry and the allocation fails, <code>err</code> is set and returned.</p>
+<p>If <code>err</code> is <code>nil</code>, <code>key_ptr</code> and <code>value_ptr</code> are valid pointers and will not be <code>nil</code>.</p>
+<p>WARN: User modification of the key pointed at by <code>key_ptr</code> should only be done if the new key is equal to (in hash) the old key.
+If that is not the case you will corrupt the map.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="card"><span><a class="doc-id-link" href="#card">card<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1009"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">card :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (s: $T/<span class="keyword-type">bit_set</span>[$E]) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="assert"><span><a class="doc-id-link" href="#assert">assert<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1017"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">assert :: <span class="keyword-type">proc</span>(condition: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = #caller_expression(condition), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ensure"><span><a class="doc-id-link" href="#ensure">ensure<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1039"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ensure :: <span class="keyword-type">proc</span>(condition: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = #caller_expression(condition), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Evaluates the condition and aborts the program iff the condition is
+false.  This routine ignores <code>ODIN_DISABLE_ASSERT</code>, and will always
+execute.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="panic"><span><a class="doc-id-link" href="#panic">panic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1054"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">panic :: <span class="keyword-type">proc</span>(message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ! {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="unimplemented"><span><a class="doc-id-link" href="#unimplemented">unimplemented<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1063"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">unimplemented :: <span class="keyword-type">proc</span>(message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = "", loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ! {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="assert_contextless"><span><a class="doc-id-link" href="#assert_contextless">assert_contextless<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1074"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">assert_contextless :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (condition: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = #caller_expression(condition), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="ensure_contextless"><span><a class="doc-id-link" href="#ensure_contextless">ensure_contextless<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1089"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">ensure_contextless :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (condition: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = #caller_expression(condition), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="panic_contextless"><span><a class="doc-id-link" href="#panic_contextless">panic_contextless<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1100"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">panic_contextless :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ! {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="unimplemented_contextless"><span><a class="doc-id-link" href="#unimplemented_contextless">unimplemented_contextless<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L1105"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">unimplemented_contextless :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (message: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = "", loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ! {…}</pre>
+</div>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
