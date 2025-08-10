@@ -2312,7 +2312,7 @@ at least <code>size_of(Buddy_Block)</code>.</p>
 <div class="pkg-entity">
 <h3 id="buffer_from_slice"><span><a class="doc-id-link" href="#buffer_from_slice">buffer_from_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/mem.odin#L452"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">buffer_from_slice :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (backing: $T/[]$E) -> [<span class="keyword">dynamic</span>]$E {…}</pre>
+<pre class="doc-code">buffer_from_slice :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (backing: $T/[]$E) -> $T/[<span class="keyword">dynamic</span>]$E {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -2631,7 +2631,7 @@ freed.
 <div class="pkg-entity">
 <h3 id="delete_dynamic_array"><span><a class="doc-id-link" href="#delete_dynamic_array">delete_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L760"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">delete_dynamic_array :: <span class="keyword-type">proc</span>(array: [<span class="keyword">dynamic</span>]$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
+<pre class="doc-code">delete_dynamic_array :: <span class="keyword-type">proc</span>(array: $T/[<span class="keyword">dynamic</span>]$E, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3171,7 +3171,7 @@ typeid <code>id</code> located at an address specified by <code>data</code>.</p>
 <div class="pkg-entity">
 <h3 id="make_dynamic_array"><span><a class="doc-id-link" href="#make_dynamic_array">make_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L942"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_dynamic_array :: <span class="keyword-type">proc</span>($T: [<span class="keyword">dynamic</span>]$E, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([<span class="keyword">dynamic</span>]$E, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">make_dynamic_array :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[<span class="keyword">dynamic</span>]$E, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (T, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3183,7 +3183,7 @@ backing allocator, and initial length and capacity of <code>0</code>.</p>
 <div class="pkg-entity">
 <h3 id="make_dynamic_array_len"><span><a class="doc-id-link" href="#make_dynamic_array_len">make_dynamic_array_len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L957"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_dynamic_array_len :: <span class="keyword-type">proc</span>($T: [<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([<span class="keyword">dynamic</span>]$E, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">make_dynamic_array_len :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (T, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -3195,7 +3195,7 @@ backing allocator, and initial capacity and length specified by <code>len</code>
 <div class="pkg-entity">
 <h3 id="make_dynamic_array_len_cap"><span><a class="doc-id-link" href="#make_dynamic_array_len_cap">make_dynamic_array_len_cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/alloc.odin#L974"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_dynamic_array_len_cap :: <span class="keyword-type">proc</span>($T: [<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">#any_int</span> cap: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: [<span class="keyword">dynamic</span>]$E, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">make_dynamic_array_len_cap :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, <span class="keyword-type">#any_int</span> cap: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -4920,7 +4920,7 @@ to zero, and returns the slice <code>data</code>.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/mem/tracking_allocator.odin">tracking_allocator.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-08 (vendor "odin") Windows_amd64 @ 2025-08-09 21:12:40.584255700 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-08 (vendor "odin") Windows_amd64 @ 2025-08-10 21:13:05.586314200 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
