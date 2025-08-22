@@ -694,7 +694,7 @@ main :: proc() {
 <div class="pkg-entity">
 <h3 id="init"><span><a class="doc-id-link" href="#init">init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L25"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">init :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_CAPACITY, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
+<pre class="doc-code">init :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = DEFAULT_CAPACITY, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -820,7 +820,7 @@ Otherwise, return a nil element and false.</p>
 <div class="pkg-entity">
 <h3 id="push_back"><span><a class="doc-id-link" href="#push_back">push_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L272"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">push_back :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), elem: $T) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">push_back :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), elem: $T, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -851,7 +851,7 @@ main :: proc() {
 <div class="pkg-entity">
 <h3 id="push_back_elems"><span><a class="doc-id-link" href="#push_back_elems">push_back_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L399"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">push_back_elems :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), <span class="keyword-type">..</span> elems: ..$T) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">push_back_elems :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), <span class="keyword-type">..</span> elems: ..$T, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -863,7 +863,7 @@ return false with an <code>Allocator_Error</code>.</p>
 <div class="pkg-entity">
 <h3 id="push_front"><span><a class="doc-id-link" href="#push_front">push_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L306"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">push_front :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), elem: $T) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+<pre class="doc-code">push_front :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), elem: $T, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -894,7 +894,7 @@ main :: proc() {
 <div class="pkg-entity">
 <h3 id="reserve"><span><a class="doc-id-link" href="#reserve">reserve<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin#L117"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">reserve :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
+<pre class="doc-code">reserve :: <span class="keyword-type">proc</span>(q: ^$Q/<a class="code-typename" href="/core/container/queue/#Queue">Queue</a>($T), capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -962,7 +962,7 @@ main :: proc() {
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/container/queue/queue.odin">queue.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-08 (vendor "odin") Windows_amd64 @ 2025-08-21 21:12:40.779111200 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-08 (vendor "odin") Windows_amd64 @ 2025-08-22 21:12:34.990450000 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
