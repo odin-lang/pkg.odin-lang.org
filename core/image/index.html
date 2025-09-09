@@ -494,7 +494,7 @@ Procedure Groups (4)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Alpha_Key"><span><a class="doc-id-link" href="#Alpha_Key">Alpha_Key<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L891"><em>Source</em></a></div></h3>
+<h3 id="Alpha_Key"><span><a class="doc-id-link" href="#Alpha_Key">Alpha_Key<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L893"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Alpha_Key :: <span class="keyword-type">union</span> {
 	[2]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
@@ -681,7 +681,7 @@ without putting it in BMP_Header</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Channel"><span><a class="doc-id-link" href="#Channel">Channel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L724"><em>Source</em></a></div></h3>
+<h3 id="Channel"><span><a class="doc-id-link" href="#Channel">Channel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L726"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Channel :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
 	R = 1, 
@@ -924,13 +924,14 @@ without putting it in BMP_Header</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="JPEG_Info"><span><a class="doc-id-link" href="#JPEG_Info">JPEG_Info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L711"><em>Source</em></a></div></h3>
+<h3 id="JPEG_Info"><span><a class="doc-id-link" href="#JPEG_Info">JPEG_Info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L712"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">JPEG_Info :: <span class="keyword-type">struct</span> {
-	jfif_app0: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=JFIF_APP0),
-	jfxx_app0: runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=JFXX_APP0),
-	comments:  [<span class="keyword">dynamic</span>]<a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
-	exif:      [<span class="keyword">dynamic</span>]<a class="code-typename" href="/core/image/#Exif">Exif</a>,
+	jfif_app0:  runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=JFIF_APP0),
+	jfxx_app0:  runtime.<a class="code-typename" href="/base/runtime/#Maybe">Maybe</a>($T=JFXX_APP0),
+	comments:   [<span class="keyword">dynamic</span>]<a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
+	exif:       [<span class="keyword">dynamic</span>]<a class="code-typename" href="/core/image/#Exif">Exif</a>,
+	frame_type: <a class="code-typename" href="/core/image/#JPEG_Marker">JPEG_Marker</a>,
 }</pre>
 </div>
 </div>
@@ -938,22 +939,22 @@ without putting it in BMP_Header</p>
 <h3 id="JPEG_Marker"><span><a class="doc-id-link" href="#JPEG_Marker">JPEG_Marker<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L644"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">JPEG_Marker :: <span class="keyword-type">enum</span> <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a> {
-	SOF0  = 192, 
-	SOF1  = 193, 
-	SOF2  = 194, 
-	SOF3  = 195, 
+	SOF0  = 192, <span class="comment">// Baseline sequential DCT</span>
+	SOF1  = 193, <span class="comment">// Extended sequential DCT</span>
+	SOF2  = 194, <span class="comment">// Progressive DCT</span>
+	SOF3  = 195, <span class="comment">// Lossless (sequential)</span>
+	SOF5  = 197, <span class="comment">// Differential sequential DCT</span>
+	SOF6  = 198, <span class="comment">// Differential progressive DCT</span>
+	SOF7  = 199, <span class="comment">// Differential lossless (sequential)</span>
+	SOF9  = 201, <span class="comment">// Extended sequential DCT, Arithmetic coding</span>
+	SOF10 = 202, <span class="comment">// Progressive DCT, Arithmetic coding</span>
+	SOF11 = 203, <span class="comment">// Lossless (sequential), Arithmetic coding</span>
+	SOF13 = 205, <span class="comment">// Differential sequential DCT, Arithmetic coding</span>
+	SOF14 = 206, <span class="comment">// Differential progressive DCT, Arithmetic coding</span>
+	SOF15 = 207, <span class="comment">// Differential lossless (sequential), Arithmetic coding</span>
 	DHT   = 196, 
-	SOF5  = 197, 
-	SOF6  = 198, 
-	SOF7  = 199, 
 	JPG   = 200, 
-	SOF9  = 201, 
-	SOF10 = 202, 
-	SOF11 = 203, 
 	DAC   = 204, 
-	SOF13 = 205, 
-	SOF14 = 206, 
-	SOF15 = 207, 
 	RST0  = 208, 
 	RST1  = 209, 
 	RST2  = 210, 
@@ -1557,7 +1558,7 @@ except in very specific circumstances.</p>
 </div>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="alpha_add_if_missing"><span><a class="doc-id-link" href="#alpha_add_if_missing">alpha_add_if_missing<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L911"><em>Source</em></a></div></h3>
+<h3 id="alpha_add_if_missing"><span><a class="doc-id-link" href="#alpha_add_if_missing">alpha_add_if_missing<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L913"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">alpha_add_if_missing :: <span class="keyword-type">proc</span>(img: ^<a class="code-typename" href="/core/image/#Image">Image</a>, alpha_key: <a class="code-typename" href="/core/image/#Alpha_Key">Alpha_Key</a> = Alpha_Key{}, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1576,7 +1577,7 @@ If the optional <code>alpha_key</code> is provided, it will be resolved as follo
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="alpha_apply_keyed_alpha"><span><a class="doc-id-link" href="#alpha_apply_keyed_alpha">alpha_apply_keyed_alpha<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L911"><em>Source</em></a></div></h3>
+<h3 id="alpha_apply_keyed_alpha"><span><a class="doc-id-link" href="#alpha_apply_keyed_alpha">alpha_apply_keyed_alpha<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L913"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">alpha_apply_keyed_alpha :: <a class="code-procedure" href="/core/image/#alpha_add_if_missing">alpha_add_if_missing</a></pre>
 </div>
@@ -1595,7 +1596,7 @@ If the optional <code>alpha_key</code> is provided, it will be resolved as follo
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="alpha_drop_if_present"><span><a class="doc-id-link" href="#alpha_drop_if_present">alpha_drop_if_present<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1085"><em>Source</em></a></div></h3>
+<h3 id="alpha_drop_if_present"><span><a class="doc-id-link" href="#alpha_drop_if_present">alpha_drop_if_present<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1087"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">alpha_drop_if_present :: <span class="keyword-type">proc</span>(img: ^<a class="code-typename" href="/core/image/#Image">Image</a>, options: <a class="code-typename" href="/core/image/#Options">Options</a> = Options{}, alpha_key: <a class="code-typename" href="/core/image/#Alpha_Key">Alpha_Key</a> = Alpha_Key{}, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1621,7 +1622,7 @@ with one exception: <code>alpha_key</code> and <code>img.background</code> are p
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="apply_palette_rgb"><span><a class="doc-id-link" href="#apply_palette_rgb">apply_palette_rgb<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1356"><em>Source</em></a></div></h3>
+<h3 id="apply_palette_rgb"><span><a class="doc-id-link" href="#apply_palette_rgb">apply_palette_rgb<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1358"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">apply_palette_rgb :: <span class="keyword-type">proc</span>(img: ^<a class="code-typename" href="/core/image/#Image">Image</a>, palette: [256][3]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1632,7 +1633,7 @@ If the image given is not a valid 8-bit single channel image, the procedure will
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="apply_palette_rgba"><span><a class="doc-id-link" href="#apply_palette_rgba">apply_palette_rgba<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1393"><em>Source</em></a></div></h3>
+<h3 id="apply_palette_rgba"><span><a class="doc-id-link" href="#apply_palette_rgba">apply_palette_rgba<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1395"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">apply_palette_rgba :: <span class="keyword-type">proc</span>(img: ^<a class="code-typename" href="/core/image/#Image">Image</a>, palette: [256][4]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1643,19 +1644,19 @@ If the image given is not a valid 8-bit single channel image, the procedure will
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="blend_pixel"><span><a class="doc-id-link" href="#blend_pixel">blend_pixel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1436"><em>Source</em></a></div></h3>
+<h3 id="blend_pixel"><span><a class="doc-id-link" href="#blend_pixel">blend_pixel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1438"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">blend_pixel :: <span class="keyword-type">proc</span>(fg: [0]$T, alpha: $T, bg: [0]$T) -> (res: [0]$T) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="blend_single_channel"><span><a class="doc-id-link" href="#blend_single_channel">blend_single_channel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1429"><em>Source</em></a></div></h3>
+<h3 id="blend_single_channel"><span><a class="doc-id-link" href="#blend_single_channel">blend_single_channel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1431"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">blend_single_channel :: <span class="keyword-type">proc</span>(fg, alpha, bg: $T) -> (res: $T) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="compute_buffer_size"><span><a class="doc-id-link" href="#compute_buffer_size">compute_buffer_size<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L719"><em>Source</em></a></div></h3>
+<h3 id="compute_buffer_size"><span><a class="doc-id-link" href="#compute_buffer_size">compute_buffer_size<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L721"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">compute_buffer_size :: <span class="keyword-type">proc</span>(width, height, channels, depth: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, extra_row_bytes: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = int(0)) -> (size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
@@ -1671,7 +1672,7 @@ If the image given is not a valid 8-bit single channel image, the procedure will
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="expand_grayscale"><span><a class="doc-id-link" href="#expand_grayscale">expand_grayscale<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1502"><em>Source</em></a></div></h3>
+<h3 id="expand_grayscale"><span><a class="doc-id-link" href="#expand_grayscale">expand_grayscale<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1504"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">expand_grayscale :: <span class="keyword-type">proc</span>(img: ^<a class="code-typename" href="/core/image/#Image">Image</a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1682,7 +1683,7 @@ Returns early with <code>false</code> if already an RGB(A) image.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="is_valid_color_image"><span><a class="doc-id-link" href="#is_valid_color_image">is_valid_color_image<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L853"><em>Source</em></a></div></h3>
+<h3 id="is_valid_color_image"><span><a class="doc-id-link" href="#is_valid_color_image">is_valid_color_image<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L855"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_valid_color_image :: <span class="keyword-type">proc</span>(img: ^<a class="code-typename" href="/core/image/#Image">Image</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1693,7 +1694,7 @@ Is the pointer valid, are the dimensions valid?</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="is_valid_grayscale_image"><span><a class="doc-id-link" href="#is_valid_grayscale_image">is_valid_grayscale_image<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L824"><em>Source</em></a></div></h3>
+<h3 id="is_valid_grayscale_image"><span><a class="doc-id-link" href="#is_valid_grayscale_image">is_valid_grayscale_image<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L826"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_valid_grayscale_image :: <span class="keyword-type">proc</span>(img: ^<a class="code-typename" href="/core/image/#Image">Image</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1704,7 +1705,7 @@ Is the pointer valid, are the dimensions valid?</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="is_valid_image"><span><a class="doc-id-link" href="#is_valid_image">is_valid_image<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L882"><em>Source</em></a></div></h3>
+<h3 id="is_valid_image"><span><a class="doc-id-link" href="#is_valid_image">is_valid_image<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L884"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_valid_image :: <span class="keyword-type">proc</span>(img: ^<a class="code-typename" href="/core/image/#Image">Image</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1727,7 +1728,7 @@ Is the pointer valid, are the dimensions valid?</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="pixels_to_image"><span><a class="doc-id-link" href="#pixels_to_image">pixels_to_image<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L733"><em>Source</em></a></div></h3>
+<h3 id="pixels_to_image"><span><a class="doc-id-link" href="#pixels_to_image">pixels_to_image<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L735"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pixels_to_image :: <span class="keyword-type">proc</span>(pixels: [][0]$E, width: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, height: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> (img: <a class="code-typename" href="/core/image/#Image">Image</a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1738,7 +1739,7 @@ Don't call <code>destroy</code> on the resulting <code>Image</code>. Instead, de
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="premultiply_alpha"><span><a class="doc-id-link" href="#premultiply_alpha">premultiply_alpha<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1466"><em>Source</em></a></div></h3>
+<h3 id="premultiply_alpha"><span><a class="doc-id-link" href="#premultiply_alpha">premultiply_alpha<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1468"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">premultiply_alpha :: <span class="keyword-type">proc</span>(img: ^<a class="code-typename" href="/core/image/#Image">Image</a>) -> (ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1750,7 +1751,7 @@ Note that some image formats like QOI explicitly do NOT support premultiplied al
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_data"><span><a class="doc-id-link" href="#read_data">read_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1585"><em>Source</em></a></div></h3>
+<h3 id="read_data"><span><a class="doc-id-link" href="#read_data">read_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1587"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_data :: <span class="keyword-type">proc</span>(z: $C, $T: <a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a>) -> (res: <a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a>, err: compress.<a class="code-typename" href="/core/compress/#General_Error">General_Error</a>) {…}</pre>
 </div>
@@ -1760,7 +1761,7 @@ Note that some image formats like QOI explicitly do NOT support premultiplied al
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_u8"><span><a class="doc-id-link" href="#read_u8">read_u8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1594"><em>Source</em></a></div></h3>
+<h3 id="read_u8"><span><a class="doc-id-link" href="#read_u8">read_u8<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1596"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_u8 :: <span class="keyword-type">proc</span>(z: $C) -> (res: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, err: compress.<a class="code-typename" href="/core/compress/#General_Error">General_Error</a>) {…}</pre>
 </div>
@@ -1772,7 +1773,7 @@ Note that some image formats like QOI explicitly do NOT support premultiplied al
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="return_single_channel"><span><a class="doc-id-link" href="#return_single_channel">return_single_channel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L758"><em>Source</em></a></div></h3>
+<h3 id="return_single_channel"><span><a class="doc-id-link" href="#return_single_channel">return_single_channel<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L760"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">return_single_channel :: <span class="keyword-type">proc</span>(img: ^<a class="code-typename" href="/core/image/#Image">Image</a>, channel: <a class="code-typename" href="/core/image/#Channel">Channel</a>) -> (res: ^<a class="code-typename" href="/core/image/#Image">Image</a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1794,14 +1795,14 @@ Note that some image formats like QOI explicitly do NOT support premultiplied al
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="write_bytes"><span><a class="doc-id-link" href="#write_bytes">write_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1602"><em>Source</em></a></div></h3>
+<h3 id="write_bytes"><span><a class="doc-id-link" href="#write_bytes">write_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1604"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write_bytes :: <span class="keyword-type">proc</span>(buf: ^bytes.<a class="code-typename" href="/core/bytes/#Buffer">Buffer</a>, data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (err: compress.<a class="code-typename" href="/core/compress/#General_Error">General_Error</a>) {…}</pre>
 </div>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="apply_palette"><span><a class="doc-id-link" href="#apply_palette">apply_palette<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1427"><em>Source</em></a></div></h3>
+<h3 id="apply_palette"><span><a class="doc-id-link" href="#apply_palette">apply_palette<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1429"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">apply_palette :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/image/#apply_palette_rgb">apply_palette_rgb</a>,
@@ -1811,7 +1812,7 @@ Note that some image formats like QOI explicitly do NOT support premultiplied al
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="blend"><span><a class="doc-id-link" href="#blend">blend<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1461"><em>Source</em></a></div></h3>
+<h3 id="blend"><span><a class="doc-id-link" href="#blend">blend<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/image/common.odin#L1463"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">blend :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/image/#blend_single_channel">blend_single_channel</a>,
@@ -1848,7 +1849,7 @@ Note that some image formats like QOI explicitly do NOT support premultiplied al
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/image/general_os.odin">general_os.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-09 (vendor "odin") Windows_amd64 @ 2025-09-08 21:13:26.570833500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-09 (vendor "odin") Windows_amd64 @ 2025-09-09 21:11:11.042862500 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
