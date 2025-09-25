@@ -506,7 +506,7 @@ when 'skip_dir' is invoked on a non-directory. 'walk' skips the remaining files 
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="abs"><span><a class="doc-id-link" href="#abs">abs<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/path/filepath/path_windows.odin#L81"><em>Source</em></a></div></h3>
+<h3 id="abs"><span><a class="doc-id-link" href="#abs">abs<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/path/filepath/path_windows.odin#L77"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">abs :: <span class="keyword-type">proc</span>(path: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (<a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -604,7 +604,7 @@ The pattern may describe hierarchical names such as /usr/*/bin (assuming '/' is 
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="is_abs"><span><a class="doc-id-link" href="#is_abs">is_abs<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/path/filepath/path_windows.odin#L36"><em>Source</em></a></div></h3>
+<h3 id="is_abs"><span><a class="doc-id-link" href="#is_abs">is_abs<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/path/filepath/path_windows.odin#L35"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_abs :: <span class="keyword-type">proc</span>(path: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -626,15 +626,15 @@ The pattern may describe hierarchical names such as /usr/*/bin (assuming '/' is 
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="join"><span><a class="doc-id-link" href="#join">join<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/path/filepath/path_windows.odin#L92"><em>Source</em></a></div></h3>
+<h3 id="join"><span><a class="doc-id-link" href="#join">join<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/path/filepath/path_windows.odin#L87"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">join :: <span class="keyword-type">proc</span>(elems: []<a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
+<pre class="doc-code">join :: <span class="keyword-type">proc</span>(elems: []<a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (<a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="join_non_empty"><span><a class="doc-id-link" href="#join_non_empty">join_non_empty<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/path/filepath/path_windows.odin#L101"><em>Source</em></a></div></h3>
+<h3 id="join_non_empty"><span><a class="doc-id-link" href="#join_non_empty">join_non_empty<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/path/filepath/path_windows.odin#L96"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">join_non_empty :: <span class="keyword-type">proc</span>(elems: []<a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
+<pre class="doc-code">join_non_empty :: <span class="keyword-type">proc</span>(elems: []<a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (joined: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -815,7 +815,7 @@ NOTE: os.File_Info uses the 'context.temp_allocator' to allocate, and will delet
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-09 (vendor "odin") Windows_amd64 @ 2025-09-24 21:12:00.948397600 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-09 (vendor "odin") Windows_amd64 @ 2025-09-25 21:14:36.117306600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
