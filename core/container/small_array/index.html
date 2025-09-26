@@ -428,7 +428,7 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (24)</summary>
+Procedures (25)</summary>
 <ul>
 <li><a href="#append_elem">append_elem</a></li>
 <li><a href="#append_elems">append_elems</a></li>
@@ -441,6 +441,7 @@ Procedures (24)</summary>
 <li><a href="#get_safe">get_safe</a></li>
 <li><a href="#inject_at">inject_at</a></li>
 <li><a href="#len">len</a></li>
+<li><a href="#non_zero_resize">non_zero_resize</a></li>
 <li><a href="#ordered_remove">ordered_remove</a></li>
 <li><a href="#pop_back">pop_back</a></li>
 <li><a href="#pop_back_safe">pop_back_safe</a></li>
@@ -506,6 +507,7 @@ example :: proc() {
 <li><a href="/core/container/small_array/#get_safe">get_safe</a></li>
 <li><a href="/core/container/small_array/#inject_at">inject_at</a></li>
 <li><a href="/core/container/small_array/#len">len</a></li>
+<li><a href="/core/container/small_array/#non_zero_resize">non_zero_resize</a></li>
 <li><a href="/core/container/small_array/#ordered_remove">ordered_remove</a></li>
 <li><a href="/core/container/small_array/#pop_back">pop_back</a></li>
 <li><a href="/core/container/small_array/#pop_back_safe">pop_back_safe</a></li>
@@ -529,7 +531,7 @@ example :: proc() {
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="append_elem"><span><a class="doc-id-link" href="#append_elem">append_elem<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L319"><em>Source</em></a></div></h3>
+<h3 id="append_elem"><span><a class="doc-id-link" href="#append_elem">append_elem<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L365"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_elem :: <a class="code-procedure" href="/core/container/small_array/#push_back">push_back</a></pre>
 </div>
@@ -563,7 +565,7 @@ push_back_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="append_elems"><span><a class="doc-id-link" href="#append_elems">append_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L688"><em>Source</em></a></div></h3>
+<h3 id="append_elems"><span><a class="doc-id-link" href="#append_elems">append_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L734"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append_elems :: <a class="code-procedure" href="/core/container/small_array/#push_back_elems">push_back_elems</a></pre>
 </div>
@@ -608,7 +610,7 @@ push_back_elems_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="clear"><span><a class="doc-id-link" href="#clear">clear<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L657"><em>Source</em></a></div></h3>
+<h3 id="clear"><span><a class="doc-id-link" href="#clear">clear<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L703"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">clear :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>($N, $T)) {…}</pre>
 </div>
@@ -639,7 +641,7 @@ AFTER : []
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="consume"><span><a class="doc-id-link" href="#consume">consume<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L554"><em>Source</em></a></div></h3>
+<h3 id="consume"><span><a class="doc-id-link" href="#consume">consume<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L600"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">consume :: <span class="keyword-type">proc</span>(a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>($N, $T), count: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
@@ -768,7 +770,7 @@ x
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="inject_at"><span><a class="doc-id-link" href="#inject_at">inject_at<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L727"><em>Source</em></a></div></h3>
+<h3 id="inject_at"><span><a class="doc-id-link" href="#inject_at">inject_at<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L773"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">inject_at :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>($N, $T), item: $T, index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -816,7 +818,50 @@ inject_at_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="ordered_remove"><span><a class="doc-id-link" href="#ordered_remove">ordered_remove<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L588"><em>Source</em></a></div></h3>
+<h3 id="non_zero_resize"><span><a class="doc-id-link" href="#non_zero_resize">non_zero_resize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L332"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">non_zero_resize :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Tries to resize the small-array to the specified length.</p>
+<p>The new length will be:</p>
+<pre>- `length` if `length` &lt;= capacity
+- capacity if length &gt; capacity
+
+</pre>
+<p><b>Inputs</b>
+<span class="doc-list"><code>a</code>: A pointer to the small-array</span>
+<span class="doc-list"><code>length</code>: The new desired length</span></p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:container/small_array"
+import "core:fmt"
+
+non_zero_resize :: proc() {
+	a: small_array.Small_Array(5, int)
+
+	small_array.push_back(&a, 1)
+	small_array.push_back(&a, 2)
+	fmt.println(small_array.slice(&a))
+
+	small_array.non_zero_resize(&a, 1)
+	fmt.println(small_array.slice(&a))
+
+	small_array.non_zero_resize(&a, 100)
+	fmt.println(small_array.slice(&a))
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">[1, 2]
+[1]
+[1, 2, 0, 0, 0]
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="ordered_remove"><span><a class="doc-id-link" href="#ordered_remove">ordered_remove<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L634"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ordered_remove :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>($N, $T), index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
@@ -850,7 +895,7 @@ AFTER : [0, 2, 3]
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="pop_back"><span><a class="doc-id-link" href="#pop_back">pop_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L401"><em>Source</em></a></div></h3>
+<h3 id="pop_back"><span><a class="doc-id-link" href="#pop_back">pop_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L447"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pop_back :: <span class="keyword-type">proc</span>(a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>($N, $T), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> $T {…}</pre>
 </div>
@@ -884,7 +929,7 @@ AFTER:  [0, 1]
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="pop_back_safe"><span><a class="doc-id-link" href="#pop_back_safe">pop_back_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L475"><em>Source</em></a></div></h3>
+<h3 id="pop_back_safe"><span><a class="doc-id-link" href="#pop_back_safe">pop_back_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L521"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pop_back_safe :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>($N, $T)) -> (item: $T, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -916,7 +961,7 @@ pop_back_safe_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="pop_front"><span><a class="doc-id-link" href="#pop_front">pop_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L440"><em>Source</em></a></div></h3>
+<h3 id="pop_front"><span><a class="doc-id-link" href="#pop_front">pop_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L486"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pop_front :: <span class="keyword-type">proc</span>(a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>($N, $T), loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> $T {…}</pre>
 </div>
@@ -952,7 +997,7 @@ AFTER:  [1, 2]
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="pop_front_safe"><span><a class="doc-id-link" href="#pop_front_safe">pop_front_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L513"><em>Source</em></a></div></h3>
+<h3 id="pop_front_safe"><span><a class="doc-id-link" href="#pop_front_safe">pop_front_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L559"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pop_front_safe :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>($N, $T)) -> (item: $T, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -986,7 +1031,7 @@ pop_front_safe_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="push_back"><span><a class="doc-id-link" href="#push_back">push_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L319"><em>Source</em></a></div></h3>
+<h3 id="push_back"><span><a class="doc-id-link" href="#push_back">push_back<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L365"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">push_back :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>($N, $T), item: $T) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -1020,7 +1065,7 @@ push_back_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="push_back_elems"><span><a class="doc-id-link" href="#push_back_elems">push_back_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L688"><em>Source</em></a></div></h3>
+<h3 id="push_back_elems"><span><a class="doc-id-link" href="#push_back_elems">push_back_elems<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L734"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">push_back_elems :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>($N, $T), <span class="keyword-type">..</span> items: ..$T) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -1052,7 +1097,7 @@ push_back_elems_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="push_front"><span><a class="doc-id-link" href="#push_front">push_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L361"><em>Source</em></a></div></h3>
+<h3 id="push_front"><span><a class="doc-id-link" href="#push_front">push_front<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L407"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">push_front :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>($N, $T), item: $T) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -1089,13 +1134,14 @@ push_front_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="resize"><span><a class="doc-id-link" href="#resize">resize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L286"><em>Source</em></a></div></h3>
+<h3 id="resize"><span><a class="doc-id-link" href="#resize">resize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L288"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">resize :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>, length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+<pre class="doc-code">resize :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>($N, $T), length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Tries to resize the small-array to the specified length.</p>
+<p>The memory of added elements will be zeroed out.</p>
 <p>The new length will be:</p>
 <pre>- `length` if `length` &lt;= capacity
 - capacity if length &gt; capacity
@@ -1115,7 +1161,7 @@ resize_example :: proc() {
 	small_array.push_back(&a, 1)
 	small_array.push_back(&a, 2)
 	fmt.println(small_array.slice(&a))
-	
+
 	small_array.resize(&a, 1)
 	fmt.println(small_array.slice(&a))
 
@@ -1127,7 +1173,7 @@ resize_example :: proc() {
 <b>Output:</b>
 <pre class="doc-code">[1, 2]
 [1]
-[1, 2, 0, 0, 0]
+[1, 0, 0, 0, 0]
 </pre>
 </details>
 </div>
@@ -1173,7 +1219,7 @@ set_example :: proc() {
 	fmt.println(small_array.slice(&a))
 
 	// resizing makes the change visible
-	small_array.resize(&a, 100)
+	small_array.non_zero_resize(&a, 100)
 	fmt.println(small_array.slice(&a))
 }
 </code></pre>
@@ -1238,7 +1284,7 @@ slice_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="unordered_remove"><span><a class="doc-id-link" href="#unordered_remove">unordered_remove<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L622"><em>Source</em></a></div></h3>
+<h3 id="unordered_remove"><span><a class="doc-id-link" href="#unordered_remove">unordered_remove<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L668"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">unordered_remove :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (a: ^$A/<a class="code-typename" href="/core/container/small_array/#Small_Array">Small_Array</a>($N, $T), index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
 </div>
@@ -1271,7 +1317,7 @@ AFTER : [0, 3, 2]
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="append"><span><a class="doc-id-link" href="#append">append<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L773"><em>Source</em></a></div></h3>
+<h3 id="append"><span><a class="doc-id-link" href="#append">append<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L819"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">append :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/container/small_array/#push_back">push_back</a>,
@@ -1285,7 +1331,7 @@ AFTER : [0, 3, 2]
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="push"><span><a class="doc-id-link" href="#push">push<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L771"><em>Source</em></a></div></h3>
+<h3 id="push"><span><a class="doc-id-link" href="#push">push<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin#L817"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">push :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/container/small_array/#push_back">push_back</a>,
@@ -1327,7 +1373,7 @@ push_example :: proc() {
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin">small_array.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-09 (vendor "odin") Windows_amd64 @ 2025-09-25 21:14:35.769202000 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-09 (vendor "odin") Windows_amd64 @ 2025-09-26 21:11:40.431320300 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -1348,6 +1394,7 @@ push_example :: proc() {
 <li><a href="#get_safe">get_safe</a></li>
 <li><a href="#inject_at">inject_at</a></li>
 <li><a href="#len">len</a></li>
+<li><a href="#non_zero_resize">non_zero_resize</a></li>
 <li><a href="#ordered_remove">ordered_remove</a></li>
 <li><a href="#pop_back">pop_back</a></li>
 <li><a href="#pop_back_safe">pop_back_safe</a></li>
