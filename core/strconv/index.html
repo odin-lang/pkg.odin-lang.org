@@ -380,7 +380,7 @@ Variables (1)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (49)</summary>
+Procedures (50)</summary>
 <ul>
 <li><a href="#append_bits">append_bits</a></li>
 <li><a href="#append_bits_128">append_bits_128</a></li>
@@ -392,6 +392,7 @@ Procedures (49)</summary>
 <li><a href="#atof">atof</a></li>
 <li><a href="#atoi">atoi</a></li>
 <li><a href="#decimal_to_float_bits">decimal_to_float_bits</a></li>
+<li><a href="#digit_to_int">digit_to_int</a></li>
 <li><a href="#format_digits">format_digits</a></li>
 <li><a href="#ftoa">ftoa</a></li>
 <li><a href="#generic_ftoa">generic_ftoa</a></li>
@@ -634,6 +635,16 @@ atoi_example :: proc() {
 <p><b>Returns</b>
 <span class="doc-list">b: The bits representing the floating-point number</span>
 <span class="doc-list">overflow: A boolean indicating whether an overflow occurred during conversion</span></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="digit_to_int"><span><a class="doc-id-link" href="#digit_to_int">digit_to_int<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1659"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">digit_to_int :: <span class="keyword-type">proc</span>(r: untyped rune) -> (value: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Accepts '0'..='9', otherwise returns ok = false</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1493,7 +1504,7 @@ ok: <code>false</code> if no appropriate value could be found; the value was neg
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="quote"><span><a class="doc-id-link" href="#quote">quote<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1684"><em>Source</em></a></div></h3>
+<h3 id="quote"><span><a class="doc-id-link" href="#quote">quote<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1691"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">quote :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
@@ -1523,7 +1534,7 @@ quote_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="quote_rune"><span><a class="doc-id-link" href="#quote_rune">quote_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1745"><em>Source</em></a></div></h3>
+<h3 id="quote_rune"><span><a class="doc-id-link" href="#quote_rune">quote_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1752"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">quote_rune :: <span class="keyword-type">proc</span>(buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, r: untyped rune) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
@@ -1567,7 +1578,7 @@ quote_rune_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="unquote_char"><span><a class="doc-id-link" href="#unquote_char">unquote_char<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1829"><em>Source</em></a></div></h3>
+<h3 id="unquote_char"><span><a class="doc-id-link" href="#unquote_char">unquote_char<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1836"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">unquote_char :: <span class="keyword-type">proc</span>(str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, quote: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (r: untyped rune, multiple_bytes: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, tail_string: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, success: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1601,7 +1612,7 @@ r: &lt;'&gt;, multiple_bytes:false, tail_string:&lt;The' raven&gt;, success:true
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="unquote_string"><span><a class="doc-id-link" href="#unquote_string">unquote_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1971"><em>Source</em></a></div></h3>
+<h3 id="unquote_string"><span><a class="doc-id-link" href="#unquote_string">unquote_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin#L1978"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">unquote_string :: <span class="keyword-type">proc</span>(lit: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (res: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocated, success: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1884,7 +1895,7 @@ write_uint_example :: proc() {
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/strconv/strconv.odin">strconv.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-09 (vendor "odin") Windows_amd64 @ 2025-10-01 21:11:45.337443500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-02 21:12:52.234682600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -1915,6 +1926,7 @@ write_uint_example :: proc() {
 <li><a href="#atof">atof</a></li>
 <li><a href="#atoi">atoi</a></li>
 <li><a href="#decimal_to_float_bits">decimal_to_float_bits</a></li>
+<li><a href="#digit_to_int">digit_to_int</a></li>
 <li><a href="#format_digits">format_digits</a></li>
 <li><a href="#ftoa">ftoa</a></li>
 <li><a href="#generic_ftoa">generic_ftoa</a></li>
