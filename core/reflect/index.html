@@ -370,24 +370,24 @@ The use of <code>any</code> outside of this is heavily discourage and should be 
 the current stack frame.</p>
 <details open class="code-example">
 <summary><b>Example:</b></summary>
-<pre><code class="hljs language-odin" data-lang="odin"></code></pre>
+<pre><code class="hljs language-odin" data-lang="odin">x: int = 123
+a: any = x
+// equivalent to
+a: any
+a.data = &x
+a.id   = typeid_of(type_of(x))
+</code></pre>
 </details>
-<p>    x: int = 123
-    a: any = x
-    // equivalent to
-    a: any
-    a.data = &x
-    a.id   = typeid_of(type_of(x))</p>
-<details open class="code-example">
-<summary><b>Example:</b></summary>
-<pre><code class="hljs language-odin" data-lang="odin"></code></pre>
-</details>
-<p>    a: any = 123
-    // equivalent to
-    a: any
-    tmp: int = 123
-    a.data = &tmp
-    a.id   = typeid_of(type_of(tmp))</p>
+<p>Example:</p>
+<pre>a: any = 123
+// equivalent to
+a: any
+tmp: int = 123
+a.data = &tmp
+a.id   = typeid_of(type_of(tmp))
+
+
+</pre>
 <p><code>any</code> is a topologically-dual to a <code>union</code> in terms of its usage. Both support assignments of differing types
 (<code>any</code> being open to any type, <code>union</code> being closed to a specific set of types), type assertions (<code>x.(T)</code>), and <code>switch in</code>.
 The main internal difference is how the memory is stored. <code>any</code> being open is a pointer+typeid, a <code>union</code>
@@ -2125,7 +2125,7 @@ The <code>ok</code> value returns whether the value was explicit set in the tag 
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/reflect/types.odin">types.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-07 10:59:00.709136800 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-07 11:05:26.460886500 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
