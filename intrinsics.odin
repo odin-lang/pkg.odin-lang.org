@@ -330,7 +330,7 @@ intrinsics_table := []Builtin{
 	{name = "type_field_index_of",                      kind = "b", type = "proc($T: typeid, $name: string) -> uintptr"},
 
 	{name = "type_equal_proc",                          kind = "b", type = "proc($T: typeid) -> (equal:  proc \"contextless\" (rawptr, rawptr) -> bool)                 where type_is_comparable(T)",
-		comment = "Returns the underlying procedure that is used to compare pointers to two values of the same time together. This is used by the `map` type and general complicated comparisons.",
+		comment = "Returns the underlying procedure that is used to compare pointers to two values of the same type together. This is used by the `map` type and general complicated comparisons.",
 	},
 	{name = "type_hasher_proc",                         kind = "b", type = "proc($T: typeid) -> (hasher: proc \"contextless\" (data: rawptr, seed: uintptr) -> uintptr) where type_is_comparable(T)",
 		comment = "Returns the underlying procedure that is used to hash a pointer to a value used by the `map` type.",
