@@ -400,7 +400,7 @@ Variables (19)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (40)</summary>
+Procedures (41)</summary>
 <ul>
 <li><a href="#binary_search">binary_search</a></li>
 <li><a href="#is_alpha">is_alpha</a></li>
@@ -439,6 +439,7 @@ Procedures (40)</summary>
 <li><a href="#is_upper">is_upper</a></li>
 <li><a href="#is_white_space">is_white_space</a></li>
 <li><a href="#normalized_east_asian_width">normalized_east_asian_width</a></li>
+<li><a href="#simple_fold">simple_fold</a></li>
 <li><a href="#to_lower">to_lower</a></li>
 <li><a href="#to_title">to_title</a></li>
 <li><a href="#to_upper">to_upper</a></li>
@@ -987,6 +988,30 @@ Prepended_Concatenation_Mark = Yes
 </details>
 </div>
 <div class="pkg-entity">
+<h3 id="simple_fold"><span><a class="doc-id-link" href="#simple_fold">simple_fold<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/unicode/fold.odin#L17"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">simple_fold :: <span class="keyword-type">proc</span>(r: untyped rune) -> untyped rune {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>simple_fold iterates over the Unicode code points equivalent under the Unicode defined simple case folding.
+simple_fold returns the smallest rune &gt; r if one exists, or the smallest rune &gt;= 0.
+If no valid Unicode code point exists, r is returned.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">simple_fold('A')      == 'a'
+simple_fold('a')      == 'A'
+simple_fold('Z')      == 'z'
+simple_fold('z')      == 'Z'
+simple_fold('7')      == '7'
+simple_fold('k')      == '\u212a' (Kelvin symbol, K)
+simple_fold('\u212a') == 'k'
+simple_fold(-3)       == -3
+</code></pre>
+</details>
+</details>
+</div>
+<div class="pkg-entity">
 <h3 id="to_lower"><span><a class="doc-id-link" href="#to_lower">to_lower<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/unicode/letter.odin#L34"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">to_lower :: <span class="keyword-type">proc</span>(r: untyped rune) -> untyped rune {…}</pre>
@@ -1009,11 +1034,12 @@ Prepended_Concatenation_Mark = Yes
 </section>
 <h2 id="pkg-source-files">Source Files</h2>
 <ul>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/core/unicode/fold.odin">fold.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/unicode/letter.odin">letter.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/unicode/tables.odin">tables.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-06 21:12:19.142343400 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-07 10:59:02.204205300 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -1089,6 +1115,7 @@ Prepended_Concatenation_Mark = Yes
 <li><a href="#is_upper">is_upper</a></li>
 <li><a href="#is_white_space">is_white_space</a></li>
 <li><a href="#normalized_east_asian_width">normalized_east_asian_width</a></li>
+<li><a href="#simple_fold">simple_fold</a></li>
 <li><a href="#to_lower">to_lower</a></li>
 <li><a href="#to_title">to_title</a></li>
 <li><a href="#to_upper">to_upper</a></li>
