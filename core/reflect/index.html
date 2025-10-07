@@ -376,18 +376,15 @@ a: any = x
 a: any
 a.data = &x
 a.id   = typeid_of(type_of(x))
+// With literals
+v: any = 123
+// equivalent to
+v: any
+_tmp: int = 123
+v.data = &_tmp
+v.id   = typeid_of(type_of(_tmp))
 </code></pre>
 </details>
-<p>Example:</p>
-<pre>a: any = 123
-// equivalent to
-a: any
-tmp: int = 123
-a.data = &tmp
-a.id   = typeid_of(type_of(tmp))
-
-
-</pre>
 <p><code>any</code> is a topologically-dual to a <code>union</code> in terms of its usage. Both support assignments of differing types
 (<code>any</code> being open to any type, <code>union</code> being closed to a specific set of types), type assertions (<code>x.(T)</code>), and <code>switch in</code>.
 The main internal difference is how the memory is stored. <code>any</code> being open is a pointer+typeid, a <code>union</code>
@@ -2125,7 +2122,7 @@ The <code>ok</code> value returns whether the value was explicit set in the tag 
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/reflect/types.odin">types.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-07 11:05:26.460886500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-07 11:14:21.767916800 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
