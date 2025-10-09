@@ -345,6 +345,10 @@
 </div>
 <ul id="odin-search-results"></ul>
 <div id="pkg-top">
+<h2>Overview</h2>
+<div id="pkg-overview">
+<p>package relative implements relative pointers and slices.</p>
+</div>
 <div id="pkg-index">
 <h2>Index</h2>
 <div>
@@ -402,7 +406,7 @@ Procedure Groups (3)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Pointer"><span><a class="doc-id-link" href="#Pointer">Pointer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L5"><em>Source</em></a></div></h3>
+<h3 id="Pointer"><span><a class="doc-id-link" href="#Pointer">Pointer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L6"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Pointer :: <span class="keyword-type">struct</span>($Type: <span class="keyword-type">typeid</span>, $Backing: <span class="keyword-type">typeid</span>) <span class="keyword">where</span> intrinsics.type_is_pointer(Type) || intrinsics.type_is_multi_pointer(Type), intrinsics.type_is_integer(Backing) {
 	<span class="comment">… // See source for fields</span>
@@ -419,7 +423,7 @@ Procedure Groups (3)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Set_Safe_Error"><span><a class="doc-id-link" href="#Set_Safe_Error">Set_Safe_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L74"><em>Source</em></a></div></h3>
+<h3 id="Set_Safe_Error"><span><a class="doc-id-link" href="#Set_Safe_Error">Set_Safe_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L75"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Set_Safe_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
 	None, 
@@ -435,7 +439,7 @@ Procedure Groups (3)</summary>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Slice"><span><a class="doc-id-link" href="#Slice">Slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L12"><em>Source</em></a></div></h3>
+<h3 id="Slice"><span><a class="doc-id-link" href="#Slice">Slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L13"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Slice :: <span class="keyword-type">struct</span>($Type: <span class="keyword-type">typeid</span>, $Backing: <span class="keyword-type">typeid</span>) <span class="keyword">where</span> intrinsics.type_is_pointer(Type) || intrinsics.type_is_multi_pointer(Type), intrinsics.type_is_integer(Backing) {
 	<span class="comment">… // See source for fields</span>
@@ -457,44 +461,44 @@ Procedure Groups (3)</summary>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="pointer_get"><span><a class="doc-id-link" href="#pointer_get">pointer_get<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L23"><em>Source</em></a></div></h3>
+<h3 id="pointer_get"><span><a class="doc-id-link" href="#pointer_get">pointer_get<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L24"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pointer_get :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (p: ^$P/<a class="code-typename" href="/core/relative/#Pointer">Pointer</a>($Type, $Backing)) -> $T {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="pointer_set"><span><a class="doc-id-link" href="#pointer_set">pointer_set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L31"><em>Source</em></a></div></h3>
+<h3 id="pointer_set"><span><a class="doc-id-link" href="#pointer_set">pointer_set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L32"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pointer_set :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (p: ^$P/<a class="code-typename" href="/core/relative/#Pointer">Pointer</a>($Type, $Backing), ptr: $T) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="pointer_set_safe"><span><a class="doc-id-link" href="#pointer_set_safe">pointer_set_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L82"><em>Source</em></a></div></h3>
+<h3 id="pointer_set_safe"><span><a class="doc-id-link" href="#pointer_set_safe">pointer_set_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L83"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pointer_set_safe :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (p: ^$P/<a class="code-typename" href="/core/relative/#Pointer">Pointer</a>($Type, $Backing), ptr: $T) -> <a class="code-typename" href="/core/relative/#Set_Safe_Error">Set_Safe_Error</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="slice_get"><span><a class="doc-id-link" href="#slice_get">slice_get<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L40"><em>Source</em></a></div></h3>
+<h3 id="slice_get"><span><a class="doc-id-link" href="#slice_get">slice_get<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L41"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">slice_get :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (p: ^$S/<a class="code-typename" href="/core/relative/#Slice">Slice</a>($Type, $Backing)) -> (slice: $T/[]$E) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="slice_set"><span><a class="doc-id-link" href="#slice_set">slice_set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L52"><em>Source</em></a></div></h3>
+<h3 id="slice_set"><span><a class="doc-id-link" href="#slice_set">slice_set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L53"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">slice_set :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (p: ^$S/<a class="code-typename" href="/core/relative/#Slice">Slice</a>($Type, $Backing), slice: $T) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="slice_set_safe"><span><a class="doc-id-link" href="#slice_set_safe">slice_set_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L115"><em>Source</em></a></div></h3>
+<h3 id="slice_set_safe"><span><a class="doc-id-link" href="#slice_set_safe">slice_set_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L116"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">slice_set_safe :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (p: ^$S/<a class="code-typename" href="/core/relative/#Slice">Slice</a>($Type, $Backing), slice: $T) -> <a class="code-typename" href="/core/relative/#Set_Safe_Error">Set_Safe_Error</a> {…}</pre>
 </div>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="get"><span><a class="doc-id-link" href="#get">get<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L62"><em>Source</em></a></div></h3>
+<h3 id="get"><span><a class="doc-id-link" href="#get">get<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L63"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">get :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/relative/#pointer_get">pointer_get</a>,
@@ -504,7 +508,7 @@ Procedure Groups (3)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="set"><span><a class="doc-id-link" href="#set">set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L67"><em>Source</em></a></div></h3>
+<h3 id="set"><span><a class="doc-id-link" href="#set">set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L68"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">set :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/relative/#pointer_set">pointer_set</a>,
@@ -514,7 +518,7 @@ Procedure Groups (3)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="set_safe"><span><a class="doc-id-link" href="#set_safe">set_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L168"><em>Source</em></a></div></h3>
+<h3 id="set_safe"><span><a class="doc-id-link" href="#set_safe">set_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin#L169"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">set_safe :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/relative/#pointer_set_safe">pointer_set_safe</a>,
@@ -529,12 +533,12 @@ Procedure Groups (3)</summary>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/relative/relative.odin">relative.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 15:53:47.672378300 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 18:46:04.000349800 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
 <ul>
-<li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#pkg-overview">Overview</a><li><a href="#pkg-Types">Types</a><ul>
 <li><a href="#Pointer">Pointer</a></li>
 <li><a href="#Set_Safe_Error">Set_Safe_Error</a></li>
 <li><a href="#Slice">Slice</a></li>
