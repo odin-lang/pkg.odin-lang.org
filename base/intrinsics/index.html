@@ -160,7 +160,7 @@ Types (7)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (220)</summary>
+Procedures (223)</summary>
 <ul>
 <li><a href="#transpose">transpose</a></li>
 <li><a href="#outer_product">outer_product</a></li>
@@ -381,6 +381,9 @@ Procedures (220)</summary>
 <li><a href="#objc_register_selector">objc_register_selector</a></li>
 <li><a href="#objc_find_class">objc_find_class</a></li>
 <li><a href="#objc_register_class">objc_register_class</a></li>
+<li><a href="#objc_ivar_get">objc_ivar_get</a></li>
+<li><a href="#objc_block">objc_block</a></li>
+<li><a href="#objc_super">objc_super</a></li>
 <li><a href="#valgrind_client_request">valgrind_client_request</a></li>
 </ul>
 </details>
@@ -4027,18 +4030,6 @@ ptr     v     v
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>The first two operators of <code>simd_shuffle</code> are <code>#simd</code> vectors of the same type. The indices following these represent the shuffle mask values. The mask elements must be constant integers. The result of the procedure is a vector whose length is the same as the number of indices passed to the procedure type.</p>
-<p>The elements of the two input <code>#simd</code> vectors are numbers from left to right across both of the vectors. For each element of the result <code>#simd</code> vector, the shuffle indices selement an element from one of the two input vectors to copy to the result.</p>
-<details open class="code-example">
-<summary><b>Example:</b></summary>
-<pre><code class="hljs language-odin" data-lang="odin">a, b: #simd[4]T = ...
-x: #simd[4]T = intrinsics.simd_shuffle(a, b, 0, 1, 2, 3) // identity shuffle of `a`
-y: #simd[4]T = intrinsics.simd_shuffle(a, b, 4, 5, 6, 7) // identity shuffle of `b`
-z: #simd[4]T = intrinsics.simd_shuffle(a, b, 0, 4, 1, 5)
-w: #simd[8]T = intrinsics.simd_shuffle(a, b, 0, 1, 2, 3, 4, 5, 6, 7)
-v: #simd[6]T = intrinsics.simd_shuffle(a, b, 0, 1, 0, 3, 0, 4) // repeated indices and different sized vector
-</code></pre>
-</details>
 <p>Reorder the lanes of two SIMD vectors.</p>
 <p>This procedure returns a vector, containing the scalars from the lanes of two
 vectors, according to the provided indices vector. Each index in the indices
@@ -4412,6 +4403,36 @@ Will register a class value at run-time for the given constant string value.</p>
 </details>
 </div>
 <div class="pkg-entity">
+<h3 id="objc_ivar_get"><span><a class="doc-id-link" href="#objc_ivar_get">objc_ivar_get<span class="a-hidden">&nbsp;¶</span></a></span></h3>
+<div>
+<pre class="doc-code">objc_ivar_get :: <span class="keyword-type">proc</span>(self: $T) ^$U {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Darwin targets only</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="objc_block"><span><a class="doc-id-link" href="#objc_block">objc_block<span class="a-hidden">&nbsp;¶</span></a></span></h3>
+<div>
+<pre class="doc-code">objc_block :: <span class="keyword-type">proc</span>(invoke: $T, ..any) -> ^Objc_Block(T) <span class="keyword">where</span> <a href="/base/intrinsics#type_is_proc"><span class="code-procedure">type_is_proc</span></a>(T) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Darwin targets only</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="objc_super"><span><a class="doc-id-link" href="#objc_super">objc_super<span class="a-hidden">&nbsp;¶</span></a></span></h3>
+<div>
+<pre class="doc-code">objc_super :: <span class="keyword-type">proc</span>(obj: ^$T) -> ^$U <span class="keyword">where</span> <a href="/base/intrinsics#type_is_subtype_of"><span class="code-procedure">type_is_subtype_of</span></a>(T, <a href="/base/intrinsics#objc_object"><span class="code-typename">objc_object</span></a>), <a href="/base/intrinsics#type_is_subtype_of"><span class="code-procedure">type_is_subtype_of</span></a>(U, <a href="/base/intrinsics#objc_object"><span class="code-typename">objc_object</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Darwin targets only</p>
+</details>
+</div>
+<div class="pkg-entity">
 <h3 id="valgrind_client_request"><span><a class="doc-id-link" href="#valgrind_client_request">valgrind_client_request<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">valgrind_client_request :: <span class="keyword-type">proc</span>(default: <a href="/base/builtin#uintptr"><span class="doc-builtin">uintptr</span></a>, request: <a href="/base/builtin#uintptr"><span class="doc-builtin">uintptr</span></a>, a0, a1, a2, a3, a4: <a href="/base/builtin#uintptr"><span class="doc-builtin">uintptr</span></a>) -> <a href="/base/builtin#uintptr"><span class="doc-builtin">uintptr</span></a> {…}</pre>
@@ -4663,6 +4684,9 @@ Will register a class value at run-time for the given constant string value.</p>
 <li><a href="#objc_register_selector">objc_register_selector</a></li>
 <li><a href="#objc_find_class">objc_find_class</a></li>
 <li><a href="#objc_register_class">objc_register_class</a></li>
+<li><a href="#objc_ivar_get">objc_ivar_get</a></li>
+<li><a href="#objc_block">objc_block</a></li>
+<li><a href="#objc_super">objc_super</a></li>
 <li><a href="#valgrind_client_request">valgrind_client_request</a></li>
 </ul>
 </li>

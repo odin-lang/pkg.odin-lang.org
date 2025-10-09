@@ -264,28 +264,28 @@ Procedures (107)</summary>
 <li><a href="#soa_unzip">soa_unzip</a></li>
 <li><a href="#raw_data">raw_data</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#raw_soa_footer_slice">raw_soa_footer_slice</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#raw_soa_footer_dynamic_array">raw_soa_footer_dynamic_array</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#make_soa_aligned">make_soa_aligned</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#container_of">container_of</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#make_soa_slice">make_soa_slice</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#raw_soa_footer_dynamic_array">raw_soa_footer_dynamic_array</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#init_global_temporary_allocator">init_global_temporary_allocator</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#make_soa_dynamic_array">make_soa_dynamic_array</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#make_soa_dynamic_array_len">make_soa_dynamic_array_len</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#make_soa_aligned">make_soa_aligned</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#copy_slice">copy_slice</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#make_soa_dynamic_array_len_cap">make_soa_dynamic_array_len_cap</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#make_soa_slice">make_soa_slice</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#copy_from_string">copy_from_string</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#make_soa_dynamic_array">make_soa_dynamic_array</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#copy_from_string16">copy_from_string16</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#resize_soa">resize_soa</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#make_soa_dynamic_array_len">make_soa_dynamic_array_len</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#make_soa_dynamic_array_len_cap">make_soa_dynamic_array_len_cap</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#unordered_remove">unordered_remove</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#ordered_remove">ordered_remove</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#resize_soa">resize_soa</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#remove_range">remove_range</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#pop">pop</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#pop_safe">pop_safe</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#non_zero_resize_soa">non_zero_resize_soa</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#pop_front">pop_front</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#pop">pop</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#reserve_soa">reserve_soa</a></li>
-<li><a href="/base/runtime">runtime</a>.<a href="#pop_front_safe">pop_front_safe</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#pop_safe">pop_safe</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#non_zero_reserve_soa">non_zero_reserve_soa</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#pop_front">pop_front</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#pop_front_safe">pop_front_safe</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#append_soa_elem">append_soa_elem</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#non_zero_append_soa_elem">non_zero_append_soa_elem</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#append_soa_elems">append_soa_elems</a></li>
@@ -351,8 +351,8 @@ Procedures (107)</summary>
 <summary id="#doc-index-Procedure Groups-header">
 Procedure Groups (19)</summary>
 <ul>
-<li><a href="/base/runtime">runtime</a>.<a href="#make_soa">make_soa</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#copy">copy</a></li>
+<li><a href="/base/runtime">runtime</a>.<a href="#make_soa">make_soa</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#clear">clear</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#reserve">reserve</a></li>
 <li><a href="/base/runtime">runtime</a>.<a href="#non_zero_reserve">non_zero_reserve</a></li>
@@ -1534,18 +1534,6 @@ raw_data(string)       -&gt; [^]byte // string
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="raw_soa_footer_dynamic_array"><span><a class="doc-id-link" href="#raw_soa_footer_dynamic_array">raw_soa_footer_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L63"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">raw_soa_footer_dynamic_array :: <span class="keyword-type">proc</span>(array: ^$T/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E) -> (footer: ^<a class="code-typename" href="/base/runtime/#Raw_SOA_Footer_Dynamic_Array">Raw_SOA_Footer_Dynamic_Array</a>) {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="make_soa_aligned"><span><a class="doc-id-link" href="#make_soa_aligned">make_soa_aligned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L79"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">make_soa_aligned :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#soa</span>[]$E, <span class="keyword-type">#any_int</span> length, <span class="keyword-type">#any_int</span> alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
 <h3 id="container_of"><span><a class="doc-id-link" href="#container_of">container_of<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L48"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">container_of :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (ptr: $P/^$Field_Type, $T: <a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a>, $field_name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> ^<a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a> {…}</pre>
@@ -1584,9 +1572,9 @@ main :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="make_soa_slice"><span><a class="doc-id-link" href="#make_soa_slice">make_soa_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L138"><em>Source</em></a></div></h3>
+<h3 id="raw_soa_footer_dynamic_array"><span><a class="doc-id-link" href="#raw_soa_footer_dynamic_array">raw_soa_footer_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L63"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_soa_slice :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#soa</span>[]$E, <span class="keyword-type">#any_int</span> length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">raw_soa_footer_dynamic_array :: <span class="keyword-type">proc</span>(array: ^$T/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E) -> (footer: ^<a class="code-typename" href="/base/runtime/#Raw_SOA_Footer_Dynamic_Array">Raw_SOA_Footer_Dynamic_Array</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1601,15 +1589,9 @@ This is ignored when <code>NO_DEFAULT_TEMP_ALLOCATOR</code> is true.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="make_soa_dynamic_array"><span><a class="doc-id-link" href="#make_soa_dynamic_array">make_soa_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L143"><em>Source</em></a></div></h3>
+<h3 id="make_soa_aligned"><span><a class="doc-id-link" href="#make_soa_aligned">make_soa_aligned<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L79"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_soa_dynamic_array :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="make_soa_dynamic_array_len"><span><a class="doc-id-link" href="#make_soa_dynamic_array_len">make_soa_dynamic_array_len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L151"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">make_soa_dynamic_array_len :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">make_soa_aligned :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#soa</span>[]$E, <span class="keyword-type">#any_int</span> length, <span class="keyword-type">#any_int</span> alignment: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1626,9 +1608,9 @@ of len(src) and len(dst).</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="make_soa_dynamic_array_len_cap"><span><a class="doc-id-link" href="#make_soa_dynamic_array_len_cap">make_soa_dynamic_array_len_cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L159"><em>Source</em></a></div></h3>
+<h3 id="make_soa_slice"><span><a class="doc-id-link" href="#make_soa_slice">make_soa_slice<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L138"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">make_soa_dynamic_array_len_cap :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> length, <span class="keyword-type">#any_int</span> capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">make_soa_slice :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#soa</span>[]$E, <span class="keyword-type">#any_int</span> length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1645,6 +1627,12 @@ of len(src) and len(dst).</p>
 </details>
 </div>
 <div class="pkg-entity">
+<h3 id="make_soa_dynamic_array"><span><a class="doc-id-link" href="#make_soa_dynamic_array">make_soa_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L143"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">make_soa_dynamic_array :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
 <h3 id="copy_from_string16"><span><a class="doc-id-link" href="#copy_from_string16">copy_from_string16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L110"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">copy_from_string16 :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (dst: []<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>, src: <a href="/base/builtin#string16"><span class="doc-builtin">string16</span></a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
@@ -1658,9 +1646,15 @@ of len(src) and len(dst).</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="resize_soa"><span><a class="doc-id-link" href="#resize_soa">resize_soa<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L177"><em>Source</em></a></div></h3>
+<h3 id="make_soa_dynamic_array_len"><span><a class="doc-id-link" href="#make_soa_dynamic_array_len">make_soa_dynamic_array_len<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L151"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">resize_soa :: <span class="keyword-type">proc</span>(array: ^$T/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
+<pre class="doc-code">make_soa_dynamic_array_len :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="make_soa_dynamic_array_len_cap"><span><a class="doc-id-link" href="#make_soa_dynamic_array_len_cap">make_soa_dynamic_array_len_cap<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L159"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">make_soa_dynamic_array_len_cap :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> length, <span class="keyword-type">#any_int</span> capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (array: T, err: <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1691,6 +1685,12 @@ Note: If the index is out of bounds, this procedure will panic.</p>
 </details>
 </div>
 <div class="pkg-entity">
+<h3 id="resize_soa"><span><a class="doc-id-link" href="#resize_soa">resize_soa<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L177"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">resize_soa :: <span class="keyword-type">proc</span>(array: ^$T/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
 <h3 id="remove_range"><span><a class="doc-id-link" href="#remove_range">remove_range<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L156"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">remove_range :: <span class="keyword-type">proc</span>(array: ^[<span class="keyword">dynamic</span>]$T, <span class="keyword-type">#any_int</span> lo, <span class="keyword-type">#any_int</span> hi: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) {…}</pre>
@@ -1701,6 +1701,12 @@ Note: If the index is out of bounds, this procedure will panic.</p>
 <p>Note: This is an O(N) operation.
 Note: If the range is out of bounds, this procedure will panic.</p>
 </details>
+</div>
+<div class="pkg-entity">
+<h3 id="non_zero_resize_soa"><span><a class="doc-id-link" href="#non_zero_resize_soa">non_zero_resize_soa<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L211"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">non_zero_resize_soa :: <span class="keyword-type">proc</span>(array: ^$T/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
+</div>
 </div>
 <div class="pkg-entity">
 <h3 id="pop"><span><a class="doc-id-link" href="#pop">pop<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L172"><em>Source</em></a></div></h3>
@@ -1714,6 +1720,12 @@ Note: If the range is out of bounds, this procedure will panic.</p>
 </details>
 </div>
 <div class="pkg-entity">
+<h3 id="reserve_soa"><span><a class="doc-id-link" href="#reserve_soa">reserve_soa<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L222"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">reserve_soa :: <span class="keyword-type">proc</span>(array: ^$T/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
 <h3 id="pop_safe"><span><a class="doc-id-link" href="#pop_safe">pop_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L189"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pop_safe :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (array: ^$T/[<span class="keyword">dynamic</span>]$E) -> (res: $E, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
@@ -1725,9 +1737,9 @@ If the operation is not possible, it will return false.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="non_zero_resize_soa"><span><a class="doc-id-link" href="#non_zero_resize_soa">non_zero_resize_soa<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L211"><em>Source</em></a></div></h3>
+<h3 id="non_zero_reserve_soa"><span><a class="doc-id-link" href="#non_zero_reserve_soa">non_zero_reserve_soa<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L227"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">non_zero_resize_soa :: <span class="keyword-type">proc</span>(array: ^$T/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> length: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
+<pre class="doc-code">non_zero_reserve_soa :: <span class="keyword-type">proc</span>(array: ^$T/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1742,12 +1754,6 @@ If the operation is not possible, it will return false.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="reserve_soa"><span><a class="doc-id-link" href="#reserve_soa">reserve_soa<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L222"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">reserve_soa :: <span class="keyword-type">proc</span>(array: ^$T/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
-</div>
-</div>
-<div class="pkg-entity">
 <h3 id="pop_front_safe"><span><a class="doc-id-link" href="#pop_front_safe">pop_front_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L215"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">pop_front_safe :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (array: ^$T/[<span class="keyword">dynamic</span>]$E) -> (res: $E, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
@@ -1757,12 +1763,6 @@ If the operation is not possible, it will return false.</p>
 <p><code>pop_front_safe</code> trys to return and remove the first value of dynamic array <code>array</code> and reduces the length of <code>array</code> by 1.
 If the operation is not possible, it will return false.</p>
 </details>
-</div>
-<div class="pkg-entity">
-<h3 id="non_zero_reserve_soa"><span><a class="doc-id-link" href="#non_zero_reserve_soa">non_zero_reserve_soa<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L227"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">non_zero_reserve_soa :: <span class="keyword-type">proc</span>(array: ^$T/<span class="directive">#soa</span>[<span class="keyword">dynamic</span>]$E, <span class="keyword-type">#any_int</span> capacity: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> <a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a> {…}</pre>
-</div>
 </div>
 <div class="pkg-entity">
 <h3 id="append_soa_elem"><span><a class="doc-id-link" href="#append_soa_elem">append_soa_elem<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L375"><em>Source</em></a></div></h3>
@@ -2376,18 +2376,6 @@ This uses the <code>default_assertion_contextless_failure_proc</code> to assert.
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="make_soa"><span><a class="doc-id-link" href="#make_soa">make_soa<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L168"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">make_soa :: <span class="keyword-type">proc</span>{
-	<a class="code-procedure" href="/base/runtime/#make_soa_slice">make_soa_slice</a>,
-	<a class="code-procedure" href="/base/runtime/#make_soa_dynamic_array">make_soa_dynamic_array</a>,
-	<a class="code-procedure" href="/base/runtime/#make_soa_dynamic_array_len">make_soa_dynamic_array_len</a>,
-	<a class="code-procedure" href="/base/runtime/#make_soa_dynamic_array_len_cap">make_soa_dynamic_array_len_cap</a>,
-}
-</pre>
-</div>
-</div>
-<div class="pkg-entity">
 <h3 id="copy"><span><a class="doc-id-link" href="#copy">copy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L118"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">copy :: <span class="keyword-type">proc</span>{
@@ -2403,6 +2391,18 @@ This uses the <code>default_assertion_contextless_failure_proc</code> to assert.
 The source and destination may overlap. Copy returns the number of elements copied, which will be the minimum
 of len(src) and len(dst).</p>
 </details>
+</div>
+<div class="pkg-entity">
+<h3 id="make_soa"><span><a class="doc-id-link" href="#make_soa">make_soa<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin_soa.odin#L168"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">make_soa :: <span class="keyword-type">proc</span>{
+	<a class="code-procedure" href="/base/runtime/#make_soa_slice">make_soa_slice</a>,
+	<a class="code-procedure" href="/base/runtime/#make_soa_dynamic_array">make_soa_dynamic_array</a>,
+	<a class="code-procedure" href="/base/runtime/#make_soa_dynamic_array_len">make_soa_dynamic_array_len</a>,
+	<a class="code-procedure" href="/base/runtime/#make_soa_dynamic_array_len_cap">make_soa_dynamic_array_len_cap</a>,
+}
+</pre>
+</div>
 </div>
 <div class="pkg-entity">
 <h3 id="clear"><span><a class="doc-id-link" href="#clear">clear<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/base/runtime/core_builtin.odin#L230"><em>Source</em></a></div></h3>
