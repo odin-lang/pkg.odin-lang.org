@@ -1778,8 +1778,13 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 			case strings.has_prefix(line, "Possible Output:"):
 				next_block_kind = .Possible_Output
 				has_any_output = true
-			case strings.has_prefix(line, "\t"): next_block_kind = .Code
-			case text == "": force_write_block = true
+			case strings.has_prefix(line, "\t"):
+				next_block_kind = .Code
+			case text == "":
+				force_write_block = true
+			case strings.has_prefix(line, "// Defined internally by the compiler"):
+				next_block_kind = .Example
+				has_example = true
 			}
 		case .Code:
 			switch {
