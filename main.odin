@@ -499,7 +499,9 @@ generate_package_from_directory_tree :: proc(b: ^strings.Builder, node: ^Dir_Nod
 		}
 
 		if str(pkg.fullpath) not_in cfg.pkgs_line_docs {
-			line_doc, _, _ := strings.partition(str(pkg.docs), "\n")
+			docs := str(pkg.docs)
+			docs = strings.trim_space(docs)
+			line_doc, _, _ := strings.partition(docs, "\n")
 			line_doc = strings.trim_space(line_doc)
 			cfg.pkgs_line_docs[strings.clone(str(pkg.fullpath))] = strings.clone(line_doc)
 		}
@@ -688,6 +690,13 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 		}
 		line_doc = cfg.pkgs_line_docs[str(pkg.fullpath)]
 		if line_doc == "" {
+			docs := str(pkg.docs)
+			docs = strings.trim_space(docs)
+			line_doc, _, _ = strings.partition(docs, "\n")
+			line_doc = strings.trim_space(line_doc)
+		}
+
+		if line_doc == "" {
 			return
 		}
 		switch {
@@ -759,27 +768,30 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 		io.write_string(w, `<td class="pkg-line pkg-line-doc">`)
 		if line_doc, ok := get_line_doc(dir.pkg); ok {
 			write_doc_line(w, line_doc)
-		} else if dir.name == "builtin" {
-			first, _, _ := strings.partition(builtin_docs, ".")
-			write_doc_line(w, first)
-			io.write_string(w, `.`)
-		} else if dir.name == "intrinsics" {
-			first, _, _ := strings.partition(intrinsics_docs, ".")
-			write_doc_line(w, first)
-			io.write_string(w, `.`)
-		} else if dir.name == "runtime" {
-			first := "package runtime provides all of the declarations needed by all Odin code-bases"
-			write_doc_line(w, first)
-			io.write_string(w, `.`)
-		} else if dir.name == "sanitizer" {
-			first := "package sanitizer implements various procedures for interacting with sanitizers from user code"
-			write_doc_line(w, first)
-			io.write_string(w, `.`)
 		} else {
-			if dir.dir == "sys" {
-				io.write_string(w, `Platform specific packages - documentation may be for a specific platform only`)
-			} else {
-				io.write_string(w, `&nbsp;`)
+			switch dir.name {
+			case "builtin":
+				first, _, _ := strings.partition(builtin_docs, ".")
+				write_doc_line(w, first)
+				io.write_string(w, `.`)
+			case "intrinsics":
+				first, _, _ := strings.partition(intrinsics_docs, ".")
+				write_doc_line(w, first)
+				io.write_string(w, `.`)
+			case  "runtime":
+				first := "package runtime provides all of the declarations needed by all Odin code-bases"
+				write_doc_line(w, first)
+				io.write_string(w, `.`)
+			case "sanitizer":
+				first := "package sanitizer implements various procedures for interacting with sanitizers from user code"
+				write_doc_line(w, first)
+				io.write_string(w, `.`)
+			case:
+				if dir.dir == "sys" {
+					io.write_string(w, `Platform specific packages - documentation may be for a specific platform only`)
+				} else {
+					io.write_string(w, `&nbsp;`)
+				}
 			}
 		}
 		io.write_string(w, `</td>`)
