@@ -541,12 +541,35 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 
 			fmt.wprintln(w, `</div>`)
 
-			if len(the_comment) != 0 || len(extra_comment) != 0 {
+			core_comment := ""
+
+
+			simd_docs: if strings.has_prefix(name, "simd_") {
+				simd_name := name[len("simd_"):]
+
+				core     := (&cfg._collections["core"]) or_break simd_docs
+				simd_pkg := core.pkgs["simd"]           or_break simd_docs
+				for e in array(simd_pkg.entries) {
+					if str(e.name) == simd_name {
+						simd_entity := &cfg.entities[e.entity]
+						core_comment = str(simd_entity.docs)
+						core_comment = strings.trim_space(core_comment)
+						break
+					}
+				}
+			}
+
+			if core_comment == "" || the_comment == "" || extra_comment == "" {
 				fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
 				fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
-				write_docs(w, the_comment, name)
-				if len(extra_comment) > 0 {
+				if the_comment != "" {
+					write_docs(w, the_comment, name)
+				}
+				if extra_comment != "" {
 					write_docs(w, extra_comment, name)
+				}
+				if core_comment != "" {
+					write_docs(w, core_comment, name)
 				}
 				fmt.wprintln(w, `</details>`)
 			}

@@ -488,14 +488,29 @@ intrinsics_table := []Builtin{
 	{name = "type_convert_variants_to_pointers",        kind = "b", type = "proc($T: typeid) -> typeid where type_is_union(T)",
 		comment = "Returns a type which converts all of the variants of a `union` to be pointer types of those variants.\n\n"+
 		"Example:\n"+
-		"	Foo :: union {A, B, C}\n"+
-		"	type_convert_variants_to_pointers(Foo) == union {^A, ^B, ^C}\n"+
+		"\tFoo :: union {A, B, C}\n"+
+		"\ttype_convert_variants_to_pointers(Foo) == union {^A, ^B, ^C}\n"+
 		"",
 	},
-	{name = "type_merge",                               kind = "b", type = "proc($U, $V: typeid) -> typeid where type_is_union(U), type_is_union(V)"},
+	{name = "type_merge",                               kind = "b", type = "proc($U, $V: typeid) -> typeid where type_is_union(U), type_is_union(V)",
+		comment = "Merges to union's variants into one bigger union.\n\n"+
+		"Note: the merging is done is order and duplicate variant types are ignored.\n\n"+
+		"Example:\n"+
+		"\tA :: union{i32, f32, string}\n"+
+		"\tB :: union{bool, complex64}\n"+
+		"\tC :: union{string, bool, i32}\n"+
+		"\t\n"+
+		"\ttype_merge(A, B) == union{i32, f32, string, bool, complex64}\n"+
+		"\ttype_merge(A, C) == union{i32, f32, string, bool}\n"+
+		"\ttype_merge(B, C) == union{bool, complex64, string, i32}\n"+
+		"\ttype_merge(C, A) == union{string, bool, i32, f32}\n"+
+		"",
+	},
 
 	{name = "constant_utf16_cstring", kind = "b", type = "proc($literal: string) -> [^]u16",
-		comment = "Returns a runtime value of a constant string UTF-8 value encoded as a UTF-16 NULL terminated string value, useful for interfacing with UTF-16 procedure such as the Windows API.",
+		comment = "Returns a runtime value of a constant string UTF-8 value encoded as a UTF-16 NULL terminated string value, useful for interfacing with UTF-16 procedure such as the Windows API.\n\n"+
+		"**Important Note:** This will be deprecated soon as UTF-16 string types and literals are supported natively."+
+		"",
 	},
 
 	{name = "constant_log2", kind = "b", type = "proc($v: $T) -> T where type_is_integer(T)",

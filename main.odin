@@ -2820,12 +2820,12 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	}
 	fmt.wprintln(w, `</div>`)
 
-	the_docs := str(e.docs)
-	if strings.trim_space(the_docs) == "" {
-		the_docs = str(e.comment)
+	the_docs := strings.trim_space(str(e.docs))
+	if the_docs == "" {
+		the_docs = strings.trim_space(str(e.comment))
 	}
 
-	if strings.trim_space(the_docs) != "" {
+	if the_docs != "" {
 		fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
 		fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
 		write_docs(w, the_docs, str(e.name))
