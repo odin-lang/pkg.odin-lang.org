@@ -742,12 +742,15 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 	fmt.wprintln(w, "\t\t<tbody>")
 
 	write_directory :: proc(w: io.Writer, dir: ^Dir_Node, collection: ^Collection) {
+		has_children := len(dir.children) != 0
 		if len(dir.children) != 0 {
 			fmt.wprint(w, `<tr aria-controls="`)
 			for child in dir.children {
 				fmt.wprintf(w, "pkg-%s ", child.name)
 			}
-			fmt.wprint(w, `" class="directory-pkg"><td class="pkg-line pkg-name" data-aria-owns="`)
+			fmt.wprint(w, `" class="directory-pkg">`)
+
+			fmt.wprint(w, `<td class="pkg-line pkg-name" data-aria-owns="`)
 			for child in dir.children {
 				fmt.wprintf(w, "pkg-%s ", child.name)
 			}
@@ -766,57 +769,57 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 		}
 		io.write_string(w, `</td>`)
 		io.write_string(w, `<td class="pkg-line pkg-line-doc">`)
-		if line_doc, ok := get_line_doc(dir.pkg); ok {
-			write_doc_line(w, line_doc)
-		} else {
-			switch dir.name {
-			case "builtin":
-				first, _, _ := strings.partition(builtin_docs, ".")
-				write_doc_line(w, first)
-				io.write_string(w, `.`)
-			case "intrinsics":
-				first, _, _ := strings.partition(intrinsics_docs, ".")
-				write_doc_line(w, first)
-				io.write_string(w, `.`)
-			case  "runtime":
-				first := "package runtime provides all of the declarations needed by all Odin code-bases"
-				write_doc_line(w, first)
-				io.write_string(w, `.`)
-			case "sanitizer":
-				first := "package sanitizer implements various procedures for interacting with sanitizers from user code"
-				write_doc_line(w, first)
-				io.write_string(w, `.`)
-			case:
-				if dir.dir == "sys" {
-					io.write_string(w, `Platform specific packages - documentation may be for a specific platform only`)
-				} else {
-					io.write_string(w, `&nbsp;`)
-				}
+		switch dir.name {
+		case "builtin":
+			first, _, _ := strings.partition(builtin_docs, ".")
+			write_doc_line(w, first)
+			io.write_string(w, `.`)
+		case "intrinsics":
+			first, _, _ := strings.partition(intrinsics_docs, ".")
+			write_doc_line(w, first)
+			io.write_string(w, `.`)
+		case  "runtime":
+			first := "package runtime provides all of the declarations needed by all Odin code-bases"
+			write_doc_line(w, first)
+			io.write_string(w, `.`)
+		case "sanitizer":
+			first := "package sanitizer implements various procedures for interacting with sanitizers from user code"
+			write_doc_line(w, first)
+			io.write_string(w, `.`)
+		case:
+			if line_doc, ok := get_line_doc(dir.pkg); ok {
+				write_doc_line(w, line_doc)
+			} else if dir.dir == "sys" {
+				io.write_string(w, `Platform specific packages - documentation may be for a specific platform only`)
+			} else {
+				io.write_string(w, `&nbsp;`)
 			}
 		}
 		io.write_string(w, `</td>`)
 		fmt.wprintf(w, "</tr>\n")
 
-		for child in dir.children {
-			assert(child.pkg != nil)
-			init_cfg_from_pkg(child.pkg)
+		if has_children {
+			for child in dir.children {
+				assert(child.pkg != nil)
+				init_cfg_from_pkg(child.pkg)
 
-			fmt.wprintf(w, `<tr id="pkg-%s" class="directory-pkg directory-child"><td class="pkg-line pkg-name">`, child.name)
-			fmt.wprintf(w, `<a href="%s/%s/">%s</a>`, collection.base_url, child.path, child.name)
-			io.write_string(w, `</td>`)
+				fmt.wprintf(w, `<tr id="pkg-%s" class="directory-pkg directory-child visible"><td class="pkg-line pkg-name">`, child.name)
+				fmt.wprintf(w, `<a href="%s/%s/">%s</a>`, collection.base_url, child.path, child.name)
+				io.write_string(w, `</td>`)
 
-			io.write_string(w, `<td class="pkg-line pkg-line-doc">`)
-			if child_line_doc, ok := get_line_doc(child.pkg); ok {
-				write_doc_line(w, child_line_doc)
-			} else if target, target_ok := target_from_pkg(child.pkg); target_ok {
-				fmt.wprintf(w, `<em>(Generated with <code>-target:%s</code>, please read the source code directly)</em>`, target)
-			} else {
-				io.write_string(w, `&nbsp;`)
+				io.write_string(w, `<td class="pkg-line pkg-line-doc">`)
+				if child_line_doc, ok := get_line_doc(child.pkg); ok {
+					write_doc_line(w, child_line_doc)
+				} else if target, target_ok := target_from_pkg(child.pkg); target_ok {
+					fmt.wprintf(w, `<em>(Generated with <code>-target:%s</code>, please read the source code directly)</em>`, target)
+				} else {
+					io.write_string(w, `&nbsp;`)
+				}
+				io.write_string(w, `</td>`)
+
+				fmt.wprintf(w, "</td>")
+				fmt.wprintf(w, "</tr>\n")
 			}
-			io.write_string(w, `</td>`)
-
-			fmt.wprintf(w, "</td>")
-			fmt.wprintf(w, "</tr>\n")
 		}
 	}
 
