@@ -48,6 +48,9 @@ intrinsics_table := []Builtin{
 	{name = "read_cycle_counter", kind = "b", type = "proc() -> i64",
 		comment = "This provides access to the cycle counter register (or similar low latency, high accuracy clocks) on the targets that support it. On i386/amd64, it should map to the `rdtsc` instruction. On arm64, it should map to the `cntvct_el0` instruction.",
 	},
+	{name = "read_cycle_counter_frequency", kind = "b", type = "proc() -> i64",
+		comment = "This provides access to the frequency that the cycle counter register (or similar low latency, high accuracy clocks) uses on the targets that support it.",
+	},
 
 	{name = "count_ones",           kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)",
 		comment = "Counts the number of set bits (`1`s).",
@@ -135,9 +138,9 @@ intrinsics_table := []Builtin{
 	},
 
 	// Linux and Darwin Only
-	{name = "syscall", kind = "b", type = "proc(id: uintptr, args: ..uintptr) -> uintptr", comment="Linux and Darwin Only"},
+	{name = "syscall", kind = "b", type = "proc(id: uintptr, args: ..uintptr) -> uintptr", comment="system call for Linux and Darwin Only"},
 	// FreeBSD, NetBSD, et cetera
-	{name = "syscall_bsd", kind = "b", type = "proc(id: uintptr, args: ..uintptr) -> (uintptr, bool)", comment="FreeBSD, NetBSD, etc." },
+	{name = "syscall_bsd", kind = "b", type = "proc(id: uintptr, args: ..uintptr) -> (uintptr, bool)", comment="system call FreeBSD, NetBSD, etc." },
 
 	// Atomics
 	{
@@ -198,7 +201,7 @@ intrinsics_table := []Builtin{
 		comment = "Returns the type without any `distinct` indirection e.g. `Foo :: distinct int`, `type_base_type(Foo) == int`",
 	},
 	{name = "type_core_type",                kind = "b", type = "proc($T: typeid) -> type",
-		comment = "Returns the type without any `distinct` indirection and the underlying integer type for an enum e.g. `Foo :: distinct int`, `type_core_type(Foo) == int`, or `Bar :: enum u8 {A}`, `type_core_type(Bar) == u8`",
+		comment = "Returns the type without any `distinct` indirection and the underlying integer type for an enum or bit_set e.g. `Foo :: distinct int`, `type_core_type(Foo) == int`, or `Bar :: enum u8 {A}`, `type_core_type(Bar) == u8`, or `Baz :: bit_set[Bar; u32]`, `type_core_type(Baz) == u32`",
 
 	},
 	{name = "type_elem_type",                kind = "b", type = "proc($T: typeid) -> type",
@@ -213,61 +216,103 @@ intrinsics_table := []Builtin{
 		"",
 	},
 
-	{name = "type_is_boolean",               kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_integer",               kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_rune",                  kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_float",                 kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_complex",               kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_quaternion",            kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_string",                kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_typeid",                kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_any",                   kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_boolean",               kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Return true if the type is derived from any boolean type: `bool`, `b8`, `b16`, `b32`, `b64`"},
+	{name = "type_is_integer",               kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Return true if the type is derived from any integer type"},
+	{name = "type_is_rune",                  kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Return true if the type is derived from the `rune` type"},
+	{name = "type_is_float",                 kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Return true if the type is derived from any float type"},
+	{name = "type_is_complex",               kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Return true if the type is derived from any complex type: `complex32`, `complex64`, `complex128`"},
+	{name = "type_is_quaternion",            kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Return true if the type is derived from any quaternion type: `quaternion64`, `quaternion128`, `quaternion256`"},
+	{name = "type_is_typeid",                kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Return true if the type is derived from `typeid`"},
+	{name = "type_is_any",                   kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Return true if the type is derived from `any`"},
+	{name = "type_is_string",                kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Returns true if the type is derived from any string type: `string`, `cstring`, `string16`, `cstring16`"},
+	{name = "type_is_string16",                kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Returns true if the type is derived from the `string16` type AND not `cstring16`"},
+	{name = "type_is_cstring",                kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Returns true if the type is derived from the `cstring` type"},
+	{name = "type_is_cstring16",                kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Returns true if the type is derived from the `cstring16` type"},
 
-	{name = "type_is_endian_platform",       kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_endian_little",         kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_endian_big",            kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_unsigned",              kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_endian_platform",       kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Returns true if the type uses the platform native layout rather than a specific layout. Example: `type_is_endian_platform(u32) == true`, `type_is_endian_platform(u32le) == false`, `type_is_endian_platform(u32be) == false`"},
+	{name = "type_is_endian_little",         kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Returns true if the type is little endian specific or it is a platform native layout which is also little endian. Example: `type_is_endian_little(u32le) == true`, `type_is_endian_little(u32be) == false`, `type_is_endian_little(u32) == (ODIN_ENDIAN == .Little)`"},
+	{name = "type_is_endian_big",            kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Returns true if the type is big endian specific or it is a platform native layout which is also big endian. Example: `type_is_endian_big(u32be) == true`, `type_is_endian_big(u32le) == false`, `type_is_endian_big(u32) == (ODIN_ENDIAN == .Big)`"},
+	{name = "type_is_unsigned",              kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Returns true if the type is an unsigned integer or an enum backed by an unsigned integer, and false otherwise for any other type"},
 	{name = "type_is_numeric",               kind = "b", type = "proc($T: typeid) -> bool",
-		comment = "Returns true if a \"numeric\" in nature:\n\n"+
+		comment = "Returns true if it is a \"numeric\" type in nature:\n\n"+
 		"- Any integer\n"+
 		"- Any float\n"+
 		"- Any complex number\n"+
 		"- Any quaternion\n"+
 		"- Any enum\n"+
-		"- Any fixed-array of a numeric type\n"+
+		"- Any fixed-length array of a numeric type\n"+
 		"",
 	},
-	{name = "type_is_ordered",               kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_ordered_numeric",       kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_indexable",             kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_sliceable",             kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_ordered",               kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Returns true if the type is an integer, float, rune, any string, pointer, or multi-pointer"},
+	{name = "type_is_ordered_numeric",       kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Returns true if the type is an integer, float, or rune"},
+	{name = "type_is_indexable",             kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Returns true if a value of this type can indexed:\n\n"+
+		"- `string` or `string16`\n"+
+		"- Any fixed-length array\n"+
+		"- Any slice\n"+
+		"- Any dynamic array\n"+
+		"- Any map\n"+
+		"- Any multi-pointer\n"+
+		"- Any enumerated array\n"+
+		"- Any matrix\n"+
+		"",
+	},
+	{name = "type_is_sliceable",             kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Returns true if a value of this type can indexed:\n\n"+
+		"- `string` or `string16`\n"+
+		"- Any fixed-length array\n"+
+		"- Any slice\n"+
+		"- Any dynamic array\n"+
+		"- Any multi-pointer\n"+
+		"",
+	},
 	{name = "type_is_comparable",            kind = "b", type = "proc($T: typeid) -> bool",
 		comment = ""+
 		"Returns true if the type is comparable, which allows for the use of `==` and `!=` binary operators.\n\n"+
-		"One of the following non-compound types (as well as any `distinct` forms): `rune`, `string`, `cstring`, `typeid`, pointer, `#soa` related pointer, multi-pointer, enum, procedure, matrix, `bit_set`, `#simd` vector.\n\n"+
+		"One of the following non-compound types (as well as any `distinct` forms): `rune`, `string`, `cstring`, `string16`, `cstring16`, `typeid`, pointer, `#soa` related pointer, multi-pointer, enum, procedure, matrix, `bit_set`, `#simd` vector.\n\n"+
 		"One of the following compound types (as well as any `distinct` forms): any array or enumerated array where its element type is also comparable; any `struct` where all of its fields are comparable; any `struct #raw_union` were all of its fields are simply comparable (see `type_is_simple_compare`); any `union` where all of its variants are comparable.\n"+
 		"",
 	},
-	{name = "type_is_simple_compare",        kind = "b", type = "proc($T: typeid) -> bool", comment = "easily compared using memcmp (== and !=)"},
+	{name = "type_is_simple_compare",        kind = "b", type = "proc($T: typeid) -> bool", comment = "easily compared using memcmp (`==` and `!=`) (not including floats)"},
+	{name = "type_is_nearly_simple_compare", kind = "b", type = "proc($T: typeid) -> bool", comment = "easily compared using memcmp (`==` and `!=`) (including floats)"},
 	{name = "type_is_dereferenceable",       kind = "b", type = "proc($T: typeid) -> bool", comment = "Must be a pointer type `^T` (not `rawptr`) or an `#soa` related pointer type."},
 	{name = "type_is_valid_map_key",         kind = "b", type = "proc($T: typeid) -> bool", comment = "Any comparable type which is not-untyped nor generic."},
 	{name = "type_is_valid_matrix_elements", kind = "b", type = "proc($T: typeid) -> bool", comment = "Any integer, float, or complex number type (not-untyped)."},
 
-	{name = "type_is_named",                 kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_pointer",               kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_multi_pointer",         kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_array",                 kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_enumerated_array",      kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_slice",                 kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_dynamic_array",         kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_map",                   kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_struct",                kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_union",                 kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_enum",                  kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_proc",                  kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_bit_set",               kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_simd_vector",           kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_matrix",                kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_named",                 kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the type is a named"},
+	{name = "type_is_pointer",               kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a pointer, i.e. `^T` or `rawptr`"},
+	{name = "type_is_multi_pointer",         kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a multi pointer, i.e. `[^]T`"},
+	{name = "type_is_array",                 kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a fixed-length array, i.e. `[N]T`"},
+	{name = "type_is_enumerated_array",      kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a enumerated array, i.e. `[Some_Enum]T`"},
+	{name = "type_is_slice",                 kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a slice, i.e. `[]T`"},
+	{name = "type_is_dynamic_array",         kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a dynamic array, i.e. `[dynamic]T`"},
+	{name = "type_is_map",                   kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a `map`, i.e. `map[K]V`"},
+	{name = "type_is_struct",                kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a `struct`"},
+	{name = "type_is_union",                 kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a `union`, but not `struct #raw_union`"},
+	{name = "type_is_enum",                  kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a `enum`"},
+	{name = "type_is_proc",                  kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a `proc`"},
+	{name = "type_is_bit_set",               kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a `bit_set`"},
+	{name = "type_is_simd_vector",           kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a simd vector, i.e. `#simd[N]T`"},
+	{name = "type_is_matrix",                kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a `matrix`"},
+	{name = "type_is_raw_union",                kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a `struct #raw_union`"},
 
 
 	{name = "type_has_nil",                             kind = "b", type = "proc($T: typeid) -> bool",
@@ -275,6 +320,7 @@ intrinsics_table := []Builtin{
 		"- `rawptr`\n"+
 		"- `any`\n"+
 		"- `cstring`\n"+
+		"- `cstring16`\n"+
 		"- `typeid`\n"+
 		"- `enum`\n"+
 		"- `bit_set`\n"+
@@ -291,41 +337,141 @@ intrinsics_table := []Builtin{
 		"",
 	},
 
-	{name = "type_is_matrix_row_major",    kind = "b", type = "proc($T: typeid) -> bool where type_is_matrix(T)"},
-	{name = "type_is_matrix_column_major", kind = "b", type = "proc($T: typeid) -> bool where type_is_matrix(T)"},
+	{name = "type_is_matrix_row_major",    kind = "b", type = "proc($T: typeid) -> bool where type_is_matrix(T)",
+		comment = "Returns true if the type passed is a matrix using `#row_major` ordering, this intrinsic only allows for matrices and will not compile otherwise. Note: The default matrix layout is `#column_major`."},
+	{name = "type_is_matrix_column_major", kind = "b", type = "proc($T: typeid) -> bool where type_is_matrix(T)",
+		comment = "Returns true if the type passed is a matrix using `#column_major` ordering, this intrinsic only allows for matrices and will not compile otherwise. Note: The default matrix layout is `#column_major`."},
 
-	{name = "type_is_specialization_of",                kind = "b", type = "proc($T, $S: typeid) -> bool"},
+	{name = "type_is_specialization_of",                kind = "b", type = "proc($T, $S: typeid) -> bool",
+		comment = "Returns true if the type passed is a specialization of a parametric polymorphic type.\n\n"+
+		"Example:\n"+
+		"\tFoo :: struct($T: typeid) {x: T}\n"+
+		"\tassert(type_is_specialization_of(Foo(int)) == true)\n"+
+		"\tassert(type_is_specialization_of(Foo)      == false)\n"+
+		"\tassert(type_is_specialization_of(i32)      == false)\n"+
+		"",
+	},
 
-	{name = "type_is_variant_of",                       kind = "b", type = "proc($U, $V: typeid) -> bool where type_is_union(U)"},
-	{name = "type_union_tag_type",                      kind = "b", type = "proc($T: typeid) -> typeid where type_is_union(T)"},
-	{name = "type_union_tag_offset",                    kind = "b", type = "proc($T: typeid) -> uintptr where type_is_union(T)"},
-	{name = "type_union_base_tag_value",                kind = "b", type = "proc($T: typeid) -> int where type_is_union(U)"},
-	{name = "type_union_variant_count",                 kind = "b", type = "proc($T: typeid) -> int where type_is_union(T)"},
-	{name = "type_variant_type_of",                     kind = "b", type = "proc($T: typeid, $index: int) -> typeid where type_is_union(T)"},
-	{name = "type_variant_index_of",                    kind = "b", type = "proc($U, $V: typeid) -> int where type_is_union(U)"},
+	{name = "type_is_variant_of",                       kind = "b", type = "proc($U, $V: typeid) -> bool where type_is_union(U)",
+		comment = "Returns true if the `V` is a variant of the union type `U`.\n\n"+
+		"Example:\n"+
+		"\tFoo:: union {i32, f32}\n"+
+		"\tassert(type_is_variant_of(Foo, i32)    == true)\n"+
+		"\tassert(type_is_variant_of(Foo, f32)    == true)\n"+
+		"\tassert(type_is_variant_of(Foo, string) == false)\n"+
+		"",
+	},
+	{name = "type_union_tag_type",                      kind = "b", type = "proc($T: typeid) -> typeid where type_is_union(T)",
+		comment = "Returns the type used to store the tag for a union. If no tag is used (e.g. `Maybe(Pointer_Like_Type)`), then `u8` is returned.\n\n"+
+		"Possible tag types: `u8`, `u16`, `u32`, `u64`",
+	},
+	{name = "type_union_tag_offset",                    kind = "b", type = "proc($T: typeid) -> uintptr where type_is_union(T)",
+		comment = "Returns the offset to the tag in bytes from the start of the union. If no tag is used (e.g. 'Maybe(Pointer_Like_Type)`), then size of the variant block space is returned.\n\n"+
+		"Note: unions store the tag after the variant block space.",
+	},
+	{name = "type_union_base_tag_value",                kind = "b", type = "proc($T: typeid) -> int where type_is_union(U)",
+		comment = "Returns the first valid tag value for the first variant. If `#no_nil` is used, the returned value will be `0`, otherwise `1` will be returned.\n\n"+
+		"Example:\n"+
+		"\tassert(type_union_base_tag_value(union {i32, f32})         == 1)\n"+
+		"\tassert(type_union_base_tag_value(union #no_nil {i32, f32}) == 0)\n"+
+		"\tassert(type_union_base_tag_value(Maybe(rawptr})            == 1)\n"+
+		"",
+	},
+	{name = "type_union_variant_count",                 kind = "b", type = "proc($T: typeid) -> int where type_is_union(T)",
+		comment = "Returns the number of possible variants a union can be (excluding a possible `nil` state).\n\n"+
+		"Example:\n"+
+		"\tassert(type_union_variant_count(union {i32, f32})      == 2)\n"+
+		"\tassert(type_union_variant_count(union {i32, f32, b32}) == 3)\n"+
+		"\tassert(type_union_variant_count(union {})              == 0)\n"+
+		"",
+	},
+	{name = "type_variant_type_of",                     kind = "b", type = "proc($T: typeid, $index: int) -> typeid where type_is_union(T)",
+		comment = "Returns the type of a union `T`'s variant at a specified `index`.\n\n"+
+		"Example:\n"+
+		"\tFoo :: union{i32, f32, string}\n"+
+		"\tassert(type_variant_type_of(Foo, 0) == i32)\n"+
+		"\tassert(type_variant_type_of(Foo, 1) == f32)\n"+
+		"\tassert(type_variant_type_of(Foo, 2) == string)\n"+
+		"",
+	},
+	{name = "type_variant_index_of",                    kind = "b", type = "proc($U, $V: typeid) -> int where type_is_union(U)",
+		comment = "Returns the index of a variant `V` of a union `U`.\n\n"+
+		"Example:\n"+
+		"\tFoo :: union{i32, f32, string}\n"+
+		"\tassert(type_variant_type_of(Foo, i32)    == 0)\n"+
+		"\tassert(type_variant_type_of(Foo, f32)    == 1)\n"+
+		"\tassert(type_variant_type_of(Foo, string) == 2)\n"+
+		"",
+	},
 
-	{name = "type_bit_set_elem_type",       kind = "b", type = "proc($T: typeid) -> typeid where type_is_bit_set(T)" },
-	{name = "type_bit_set_underlying_type", kind = "b", type = "proc($T: typeid) -> typeid where type_is_bit_set(T)" },
+	{name = "type_bit_set_elem_type",       kind = "b", type = "proc($T: typeid) -> typeid where type_is_bit_set(T)",
+		comment = "Returns the element type of a `bit_set` `T`.",
+	},
+	{name = "type_bit_set_underlying_type", kind = "b", type = "proc($T: typeid) -> typeid where type_is_bit_set(T)",
+		comment = "Returns the underlying/backing type of a `bit_set` `T` rather than the element type.\n\n"+
+		"Example:\n"+
+		"\tassert(type_bit_set_underlying_type(bit_set[0..<8])     == u8)\n"+
+		"\tassert(type_bit_set_underlying_type(bit_set[Enum; int]) == int)\n"+
+		"",
+	},
 
-	{name = "type_has_field",                           kind = "b", type = "proc($T: typeid, $name: string) -> bool"},
-	{name = "type_field_type",                          kind = "b", type = "proc($T: typeid, $name: string) -> typeid"},
+	{name = "type_has_field",                           kind = "b", type = "proc($T: typeid, $name: string) -> bool",
+		comment = "Returns true if the field `name` exists on the type `T`."},
+	{name = "type_field_type",                          kind = "b", type = "proc($T: typeid, $name: string) -> typeid",
+		comment = "Returns type of the field `name` on the type `T`. Note: the field must exist otherwise this will not compile.",
+	},
 
-	{name = "type_proc_parameter_count",                kind = "b", type = "proc($T: typeid) -> int where type_is_proc(T)"},
-	{name = "type_proc_return_count",                   kind = "b", type = "proc($T: typeid) -> int where type_is_proc(T)"},
+	{name = "type_proc_parameter_count",                kind = "b", type = "proc($T: typeid) -> int where type_is_proc(T)",
+		comment = "Returns the number of parameters a procedure type has.\n\n"+
+		"Example:\n"+
+		"\tassert(type_proc_parameter_count(proc(i32, f32) -> bool) == 2)\n"+
+		"",
+	},
+	{name = "type_proc_return_count",                   kind = "b", type = "proc($T: typeid) -> int where type_is_proc(T)",
+		comment = "Returns the number of return values a procedure type has.\n\n"+
+		"Example:\n"+
+		"\tassert(type_proc_return_count(proc(i32, f32) -> bool) == 1)\n"+
+		"",
+	},
 
-	{name = "type_proc_parameter_type",                 kind = "b", type = "proc($T: typeid, index: int) -> typeid where type_is_proc(T)"},
-	{name = "type_proc_return_type",                    kind = "b", type = "proc($T: typeid, index: int) -> typeid where type_is_proc(T)"},
+	{name = "type_proc_parameter_type",                 kind = "b", type = "proc($T: typeid, index: int) -> typeid where type_is_proc(T)",
+		comment = "Returns the type of a parameter of a procedure type at the specified `index`.\n\n"+
+		"Example:\n"+
+		"\tassert(type_proc_parameter_type(proc(i32, f32) -> bool, 1) == f32)\n"+
+		"",
+	},
+	{name = "type_proc_return_type",                    kind = "b", type = "proc($T: typeid, index: int) -> typeid where type_is_proc(T)",
+		comment = "Returns the type of a return value of a procedure type at the specified `index`.\n\n"+
+		"Example:\n"+
+		"\tassert(type_proc_return_type(proc(i32, f32) -> bool, 0) == bool)\n"+
+		"",
+	},
 
-	{name = "type_struct_field_count",                  kind = "b", type = "proc($T: typeid) -> int where type_is_struct(T)"},
-	{name = "type_struct_has_implicit_padding",         kind = "b", type = "proc($T: typeid) -> bool where type_is_struct(T)"},
+	{name = "type_struct_field_count",                  kind = "b", type = "proc($T: typeid) -> int where type_is_struct(T)",
+		comment = "Returns the number of fields in a `struct` type.",
+	},
+	{name = "type_struct_has_implicit_padding",         kind = "b", type = "proc($T: typeid) -> bool where type_is_struct(T)",
+		comment = "Returns whether the struct has any implicit padding to ensure correct alignment for the fields.\n\n"+
+		"Example:\n"+
+		"\tFoo :: struct {x: u8, y: u32}\n"+
+		"\tassert(type_struct_has_implicit_padding(Foo) == true)\n"+
+		"",
+	},
 
-	{name = "type_polymorphic_record_parameter_count",  kind = "b", type = "proc($T: typeid) -> typeid"},
-	{name = "type_polymorphic_record_parameter_value",  kind = "b", type = "proc($T: typeid, index: int) -> $V"},
+	{name = "type_polymorphic_record_parameter_count",  kind = "b", type = "proc($T: typeid) -> typeid",
+		comment = "Returns the number of parametric polymorphic parameters to a parametric polymorphic record type (`struct` or `union`). Fails if the type is not such a type.",
+	},
+	{name = "type_polymorphic_record_parameter_value",  kind = "b", type = "proc($T: typeid, index: int) -> $V",
+		comment = "Returns the value of a specifialized parametric polymorphic record type (`struct` or `union`) at a specified `index`. Fails if the type is not such a type.",
+	},
 
-	{name = "type_is_specialized_polymorphic_record",   kind = "b", type = "proc($T: typeid) -> bool"},
-	{name = "type_is_unspecialized_polymorphic_record", kind = "b", type = "proc($T: typeid) -> bool"},
+	{name = "type_is_specialized_polymorphic_record",   kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Returns true if the record type (`struct` or `union`) passed is a specialized polymorphic record. Returns false when the type is not polymorphic in the first place."},
+	{name = "type_is_unspecialized_polymorphic_record", kind = "b", type = "proc($T: typeid) -> bool",
+		comment = "Returns true if the record type (`struct` or `union`) passed is a unspecialized polymorphic record. Returns false when the type is not polymorphic in the first place."},
 
-	{name = "type_is_subtype_of",                       kind = "b", type = "proc($T, $U: typeid) -> bool"},
+	{name = "type_is_subtype_of",                       kind = "b", type = "proc($T, $U: typeid) -> bool",
+		comment = "Returns true if `T` is a subtype (i.e. `using` was applied on a field) to type `U`."},
 
 	{name = "type_field_index_of",                      kind = "b", type = "proc($T: typeid, $name: string) -> uintptr"},
 
@@ -537,7 +683,7 @@ PREFETCH_COMMENT :: ""+
 VOLATILE_COMMENT :: ""+
 	"Tells the optimizing backend of a compiler to not change the number of 'volatile' operations nor change their order of execution relative to other 'volatile' operations. "+
 	"Optimizers are allowed to change the order of volatile operations relative to non-volatile operations.\n\n"+
-	"NOTE: This has nothing to do with Java's 'volatile' and has no cross-thread synchronization behaviour. Use atomics if this behaviour is wanted."
+	"Note: This has nothing to do with Java's 'volatile' and has no cross-thread synchronization behaviour. Use atomics if this behaviour is wanted."
 
 NON_TEMPORAL_COMMENT :: ""+
 	"Tells the code generator of a compiler that this operation is not expected to be reused in the cache. The code generator may select special instructions to save cache bandwidth (e.g. on x86, `movnt` instruct might be used)."
