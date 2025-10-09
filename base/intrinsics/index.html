@@ -414,7 +414,60 @@ Procedure Groups (0)</summary>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>An enumeration of atomic memory orderings used by the <code>atomic_*_explicit</code> intrinsics that determines which atomic instructions on the same address they synchronize with.This follows the same memory model as C11/C++11.</p>
+<p>Describes memory ordering for an atomic operation.</p>
+<p>Modern CPU's contain multiple cores and caches specific to those cores. When a
+core performs a write to memory, the value is written to cache first. The issue
+is that a core doesn't typically see what's inside the caches of other cores.
+In order to make operations consistent CPU's implement mechanisms that
+synchronize memory operations across cores by asking other cores or by
+pushing data about writes to other cores.</p>
+<p>Due to how these algorithms are implemented, the stores and loads performed by
+one core may seem to happen in a different order to another core. It also may
+happen that a core reorders stores and loads (independent of how compiler put
+them into the machine code). This can cause issues when trying to synchronize
+multiple memory locations between two cores. Which is why CPU's allow for
+stronger memory ordering guarantees if certain instructions or instruction
+variants are used.</p>
+<p>In Odin there are 5 different memory ordering guaranties that can be provided
+to an atomic operation:</p>
+<p><span class="doc-list"><code>Relaxed</code>: The memory access (load or store) is unordered with respect to</span>
+  other memory accesses. This can be used to implement an atomic counter.
+  Multiple threads access a single variable, but it doesn't matter when
+  exactly it gets incremented, because it will become eventually consistent.
+<span class="doc-list"><code>Consume</code>: No loads or stores dependent on a memory location can be</span>
+  reordered before a load with consume memory order. If other threads released
+  the same memory, it becomes visible.
+<span class="doc-list"><code>Acquire</code>: No loads or stores on a memory location can be reordered before a</span>
+  load of that memory location with acquire memory ordering. If other threads
+  release the same memory, it becomes visible.
+<span class="doc-list"><code>Release</code>: No loads or stores on a memory location can be reordered after a</span>
+  store of that memory location with release memory ordering. All threads that
+  acquire the same memory location will see all writes done by the current
+  thread.
+<span class="doc-list"><code>Acq_Rel</code>: Acquire-release memory ordering: combines acquire and release</span>
+  memory orderings in the same operation.
+<span class="doc-list"><code>Seq_Cst</code>: Sequential consistency. The strongest memory ordering. A load will</span>
+  always be an acquire operation, a store will always be a release operation,
+  and in addition to that all threads observe the same order of writes.</p>
+<p>Non-explicit atomics will always be sequentially consistent.</p>
+<pre>Atomic_Memory_Order :: enum {
+	Relaxed = 0, // Unordered
+	Consume = 1, // Monotonic
+	Acquire = 2,
+	Release = 3,
+	Acq_Rel = 4,
+	Seq_Cst = 5,
+}
+
+</pre>
+<p><b>Note(i386, x64)</b>: x86 has a very strong memory model by default. It
+guarantees that all writes are ordered, stores and loads aren't reordered. In
+a sense, all operations are at least acquire and release operations. If <code>lock</code>
+prefix is used, all operations are sequentially consistent. If you use explicit
+atomics, make sure you have the correct atomic memory order, because bugs likely
+will not show up in x86, but may show up on e.g. arm. More on x86 memory
+ordering can be found
+<a href="https://www.cs.cmu.edu/~410-f10/doc/Intel_Reordering_318147.pdf">here</a></p>
 </details>
 </div>
 <div class="pkg-entity">
