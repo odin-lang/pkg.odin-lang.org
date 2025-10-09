@@ -2158,11 +2158,11 @@ Procedure Groups (188)</summary>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>We don't allow these to be switched at runtime for two reasons:</p>
-<p>1) 32-bit and 64-bit versions of procedures use different types for their storage,</p>
-<pre>so we'd have to double the number of procedures, and they couldn't interact.
+<pre>1) 32-bit and 64-bit versions of procedures use different types for their storage,
+	so we'd have to double the number of procedures, and they couldn't interact.
 
+2) Optimizations thanks to precomputed masks wouldn't work.
 </pre>
-<p>2) Optimizations thanks to precomputed masks wouldn't work.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2179,7 +2179,8 @@ Procedure Groups (188)</summary>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p><code>internal_int_is_prime</code> switchables.</p>
-<p>Use Frobenius-Underwood for primality testing, or use Lucas-Selfridge (default).</p>
+<pre>Use Frobenius-Underwood for primality testing, or use Lucas-Selfridge (default).
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2282,8 +2283,9 @@ Procedure Groups (188)</summary>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>How many times we'll call <code>internal_int_random</code> during random prime generation before we bail out.
-Set to 0 or less to try indefinitely.</p>
+<p>How many times we'll call <code>internal_int_random</code> during random prime generation before we bail out.</p>
+<pre>Set to 0 or less to try indefinitely.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2384,8 +2386,9 @@ RANDOM_PRIME_ITERATIONS_USED: <a href="/base/builtin#int"><span class="doc-built
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Trim unused digits.</p>
-<p>This is used to ensure that leading zero digits are trimmed and the leading "used" digit will be non-zero.
-Typically very fast.  Also fixes the sign if there are no more leading digits.</p>
+<pre>This is used to ensure that leading zero digits are trimmed and the leading "used" digit will be non-zero.
+Typically very fast.  Also fixes the sign if there are no more leading digits.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2408,7 +2411,8 @@ Typically very fast.  Also fixes the sign if there are no more leading digits.</
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>With <code>n</code> items, calculate how many ways that <code>r</code> of them can be chosen.</p>
-<p>Also known as the multiset coefficient or (n multichoose k).</p>
+<pre>Also known as the multiset coefficient or (n multichoose k).
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2419,7 +2423,8 @@ Typically very fast.  Also fixes the sign if there are no more leading digits.</
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>With <code>n</code> items, calculate how many ways that <code>r</code> of them can be chosen without any repeats.</p>
-<p>Also known as the binomial coefficient or (n choose k).</p>
+<pre>Also known as the binomial coefficient or (n choose k).
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2489,9 +2494,11 @@ Typically very fast.  Also fixes the sign if there are no more leading digits.</
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Adds the unsigned <code>DIGIT</code> immediate to an <code>Int</code>,
-such that the <code>DIGIT</code> doesn't have to be turned into an <code>Int</code> first.</p>
-<p>dest = a + digit;</p>
+<p>Adds the unsigned <code>DIGIT</code> immediate to an <code>Int</code>,</p>
+<pre>such that the `DIGIT` doesn't have to be turned into an `Int` first.
+
+dest = a + digit;
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2583,15 +2590,18 @@ such that the <code>DIGIT</code> doesn't have to be turned into an <code>Int</co
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Number of ways to choose <code>k</code> items from <code>n</code> items.
-Also known as the binomial coefficient.</p>
-<p>TODO: Speed up.</p>
-<p>Could be done faster by reusing code from factorial and reusing the common "prefix" results for n!, k! and n-k!
-We know that n &gt;= k, otherwise we early out with res = 0.</p>
-<p>So:</p>
-<pre>n-k, keep result
-n, start from previous result
-k, start from previous result
+<p>Number of ways to choose <code>k</code> items from <code>n</code> items.</p>
+<pre>Also known as the binomial coefficient.
+
+TODO: Speed up.
+
+Could be done faster by reusing code from factorial and reusing the common "prefix" results for n!, k! and n-k!
+We know that n &gt;= k, otherwise we early out with res = 0.
+
+So:
+	n-k, keep result
+	n, start from previous result
+	k, start from previous result
 </pre>
 </details>
 </div>
@@ -2682,8 +2692,9 @@ k, start from previous result
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Returns the number of trailing zeroes before the first one.
-Differs from regular <code>ctz</code> in that 0 returns 0.</p>
+<p>Returns the number of trailing zeroes before the first one.</p>
+<pre>Differs from regular `ctz` in that 0 returns 0.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2721,8 +2732,9 @@ Differs from regular <code>ctz</code> in that 0 returns 0.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>divmod.
-Both the quotient and remainder are optional and may be passed a nil.</p>
+<p>divmod.</p>
+<pre>Both the quotient and remainder are optional and may be passed a nil.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2738,8 +2750,9 @@ Both the quotient and remainder are optional and may be passed a nil.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>dest = src  * 2
-dest = src &lt;&lt; 1</p>
+<p>dest = src  * 2</p>
+<pre>dest = src &lt;&lt; 1
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2759,9 +2772,8 @@ dest = src &lt;&lt; 1</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<pre>bool := |a| == |b|
-</pre>
-<p>    Compares the magnitudes only, ignores the sign.</p>
+<p>bool := |a| == |b|
+    Compares the magnitudes only, ignores the sign.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2787,8 +2799,9 @@ dest = src &lt;&lt; 1</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Read <code>Int</code> from a Big Endian binary representation.
-Sign is detected from the first byte if <code>signed</code> is true.</p>
+<p>Read <code>Int</code> from a Big Endian binary representation.</p>
+<pre>Sign is detected from the first byte if `signed` is true.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2798,8 +2811,9 @@ Sign is detected from the first byte if <code>signed</code> is true.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Read <code>Int</code> from a Big Endian Python binary representation.
-Sign is detected from the first byte if <code>signed</code> is true.</p>
+<p>Read <code>Int</code> from a Big Endian Python binary representation.</p>
+<pre>Sign is detected from the first byte if `signed` is true.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2809,8 +2823,9 @@ Sign is detected from the first byte if <code>signed</code> is true.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Read <code>Int</code> from a Little Endian binary representation.
-Sign is detected from the last byte if <code>signed</code> is true.</p>
+<p>Read <code>Int</code> from a Little Endian binary representation.</p>
+<pre>Sign is detected from the last byte if `signed` is true.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2820,8 +2835,9 @@ Sign is detected from the last byte if <code>signed</code> is true.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Read <code>Int</code> from a Little Endian Python binary representation.
-Sign is detected from the first byte if <code>signed</code> is true.</p>
+<p>Read <code>Int</code> from a Little Endian Python binary representation.</p>
+<pre>Sign is detected from the first byte if `signed` is true.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2851,8 +2867,9 @@ Sign is detected from the first byte if <code>signed</code> is true.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>TODO: Think about using <code>count_bits</code> to check if the value could be returned completely,
-and maybe return max(T), .Integer_Overflow if not?</p>
+<p>TODO: Think about using <code>count_bits</code> to check if the value could be returned completely,</p>
+<pre>and maybe return max(T), .Integer_Overflow if not?
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2914,9 +2931,8 @@ and maybe return max(T), .Integer_Overflow if not?</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<pre>bool := |a| &gt; |b|
-</pre>
-<p>    Compares the magnitudes only, ignores the sign.</p>
+<p>bool := |a| &gt; |b|
+    Compares the magnitudes only, ignores the sign.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2946,9 +2962,8 @@ and maybe return max(T), .Integer_Overflow if not?</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<pre>bool := |a| &gt;= |b|
-</pre>
-<p>    Compares the magnitudes only, ignores the sign.</p>
+<p>bool := |a| &gt;= |b|
+    Compares the magnitudes only, ignores the sign.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2974,8 +2989,9 @@ and maybe return max(T), .Integer_Overflow if not?</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>dest = src  / 2
-dest = src &gt;&gt; 1</p>
+<p>dest = src  / 2</p>
+<pre>dest = src &gt;&gt; 1
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3042,8 +3058,9 @@ dest = src &gt;&gt; 1</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Check if remainders are possible squares - fast exclude non-squares.</p>
-<p>Returns <code>true</code> if <code>a</code> is a square, <code>false</code> if not.
-Assumes <code>a</code> not to be <code>nil</code> and to have been initialized.</p>
+<pre>Returns `true` if `a` is a square, `false` if not.
+Assumes `a` not to be `nil` and to have been initialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3059,8 +3076,9 @@ Assumes <code>a</code> not to be <code>nil</code> and to have been initialized.<
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This version of <code>itoa</code> allocates on behalf of the caller. The caller must free the string.
-The radix defaults to 10.</p>
+<p>This version of <code>itoa</code> allocates on behalf of the caller. The caller must free the string.</p>
+<pre>The radix defaults to 10.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3070,21 +3088,25 @@ The radix defaults to 10.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>A low-level <code>itoa</code> using a caller-provided buffer. <code>itoa_string</code> and <code>itoa_cstring</code> use this.
-You can use also use it if you want to pre-allocate a buffer and optionally reuse it.</p>
-<p>Use <code>radix_size</code> or <code>radix_size_estimate</code> to determine a buffer size big enough.</p>
-<p>You can pass the output of <code>radix_size</code> to <code>size</code> if you've previously called it to size
-the output buffer. If you haven't, this routine will call it. This way it knows if the buffer
-is the appropriate size, and we can write directly in place without a reverse step at the end.</p>
-<pre>			=== === === IMPORTANT === === ===
+<p>A low-level <code>itoa</code> using a caller-provided buffer. <code>itoa_string</code> and <code>itoa_cstring</code> use this.</p>
+<pre>You can use also use it if you want to pre-allocate a buffer and optionally reuse it.
 
-</pre>
-<p>If you determined the buffer size using <code>radix_size_estimate</code>, or have a buffer
+Use `radix_size` or `radix_size_estimate` to determine a buffer size big enough.
+
+You can pass the output of `radix_size` to `size` if you've previously called it to size
+the output buffer. If you haven't, this routine will call it. This way it knows if the buffer
+is the appropriate size, and we can write directly in place without a reverse step at the end.
+
+				=== === === IMPORTANT === === ===
+
+If you determined the buffer size using `radix_size_estimate`, or have a buffer
 that you reuse that you know is large enough, don't pass this size unless you know what you are doing,
-because we will always write backwards starting at last byte of the buffer.</p>
-<p>Keep in mind that if you set <code>size</code> yourself and it's smaller than the buffer,
+because we will always write backwards starting at last byte of the buffer.
+
+Keep in mind that if you set `size` yourself and it's smaller than the buffer,
 it'll result in buffer overflows, as we use it to avoid reversing at the end
-and having to perform a buffer overflow check each character.</p>
+and having to perform a buffer overflow check each character.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3094,8 +3116,9 @@ and having to perform a buffer overflow check each character.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This version of <code>itoa</code> allocates on behalf of the caller. The caller must free the string.
-The radix defaults to 10.</p>
+<p>This version of <code>itoa</code> allocates on behalf of the caller. The caller must free the string.</p>
+<pre>The radix defaults to 10.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3125,9 +3148,8 @@ The radix defaults to 10.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<pre>bool := |a| &lt; |b|
-</pre>
-<p>    Compares the magnitudes only, ignores the sign.</p>
+<p>bool := |a| &lt; |b|
+    Compares the magnitudes only, ignores the sign.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3157,9 +3179,8 @@ The radix defaults to 10.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<pre>bool := |a| &lt;= |b|
-</pre>
-<p>    Compares the magnitudes only, ignores the sign.</p>
+<p>bool := |a| &lt;= |b|
+    Compares the magnitudes only, ignores the sign.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3209,9 +3230,10 @@ The radix defaults to 10.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>remainder = numerator % denominator.
-0 &lt;= remainder &lt; denominator if denominator &gt; 0
-denominator &lt; remainder &lt;= 0 if denominator &lt; 0</p>
+<p>remainder = numerator % denominator.</p>
+<pre>0 &lt;= remainder &lt; denominator if denominator &gt; 0
+denominator &lt; remainder &lt;= 0 if denominator &lt; 0
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3335,10 +3357,12 @@ denominator &lt; remainder &lt;= 0 if denominator &lt; 0</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Find the nth root of an Integer.
-Result found such that <code>(dest)**n &lt;= src</code> and <code>(dest+1)**n &gt; src</code></p>
-<p>This algorithm uses Newton's approximation <code>x[i+1] = x[i] - f(x[i])/f'(x[i])</code>,
-which will find the root in <code>log(n)</code> time where each step involves a fair bit.</p>
+<p>Find the nth root of an Integer.</p>
+<pre>Result found such that `(dest)**n &lt;= src` and `(dest+1)**n &gt; src`
+
+This algorithm uses Newton's approximation `x[i+1] = x[i] - f(x[i])/f'(x[i])`,
+which will find the root in `log(n)` time where each step involves a fair bit.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3384,8 +3408,9 @@ which will find the root in <code>log(n)</code> time where each step involves a 
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>quotient, remainder := numerator &gt;&gt; bits;
-<code>remainder</code> is allowed to be passed a <code>nil</code>, in which case <code>mod</code> won't be computed.</p>
+<p>quotient, remainder := numerator &gt;&gt; bits;</p>
+<pre>`remainder` is allowed to be passed a `nil`, in which case `mod` won't be computed.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3431,9 +3456,11 @@ which will find the root in <code>log(n)</code> time where each step involves a 
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Adds the unsigned <code>DIGIT</code> immediate to an <code>Int</code>,
-such that the <code>DIGIT</code> doesn't have to be turned into an <code>Int</code> first.</p>
-<p>dest = a - digit;</p>
+<p>Adds the unsigned <code>DIGIT</code> immediate to an <code>Int</code>,</p>
+<pre>such that the `DIGIT` doesn't have to be turned into an `Int` first.
+
+dest = a - digit;
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3459,9 +3486,10 @@ such that the <code>DIGIT</code> doesn't have to be turned into an <code>Int</co
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>In normal code, you can also write <code>a, b = b, a</code>.
-However, that only swaps within the current scope.
-This helper swaps completely.</p>
+<p>In normal code, you can also write <code>a, b = b, a</code>.</p>
+<pre>However, that only swaps within the current scope.
+This helper swaps completely.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3471,8 +3499,9 @@ This helper swaps completely.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Return Big Endian binary representation of <code>a</code>, either signed or unsigned.
-If <code>a</code> is negative and we ask for the default unsigned representation, we return abs(a).</p>
+<p>Return Big Endian binary representation of <code>a</code>, either signed or unsigned.</p>
+<pre>If `a` is negative and we ask for the default unsigned representation, we return abs(a).
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3482,8 +3511,9 @@ If <code>a</code> is negative and we ask for the default unsigned representation
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Return Python 3.x compatible Big Endian binary representation of <code>a</code>, either signed or unsigned.
-If <code>a</code> is negative when asking for an unsigned number, we return an error like Python does.</p>
+<p>Return Python 3.x compatible Big Endian binary representation of <code>a</code>, either signed or unsigned.</p>
+<pre>If `a` is negative when asking for an unsigned number, we return an error like Python does.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3493,8 +3523,9 @@ If <code>a</code> is negative when asking for an unsigned number, we return an e
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Return Little Endian binary representation of <code>a</code>, either signed or unsigned.
-If <code>a</code> is negative and we ask for the default unsigned representation, we return abs(a).</p>
+<p>Return Little Endian binary representation of <code>a</code>, either signed or unsigned.</p>
+<pre>If `a` is negative and we ask for the default unsigned representation, we return abs(a).
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3504,8 +3535,9 @@ If <code>a</code> is negative and we ask for the default unsigned representation
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Return Python 3.x compatible Little Endian binary representation of <code>a</code>, either signed or unsigned.
-If <code>a</code> is negative when asking for an unsigned number, we return an error like Python does.</p>
+<p>Return Python 3.x compatible Little Endian binary representation of <code>a</code>, either signed or unsigned.</p>
+<pre>If `a` is negative when asking for an unsigned number, we return an error like Python does.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3525,8 +3557,9 @@ If <code>a</code> is negative when asking for an unsigned number, we return an e
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This version of <code>itoa</code> allocates on behalf of the caller. The caller must free the string.
-The radix defaults to 10.</p>
+<p>This version of <code>itoa</code> allocates on behalf of the caller. The caller must free the string.</p>
+<pre>The radix defaults to 10.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3536,8 +3569,9 @@ The radix defaults to 10.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This version of <code>itoa</code> allocates on behalf of the caller. The caller must free the string.
-The radix defaults to 10.</p>
+<p>This version of <code>itoa</code> allocates on behalf of the caller. The caller must free the string.</p>
+<pre>The radix defaults to 10.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3558,8 +3592,9 @@ The radix defaults to 10.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Trim unused digits.</p>
-<p>This is used to ensure that leading zero digits are trimmed and the leading "used" digit will be non-zero.
-Typically very fast.  Also fixes the sign if there are no more leading digits.</p>
+<pre>This is used to ensure that leading zero digits are trimmed and the leading "used" digit will be non-zero.
+Typically very fast.  Also fixes the sign if there are no more leading digits.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3587,8 +3622,9 @@ Typically very fast.  Also fixes the sign if there are no more leading digits.</
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Count bits in an <code>Int</code>.
-Assumes <code>a</code> not to be <code>nil</code> and to have been initialized.</p>
+<p>Count bits in an <code>Int</code>.</p>
+<pre>Assumes `a` not to be `nil` and to have been initialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3643,9 +3679,9 @@ Assumes <code>a</code> not to be <code>nil</code> and to have been initialized.<
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Low-level addition Int+DIGIT, signed. Handbook of Applied Cryptography, algorithm 14.7.</p>
-<p>Assumptions:</p>
-<pre>`dest` and `a` != `nil` and have been initalized.
-`dest` is large enough (a.used + 1) to fit result.
+<pre>Assumptions:
+	`dest` and `a` != `nil` and have been initalized.
+	`dest` is large enough (a.used + 1) to fit result.
 </pre>
 </details>
 </div>
@@ -3657,8 +3693,8 @@ Assumes <code>a</code> not to be <code>nil</code> and to have been initialized.<
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Low-level addition, signed. Handbook of Applied Cryptography, algorithm 14.7.</p>
-<p>Assumptions:</p>
-<pre>`dest`, `a` and `b` != `nil` and have been initalized.
+<pre>Assumptions:
+	`dest`, `a` and `b` != `nil` and have been initalized.
 </pre>
 </details>
 </div>
@@ -3670,8 +3706,8 @@ Assumes <code>a</code> not to be <code>nil</code> and to have been initialized.<
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Low-level addition, unsigned. Handbook of Applied Cryptography, algorithm 14.7.</p>
-<p>Assumptions:</p>
-<pre>`dest`, `a` and `b` != `nil` and have been initalized.
+<pre>Assumptions:
+	`dest`, `a` and `b` != `nil` and have been initalized.
 </pre>
 </details>
 </div>
@@ -3692,8 +3728,9 @@ Assumes <code>a</code> not to be <code>nil</code> and to have been initialized.<
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This procedure returns the allocated capacity of an Int.
-Assumes <code>a</code> not to be <code>nil</code>.</p>
+<p>This procedure returns the allocated capacity of an Int.</p>
+<pre>Assumes `a` not to be `nil`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3719,8 +3756,9 @@ Assumes <code>a</code> not to be <code>nil</code>.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Helpers to extract values from the <code>Int</code>.
-Offset is zero indexed.</p>
+<p>Helpers to extract values from the <code>Int</code>.</p>
+<pre>Offset is zero indexed.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3736,8 +3774,9 @@ Offset is zero indexed.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Helpers to (un)set a bit in an Int.
-Offset is zero indexed.</p>
+<p>Helpers to (un)set a bit in an Int.</p>
+<pre>Offset is zero indexed.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3759,8 +3798,9 @@ Offset is zero indexed.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Clear <code>Int</code> and resize it to the default size.
-Assumes <code>a</code> not to be <code>nil</code>.</p>
+<p>Clear <code>Int</code> and resize it to the default size.</p>
+<pre>Assumes `a` not to be `nil`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3770,9 +3810,11 @@ Assumes <code>a</code> not to be <code>nil</code>.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Compare two <code>Int</code>s, signed.
-Returns -1 if <code>a</code> &lt; <code>b</code>, 0 if <code>a</code> == <code>b</code> and 1 if <code>b</code> &gt; <code>a</code>.</p>
-<p>Expects <code>a</code> and <code>b</code> both to be valid <code>Int</code>s, i.e. initialized and not <code>nil</code>.</p>
+<p>Compare two <code>Int</code>s, signed.</p>
+<pre>Returns -1 if `a` &lt; `b`, 0 if `a` == `b` and 1 if `b` &gt; `a`.
+
+Expects `a` and `b` both to be valid `Int`s, i.e. initialized and not `nil`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3782,9 +3824,11 @@ Returns -1 if <code>a</code> &lt; <code>b</code>, 0 if <code>a</code> == <code>b
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Compare an <code>Int</code> to an unsigned number upto <code>DIGIT & _MASK</code>.
-Returns -1 if <code>a</code> &lt; <code>b</code>, 0 if <code>a</code> == <code>b</code> and 1 if <code>b</code> &gt; <code>a</code>.</p>
-<p>Expects: <code>a</code> and <code>b</code> both to be valid <code>Int</code>s, i.e. initialized and not <code>nil</code>.</p>
+<p>Compare an <code>Int</code> to an unsigned number upto <code>DIGIT & _MASK</code>.</p>
+<pre>Returns -1 if `a` &lt; `b`, 0 if `a` == `b` and 1 if `b` &gt; `a`.
+
+Expects: `a` and `b` both to be valid `Int`s, i.e. initialized and not `nil`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3824,9 +3868,11 @@ Returns -1 if <code>a</code> &lt; <code>b</code>, 0 if <code>a</code> == <code>b
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Returns the number of trailing zeroes before the first one.
-Differs from regular <code>ctz</code> in that 0 returns 0.</p>
-<p>Assumes <code>a</code> not to be <code>nil</code> and have been initialized.</p>
+<p>Returns the number of trailing zeroes before the first one.</p>
+<pre>Differs from regular `ctz` in that 0 returns 0.
+
+Assumes `a` not to be `nil` and have been initialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3842,8 +3888,9 @@ Differs from regular <code>ctz</code> in that 0 returns 0.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Deallocates the backing memory of one or more <code>Int</code>s.
-Asssumes none of the <code>integers</code> to be a <code>nil</code>.</p>
+<p>Deallocates the backing memory of one or more <code>Int</code>s.</p>
+<pre>Asssumes none of the `integers` to be a `nil`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3863,9 +3910,10 @@ Asssumes none of the <code>integers</code> to be a <code>nil</code>.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>divmod.
-Both the quotient and remainder are optional and may be passed a nil.
-<code>numerator</code> and <code>denominator</code> are expected not to be <code>nil</code> and have been initialized.</p>
+<p>divmod.</p>
+<pre>Both the quotient and remainder are optional and may be passed a nil.
+`numerator` and `denominator` are expected not to be `nil` and have been initialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3875,8 +3923,9 @@ Both the quotient and remainder are optional and may be passed a nil.
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Single digit division (based on routine from MPI).
-The quotient is optional and may be passed a nil.</p>
+<p>Single digit division (based on routine from MPI).</p>
+<pre>The quotient is optional and may be passed a nil.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3896,9 +3945,8 @@ The quotient is optional and may be passed a nil.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<pre>bool := |a| == |b|
-</pre>
-<p>    Compares the magnitudes only, ignores the sign.</p>
+<p>bool := |a| == |b|
+    Compares the magnitudes only, ignores the sign.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3918,11 +3966,13 @@ The quotient is optional and may be passed a nil.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This is a shell function that calls either the normal or Montgomery exptmod functions.
-Originally the call to the Montgomery code was embedded in the normal function but that
-wasted alot of stack space for nothing (since 99% of the time the Montgomery code would be called).</p>
-<p>Computes res == G**X mod P.
-Assumes <code>res</code>, <code>G</code>, <code>X</code> and <code>P</code> to not be <code>nil</code> and for <code>G</code>, <code>X</code> and <code>P</code> to have been initialized.</p>
+<p>This is a shell function that calls either the normal or Montgomery exptmod functions.</p>
+<pre>Originally the call to the Montgomery code was embedded in the normal function but that
+wasted alot of stack space for nothing (since 99% of the time the Montgomery code would be called).
+
+Computes res == G**X mod P.
+Assumes `res`, `G`, `X` and `P` to not be `nil` and for `G`, `X` and `P` to have been initialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3945,8 +3995,9 @@ Assumes <code>res</code>, <code>G</code>, <code>X</code> and <code>P</code> to n
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>TODO: Use Sterling's Approximation to estimate log2(N!) to size the result.
-This way we'll have to reallocate less, possibly not at all.</p>
+<p>TODO: Use Sterling's Approximation to estimate log2(N!) to size the result.</p>
+<pre>This way we'll have to reallocate less, possibly not at all.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3963,8 +4014,9 @@ This way we'll have to reallocate less, possibly not at all.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Returns GCD, LCM or both.</p>
-<p>Assumes <code>a</code> and <code>b</code> to have been initialized.
-<code>res_gcd</code> and <code>res_lcm</code> can be nil or ^Int depending on which results are desired.</p>
+<pre>Assumes `a` and `b` to have been initialized.
+`res_gcd` and `res_lcm` can be nil or ^Int depending on which results are desired.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3974,8 +4026,9 @@ This way we'll have to reallocate less, possibly not at all.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>TODO: Think about using <code>count_bits</code> to check if the value could be returned completely,
-and maybe return max(T), .Integer_Overflow if not?</p>
+<p>TODO: Think about using <code>count_bits</code> to check if the value could be returned completely,</p>
+<pre>and maybe return max(T), .Integer_Overflow if not?
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4037,9 +4090,8 @@ and maybe return max(T), .Integer_Overflow if not?</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<pre>bool := |a| &gt; |b|
-</pre>
-<p>    Compares the magnitudes only, ignores the sign.</p>
+<p>bool := |a| &gt; |b|
+    Compares the magnitudes only, ignores the sign.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4069,9 +4121,8 @@ and maybe return max(T), .Integer_Overflow if not?</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<pre>bool := |a| &gt;= |b|
-</pre>
-<p>    Compares the magnitudes only, ignores the sign.</p>
+<p>bool := |a| &gt;= |b|
+    Compares the magnitudes only, ignores the sign.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4143,8 +4194,9 @@ and maybe return max(T), .Integer_Overflow if not?</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This procedure will return <code>true</code> if the <code>Int</code> is even, <code>false</code> if not.
-Assumes <code>a</code> not to be <code>nil</code>.</p>
+<p>This procedure will return <code>true</code> if the <code>Int</code> is even, <code>false</code> if not.</p>
+<pre>Assumes `a` not to be `nil`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4154,8 +4206,9 @@ Assumes <code>a</code> not to be <code>nil</code>.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This procedure will return <code>true</code> if the <code>Int</code> is initialized, <code>false</code> if not.
-Assumes <code>a</code> not to be <code>nil</code>.</p>
+<p>This procedure will return <code>true</code> if the <code>Int</code> is initialized, <code>false</code> if not.</p>
+<pre>Assumes `a` not to be `nil`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4165,8 +4218,9 @@ Assumes <code>a</code> not to be <code>nil</code>.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This procedure will return <code>true</code> if the <code>Int</code> is negative, <code>false</code> if not.
-Assumes <code>a</code> not to be <code>nil</code>.</p>
+<p>This procedure will return <code>true</code> if the <code>Int</code> is negative, <code>false</code> if not.</p>
+<pre>Assumes `a` not to be `nil`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4176,8 +4230,9 @@ Assumes <code>a</code> not to be <code>nil</code>.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This procedure will return <code>true</code> if the <code>Int</code> is even, <code>false</code> if not.
-Assumes <code>a</code> not to be <code>nil</code>.</p>
+<p>This procedure will return <code>true</code> if the <code>Int</code> is even, <code>false</code> if not.</p>
+<pre>Assumes `a` not to be `nil`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4187,8 +4242,9 @@ Assumes <code>a</code> not to be <code>nil</code>.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This procedure will return <code>true</code> if the <code>Int</code> is positive, <code>false</code> if not.
-Assumes <code>a</code> not to be <code>nil</code>.</p>
+<p>This procedure will return <code>true</code> if the <code>Int</code> is positive, <code>false</code> if not.</p>
+<pre>Assumes `a` not to be `nil`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4198,8 +4254,9 @@ Assumes <code>a</code> not to be <code>nil</code>.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This procedure will return <code>true</code> if the <code>Int</code> is a power of two, <code>false</code> if not.
-Assumes <code>a</code> not to be <code>nil</code>.</p>
+<p>This procedure will return <code>true</code> if the <code>Int</code> is a power of two, <code>false</code> if not.</p>
+<pre>Assumes `a` not to be `nil`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4210,26 +4267,25 @@ Assumes <code>a</code> not to be <code>nil</code>.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p><code>a</code> is the big Int to test for primality.</p>
-<p><code>miller_rabin_trials</code> can be one of the following:</p>
-<pre>`&lt; 0`:	For `a` up to 3_317_044_064_679_887_385_961_981, set `miller_rabin_trials` to negative to run a predetermined
-		number of trials for a deterministic answer.
-`= 0`:	Run Miller-Rabin with bases 2, 3 and one random base &lt; `a`. Non-deterministic.
-`&gt; 0`:	Run Miller-Rabin with bases 2, 3 and `miller_rabin_trials` number of random bases. Non-deterministic.
+<pre>`miller_rabin_trials` can be one of the following:
+	`&lt; 0`:	For `a` up to 3_317_044_064_679_887_385_961_981, set `miller_rabin_trials` to negative to run a predetermined
+			number of trials for a deterministic answer.
+	`= 0`:	Run Miller-Rabin with bases 2, 3 and one random base &lt; `a`. Non-deterministic.
+	`&gt; 0`:	Run Miller-Rabin with bases 2, 3 and `miller_rabin_trials` number of random bases. Non-deterministic.
 
-</pre>
-<p><code>miller_rabin_only</code>:</p>
-<pre>`false`	Also use either Frobenius-Underwood or Lucas-Selfridge, depending on the compile-time `MATH_BIG_USE_FROBENIUS_TEST` choice.
-`true`	Run Rabin-Miller trials but skip Frobenius-Underwood / Lucas-Selfridge.
+`miller_rabin_only`:
+	`false`	Also use either Frobenius-Underwood or Lucas-Selfridge, depending on the compile-time `MATH_BIG_USE_FROBENIUS_TEST` choice.
+	`true`	Run Rabin-Miller trials but skip Frobenius-Underwood / Lucas-Selfridge.
 
-</pre>
-<p><code>r</code> takes a pointer to an instance of <code>core:math/rand</code>'s <code>Rand</code> and may be <code>nil</code> to use the global one.</p>
-<p>Returns <code>is_prime</code> (bool), where:</p>
-<pre>`false`	Definitively composite.
-`true`	Probably prime if `miller_rabin_trials` &gt;= 0, with increasing certainty with more trials.
-		Deterministically prime if `miller_rabin_trials` = 0 for `a` up to 3_317_044_064_679_887_385_961_981.
+`r` takes a pointer to an instance of `core:math/rand`'s `Rand` and may be `nil` to use the global one.
 
+Returns `is_prime` (bool), where:
+	`false`	Definitively composite.
+	`true`	Probably prime if `miller_rabin_trials` &gt;= 0, with increasing certainty with more trials.
+			Deterministically prime if `miller_rabin_trials` = 0 for `a` up to 3_317_044_064_679_887_385_961_981.
+
+Assumes `a` not to be `nil` and to have been initialized.
 </pre>
-<p>Assumes <code>a</code> not to be <code>nil</code> and to have been initialized.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4240,8 +4296,9 @@ Assumes <code>a</code> not to be <code>nil</code>.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Check if remainders are possible squares - fast exclude non-squares.</p>
-<p>Returns <code>true</code> if <code>a</code> is a square, <code>false</code> if not.
-Assumes <code>a</code> not to be <code>nil</code> and to have been initialized.</p>
+<pre>Returns `true` if `a` is a square, `false` if not.
+Assumes `a` not to be `nil` and to have been initialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4251,8 +4308,9 @@ Assumes <code>a</code> not to be <code>nil</code> and to have been initialized.<
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This procedure will return <code>true</code> if the <code>Int</code> is zero, <code>false</code> if not.
-Assumes <code>a</code> not to be <code>nil</code>.</p>
+<p>This procedure will return <code>true</code> if the <code>Int</code> is zero, <code>false</code> if not.</p>
+<pre>Assumes `a` not to be `nil`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4262,18 +4320,20 @@ Assumes <code>a</code> not to be <code>nil</code>.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Kronecker/Legendre symbol (a|p)
-Straightforward implementation of algorithm 1.4.10 in
-Henri Cohen: "A Course in Computational Algebraic Number Theory"</p>
-<p>@book{cohen2013course,</p>
-<pre>title={A course in computational algebraic number theory},
-author={Cohen, Henri},
-volume={138},
-year={2013},
-publisher={Springer Science \& Business Media}
+<p>Kronecker/Legendre symbol (a|p)</p>
+<pre>Straightforward implementation of algorithm 1.4.10 in
+Henri Cohen: "A Course in Computational Algebraic Number Theory"
+
+@book{cohen2013course,
+	title={A course in computational algebraic number theory},
+	author={Cohen, Henri},
+	volume={138},
+	year={2013},
+	publisher={Springer Science \& Business Media}
+}
+
+Assumes `a` and `p` to not be `nil` and to have been initialized.
 </pre>
-<p>}</p>
-<p>Assumes <code>a</code> and <code>p</code> to not be <code>nil</code> and to have been initialized.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4289,18 +4349,20 @@ publisher={Springer Science \& Business Media}
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Kronecker/Legendre symbol (a|p)
-Straightforward implementation of algorithm 1.4.10 in
-Henri Cohen: "A Course in Computational Algebraic Number Theory"</p>
-<p>@book{cohen2013course,</p>
-<pre>title={A course in computational algebraic number theory},
-author={Cohen, Henri},
-volume={138},
-year={2013},
-publisher={Springer Science \& Business Media}
+<p>Kronecker/Legendre symbol (a|p)</p>
+<pre>Straightforward implementation of algorithm 1.4.10 in
+Henri Cohen: "A Course in Computational Algebraic Number Theory"
+
+@book{cohen2013course,
+	title={A course in computational algebraic number theory},
+	author={Cohen, Henri},
+	volume={138},
+	year={2013},
+	publisher={Springer Science \& Business Media}
+}
+
+Assumes `a` and `p` to not be `nil` and to have been initialized.
 </pre>
-<p>}</p>
-<p>Assumes <code>a</code> and <code>p</code> to not be <code>nil</code> and to have been initialized.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4320,9 +4382,8 @@ publisher={Springer Science \& Business Media}
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<pre>bool := |a| &lt; |b|
-</pre>
-<p>    Compares the magnitudes only, ignores the sign.</p>
+<p>bool := |a| &lt; |b|
+    Compares the magnitudes only, ignores the sign.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4352,9 +4413,8 @@ publisher={Springer Science \& Business Media}
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<pre>bool := |a| &lt;= |b|
-</pre>
-<p>    Compares the magnitudes only, ignores the sign.</p>
+<p>bool := |a| &lt;= |b|
+    Compares the magnitudes only, ignores the sign.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4374,8 +4434,9 @@ publisher={Springer Science \& Business Media}
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Returns log_base(a).
-Assumes <code>a</code> to not be <code>nil</code> and have been iniialized.</p>
+<p>Returns log_base(a).</p>
+<pre>Assumes `a` to not be `nil` and have been iniialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4405,10 +4466,12 @@ Assumes <code>a</code> to not be <code>nil</code> and have been iniialized.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>remainder = numerator % denominator.
-0 &lt;= remainder &lt; denominator if denominator &gt; 0
-denominator &lt; remainder &lt;= 0 if denominator &lt; 0</p>
-<p>Asssumes quotient, numerator and denominator to have been initialized and not to be nil.</p>
+<p>remainder = numerator % denominator.</p>
+<pre>0 &lt;= remainder &lt; denominator if denominator &gt; 0
+denominator &lt; remainder &lt;= 0 if denominator &lt; 0
+
+Asssumes quotient, numerator and denominator to have been initialized and not to be nil.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4419,7 +4482,8 @@ denominator &lt; remainder &lt;= 0 if denominator &lt; 0</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>remainder = numerator % (1 &lt;&lt; bits)</p>
-<p>Assumes <code>remainder</code> and <code>numerator</code> both not to be <code>nil</code> and <code>bits</code> to be &gt;= 0.</p>
+<pre>Assumes `remainder` and `numerator` both not to be `nil` and `bits` to be &gt;= 0.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4461,9 +4525,8 @@ denominator &lt; remainder &lt;= 0 if denominator &lt; 0</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<pre>Multiply bigint `a` with int `d` and put the result in `dest`.
-</pre>
-<p> 	Like <code>internal_int_mul_digit</code> but with an integer as the small input.</p>
+<p>Multiply bigint <code>a</code> with int <code>d</code> and put the result in <code>dest</code>.
+ 	Like <code>internal_int_mul_digit</code> but with an integer as the small input.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4523,22 +4586,23 @@ denominator &lt; remainder &lt;= 0 if denominator &lt; 0</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Based on gmp's mpz_export.
-See https://gmplib.org/manual/Integer-Import-and-Export.html</p>
-<p><code>buf</code> is a pre-allocated slice of type <code>T</code> "words", which must be an unsigned integer of some description.</p>
-<pre>Use `internal_int_pack_count(a, T, nails)` to calculate the necessary size.
-The library internally uses `DIGIT` as the type, which is u64 or u32 depending on the platform.
-You are of course welcome to export to []u8, []u32be, and so forth.
-After this you can use `mem.slice_data_cast` to interpret the buffer as bytes if you so choose.
+<p>Based on gmp's mpz_export.</p>
+<pre>See https://gmplib.org/manual/Integer-Import-and-Export.html
 
-</pre>
-<p><code>nails</code> are the number of top bits the output "word" reserves.</p>
-<pre>To mimic the internals of this library, this would be 4.
+`buf` is a pre-allocated slice of type `T` "words", which must be an unsigned integer of some description.
+	Use `internal_int_pack_count(a, T, nails)` to calculate the necessary size.
+	The library internally uses `DIGIT` as the type, which is u64 or u32 depending on the platform.
+	You are of course welcome to export to []u8, []u32be, and so forth.
+	After this you can use `mem.slice_data_cast` to interpret the buffer as bytes if you so choose.
 
+`nails` are the number of top bits the output "word" reserves.
+	To mimic the internals of this library, this would be 4.
+
+To use the minimum amount of output bytes, set `nails` to 0 and pass a `[]u8`.
+IMPORTANT: `pack` serializes the magnitude of an Int, that is, the output is unsigned.
+
+Assumes `a` not to be `nil` and to have been initialized.
 </pre>
-<p>To use the minimum amount of output bytes, set <code>nails</code> to 0 and pass a <code>[]u8</code>.
-IMPORTANT: <code>pack</code> serializes the magnitude of an Int, that is, the output is unsigned.</p>
-<p>Assumes <code>a</code> not to be <code>nil</code> and to have been initialized.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4549,7 +4613,8 @@ IMPORTANT: <code>pack</code> serializes the magnitude of an Int, that is, the ou
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Calculate the size needed for <code>internal_int_pack</code>.</p>
-<p>See https://gmplib.org/manual/Integer-Import-and-Export.html</p>
+<pre>See https://gmplib.org/manual/Integer-Import-and-Export.html
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4559,8 +4624,9 @@ IMPORTANT: <code>pack</code> serializes the magnitude of an Int, that is, the ou
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Calculate dest = base^power using a square-multiply algorithm.
-Assumes <code>dest</code> and <code>base</code> not to be <code>nil</code> and to have been initialized.</p>
+<p>Calculate dest = base^power using a square-multiply algorithm.</p>
+<pre>Assumes `dest` and `base` not to be `nil` and to have been initialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4570,8 +4636,9 @@ Assumes <code>dest</code> and <code>base</code> not to be <code>nil</code> and t
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Calculate <code>dest = base^power</code>.
-Assumes <code>dest</code> not to be <code>nil</code> and to have been initialized.</p>
+<p>Calculate <code>dest = base^power</code>.</p>
+<pre>Assumes `dest` not to be `nil` and to have been initialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4581,11 +4648,13 @@ Assumes <code>dest</code> not to be <code>nil</code> and to have been initialize
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This is a shell function that calls either the normal or Montgomery exptmod functions.
-Originally the call to the Montgomery code was embedded in the normal function but that
-wasted alot of stack space for nothing (since 99% of the time the Montgomery code would be called).</p>
-<p>Computes res == G**X mod P.
-Assumes <code>res</code>, <code>G</code>, <code>X</code> and <code>P</code> to not be <code>nil</code> and for <code>G</code>, <code>X</code> and <code>P</code> to have been initialized.</p>
+<p>This is a shell function that calls either the normal or Montgomery exptmod functions.</p>
+<pre>Originally the call to the Montgomery code was embedded in the normal function but that
+wasted alot of stack space for nothing (since 99% of the time the Montgomery code would be called).
+
+Computes res == G**X mod P.
+Assumes `res`, `G`, `X` and `P` to not be `nil` and for `G`, `X` and `P` to have been initialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4601,11 +4670,13 @@ Assumes <code>res</code>, <code>G</code>, <code>X</code> and <code>P</code> to n
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This is a shell function that calls either the normal or Montgomery exptmod functions.
-Originally the call to the Montgomery code was embedded in the normal function but that
-wasted alot of stack space for nothing (since 99% of the time the Montgomery code would be called).</p>
-<p>Computes res == G**X mod P.
-Assumes <code>res</code>, <code>G</code>, <code>X</code> and <code>P</code> to not be <code>nil</code> and for <code>G</code>, <code>X</code> and <code>P</code> to have been initialized.</p>
+<p>This is a shell function that calls either the normal or Montgomery exptmod functions.</p>
+<pre>Originally the call to the Montgomery code was embedded in the normal function but that
+wasted alot of stack space for nothing (since 99% of the time the Montgomery code would be called).
+
+Computes res == G**X mod P.
+Assumes `res`, `G`, `X` and `P` to not be `nil` and for `G`, `X` and `P` to have been initialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4621,8 +4692,9 @@ Assumes <code>res</code>, <code>G</code>, <code>X</code> and <code>P</code> to n
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Determines if an Integer is divisible by one of the _PRIME_TABLE primes.
-Returns true if it is, false if not.</p>
+<p>Determines if an Integer is divisible by one of the _PRIME_TABLE primes.</p>
+<pre>Returns true if it is, false if not.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4633,9 +4705,11 @@ Returns true if it is, false if not.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Miller-Rabin test of "a" to the base of "b" as described in HAC pp. 139 Algorithm 4.24.</p>
-<p>Sets result to <code>false</code> if definitely composite or <code>true</code> if probably prime.
-Randomly the chance of error is no more than 1/4 and often very much lower.</p>
-<p>Assumes <code>a</code> and <code>b</code> not to be <code>nil</code> and to have been initialized.</p>
+<pre>Sets result to `false` if definitely composite or `true` if probably prime.
+Randomly the chance of error is no more than 1/4 and often very much lower.
+
+Assumes `a` and `b` not to be `nil` and to have been initialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4645,9 +4719,10 @@ Randomly the chance of error is no more than 1/4 and often very much lower.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Finds the next prime after the number <code>a</code> using <code>t</code> trials of Miller-Rabin,
-in place: It sets <code>a</code> to the prime found.
-<code>bbs_style</code> = true means the prime must be congruent to 3 mod 4</p>
+<p>Finds the next prime after the number <code>a</code> using <code>t</code> trials of Miller-Rabin,</p>
+<pre>in place: It sets `a` to the prime found.
+`bbs_style` = true means the prime must be congruent to 3 mod 4
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4657,13 +4732,17 @@ in place: It sets <code>a</code> to the prime found.
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Strong Lucas-Selfridge test.
-returns true if it is a strong L-S prime, false if it is composite</p>
-<p>Code ported from Thomas Ray Nicely's implementation of the BPSW test at http://www.trnicely.net/misc/bpsw.html</p>
-<p>Freeware copyright (C) 2016 Thomas R. Nicely &lt;http://www.trnicely.net&gt;.
-Released into the public domain by the author, who disclaims any legal liability arising from its use.</p>
-<p>The multi-line comments are made by Thomas R. Nicely and are copied verbatim.
-(If that name sounds familiar, he is the guy who found the fdiv bug in the Pentium CPU.)</p>
+<p>Strong Lucas-Selfridge test.</p>
+<pre>returns true if it is a strong L-S prime, false if it is composite
+
+Code ported from Thomas Ray Nicely's implementation of the BPSW test at http://www.trnicely.net/misc/bpsw.html
+
+Freeware copyright (C) 2016 Thomas R. Nicely &lt;http://www.trnicely.net&gt;.
+Released into the public domain by the author, who disclaims any legal liability arising from its use.
+
+The multi-line comments are made by Thomas R. Nicely and are copied verbatim.
+(If that name sounds familiar, he is the guy who found the fdiv bug in the Pentium CPU.)
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4695,11 +4774,14 @@ Released into the public domain by the author, who disclaims any legal liability
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Find the nth root of an Integer.
-Result found such that <code>(dest)**n &lt;= src</code> and <code>(dest+1)**n &gt; src</code></p>
-<p>This algorithm uses Newton's approximation <code>x[i+1] = x[i] - f(x[i])/f'(x[i])</code>,
-which will find the root in <code>log(n)</code> time where each step involves a fair bit.</p>
-<p>Assumes <code>dest</code> and <code>src</code> not to be <code>nil</code> and have been initialized.</p>
+<p>Find the nth root of an Integer.</p>
+<pre>Result found such that `(dest)**n &lt;= src` and `(dest+1)**n &gt; src`
+
+This algorithm uses Newton's approximation `x[i+1] = x[i] - f(x[i])/f'(x[i])`,
+which will find the root in `log(n)` time where each step involves a fair bit.
+
+Assumes `dest` and `src` not to be `nil` and have been initialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4735,8 +4817,9 @@ which will find the root in <code>log(n)</code> time where each step involves a 
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>dest = src  * 2
-dest = src &lt;&lt; 1</p>
+<p>dest = src  * 2</p>
+<pre>dest = src &lt;&lt; 1
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4752,10 +4835,12 @@ dest = src &lt;&lt; 1</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>dest = src  / 2
-dest = src &gt;&gt; 1</p>
-<p>Assumes <code>dest</code> and <code>src</code> not to be <code>nil</code> and have been initialized.
-We make no allocations here.</p>
+<p>dest = src  / 2</p>
+<pre>dest = src &gt;&gt; 1
+
+Assumes `dest` and `src` not to be `nil` and have been initialized.
+We make no allocations here.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4775,9 +4860,11 @@ We make no allocations here.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resize backing store.
-We don't need to pass the allocator, because the storage itself stores it.</p>
-<p>Assumes <code>a</code> not to be <code>nil</code>, and to have already been initialized.</p>
+<p>Resize backing store.</p>
+<pre>We don't need to pass the allocator, because the storage itself stores it.
+
+Assumes `a` not to be `nil`, and to have already been initialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4787,8 +4874,9 @@ We don't need to pass the allocator, because the storage itself stores it.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>quotient, remainder := numerator &gt;&gt; bits;
-<code>remainder</code> is allowed to be passed a <code>nil</code>, in which case <code>mod</code> won't be computed.</p>
+<p>quotient, remainder := numerator &gt;&gt; bits;</p>
+<pre>`remainder` is allowed to be passed a `nil`, in which case `mod` won't be computed.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4808,8 +4896,9 @@ We don't need to pass the allocator, because the storage itself stores it.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This function is less generic than <code>root_n</code>, simpler and faster.
-Assumes <code>dest</code> and <code>src</code> not to be <code>nil</code> and to have been initialized.</p>
+<p>This function is less generic than <code>root_n</code>, simpler and faster.</p>
+<pre>Assumes `dest` and `src` not to be `nil` and to have been initialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4819,9 +4908,10 @@ Assumes <code>dest</code> and <code>src</code> not to be <code>nil</code> and to
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Tonelli-Shanks algorithm
-https://en.wikipedia.org/wiki/Tonelli%E2%80%93Shanks_algorithm
-https://gmplib.org/list-archives/gmp-discuss/2013-April/005300.html</p>
+<p>Tonelli-Shanks algorithm</p>
+<pre>https://en.wikipedia.org/wiki/Tonelli%E2%80%93Shanks_algorithm
+https://gmplib.org/list-archives/gmp-discuss/2013-April/005300.html
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4831,11 +4921,12 @@ https://gmplib.org/list-archives/gmp-discuss/2013-April/005300.html</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Low-level subtraction, signed. Handbook of Applied Cryptography, algorithm 14.9.
-dest = number - decrease. Assumes |number| &gt; |decrease|.</p>
-<p>Assumptions:</p>
-<pre>`dest`, `number` != `nil` and have been initalized.
-`dest` is large enough (number.used + 1) to fit result.
+<p>Low-level subtraction, signed. Handbook of Applied Cryptography, algorithm 14.9.</p>
+<pre>dest = number - decrease. Assumes |number| &gt; |decrease|.
+
+Assumptions:
+	`dest`, `number` != `nil` and have been initalized.
+	`dest` is large enough (number.used + 1) to fit result.
 </pre>
 </details>
 </div>
@@ -4846,10 +4937,11 @@ dest = number - decrease. Assumes |number| &gt; |decrease|.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Low-level subtraction, signed. Handbook of Applied Cryptography, algorithm 14.9.
-dest = number - decrease. Assumes |number| &gt; |decrease|.</p>
-<p>Assumptions:</p>
-<pre>`dest`, `number` and `decrease` != `nil` and have been initalized.
+<p>Low-level subtraction, signed. Handbook of Applied Cryptography, algorithm 14.9.</p>
+<pre>dest = number - decrease. Assumes |number| &gt; |decrease|.
+
+Assumptions:
+	`dest`, `number` and `decrease` != `nil` and have been initalized.
 </pre>
 </details>
 </div>
@@ -4860,10 +4952,11 @@ dest = number - decrease. Assumes |number| &gt; |decrease|.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Low-level subtraction, dest = number - decrease. Assumes |number| &gt; |decrease|.
-Handbook of Applied Cryptography, algorithm 14.9.</p>
-<p>Assumptions:</p>
-<pre>`dest`, `number` and `decrease` != `nil` and have been initalized.
+<p>Low-level subtraction, dest = number - decrease. Assumes |number| &gt; |decrease|.</p>
+<pre>Handbook of Applied Cryptography, algorithm 14.9.
+
+Assumptions:
+	`dest`, `number` and `decrease` != `nil` and have been initalized.
 </pre>
 </details>
 </div>
@@ -4884,9 +4977,10 @@ Handbook of Applied Cryptography, algorithm 14.9.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>In normal code, you can also write <code>a, b = b, a</code>.
-However, that only swaps within the current scope.
-This helper swaps completely.</p>
+<p>In normal code, you can also write <code>a, b = b, a</code>.</p>
+<pre>However, that only swaps within the current scope.
+This helper swaps completely.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4941,11 +5035,14 @@ This helper swaps completely.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Performs one Fermat test.</p>
-<p>If "a" were prime then b**a == b (mod a) since the order of
+<pre>If "a" were prime then b**a == b (mod a) since the order of
 the multiplicative sub-group would be phi(a) = a-1.  That means
-it would be the same as b<b>(a mod (a-1)) == b</b>1 == b (mod a).</p>
-<p>Returns <code>true</code> if the congruence holds, or <code>false</code> otherwise.</p>
-<p>Assumes <code>a</code> and <code>b</code> not to be <code>nil</code> and to have been initialized.</p>
+it would be the same as b**(a mod (a-1)) == b**1 == b (mod a).
+
+Returns `true` if the congruence holds, or `false` otherwise.
+
+Assumes `a` and `b` not to be `nil` and to have been initialized.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4956,13 +5053,13 @@ it would be the same as b<b>(a mod (a-1)) == b</b>1 == b (mod a).</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Makes a truly random prime of a given size (bits),</p>
-<p>Flags are as follows:
- 	Blum_Blum_Shub    - Make prime congruent to 3 mod 4</p>
-<pre>Safe              - Make sure (p-1)/2 is prime as well (implies .Blum_Blum_Shub)
-Second_MSB_On     - Make the 2nd highest bit one
+<pre>Flags are as follows:
+ 	Blum_Blum_Shub    - Make prime congruent to 3 mod 4
+	Safe              - Make sure (p-1)/2 is prime as well (implies .Blum_Blum_Shub)
+	Second_MSB_On     - Make the 2nd highest bit one
 
+This is possibly the mother of all prime generation functions, muahahahahaha!
 </pre>
-<p>This is possibly the mother of all prime generation functions, muahahahahaha!</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -7122,7 +7219,7 @@ Second_MSB_On     - Make the 2nd highest bit one
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/math/big/rat.odin">rat.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 09:49:15.527967800 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 10:18:47.588167800 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

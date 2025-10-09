@@ -710,7 +710,7 @@ e.g.:
 <div class="pkg-entity">
 <h3 id="clone_to_dynamic"><span><a class="doc-id-link" href="#clone_to_dynamic">clone_to_dynamic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/slice.odin#L482"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">clone_to_dynamic :: <span class="keyword-type">proc</span>(a: $T/[]$E, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ([<span class="keyword">dynamic</span>]$E, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
+<pre class="doc-code">clone_to_dynamic :: <span class="keyword-type">proc</span>(a: $T/[]$E, allocator := <a href="/base/runtime/#Context">context.allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> ($T/[<span class="keyword">dynamic</span>]$E, runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) <span class="directive">#optional_ok</span> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -866,7 +866,7 @@ e.g.:
 <div class="pkg-entity">
 <h3 id="into_dynamic"><span><a class="doc-id-link" href="#into_dynamic">into_dynamic<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/slice.odin#L491"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">into_dynamic :: <span class="keyword-type">proc</span>(a: $T/[]$E) -> [<span class="keyword">dynamic</span>]$E {…}</pre>
+<pre class="doc-code">into_dynamic :: <span class="keyword-type">proc</span>(a: $T/[]$E) -> $T/[<span class="keyword">dynamic</span>]$E {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -1141,9 +1141,10 @@ the underlying data, use <code>clone</code> to create a copy, then permute that 
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>return the prefix length common between slices <code>a</code> and <code>b</code>.</p>
-<p>slice.prefix_length([]u8{1, 2, 3, 4}, []u8{1}) -&gt; 1
+<pre>slice.prefix_length([]u8{1, 2, 3, 4}, []u8{1}) -&gt; 1
 slice.prefix_length([]u8{1, 2, 3, 4}, []u8{1, 2, 3}) -&gt; 3
-slice.prefix_length([]u8{1, 2, 3, 4}, []u8{2, 3, 4}) -&gt; 0</p>
+slice.prefix_length([]u8{1, 2, 3, 4}, []u8{2, 3, 4}) -&gt; 0
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1455,11 +1456,12 @@ This sort is not guaranteed to be stable</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>return the suffix length common between slices <code>a</code> and <code>b</code>.</p>
-<p>slice.suffix_length([]u8{1, 2, 3, 4}, []u8{1, 2, 3, 4}) -&gt; 4
+<pre>slice.suffix_length([]u8{1, 2, 3, 4}, []u8{1, 2, 3, 4}) -&gt; 4
 slice.suffix_length([]u8{1, 2, 3, 4}, []u8{3, 4}) -&gt; 2
 slice.suffix_length([]u8{1, 2, 3, 4}, []u8{1}) -&gt; 0
 slice.suffix_length([]u8{1, 2, 3, 4}, []u8{1, 3, 5}) -&gt; 0
-slice.suffix_length([]u8{3, 4, 5}, []u8{3, 5}) -&gt; 1</p>
+slice.suffix_length([]u8{3, 4, 5}, []u8{3, 5}) -&gt; 1
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1488,7 +1490,8 @@ slice.suffix_length([]u8{3, 4, 5}, []u8{3, 5}) -&gt; 1</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Turn a slice into a byte slice.</p>
-<p>See <code>slice.reinterpret</code> to go the other way.</p>
+<pre>See `slice.reinterpret` to go the other way.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1571,7 +1574,7 @@ The procedures modifies the slice in-place and returns the modified slice.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort_private.odin">sort_private.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 09:49:15.786203600 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 10:18:47.826107600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

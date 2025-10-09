@@ -9254,47 +9254,53 @@ appropriate for a given situation.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Calculates an appropriate buffer size from a descriptor, native sample rate and performance profile.</p>
-<p>This function is used by backends for helping determine an appropriately sized buffer to use with
-the device depending on the values of <code>periodSizeInFrames</code> and <code>periodSizeInMilliseconds</code> in the
-<code>pDescriptor</code> object. Since buffer size calculations based on time depends on the sample rate, a
-best guess at the device's native sample rate is also required which is where <code>nativeSampleRate</code>
+<pre>This function is used by backends for helping determine an appropriately sized buffer to use with
+the device depending on the values of `periodSizeInFrames` and `periodSizeInMilliseconds` in the
+`pDescriptor` object. Since buffer size calculations based on time depends on the sample rate, a
+best guess at the device's native sample rate is also required which is where `nativeSampleRate`
 comes in. In addition, the performance profile is also needed for cases where both the period size
-in frames and milliseconds are both zero.</p>
-<p>Parameters
+in frames and milliseconds are both zero.
+
+
+Parameters
 ----------
-pDescriptor (in)</p>
-<pre>	A pointer to device descriptor whose `periodSizeInFrames` and `periodSizeInMilliseconds` members
-	will be used for the calculation of the buffer size.
+pDescriptor (in)
+		A pointer to device descriptor whose `periodSizeInFrames` and `periodSizeInMilliseconds` members
+		will be used for the calculation of the buffer size.
 
-</pre>
-<p>nativeSampleRate (in)</p>
-<pre>	The device's native sample rate. This is only ever used when the `periodSizeInFrames` member of
-	`pDescriptor` is zero. In this case, `periodSizeInMilliseconds` will be used instead, in which
-	case a sample rate is required to convert to a size in frames.
+nativeSampleRate (in)
+		The device's native sample rate. This is only ever used when the `periodSizeInFrames` member of
+		`pDescriptor` is zero. In this case, `periodSizeInMilliseconds` will be used instead, in which
+		case a sample rate is required to convert to a size in frames.
 
-</pre>
-<p>performanceProfile (in)</p>
-<pre>	When both the `periodSizeInFrames` and `periodSizeInMilliseconds` members of `pDescriptor` are
-	zero, miniaudio will fall back to a buffer size based on the performance profile. The profile
-	to use for this calculation is determine by this parameter.
+performanceProfile (in)
+		When both the `periodSizeInFrames` and `periodSizeInMilliseconds` members of `pDescriptor` are
+		zero, miniaudio will fall back to a buffer size based on the performance profile. The profile
+		to use for this calculation is determine by this parameter.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-The calculated buffer size in frames.</p>
-<p>Thread Safety
+The calculated buffer size in frames.
+
+
+Thread Safety
 -------------
-This is safe so long as nothing modifies <code>pDescriptor</code> at the same time. However, this function
+This is safe so long as nothing modifies `pDescriptor` at the same time. However, this function
 should only ever be called from within the backend's device initialization routine and therefore
-shouldn't have any multithreading concerns.</p>
-<p>Callback Safety
+shouldn't have any multithreading concerns.
+
+
+Callback Safety
 ---------------
-This is safe to call within the data callback, but there is no reason to ever do this.</p>
-<p>Remarks
+This is safe to call within the data callback, but there is no reason to ever do this.
+
+
+Remarks
 -------
-If <code>nativeSampleRate</code> is zero, this function will fall back to <code>pDescriptor-&gt;sampleRate</code>. If that
-is also zero, <code>MA_DEFAULT_SAMPLE_RATE</code> will be used instead.</p>
+If `nativeSampleRate` is zero, this function will fall back to `pDescriptor-&gt;sampleRate`. If that
+is also zero, `MA_DEFAULT_SAMPLE_RATE` will be used instead.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9390,7 +9396,8 @@ is also zero, <code>MA_DEFAULT_SAMPLE_RATE</code> will be used instead.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Helper for determining whether or not a channel is present in the given channel map.</p>
-<p>The channel map buffer must have a capacity of at least <code>channels</code>.</p>
+<pre>The channel map buffer must have a capacity of at least `channels`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9401,7 +9408,8 @@ is also zero, <code>MA_DEFAULT_SAMPLE_RATE</code> will be used instead.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Copies a channel map.</p>
-<p>Both input and output channel map buffers must have a capacity of at least <code>channels</code>.</p>
+<pre>Both input and output channel map buffers must have a capacity of at least `channels`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9412,7 +9420,8 @@ is also zero, <code>MA_DEFAULT_SAMPLE_RATE</code> will be used instead.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Copies a channel map if one is specified, otherwise copies the default channel map.</p>
-<p>The output buffer must have a capacity of at least <code>channels</code>. If not NULL, the input channel map must also have a capacity of at least <code>channels</code>.</p>
+<pre>The output buffer must have a capacity of at least `channels`. If not NULL, the input channel map must also have a capacity of at least `channels`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9422,9 +9431,11 @@ is also zero, <code>MA_DEFAULT_SAMPLE_RATE</code> will be used instead.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Find a channel position in the given channel map. Returns MA_TRUE if the channel is found; MA_FALSE otherwise. The
-index of the channel is output to <code>pChannelIndex</code>.</p>
-<p>The channel map buffer must have a capacity of at least <code>channels</code>.</p>
+<p>Find a channel position in the given channel map. Returns MA_TRUE if the channel is found; MA_FALSE otherwise. The</p>
+<pre>index of the channel is output to `pChannelIndex`.
+
+The channel map buffer must have a capacity of at least `channels`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9435,7 +9446,8 @@ index of the channel is output to <code>pChannelIndex</code>.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Retrieves the channel position of the specified channel in the given channel map.</p>
-<p>The pChannelMap parameter can be null, in which case miniaudio's default channel map will be assumed.</p>
+<pre>The pChannelMap parameter can be null, in which case miniaudio's default channel map will be assumed.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9446,7 +9458,8 @@ index of the channel is output to <code>pChannelIndex</code>.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Initializes a blank channel map.</p>
-<p>When a blank channel map is specified anywhere it indicates that the native channel map should be used.</p>
+<pre>When a blank channel map is specified anywhere it indicates that the native channel map should be used.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9457,7 +9470,8 @@ index of the channel is output to <code>pChannelIndex</code>.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Helper for retrieving a standard channel map.</p>
-<p>The output channel map buffer must have a capacity of at least <code>channelMapCap</code>.</p>
+<pre>The output channel map buffer must have a capacity of at least `channelMapCap`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9468,7 +9482,8 @@ index of the channel is output to <code>pChannelIndex</code>.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Helper for determining if a channel map is blank (all channels set to MA_CHANNEL_NONE).</p>
-<p>The channel map buffer must have a capacity of at least <code>channels</code>.</p>
+<pre>The channel map buffer must have a capacity of at least `channels`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9479,8 +9494,10 @@ index of the channel is output to <code>pChannelIndex</code>.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Helper for comparing two channel maps for equality.</p>
-<p>This assumes the channel count is the same between the two.</p>
-<p>Both channels map buffers must have a capacity of at least <code>channels</code>.</p>
+<pre>This assumes the channel count is the same between the two.
+
+Both channels map buffers must have a capacity of at least `channels`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9491,14 +9508,15 @@ index of the channel is output to <code>pChannelIndex</code>.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Determines whether or not a channel map is valid.</p>
-<p>A blank channel map is valid (all channels set to MA_CHANNEL_NONE). The way a blank channel map is handled is context specific, but
-is usually treated as a passthrough.</p>
-<p>Invalid channel maps:</p>
-<pre>- A channel map with no channels
-- A channel map with more than one channel and a mono channel
+<pre>A blank channel map is valid (all channels set to MA_CHANNEL_NONE). The way a blank channel map is handled is context specific, but
+is usually treated as a passthrough.
 
+Invalid channel maps:
+	- A channel map with no channels
+	- A channel map with more than one channel and a mono channel
+
+The channel map buffer must have a capacity of at least `channels`.
 </pre>
-<p>The channel map buffer must have a capacity of at least <code>channels</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9509,8 +9527,10 @@ is usually treated as a passthrough.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Generates a string representing the given channel map.</p>
-<p>This is for printing and debugging purposes, not serialization/deserialization.</p>
-<p>Returns the length of the string, not including the null terminator.</p>
+<pre>This is for printing and debugging purposes, not serialization/deserialization.
+
+Returns the length of the string, not including the null terminator.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9571,17 +9591,23 @@ is usually treated as a passthrough.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Initializes a <code>ma_context_config</code> object.</p>
-<p>Return Value
+<pre>Return Value
 ------------
-A <code>ma_context_config</code> initialized to defaults.</p>
-<p>Remarks
+A `ma_context_config` initialized to defaults.
+
+
+Remarks
 -------
-You must always use this to initialize the default state of the <code>ma_context_config</code> object. Not using this will result in your program breaking when miniaudio
-is updated and new members are added to <code>ma_context_config</code>. It also sets logical defaults.</p>
-<p>You can override members of the returned object by changing it's members directly.</p>
-<p>See Also
+You must always use this to initialize the default state of the `ma_context_config` object. Not using this will result in your program breaking when miniaudio
+is updated and new members are added to `ma_context_config`. It also sets logical defaults.
+
+You can override members of the returned object by changing it's members directly.
+
+
+See Also
 --------
-ma_context_init()</p>
+ma_context_init()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9592,56 +9618,68 @@ ma_context_init()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Enumerates over every device (both playback and capture).</p>
-<p>This is a lower-level enumeration function to the easier to use <code>ma_context_get_devices()</code>. Use <code>ma_context_enumerate_devices()</code> if you would rather not incur
-an internal heap allocation, or it simply suits your code better.</p>
-<p>Note that this only retrieves the ID and name/description of the device. The reason for only retrieving basic information is that it would otherwise require
-opening the backend device in order to probe it for more detailed information which can be inefficient. Consider using <code>ma_context_get_device_info()</code> for this,
-but don't call it from within the enumeration callback.</p>
-<p>Returning false from the callback will stop enumeration. Returning true will continue enumeration.</p>
-<p>Parameters
+<pre>This is a lower-level enumeration function to the easier to use `ma_context_get_devices()`. Use `ma_context_enumerate_devices()` if you would rather not incur
+an internal heap allocation, or it simply suits your code better.
+
+Note that this only retrieves the ID and name/description of the device. The reason for only retrieving basic information is that it would otherwise require
+opening the backend device in order to probe it for more detailed information which can be inefficient. Consider using `ma_context_get_device_info()` for this,
+but don't call it from within the enumeration callback.
+
+Returning false from the callback will stop enumeration. Returning true will continue enumeration.
+
+
+Parameters
 ----------
-pContext (in)</p>
-<pre>	A pointer to the context performing the enumeration.
+pContext (in)
+		A pointer to the context performing the enumeration.
 
-</pre>
-<p>callback (in)</p>
-<pre>	The callback to fire for each enumerated device.
+callback (in)
+		The callback to fire for each enumerated device.
 
-</pre>
-<p>pUserData (in)</p>
-<pre>	A pointer to application-defined data passed to the callback.
+pUserData (in)
+		A pointer to application-defined data passed to the callback.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-MA_SUCCESS if successful; any other error code otherwise.</p>
-<p>Thread Safety
+MA_SUCCESS if successful; any other error code otherwise.
+
+
+Thread Safety
 -------------
-Safe. This is guarded using a simple mutex lock.</p>
-<p>Remarks
+Safe. This is guarded using a simple mutex lock.
+
+
+Remarks
 -------
-Do _not_ assume the first enumerated device of a given type is the default device.</p>
-<p>Some backends and platforms may only support default playback and capture devices.</p>
-<p>In general, you should not do anything complicated from within the callback. In particular, do not try initializing a device from within the callback. Also,
-do not try to call <code>ma_context_get_device_info()</code> from within the callback.</p>
-<p>Consider using <code>ma_context_get_devices()</code> for a simpler and safer API, albeit at the expense of an internal heap allocation.</p>
-<p>Example 1 - Simple Enumeration
+Do _not_ assume the first enumerated device of a given type is the default device.
+
+Some backends and platforms may only support default playback and capture devices.
+
+In general, you should not do anything complicated from within the callback. In particular, do not try initializing a device from within the callback. Also,
+do not try to call `ma_context_get_device_info()` from within the callback.
+
+Consider using `ma_context_get_devices()` for a simpler and safer API, albeit at the expense of an internal heap allocation.
+
+
+Example 1 - Simple Enumeration
 ------------------------------
-ma_bool32 ma_device_enum_callback(ma_context<i> pContext, ma_device_type deviceType, const ma_device_info</i> pInfo, void* pUserData)
-{</p>
-<pre>	printf("Device Name: %s\n", pInfo-&gt;name);
-	return MA_TRUE;
-</pre>
-<p>}</p>
-<p>ma_result result = ma_context_enumerate_devices(&context, my_device_enum_callback, pMyUserData);
-if (result != MA_SUCCESS) {</p>
-<pre>	// Error.
-</pre>
-<p>}</p>
-<p>See Also
+ma_bool32 ma_device_enum_callback(ma_context* pContext, ma_device_type deviceType, const ma_device_info* pInfo, void* pUserData)
+{
+		printf("Device Name: %s\n", pInfo-&gt;name);
+		return MA_TRUE;
+}
+
+ma_result result = ma_context_enumerate_devices(&context, my_device_enum_callback, pMyUserData);
+if (result != MA_SUCCESS) {
+		// Error.
+}
+
+
+See Also
 --------
-ma_context_get_devices()</p>
+ma_context_get_devices()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9652,39 +9690,42 @@ ma_context_get_devices()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Retrieves information about a device of the given type, with the specified ID and share mode.</p>
-<p>Parameters
+<pre>Parameters
 ----------
-pContext (in)</p>
-<pre>	A pointer to the context performing the query.
+pContext (in)
+		A pointer to the context performing the query.
 
-</pre>
-<p>deviceType (in)</p>
-<pre>	The type of the device being queried. Must be either `ma_device_type_playback` or `ma_device_type_capture`.
+deviceType (in)
+		The type of the device being queried. Must be either `ma_device_type_playback` or `ma_device_type_capture`.
 
-</pre>
-<p>pDeviceID (in)</p>
-<pre>	The ID of the device being queried.
+pDeviceID (in)
+		The ID of the device being queried.
 
-</pre>
-<p>pDeviceInfo (out)</p>
-<pre>	A pointer to the `ma_device_info` structure that will receive the device information.
+pDeviceInfo (out)
+		A pointer to the `ma_device_info` structure that will receive the device information.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-MA_SUCCESS if successful; any other error code otherwise.</p>
-<p>Thread Safety
+MA_SUCCESS if successful; any other error code otherwise.
+
+
+Thread Safety
 -------------
-Safe. This is guarded using a simple mutex lock.</p>
-<p>Remarks
+Safe. This is guarded using a simple mutex lock.
+
+
+Remarks
 -------
-Do _not_ call this from within the <code>ma_context_enumerate_devices()</code> callback.</p>
-<p>It's possible for a device to have different information and capabilities depending on whether or not it's opened in shared or exclusive mode. For example, in
+Do _not_ call this from within the `ma_context_enumerate_devices()` callback.
+
+It's possible for a device to have different information and capabilities depending on whether or not it's opened in shared or exclusive mode. For example, in
 shared mode, WASAPI always uses floating point samples for mixing, but in exclusive mode it can be anything. Therefore, this function allows you to specify
 which share mode you want information for. Note that not all backends and devices support shared or exclusive mode, in which case this function will fail if
-the requested share mode is unsupported.</p>
-<p>This leaves pDeviceInfo unmodified in the result of an error.</p>
+the requested share mode is unsupported.
+
+This leaves pDeviceInfo unmodified in the result of an error.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9695,49 +9736,55 @@ the requested share mode is unsupported.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Retrieves basic information about every active playback and/or capture device.</p>
-<p>This function will allocate memory internally for the device lists and return a pointer to them through the <code>ppPlaybackDeviceInfos</code> and <code>ppCaptureDeviceInfos</code>
-parameters. If you do not want to incur the overhead of these allocations consider using <code>ma_context_enumerate_devices()</code> which will instead use a callback.</p>
-<p>Note that this only retrieves the ID and name/description of the device. The reason for only retrieving basic information is that it would otherwise require
-opening the backend device in order to probe it for more detailed information which can be inefficient. Consider using <code>ma_context_get_device_info()</code> for this,
-but don't call it from within the enumeration callback.</p>
-<p>Parameters
+<pre>This function will allocate memory internally for the device lists and return a pointer to them through the `ppPlaybackDeviceInfos` and `ppCaptureDeviceInfos`
+parameters. If you do not want to incur the overhead of these allocations consider using `ma_context_enumerate_devices()` which will instead use a callback.
+
+Note that this only retrieves the ID and name/description of the device. The reason for only retrieving basic information is that it would otherwise require
+opening the backend device in order to probe it for more detailed information which can be inefficient. Consider using `ma_context_get_device_info()` for this,
+but don't call it from within the enumeration callback.
+
+Parameters
 ----------
-pContext (in)</p>
-<pre>	A pointer to the context performing the enumeration.
+pContext (in)
+		A pointer to the context performing the enumeration.
 
-</pre>
-<p>ppPlaybackDeviceInfos (out)</p>
-<pre>	A pointer to a pointer that will receive the address of a buffer containing the list of `ma_device_info` structures for playback devices.
+ppPlaybackDeviceInfos (out)
+		A pointer to a pointer that will receive the address of a buffer containing the list of `ma_device_info` structures for playback devices.
 
-</pre>
-<p>pPlaybackDeviceCount (out)</p>
-<pre>	A pointer to an unsigned integer that will receive the number of playback devices.
+pPlaybackDeviceCount (out)
+		A pointer to an unsigned integer that will receive the number of playback devices.
 
-</pre>
-<p>ppCaptureDeviceInfos (out)</p>
-<pre>	A pointer to a pointer that will receive the address of a buffer containing the list of `ma_device_info` structures for capture devices.
+ppCaptureDeviceInfos (out)
+		A pointer to a pointer that will receive the address of a buffer containing the list of `ma_device_info` structures for capture devices.
 
-</pre>
-<p>pCaptureDeviceCount (out)</p>
-<pre>	A pointer to an unsigned integer that will receive the number of capture devices.
+pCaptureDeviceCount (out)
+		A pointer to an unsigned integer that will receive the number of capture devices.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-MA_SUCCESS if successful; any other error code otherwise.</p>
-<p>Thread Safety
+MA_SUCCESS if successful; any other error code otherwise.
+
+
+Thread Safety
 -------------
 Unsafe. Since each call to this function invalidates the pointers from the previous call, you should not be calling this simultaneously across multiple
-threads. Instead, you need to make a copy of the returned data with your own higher level synchronization.</p>
-<p>Remarks
+threads. Instead, you need to make a copy of the returned data with your own higher level synchronization.
+
+
+Remarks
 -------
-It is _not_ safe to assume the first device in the list is the default device.</p>
-<p>You can pass in NULL for the playback or capture lists in which case they'll be ignored.</p>
-<p>The returned pointers will become invalid upon the next call this this function, or when the context is uninitialized. Do not free the returned pointers.</p>
-<p>See Also
+It is _not_ safe to assume the first device in the list is the default device.
+
+You can pass in NULL for the playback or capture lists in which case they'll be ignored.
+
+The returned pointers will become invalid upon the next call this this function, or when the context is uninitialized. Do not free the returned pointers.
+
+
+See Also
 --------
-ma_context_enumerate_devices()</p>
+ma_context_enumerate_devices()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9748,14 +9795,17 @@ ma_context_enumerate_devices()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Retrieves a pointer to the log object associated with this context.</p>
-<p>Remarks
+<pre>Remarks
 -------
-Pass the returned pointer to <code>ma_log_post()</code>, <code>ma_log_postv()</code> or <code>ma_log_postf()</code> to post a log
-message.</p>
-<p>Return Value
+Pass the returned pointer to `ma_log_post()`, `ma_log_postv()` or `ma_log_postf()` to post a log
+message.
+
+
+Return Value
 ------------
-A pointer to the <code>ma_log</code> object that the context uses to post log messages. If some error occurs,
-NULL will be returned.</p>
+A pointer to the `ma_log` object that the context uses to post log messages. If some error occurs,
+NULL will be returned.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9766,199 +9816,213 @@ NULL will be returned.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Initializes a context.</p>
-<p>The context is used for selecting and initializing an appropriate backend and to represent the backend at a more global level than that of an individual
-device. There is one context to many devices, and a device is created from a context. A context is required to enumerate devices.</p>
-<p>Parameters
+<pre>The context is used for selecting and initializing an appropriate backend and to represent the backend at a more global level than that of an individual
+device. There is one context to many devices, and a device is created from a context. A context is required to enumerate devices.
+
+
+Parameters
 ----------
-backends (in, optional)</p>
-<pre>	A list of backends to try initializing, in priority order. Can be NULL, in which case it uses default priority order.
+backends (in, optional)
+		A list of backends to try initializing, in priority order. Can be NULL, in which case it uses default priority order.
 
-</pre>
-<p>backendCount (in, optional)</p>
-<pre>	The number of items in `backend`. Ignored if `backend` is NULL.
+backendCount (in, optional)
+		The number of items in `backend`. Ignored if `backend` is NULL.
 
-</pre>
-<p>pConfig (in, optional)</p>
-<pre>	The context configuration.
+pConfig (in, optional)
+		The context configuration.
 
-</pre>
-<p>pContext (in)</p>
-<pre>	A pointer to the context object being initialized.
+pContext (in)
+		A pointer to the context object being initialized.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-MA_SUCCESS if successful; any other error code otherwise.</p>
-<p>Thread Safety
+MA_SUCCESS if successful; any other error code otherwise.
+
+
+Thread Safety
 -------------
-Unsafe. Do not call this function across multiple threads as some backends read and write to global state.</p>
-<p>Remarks
+Unsafe. Do not call this function across multiple threads as some backends read and write to global state.
+
+
+Remarks
 -------
-When <code>backends</code> is NULL, the default priority order will be used. Below is a list of backends in priority order:</p>
-<pre>	|-------------|-----------------------|--------------------------------------------------------|
-	| Name        | Enum Name             | Supported Operating Systems                            |
-	|-------------|-----------------------|--------------------------------------------------------|
-	| WASAPI      | ma_backend_wasapi     | Windows Vista+                                         |
-	| DirectSound | ma_backend_dsound     | Windows XP+                                            |
-	| WinMM       | ma_backend_winmm      | Windows XP+ (may work on older versions, but untested) |
-	| Core Audio  | ma_backend_coreaudio  | macOS, iOS                                             |
-	| ALSA        | ma_backend_alsa       | Linux                                                  |
-	| PulseAudio  | ma_backend_pulseaudio | Cross Platform (disabled on Windows, BSD and Android)  |
-	| JACK        | ma_backend_jack       | Cross Platform (disabled on BSD and Android)           |
-	| sndio       | ma_backend_sndio      | OpenBSD                                                |
-	| audio(4)    | ma_backend_audio4     | NetBSD, OpenBSD                                        |
-	| OSS         | ma_backend_oss        | FreeBSD                                                |
-	| AAudio      | ma_backend_aaudio     | Android 8+                                             |
-	| OpenSL|ES   | ma_backend_opensl     | Android (API level 16+)                                |
-	| Web Audio   | ma_backend_webaudio   | Web (via Emscripten)                                   |
-	| Null        | ma_backend_null       | Cross Platform (not used on Web)                       |
-	|-------------|-----------------------|--------------------------------------------------------|
+When `backends` is NULL, the default priority order will be used. Below is a list of backends in priority order:
 
-</pre>
-<p>The context can be configured via the <code>pConfig</code> argument. The config object is initialized with <code>ma_context_config_init()</code>. Individual configuration settings
-can then be set directly on the structure. Below are the members of the <code>ma_context_config</code> object.</p>
-<pre>	pLog
-			A pointer to the `ma_log` to post log messages to. Can be NULL if the application does not
-			require logging. See the `ma_log` API for details on how to use the logging system.
+		|-------------|-----------------------|--------------------------------------------------------|
+		| Name        | Enum Name             | Supported Operating Systems                            |
+		|-------------|-----------------------|--------------------------------------------------------|
+		| WASAPI      | ma_backend_wasapi     | Windows Vista+                                         |
+		| DirectSound | ma_backend_dsound     | Windows XP+                                            |
+		| WinMM       | ma_backend_winmm      | Windows XP+ (may work on older versions, but untested) |
+		| Core Audio  | ma_backend_coreaudio  | macOS, iOS                                             |
+		| ALSA        | ma_backend_alsa       | Linux                                                  |
+		| PulseAudio  | ma_backend_pulseaudio | Cross Platform (disabled on Windows, BSD and Android)  |
+		| JACK        | ma_backend_jack       | Cross Platform (disabled on BSD and Android)           |
+		| sndio       | ma_backend_sndio      | OpenBSD                                                |
+		| audio(4)    | ma_backend_audio4     | NetBSD, OpenBSD                                        |
+		| OSS         | ma_backend_oss        | FreeBSD                                                |
+		| AAudio      | ma_backend_aaudio     | Android 8+                                             |
+		| OpenSL|ES   | ma_backend_opensl     | Android (API level 16+)                                |
+		| Web Audio   | ma_backend_webaudio   | Web (via Emscripten)                                   |
+		| Null        | ma_backend_null       | Cross Platform (not used on Web)                       |
+		|-------------|-----------------------|--------------------------------------------------------|
 
-	threadPriority
-			The desired priority to use for the audio thread. Allowable values include the following:
+The context can be configured via the `pConfig` argument. The config object is initialized with `ma_context_config_init()`. Individual configuration settings
+can then be set directly on the structure. Below are the members of the `ma_context_config` object.
 
-			|--------------------------------------|
-			| Thread Priority                      |
-			|--------------------------------------|
-			| ma_thread_priority_idle              |
-			| ma_thread_priority_lowest            |
-			| ma_thread_priority_low               |
-			| ma_thread_priority_normal            |
-			| ma_thread_priority_high              |
-			| ma_thread_priority_highest (default) |
-			| ma_thread_priority_realtime          |
-			| ma_thread_priority_default           |
-			|--------------------------------------|
+		pLog
+				A pointer to the `ma_log` to post log messages to. Can be NULL if the application does not
+				require logging. See the `ma_log` API for details on how to use the logging system.
 
-	threadStackSize
-			The desired size of the stack for the audio thread. Defaults to the operating system's default.
+		threadPriority
+				The desired priority to use for the audio thread. Allowable values include the following:
 
-	pUserData
-			A pointer to application-defined data. This can be accessed from the context object directly such as `context.pUserData`.
+				|--------------------------------------|
+				| Thread Priority                      |
+				|--------------------------------------|
+				| ma_thread_priority_idle              |
+				| ma_thread_priority_lowest            |
+				| ma_thread_priority_low               |
+				| ma_thread_priority_normal            |
+				| ma_thread_priority_high              |
+				| ma_thread_priority_highest (default) |
+				| ma_thread_priority_realtime          |
+				| ma_thread_priority_default           |
+				|--------------------------------------|
 
-	allocationCallbacks
-			Structure containing custom allocation callbacks. Leaving this at defaults will cause it to use MA_MALLOC, MA_REALLOC and MA_FREE. These allocation
-			callbacks will be used for anything tied to the context, including devices.
+		threadStackSize
+				The desired size of the stack for the audio thread. Defaults to the operating system's default.
 
-	alsa.useVerboseDeviceEnumeration
-			ALSA will typically enumerate many different devices which can be intrusive and not user-friendly. To combat this, miniaudio will enumerate only unique
-			card/device pairs by default. The problem with this is that you lose a bit of flexibility and control. Setting alsa.useVerboseDeviceEnumeration makes
-			it so the ALSA backend includes all devices. Defaults to false.
+		pUserData
+				A pointer to application-defined data. This can be accessed from the context object directly such as `context.pUserData`.
 
-	pulse.pApplicationName
-			PulseAudio only. The application name to use when initializing the PulseAudio context with `pa_context_new()`.
+		allocationCallbacks
+				Structure containing custom allocation callbacks. Leaving this at defaults will cause it to use MA_MALLOC, MA_REALLOC and MA_FREE. These allocation
+				callbacks will be used for anything tied to the context, including devices.
 
-	pulse.pServerName
-			PulseAudio only. The name of the server to connect to with `pa_context_connect()`.
+		alsa.useVerboseDeviceEnumeration
+				ALSA will typically enumerate many different devices which can be intrusive and not user-friendly. To combat this, miniaudio will enumerate only unique
+				card/device pairs by default. The problem with this is that you lose a bit of flexibility and control. Setting alsa.useVerboseDeviceEnumeration makes
+				it so the ALSA backend includes all devices. Defaults to false.
 
-	pulse.tryAutoSpawn
-			PulseAudio only. Whether or not to try automatically starting the PulseAudio daemon. Defaults to false. If you set this to true, keep in mind that
-			miniaudio uses a trial and error method to find the most appropriate backend, and this will result in the PulseAudio daemon starting which may be
-			intrusive for the end user.
+		pulse.pApplicationName
+				PulseAudio only. The application name to use when initializing the PulseAudio context with `pa_context_new()`.
 
-	coreaudio.sessionCategory
-			iOS only. The session category to use for the shared AudioSession instance. Below is a list of allowable values and their Core Audio equivalents.
+		pulse.pServerName
+				PulseAudio only. The name of the server to connect to with `pa_context_connect()`.
 
-			|-----------------------------------------|-------------------------------------|
-			| miniaudio Token                         | Core Audio Token                    |
-			|-----------------------------------------|-------------------------------------|
-			| ma_ios_session_category_ambient         | AVAudioSessionCategoryAmbient       |
-			| ma_ios_session_category_solo_ambient    | AVAudioSessionCategorySoloAmbient   |
-			| ma_ios_session_category_playback        | AVAudioSessionCategoryPlayback      |
-			| ma_ios_session_category_record          | AVAudioSessionCategoryRecord        |
-			| ma_ios_session_category_play_and_record | AVAudioSessionCategoryPlayAndRecord |
-			| ma_ios_session_category_multi_route     | AVAudioSessionCategoryMultiRoute    |
-			| ma_ios_session_category_none            | AVAudioSessionCategoryAmbient       |
-			| ma_ios_session_category_default         | AVAudioSessionCategoryAmbient       |
-			|-----------------------------------------|-------------------------------------|
+		pulse.tryAutoSpawn
+				PulseAudio only. Whether or not to try automatically starting the PulseAudio daemon. Defaults to false. If you set this to true, keep in mind that
+				miniaudio uses a trial and error method to find the most appropriate backend, and this will result in the PulseAudio daemon starting which may be
+				intrusive for the end user.
 
-	coreaudio.sessionCategoryOptions
-			iOS only. Session category options to use with the shared AudioSession instance. Below is a list of allowable values and their Core Audio equivalents.
+		coreaudio.sessionCategory
+				iOS only. The session category to use for the shared AudioSession instance. Below is a list of allowable values and their Core Audio equivalents.
 
-			|---------------------------------------------------------------------------|------------------------------------------------------------------|
-			| miniaudio Token                                                           | Core Audio Token                                                 |
-			|---------------------------------------------------------------------------|------------------------------------------------------------------|
-			| ma_ios_session_category_option_mix_with_others                            | AVAudioSessionCategoryOptionMixWithOthers                        |
-			| ma_ios_session_category_option_duck_others                                | AVAudioSessionCategoryOptionDuckOthers                           |
-			| ma_ios_session_category_option_allow_bluetooth                            | AVAudioSessionCategoryOptionAllowBluetooth                       |
-			| ma_ios_session_category_option_default_to_speaker                         | AVAudioSessionCategoryOptionDefaultToSpeaker                     |
-			| ma_ios_session_category_option_interrupt_spoken_audio_and_mix_with_others | AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers |
-			| ma_ios_session_category_option_allow_bluetooth_a2dp                       | AVAudioSessionCategoryOptionAllowBluetoothA2DP                   |
-			| ma_ios_session_category_option_allow_air_play                             | AVAudioSessionCategoryOptionAllowAirPlay                         |
-			|---------------------------------------------------------------------------|------------------------------------------------------------------|
+				|-----------------------------------------|-------------------------------------|
+				| miniaudio Token                         | Core Audio Token                    |
+				|-----------------------------------------|-------------------------------------|
+				| ma_ios_session_category_ambient         | AVAudioSessionCategoryAmbient       |
+				| ma_ios_session_category_solo_ambient    | AVAudioSessionCategorySoloAmbient   |
+				| ma_ios_session_category_playback        | AVAudioSessionCategoryPlayback      |
+				| ma_ios_session_category_record          | AVAudioSessionCategoryRecord        |
+				| ma_ios_session_category_play_and_record | AVAudioSessionCategoryPlayAndRecord |
+				| ma_ios_session_category_multi_route     | AVAudioSessionCategoryMultiRoute    |
+				| ma_ios_session_category_none            | AVAudioSessionCategoryAmbient       |
+				| ma_ios_session_category_default         | AVAudioSessionCategoryAmbient       |
+				|-----------------------------------------|-------------------------------------|
 
-	coreaudio.noAudioSessionActivate
-			iOS only. When set to true, does not perform an explicit [[AVAudioSession sharedInstace] setActive:true] on initialization.
+		coreaudio.sessionCategoryOptions
+				iOS only. Session category options to use with the shared AudioSession instance. Below is a list of allowable values and their Core Audio equivalents.
 
-	coreaudio.noAudioSessionDeactivate
-			iOS only. When set to true, does not perform an explicit [[AVAudioSession sharedInstace] setActive:false] on uninitialization.
+				|---------------------------------------------------------------------------|------------------------------------------------------------------|
+				| miniaudio Token                                                           | Core Audio Token                                                 |
+				|---------------------------------------------------------------------------|------------------------------------------------------------------|
+				| ma_ios_session_category_option_mix_with_others                            | AVAudioSessionCategoryOptionMixWithOthers                        |
+				| ma_ios_session_category_option_duck_others                                | AVAudioSessionCategoryOptionDuckOthers                           |
+				| ma_ios_session_category_option_allow_bluetooth                            | AVAudioSessionCategoryOptionAllowBluetooth                       |
+				| ma_ios_session_category_option_default_to_speaker                         | AVAudioSessionCategoryOptionDefaultToSpeaker                     |
+				| ma_ios_session_category_option_interrupt_spoken_audio_and_mix_with_others | AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers |
+				| ma_ios_session_category_option_allow_bluetooth_a2dp                       | AVAudioSessionCategoryOptionAllowBluetoothA2DP                   |
+				| ma_ios_session_category_option_allow_air_play                             | AVAudioSessionCategoryOptionAllowAirPlay                         |
+				|---------------------------------------------------------------------------|------------------------------------------------------------------|
 
-	jack.pClientName
-			The name of the client to pass to `jack_client_open()`.
+		coreaudio.noAudioSessionActivate
+				iOS only. When set to true, does not perform an explicit [[AVAudioSession sharedInstace] setActive:true] on initialization.
 
-	jack.tryStartServer
-			Whether or not to try auto-starting the JACK server. Defaults to false.
+		coreaudio.noAudioSessionDeactivate
+				iOS only. When set to true, does not perform an explicit [[AVAudioSession sharedInstace] setActive:false] on uninitialization.
+
+		jack.pClientName
+				The name of the client to pass to `jack_client_open()`.
+
+		jack.tryStartServer
+				Whether or not to try auto-starting the JACK server. Defaults to false.
 
 
-</pre>
-<p>It is recommended that only a single context is active at any given time because it's a bulky data structure which performs run-time linking for the
-relevant backends every time it's initialized.</p>
-<p>The location of the context cannot change throughout it's lifetime. Consider allocating the <code>ma_context</code> object with <code>malloc()</code> if this is an issue. The
-reason for this is that a pointer to the context is stored in the <code>ma_device</code> structure.</p>
-<p>Example 1 - Default Initialization
+It is recommended that only a single context is active at any given time because it's a bulky data structure which performs run-time linking for the
+relevant backends every time it's initialized.
+
+The location of the context cannot change throughout it's lifetime. Consider allocating the `ma_context` object with `malloc()` if this is an issue. The
+reason for this is that a pointer to the context is stored in the `ma_device` structure.
+
+
+Example 1 - Default Initialization
 ----------------------------------
-The example below shows how to initialize the context using the default configuration.</p>
-<p><code></code>`c
+The example below shows how to initialize the context using the default configuration.
+
+```c
 ma_context context;
 ma_result result = ma_context_init(NULL, 0, NULL, &context);
-if (result != MA_SUCCESS) {</p>
-<pre>	// Error.
-</pre>
-<p>}
-<code></code>`</p>
-<p>Example 2 - Custom Configuration
+if (result != MA_SUCCESS) {
+		// Error.
+}
+```
+
+
+Example 2 - Custom Configuration
 --------------------------------
 The example below shows how to initialize the context using custom backend priorities and a custom configuration. In this hypothetical example, the program
 wants to prioritize ALSA over PulseAudio on Linux. They also want to avoid using the WinMM backend on Windows because it's latency is too high. They also
-want an error to be returned if no valid backend is available which they achieve by excluding the Null backend.</p>
-<p>For the configuration, the program wants to capture any log messages so they can, for example, route it to a log file and user interface.</p>
-<p><code></code>`c
-ma_backend backends[] = {</p>
-<pre>	ma_backend_alsa,
-	ma_backend_pulseaudio,
-	ma_backend_wasapi,
-	ma_backend_dsound
-</pre>
-<p>};</p>
-<p>ma_log log;
+want an error to be returned if no valid backend is available which they achieve by excluding the Null backend.
+
+For the configuration, the program wants to capture any log messages so they can, for example, route it to a log file and user interface.
+
+```c
+ma_backend backends[] = {
+		ma_backend_alsa,
+		ma_backend_pulseaudio,
+		ma_backend_wasapi,
+		ma_backend_dsound
+};
+
+ma_log log;
 ma_log_init(&log);
-ma_log_register_callback(&log, ma_log_callback_init(my_log_callbac, pMyLogUserData));</p>
-<p>ma_context_config config = ma_context_config_init();
-config.pLog = &log; // Specify a custom log object in the config so any logs that are posted from ma_context_init() are captured.</p>
-<p>ma_context context;
+ma_log_register_callback(&log, ma_log_callback_init(my_log_callbac, pMyLogUserData));
+
+ma_context_config config = ma_context_config_init();
+config.pLog = &log; // Specify a custom log object in the config so any logs that are posted from ma_context_init() are captured.
+
+ma_context context;
 ma_result result = ma_context_init(backends, sizeof(backends)/sizeof(backends[0]), &config, &context);
-if (result != MA_SUCCESS) {</p>
-<pre>	// Error.
-	if (result == MA_NO_BACKEND) {
-			// Couldn't find an appropriate backend.
-	}
-</pre>
-<p>}</p>
-<p>// You could also attach a log callback post-initialization:
+if (result != MA_SUCCESS) {
+		// Error.
+		if (result == MA_NO_BACKEND) {
+				// Couldn't find an appropriate backend.
+		}
+}
+
+// You could also attach a log callback post-initialization:
 ma_log_register_callback(ma_context_get_log(&context), ma_log_callback_init(my_log_callback, pMyLogUserData));
-<code></code>`</p>
-<p>See Also
+```
+
+
+See Also
 --------
 ma_context_config_init()
-ma_context_uninit()</p>
+ma_context_uninit()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9969,13 +10033,16 @@ ma_context_uninit()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Determines if the given context supports loopback mode.</p>
-<p>Parameters
+<pre>Parameters
 ----------
 pContext (in)
-    A pointer to the context getting queried.</p>
-<p>Return Value
+    A pointer to the context getting queried.
+
+
+Return Value
 ------------
-MA_TRUE if the context supports loopback mode; MA_FALSE otherwise.</p>
+MA_TRUE if the context supports loopback mode; MA_FALSE otherwise.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9986,7 +10053,8 @@ MA_TRUE if the context supports loopback mode; MA_FALSE otherwise.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Retrieves the size of the ma_context object.</p>
-<p>This is mainly for the purpose of bindings to know how much memory to allocate.</p>
+<pre>This is mainly for the purpose of bindings to know how much memory to allocate.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -9997,18 +10065,25 @@ MA_TRUE if the context supports loopback mode; MA_FALSE otherwise.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Uninitializes a context.</p>
-<p>Return Value
+<pre>Return Value
 ------------
-MA_SUCCESS if successful; any other error code otherwise.</p>
-<p>Thread Safety
+MA_SUCCESS if successful; any other error code otherwise.
+
+
+Thread Safety
 -------------
-Unsafe. Do not call this function across multiple threads as some backends read and write to global state.</p>
-<p>Remarks
+Unsafe. Do not call this function across multiple threads as some backends read and write to global state.
+
+
+Remarks
 -------
-Results are undefined if you call this while any device created by this context is still active.</p>
-<p>See Also
+Results are undefined if you call this while any device created by this context is still active.
+
+
+See Also
 --------
-ma_context_init()</p>
+ma_context_init()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -10029,11 +10104,14 @@ ma_context_init()</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>High-level helper for doing a full format conversion in one go. Returns the number of output frames. Call this with pOut set to NULL to
-determine the required size of the output buffer. frameCountOut should be set to the capacity of pOut. If pOut is NULL, frameCountOut is
-ignored.</p>
-<p>A return value of 0 indicates an error.</p>
-<p>This function is useful for one-off bulk conversions, but if you're streaming data you should use the ma_data_converter APIs instead.</p>
+<p>High-level helper for doing a full format conversion in one go. Returns the number of output frames. Call this with pOut set to NULL to</p>
+<pre>determine the required size of the output buffer. frameCountOut should be set to the capacity of pOut. If pOut is NULL, frameCountOut is
+ignored.
+
+A return value of 0 indicates an error.
+
+This function is useful for one-off bulk conversions, but if you're streaming data you should use the ma_data_converter APIs instead.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -10136,7 +10214,8 @@ ignored.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Helper for applying a volume factor to samples.</p>
-<p>Note that the source and destination buffers can be the same, in which case it'll perform the operation in-place.</p>
+<pre>Note that the source and destination buffers can be the same, in which case it'll perform the operation in-place.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -10470,8 +10549,9 @@ ignored.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Helper for opening and decoding a file into a heap allocated block of memory. Free the returned pointer with ma_free(). On input,
-pConfig should be set to what you want. On output it will be set to what you got.</p>
+<p>Helper for opening and decoding a file into a heap allocated block of memory. Free the returned pointer with ma_free(). On input,</p>
+<pre>pConfig should be set to what you want. On output it will be set to what you got.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -10500,10 +10580,12 @@ pConfig should be set to what you want. On output it will be set to what you got
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Retrieves the number of frames that can be read before reaching the end.</p>
-<p>This calls <code>ma_decoder_get_length_in_pcm_frames()</code> so you need to be aware of the rules for that function, in
-particular ensuring you do not call it on streams of an undefined length, such as internet radio.</p>
-<p>If the total length of the decoder cannot be retrieved, such as with Vorbis decoders, <code>MA_NOT_IMPLEMENTED</code> will be
-returned.</p>
+<pre>This calls `ma_decoder_get_length_in_pcm_frames()` so you need to be aware of the rules for that function, in
+particular ensuring you do not call it on streams of an undefined length, such as internet radio.
+
+If the total length of the decoder cannot be retrieved, such as with Vorbis decoders, `MA_NOT_IMPLEMENTED` will be
+returned.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -10540,12 +10622,17 @@ returned.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Retrieves the length of the decoder in PCM frames.</p>
-<p>Do not call this on streams of an undefined length, such as internet radio.</p>
-<p>If the length is unknown or an error occurs, 0 will be returned.</p>
-<p>This will always return 0 for Vorbis decoders. This is due to a limitation with stb_vorbis in push mode which is what miniaudio
-uses internally.</p>
-<p>For MP3's, this will decode the entire file. Do not call this in time critical scenarios.</p>
-<p>This function is not thread safe without your own synchronization.</p>
+<pre>Do not call this on streams of an undefined length, such as internet radio.
+
+If the length is unknown or an error occurs, 0 will be returned.
+
+This will always return 0 for Vorbis decoders. This is due to a limitation with stb_vorbis in push mode which is what miniaudio
+uses internally.
+
+For MP3's, this will decode the entire file. Do not call this in time critical scenarios.
+
+This function is not thread safe without your own synchronization.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -10592,7 +10679,8 @@ uses internally.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Reads PCM frames from the given decoder.</p>
-<p>This is not thread safe without your own synchronization.</p>
+<pre>This is not thread safe without your own synchronization.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -10603,7 +10691,8 @@ uses internally.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Seeks to a PCM frame based on its absolute index.</p>
-<p>This is not thread safe without your own synchronization.</p>
+<pre>This is not thread safe without your own synchronization.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -10760,54 +10849,66 @@ uses internally.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Initializes a device config with default settings.</p>
-<p>Parameters
+<pre>Parameters
 ----------
-deviceType (in)</p>
-<pre>	The type of the device this config is being initialized for. This must set to one of the following:
+deviceType (in)
+		The type of the device this config is being initialized for. This must set to one of the following:
 
-	|-------------------------|
-	| Device Type             |
-	|-------------------------|
-	| ma_device_type_playback |
-	| ma_device_type_capture  |
-	| ma_device_type_duplex   |
-	| ma_device_type_loopback |
-	|-------------------------|
+		|-------------------------|
+		| Device Type             |
+		|-------------------------|
+		| ma_device_type_playback |
+		| ma_device_type_capture  |
+		| ma_device_type_duplex   |
+		| ma_device_type_loopback |
+		|-------------------------|
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-A new device config object with default settings. You will typically want to adjust the config after this function returns. See remarks.</p>
-<p>Thread Safety
+A new device config object with default settings. You will typically want to adjust the config after this function returns. See remarks.
+
+
+Thread Safety
 -------------
-Safe.</p>
-<p>Callback Safety
+Safe.
+
+
+Callback Safety
 ---------------
-Safe, but don't try initializing a device in a callback.</p>
-<p>Remarks
+Safe, but don't try initializing a device in a callback.
+
+
+Remarks
 -------
 The returned config will be initialized to defaults. You will normally want to customize a few variables before initializing the device. See Example 1 for a
 typical configuration which sets the sample format, channel count, sample rate, data callback and user data. These are usually things you will want to change
-before initializing the device.</p>
-<p>See <code>ma_device_init()</code> for details on specific configuration options.</p>
-<p>Example 1 - Simple Configuration
+before initializing the device.
+
+See `ma_device_init()` for details on specific configuration options.
+
+
+Example 1 - Simple Configuration
 --------------------------------
-The example below is what a program will typically want to configure for each device at a minimum. Notice how <code>ma_device_config_init()</code> is called first, and
+The example below is what a program will typically want to configure for each device at a minimum. Notice how `ma_device_config_init()` is called first, and
 then the returned object is modified directly. This is important because it ensures that your program continues to work as new configuration options are added
-to the <code>ma_device_config</code> structure.</p>
-<p><code></code>`c
+to the `ma_device_config` structure.
+
+```c
 ma_device_config config = ma_device_config_init(ma_device_type_playback);
 config.playback.format   = ma_format_f32;
 config.playback.channels = 2;
 config.sampleRate        = 48000;
 config.dataCallback      = ma_data_callback;
 config.pUserData         = pMyUserData;
-<code></code>`</p>
-<p>See Also
+```
+
+
+See Also
 --------
 ma_device_init()
-ma_device_init_ex()</p>
+ma_device_init_ex()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -10828,33 +10929,35 @@ ma_device_init_ex()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Retrieves information about the device.</p>
-<p>Parameters
+<pre>Parameters
 ----------
-pDevice (in)</p>
-<pre>	A pointer to the device whose information is being retrieved.
+pDevice (in)
+		A pointer to the device whose information is being retrieved.
 
-</pre>
-<p>type (in)</p>
-<pre>	The device type. This parameter is required for duplex devices. When retrieving device
-	information, you are doing so for an individual playback or capture device.
+type (in)
+		The device type. This parameter is required for duplex devices. When retrieving device
+		information, you are doing so for an individual playback or capture device.
 
-</pre>
-<p>pDeviceInfo (out)</p>
-<pre>	A pointer to the `ma_device_info` that will receive the device information.
+pDeviceInfo (out)
+		A pointer to the `ma_device_info` that will receive the device information.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-MA_SUCCESS if successful; any other error code otherwise.</p>
-<p>Thread Safety
+MA_SUCCESS if successful; any other error code otherwise.
+
+
+Thread Safety
 -------------
 Unsafe. This should be considered unsafe because it may be calling into the backend which may or
-may not be safe.</p>
-<p>Callback Safety
+may not be safe.
+
+
+Callback Safety
 ---------------
 Unsafe. You should avoid calling this in the data callback because it may call into the backend
-which may or may not be safe.</p>
+which may or may not be safe.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -10875,36 +10978,43 @@ which may or may not be safe.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Retrieves the master volume factor for the device.</p>
-<p>Parameters
+<pre>Parameters
 ----------
-pDevice (in)</p>
-<pre>	A pointer to the device whose volume factor is being retrieved.
+pDevice (in)
+		A pointer to the device whose volume factor is being retrieved.
 
-</pre>
-<p>pVolume (in)</p>
-<pre>	A pointer to the variable that will receive the volume factor. The returned value will be in the range of [0, 1].
+pVolume (in)
+		A pointer to the variable that will receive the volume factor. The returned value will be in the range of [0, 1].
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
 MA_SUCCESS if successful.
 MA_INVALID_ARGS if pDevice is NULL.
-MA_INVALID_ARGS if pVolume is NULL.</p>
-<p>Thread Safety
+MA_INVALID_ARGS if pVolume is NULL.
+
+
+Thread Safety
 -------------
-Safe. This just a simple member retrieval.</p>
-<p>Callback Safety
+Safe. This just a simple member retrieval.
+
+
+Callback Safety
 ---------------
-Safe.</p>
-<p>Remarks
+Safe.
+
+
+Remarks
 -------
-If an error occurs, <code>*pVolume</code> will be set to 0.</p>
-<p>See Also
+If an error occurs, `*pVolume` will be set to 0.
+
+
+See Also
 --------
 ma_device_set_master_volume()
 ma_device_set_master_volume_gain_db()
-ma_device_get_master_volume_gain_db()</p>
+ma_device_get_master_volume_gain_db()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -10915,36 +11025,43 @@ ma_device_get_master_volume_gain_db()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Retrieves the master gain in decibels.</p>
-<p>Parameters
+<pre>Parameters
 ----------
-pDevice (in)</p>
-<pre>	A pointer to the device whose gain is being retrieved.
+pDevice (in)
+		A pointer to the device whose gain is being retrieved.
 
-</pre>
-<p>pGainDB (in)</p>
-<pre>	A pointer to the variable that will receive the gain in decibels. The returned value will be &lt;= 0.
+pGainDB (in)
+		A pointer to the variable that will receive the gain in decibels. The returned value will be &lt;= 0.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
 MA_SUCCESS if successful.
 MA_INVALID_ARGS if pDevice is NULL.
-MA_INVALID_ARGS if pGainDB is NULL.</p>
-<p>Thread Safety
+MA_INVALID_ARGS if pGainDB is NULL.
+
+
+Thread Safety
 -------------
-Safe. This just a simple member retrieval.</p>
-<p>Callback Safety
+Safe. This just a simple member retrieval.
+
+
+Callback Safety
 ---------------
-Safe.</p>
-<p>Remarks
+Safe.
+
+
+Remarks
 -------
-If an error occurs, <code>*pGainDB</code> will be set to 0.</p>
-<p>See Also
+If an error occurs, `*pGainDB` will be set to 0.
+
+
+See Also
 --------
 ma_device_set_master_volume_db()
 ma_device_set_master_volume()
-ma_device_get_master_volume()</p>
+ma_device_get_master_volume()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -10955,49 +11072,52 @@ ma_device_get_master_volume()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Retrieves the name of the device.</p>
-<p>Parameters
+<pre>Parameters
 ----------
-pDevice (in)</p>
-<pre>	A pointer to the device whose information is being retrieved.
+pDevice (in)
+		A pointer to the device whose information is being retrieved.
 
-</pre>
-<p>type (in)</p>
-<pre>	The device type. This parameter is required for duplex devices. When retrieving device
-	information, you are doing so for an individual playback or capture device.
+type (in)
+		The device type. This parameter is required for duplex devices. When retrieving device
+		information, you are doing so for an individual playback or capture device.
 
-</pre>
-<p>pName (out)</p>
-<pre>	A pointer to the buffer that will receive the name.
+pName (out)
+		A pointer to the buffer that will receive the name.
 
-</pre>
-<p>nameCap (in)</p>
-<pre>	The capacity of the output buffer, including space for the null terminator.
+nameCap (in)
+		The capacity of the output buffer, including space for the null terminator.
 
-</pre>
-<p>pLengthNotIncludingNullTerminator (out, optional)</p>
-<pre>	A pointer to the variable that will receive the length of the name, not including the null
-	terminator.
+pLengthNotIncludingNullTerminator (out, optional)
+		A pointer to the variable that will receive the length of the name, not including the null
+		terminator.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-MA_SUCCESS if successful; any other error code otherwise.</p>
-<p>Thread Safety
+MA_SUCCESS if successful; any other error code otherwise.
+
+
+Thread Safety
 -------------
 Unsafe. This should be considered unsafe because it may be calling into the backend which may or
-may not be safe.</p>
-<p>Callback Safety
+may not be safe.
+
+
+Callback Safety
 ---------------
 Unsafe. You should avoid calling this in the data callback because it may call into the backend
-which may or may not be safe.</p>
-<p>Remarks
+which may or may not be safe.
+
+
+Remarks
 -------
 If the name does not fully fit into the output buffer, it'll be truncated. You can pass in NULL to
-<code>pName</code> if you want to first get the length of the name for the purpose of memory allocation of the
-output buffer. Allocating a buffer of size <code>MA_MAX_DEVICE_NAME_LENGTH + 1</code> should be enough for
-most cases and will avoid the need for the inefficiency of calling this function twice.</p>
-<p>This is implemented in terms of <code>ma_device_get_info()</code>.</p>
+`pName` if you want to first get the length of the name for the purpose of memory allocation of the
+output buffer. Allocating a buffer of size `MA_MAX_DEVICE_NAME_LENGTH + 1` should be enough for
+most cases and will avoid the need for the inefficiency of calling this function twice.
+
+This is implemented in terms of `ma_device_get_info()`.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -11008,50 +11128,54 @@ most cases and will avoid the need for the inefficiency of calling this function
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Retrieves the state of the device.</p>
-<p>Parameters
+<pre>Parameters
 ----------
-pDevice (in)</p>
-<pre>	A pointer to the device whose state is being retrieved.
+pDevice (in)
+		A pointer to the device whose state is being retrieved.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-The current state of the device. The return value will be one of the following:</p>
-<pre>	+-------------------------------+------------------------------------------------------------------------------+
-	| ma_device_state_uninitialized | Will only be returned if the device is in the middle of initialization.      |
-	+-------------------------------+------------------------------------------------------------------------------+
-	| ma_device_state_stopped       | The device is stopped. The initial state of the device after initialization. |
-	+-------------------------------+------------------------------------------------------------------------------+
-	| ma_device_state_started       | The device started and requesting and/or delivering audio data.              |
-	+-------------------------------+------------------------------------------------------------------------------+
-	| ma_device_state_starting      | The device is in the process of starting.                                    |
-	+-------------------------------+------------------------------------------------------------------------------+
-	| ma_device_state_stopping      | The device is in the process of stopping.                                    |
-	+-------------------------------+------------------------------------------------------------------------------+
+The current state of the device. The return value will be one of the following:
+
+		+-------------------------------+------------------------------------------------------------------------------+
+		| ma_device_state_uninitialized | Will only be returned if the device is in the middle of initialization.      |
+		+-------------------------------+------------------------------------------------------------------------------+
+		| ma_device_state_stopped       | The device is stopped. The initial state of the device after initialization. |
+		+-------------------------------+------------------------------------------------------------------------------+
+		| ma_device_state_started       | The device started and requesting and/or delivering audio data.              |
+		+-------------------------------+------------------------------------------------------------------------------+
+		| ma_device_state_starting      | The device is in the process of starting.                                    |
+		+-------------------------------+------------------------------------------------------------------------------+
+		| ma_device_state_stopping      | The device is in the process of stopping.                                    |
+		+-------------------------------+------------------------------------------------------------------------------+
 
 
-</pre>
-<p>Thread Safety
+Thread Safety
 -------------
 Safe. This is implemented as a simple accessor. Note that if the device is started or stopped at the same time as this function is called,
-there's a possibility the return value could be out of sync. See remarks.</p>
-<p>Callback Safety
----------------
-Safe. This is implemented as a simple accessor.</p>
-<p>Remarks
--------
-The general flow of a devices state goes like this:</p>
-<pre>	```
-	ma_device_init()  -&gt; ma_device_state_uninitialized -&gt; ma_device_state_stopped
-	ma_device_start() -&gt; ma_device_state_starting      -&gt; ma_device_state_started
-	ma_device_stop()  -&gt; ma_device_state_stopping      -&gt; ma_device_state_stopped
-	```
+there's a possibility the return value could be out of sync. See remarks.
 
-</pre>
-<p>When the state of the device is changed with <code>ma_device_start()</code> or <code>ma_device_stop()</code> at this same time as this function is called, the
+
+Callback Safety
+---------------
+Safe. This is implemented as a simple accessor.
+
+
+Remarks
+-------
+The general flow of a devices state goes like this:
+
+		```
+		ma_device_init()  -&gt; ma_device_state_uninitialized -&gt; ma_device_state_stopped
+		ma_device_start() -&gt; ma_device_state_starting      -&gt; ma_device_state_started
+		ma_device_stop()  -&gt; ma_device_state_stopping      -&gt; ma_device_state_stopped
+		```
+
+When the state of the device is changed with `ma_device_start()` or `ma_device_stop()` at this same time as this function is called, the
 value returned by this function could potentially be out of sync. If this is significant to your program you need to implement your own
-synchronization.</p>
+synchronization.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -11062,43 +11186,47 @@ synchronization.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Called from the data callback of asynchronous backends to allow miniaudio to process the data and fire the miniaudio data callback.</p>
-<p>Parameters
+<pre>Parameters
 ----------
-pDevice (in)</p>
-<pre>	A pointer to device whose processing the data callback.
+pDevice (in)
+		A pointer to device whose processing the data callback.
 
-</pre>
-<p>pOutput (out)</p>
-<pre>	A pointer to the buffer that will receive the output PCM frame data. On a playback device this must not be NULL. On a duplex device
-	this can be NULL, in which case pInput must not be NULL.
+pOutput (out)
+		A pointer to the buffer that will receive the output PCM frame data. On a playback device this must not be NULL. On a duplex device
+		this can be NULL, in which case pInput must not be NULL.
 
-</pre>
-<p>pInput (in)</p>
-<pre>	A pointer to the buffer containing input PCM frame data. On a capture device this must not be NULL. On a duplex device this can be
-	NULL, in which case `pOutput` must not be NULL.
+pInput (in)
+		A pointer to the buffer containing input PCM frame data. On a capture device this must not be NULL. On a duplex device this can be
+		NULL, in which case `pOutput` must not be NULL.
 
-</pre>
-<p>frameCount (in)</p>
-<pre>	The number of frames being processed.
+frameCount (in)
+		The number of frames being processed.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-MA_SUCCESS if successful; any other result code otherwise.</p>
-<p>Thread Safety
+MA_SUCCESS if successful; any other result code otherwise.
+
+
+Thread Safety
 -------------
 This function should only ever be called from the internal data callback of the backend. It is safe to call this simultaneously between a
-playback and capture device in duplex setups.</p>
-<p>Callback Safety
+playback and capture device in duplex setups.
+
+
+Callback Safety
 ---------------
-Do not call this from the miniaudio data callback. It should only ever be called from the internal data callback of the backend.</p>
-<p>Remarks
+Do not call this from the miniaudio data callback. It should only ever be called from the internal data callback of the backend.
+
+
+Remarks
 -------
-If both <code>pOutput</code> and <code>pInput</code> are NULL, and error will be returned. In duplex scenarios, both <code>pOutput</code> and <code>pInput</code> can be non-NULL, in
-which case <code>pInput</code> will be processed first, followed by <code>pOutput</code>.</p>
-<p>If you are implementing a custom backend, and that backend uses a callback for data delivery, you'll need to call this from inside that
-callback.</p>
+If both `pOutput` and `pInput` are NULL, and error will be returned. In duplex scenarios, both `pOutput` and `pInput` can be non-NULL, in
+which case `pInput` will be processed first, followed by `pOutput`.
+
+If you are implementing a custom backend, and that backend uses a callback for data delivery, you'll need to call this from inside that
+callback.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -11114,9 +11242,8 @@ callback.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<pre>Initializes a device.
-
-A device represents a physical audio device. The idea is you send or receive audio data from the device to either play it back through a speaker, or capture it
+<p>Initializes a device.</p>
+<pre>A device represents a physical audio device. The idea is you send or receive audio data from the device to either play it back through a speaker, or capture it
 from a microphone. Whether or not you should send or receive data from the device (or both) depends on the type of device you are initializing which can be
 playback, capture, full-duplex or loopback. (Note that loopback mode is only supported on select backends.) Sending and receiving audio data to and from the
 device is done via a callback which is fired by miniaudio at periodic time intervals.
@@ -11454,52 +11581,59 @@ ma_context_enumerate_devices()
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Initializes a device without a context, with extra parameters for controlling the configuration of the internal self-managed context.</p>
-<p>This is the same as <code>ma_device_init()</code>, only instead of a context being passed in, the parameters from <code>ma_context_init()</code> are passed in instead. This function
-allows you to configure the internally created context.</p>
-<p>Parameters
+<pre>This is the same as `ma_device_init()`, only instead of a context being passed in, the parameters from `ma_context_init()` are passed in instead. This function
+allows you to configure the internally created context.
+
+
+Parameters
 ----------
-backends (in, optional)</p>
-<pre>	A list of backends to try initializing, in priority order. Can be NULL, in which case it uses default priority order.
+backends (in, optional)
+		A list of backends to try initializing, in priority order. Can be NULL, in which case it uses default priority order.
 
-</pre>
-<p>backendCount (in, optional)</p>
-<pre>	The number of items in `backend`. Ignored if `backend` is NULL.
+backendCount (in, optional)
+		The number of items in `backend`. Ignored if `backend` is NULL.
 
-</pre>
-<p>pContextConfig (in, optional)</p>
-<pre>	The context configuration.
+pContextConfig (in, optional)
+		The context configuration.
 
-</pre>
-<p>pConfig (in)</p>
-<pre>	A pointer to the device configuration. Cannot be null. See remarks for details.
+pConfig (in)
+		A pointer to the device configuration. Cannot be null. See remarks for details.
 
-</pre>
-<p>pDevice (out)</p>
-<pre>	A pointer to the device object being initialized.
+pDevice (out)
+		A pointer to the device object being initialized.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-MA_SUCCESS if successful; any other error code otherwise.</p>
-<p>Thread Safety
+MA_SUCCESS if successful; any other error code otherwise.
+
+
+Thread Safety
 -------------
 Unsafe. It is not safe to call this function simultaneously for different devices because some backends depend on and mutate global state. The same applies to
-calling this at the same time as <code>ma_device_uninit()</code>.</p>
-<p>Callback Safety
+calling this at the same time as `ma_device_uninit()`.
+
+
+Callback Safety
 ---------------
-Unsafe. It is not safe to call this inside any callback.</p>
-<p>Remarks
+Unsafe. It is not safe to call this inside any callback.
+
+
+Remarks
 -------
 You only need to use this function if you want to configure the context differently to its defaults. You should never use this function if you want to manage
-your own context.</p>
-<p>See the documentation for <code>ma_context_init()</code> for information on the different context configuration options.</p>
-<p>See Also
+your own context.
+
+See the documentation for `ma_context_init()` for information on the different context configuration options.
+
+
+See Also
 --------
 ma_device_init()
 ma_device_uninit()
 ma_device_config_init()
-ma_context_init()</p>
+ma_context_init()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -11510,27 +11644,33 @@ ma_context_init()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Determines whether or not the device is started.</p>
-<p>Parameters
+<pre>Parameters
 ----------
-pDevice (in)</p>
-<pre>	A pointer to the device whose start state is being retrieved.
+pDevice (in)
+		A pointer to the device whose start state is being retrieved.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-True if the device is started, false otherwise.</p>
-<p>Thread Safety
+True if the device is started, false otherwise.
+
+
+Thread Safety
 -------------
-Safe. If another thread calls <code>ma_device_start()</code> or <code>ma_device_stop()</code> at this same time as this function is called, there's a very small chance the return
-value will be out of sync.</p>
-<p>Callback Safety
+Safe. If another thread calls `ma_device_start()` or `ma_device_stop()` at this same time as this function is called, there's a very small chance the return
+value will be out of sync.
+
+
+Callback Safety
 ---------------
-Safe. This is implemented as a simple accessor.</p>
-<p>See Also
+Safe. This is implemented as a simple accessor.
+
+
+See Also
 --------
 ma_device_start()
-ma_device_stop()</p>
+ma_device_stop()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -11571,43 +11711,49 @@ ma_device_stop()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Performs post backend initialization routines for setting up internal data conversion.</p>
-<p>This should be called whenever the backend is initialized. The only time this should be called from
+<pre>This should be called whenever the backend is initialized. The only time this should be called from
 outside of miniaudio is if you're implementing a custom backend, and you would only do it if you
-are reinitializing the backend due to rerouting or reinitializing for some reason.</p>
-<p>Parameters
+are reinitializing the backend due to rerouting or reinitializing for some reason.
+
+
+Parameters
 ----------
-pDevice [in]</p>
-<pre>	A pointer to the device.
+pDevice [in]
+		A pointer to the device.
 
-</pre>
-<p>deviceType [in]</p>
-<pre>	The type of the device that was just reinitialized.
+deviceType [in]
+		The type of the device that was just reinitialized.
 
-</pre>
-<p>pPlaybackDescriptor [in]</p>
-<pre>	The descriptor of the playback device containing the internal data format and buffer sizes.
+pPlaybackDescriptor [in]
+		The descriptor of the playback device containing the internal data format and buffer sizes.
 
-</pre>
-<p>pPlaybackDescriptor [in]</p>
-<pre>	The descriptor of the capture device containing the internal data format and buffer sizes.
+pPlaybackDescriptor [in]
+		The descriptor of the capture device containing the internal data format and buffer sizes.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-MA_SUCCESS if successful; any other error otherwise.</p>
-<p>Thread Safety
+MA_SUCCESS if successful; any other error otherwise.
+
+
+Thread Safety
 -------------
-Unsafe. This will be reinitializing internal data converters which may be in use by another thread.</p>
-<p>Callback Safety
+Unsafe. This will be reinitializing internal data converters which may be in use by another thread.
+
+
+Callback Safety
 ---------------
-Unsafe. This will be reinitializing internal data converters which may be in use by the callback.</p>
-<p>Remarks
+Unsafe. This will be reinitializing internal data converters which may be in use by the callback.
+
+
+Remarks
 -------
 For a duplex device, you can call this for only one side of the system. This is why the deviceType
-is specified as a parameter rather than deriving it from the device.</p>
-<p>You do not need to call this manually unless you are doing a custom backend, in which case you need
-only do it if you're manually performing rerouting or reinitialization.</p>
+is specified as a parameter rather than deriving it from the device.
+
+You do not need to call this manually unless you are doing a custom backend, in which case you need
+only do it if you're manually performing rerouting or reinitialization.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -11618,39 +11764,49 @@ only do it if you're manually performing rerouting or reinitialization.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Sets the master volume factor for the device.</p>
-<p>The volume factor must be between 0 (silence) and 1 (full volume). Use <code>ma_device_set_master_volume_db()</code> to use decibel notation, where 0 is full volume and
-values less than 0 decreases the volume.</p>
-<p>Parameters
+<pre>The volume factor must be between 0 (silence) and 1 (full volume). Use `ma_device_set_master_volume_db()` to use decibel notation, where 0 is full volume and
+values less than 0 decreases the volume.
+
+
+Parameters
 ----------
-pDevice (in)</p>
-<pre>	A pointer to the device whose volume is being set.
+pDevice (in)
+		A pointer to the device whose volume is being set.
 
-</pre>
-<p>volume (in)</p>
-<pre>	The new volume factor. Must be &gt;= 0.
+volume (in)
+		The new volume factor. Must be &gt;= 0.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
 MA_SUCCESS if the volume was set successfully.
 MA_INVALID_ARGS if pDevice is NULL.
-MA_INVALID_ARGS if volume is negative.</p>
-<p>Thread Safety
+MA_INVALID_ARGS if volume is negative.
+
+
+Thread Safety
 -------------
-Safe. This just sets a local member of the device object.</p>
-<p>Callback Safety
+Safe. This just sets a local member of the device object.
+
+
+Callback Safety
 ---------------
-Safe. If you set the volume in the data callback, that data written to the output buffer will have the new volume applied.</p>
-<p>Remarks
+Safe. If you set the volume in the data callback, that data written to the output buffer will have the new volume applied.
+
+
+Remarks
 -------
-This applies the volume factor across all channels.</p>
-<p>This does not change the operating system's volume. It only affects the volume for the given <code>ma_device</code> object's audio stream.</p>
-<p>See Also
+This applies the volume factor across all channels.
+
+This does not change the operating system's volume. It only affects the volume for the given `ma_device` object's audio stream.
+
+
+See Also
 --------
 ma_device_get_master_volume()
 ma_device_set_master_volume_db()
-ma_device_get_master_volume_db()</p>
+ma_device_get_master_volume_db()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -11661,38 +11817,48 @@ ma_device_get_master_volume_db()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Sets the master volume for the device as gain in decibels.</p>
-<p>A gain of 0 is full volume, whereas a gain of &lt; 0 will decrease the volume.</p>
-<p>Parameters
+<pre>A gain of 0 is full volume, whereas a gain of &lt; 0 will decrease the volume.
+
+
+Parameters
 ----------
-pDevice (in)</p>
-<pre>	A pointer to the device whose gain is being set.
+pDevice (in)
+		A pointer to the device whose gain is being set.
 
-</pre>
-<p>gainDB (in)</p>
-<pre>	The new volume as gain in decibels. Must be less than or equal to 0, where 0 is full volume and anything less than 0 decreases the volume.
+gainDB (in)
+		The new volume as gain in decibels. Must be less than or equal to 0, where 0 is full volume and anything less than 0 decreases the volume.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
 MA_SUCCESS if the volume was set successfully.
 MA_INVALID_ARGS if pDevice is NULL.
-MA_INVALID_ARGS if the gain is &gt; 0.</p>
-<p>Thread Safety
+MA_INVALID_ARGS if the gain is &gt; 0.
+
+
+Thread Safety
 -------------
-Safe. This just sets a local member of the device object.</p>
-<p>Callback Safety
+Safe. This just sets a local member of the device object.
+
+
+Callback Safety
 ---------------
-Safe. If you set the volume in the data callback, that data written to the output buffer will have the new volume applied.</p>
-<p>Remarks
+Safe. If you set the volume in the data callback, that data written to the output buffer will have the new volume applied.
+
+
+Remarks
 -------
-This applies the gain across all channels.</p>
-<p>This does not change the operating system's volume. It only affects the volume for the given <code>ma_device</code> object's audio stream.</p>
-<p>See Also
+This applies the gain across all channels.
+
+This does not change the operating system's volume. It only affects the volume for the given `ma_device` object's audio stream.
+
+
+See Also
 --------
 ma_device_get_master_volume_gain_db()
 ma_device_set_master_volume()
-ma_device_get_master_volume()</p>
+ma_device_get_master_volume()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -11703,32 +11869,44 @@ ma_device_get_master_volume()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Starts the device. For playback devices this begins playback. For capture devices it begins recording.</p>
-<p>Use <code>ma_device_stop()</code> to stop the device.</p>
-<p>Parameters
+<pre>Use `ma_device_stop()` to stop the device.
+
+
+Parameters
 ----------
-pDevice (in)</p>
-<pre>	A pointer to the device to start.
+pDevice (in)
+		A pointer to the device to start.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-MA_SUCCESS if successful; any other error code otherwise.</p>
-<p>Thread Safety
+MA_SUCCESS if successful; any other error code otherwise.
+
+
+Thread Safety
 -------------
-Safe. It's safe to call this from any thread with the exception of the callback thread.</p>
-<p>Callback Safety
+Safe. It's safe to call this from any thread with the exception of the callback thread.
+
+
+Callback Safety
 ---------------
-Unsafe. It is not safe to call this inside any callback.</p>
-<p>Remarks
+Unsafe. It is not safe to call this inside any callback.
+
+
+Remarks
 -------
 For a playback device, this will retrieve an initial chunk of audio data from the client before returning. The reason for this is to ensure there is valid
-audio data in the buffer, which needs to be done before the device begins playback.</p>
-<p>This API waits until the backend device has been started for real by the worker thread. It also waits on a mutex for thread-safety.</p>
-<p>Do not call this in any callback.</p>
-<p>See Also
+audio data in the buffer, which needs to be done before the device begins playback.
+
+This API waits until the backend device has been started for real by the worker thread. It also waits on a mutex for thread-safety.
+
+Do not call this in any callback.
+
+
+See Also
 --------
-ma_device_stop()</p>
+ma_device_stop()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -11739,35 +11917,47 @@ ma_device_stop()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Stops the device. For playback devices this stops playback. For capture devices it stops recording.</p>
-<p>Use <code>ma_device_start()</code> to start the device again.</p>
-<p>Parameters
+<pre>Use `ma_device_start()` to start the device again.
+
+
+Parameters
 ----------
-pDevice (in)</p>
-<pre>	A pointer to the device to stop.
+pDevice (in)
+		A pointer to the device to stop.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-MA_SUCCESS if successful; any other error code otherwise.</p>
-<p>Thread Safety
+MA_SUCCESS if successful; any other error code otherwise.
+
+
+Thread Safety
 -------------
-Safe. It's safe to call this from any thread with the exception of the callback thread.</p>
-<p>Callback Safety
+Safe. It's safe to call this from any thread with the exception of the callback thread.
+
+
+Callback Safety
 ---------------
-Unsafe. It is not safe to call this inside any callback. Doing this will result in a deadlock.</p>
-<p>Remarks
+Unsafe. It is not safe to call this inside any callback. Doing this will result in a deadlock.
+
+
+Remarks
 -------
 This API needs to wait on the worker thread to stop the backend device properly before returning. It also waits on a mutex for thread-safety. In addition, some
 backends need to wait for the device to finish playback/recording of the current fragment which can take some time (usually proportionate to the buffer size
-that was specified at initialization time).</p>
-<p>Backends are required to either pause the stream in-place or drain the buffer if pausing is not possible. The reason for this is that stopping the device and
+that was specified at initialization time).
+
+Backends are required to either pause the stream in-place or drain the buffer if pausing is not possible. The reason for this is that stopping the device and
 the resuming it with ma_device_start() (which you might do when your program loses focus) may result in a situation where those samples are never output to the
-speakers or received from the microphone which can in turn result in de-syncs.</p>
-<p>Do not call this in any callback.</p>
-<p>See Also
+speakers or received from the microphone which can in turn result in de-syncs.
+
+Do not call this in any callback.
+
+
+See Also
 --------
-ma_device_start()</p>
+ma_device_start()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -11778,27 +11968,35 @@ ma_device_start()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Uninitializes a device.</p>
-<p>This will explicitly stop the device. You do not need to call <code>ma_device_stop()</code> beforehand, but it's harmless if you do.</p>
-<p>Parameters
+<pre>This will explicitly stop the device. You do not need to call `ma_device_stop()` beforehand, but it's harmless if you do.
+
+
+Parameters
 ----------
-pDevice (in)</p>
-<pre>	A pointer to the device to stop.
+pDevice (in)
+		A pointer to the device to stop.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
-Nothing</p>
-<p>Thread Safety
+Nothing
+
+
+Thread Safety
 -------------
-Unsafe. As soon as this API is called the device should be considered undefined.</p>
-<p>Callback Safety
+Unsafe. As soon as this API is called the device should be considered undefined.
+
+
+Callback Safety
 ---------------
-Unsafe. It is not safe to call this inside any callback. Doing this will result in a deadlock.</p>
-<p>See Also
+Unsafe. It is not safe to call this inside any callback. Doing this will result in a deadlock.
+
+
+See Also
 --------
 ma_device_init()
-ma_device_stop()</p>
+ma_device_stop()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -12364,9 +12562,11 @@ ma_device_stop()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Retrieves the size of a sample in bytes for the given format.</p>
-<p>This API is efficient and is implemented using a lookup table.</p>
-<p>Thread Safety: SAFE
-  This API is pure.</p>
+<pre>This API is efficient and is implemented using a lookup table.
+
+Thread Safety: SAFE
+  This API is pure.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -12377,61 +12577,73 @@ ma_device_stop()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Retrieves compile-time enabled backends.</p>
-<p>Parameters
+<pre>Parameters
 ----------
-pBackends (out, optional)</p>
-<pre>	A pointer to the buffer that will receive the enabled backends. Set to NULL to retrieve the backend count. Setting
-	the capacity of the buffer to `MA_BUFFER_COUNT` will guarantee it's large enough for all backends.
+pBackends (out, optional)
+		A pointer to the buffer that will receive the enabled backends. Set to NULL to retrieve the backend count. Setting
+		the capacity of the buffer to `MA_BUFFER_COUNT` will guarantee it's large enough for all backends.
 
-</pre>
-<p>backendCap (in)</p>
-<pre>	The capacity of the `pBackends` buffer.
+backendCap (in)
+		The capacity of the `pBackends` buffer.
 
-</pre>
-<p>pBackendCount (out)</p>
-<pre>	A pointer to the variable that will receive the enabled backend count.
+pBackendCount (out)
+		A pointer to the variable that will receive the enabled backend count.
 
 
-</pre>
-<p>Return Value
+Return Value
 ------------
 MA_SUCCESS if successful.
-MA_INVALID_ARGS if <code>pBackendCount</code> is NULL.
-MA_NO_SPACE if the capacity of <code>pBackends</code> is not large enough.</p>
-<p>If <code>MA_NO_SPACE</code> is returned, the <code>pBackends</code> buffer will be filled with <code>*pBackendCount</code> values.</p>
-<p>Thread Safety
+MA_INVALID_ARGS if `pBackendCount` is NULL.
+MA_NO_SPACE if the capacity of `pBackends` is not large enough.
+
+If `MA_NO_SPACE` is returned, the `pBackends` buffer will be filled with `*pBackendCount` values.
+
+
+Thread Safety
 -------------
-Safe.</p>
-<p>Callback Safety
+Safe.
+
+
+Callback Safety
 ---------------
-Safe.</p>
-<p>Remarks
+Safe.
+
+
+Remarks
 -------
-If you want to retrieve the number of backends so you can determine the capacity of <code>pBackends</code> buffer, you can call
-this function with <code>pBackends</code> set to NULL.</p>
-<p>This will also enumerate the null backend. If you don't want to include this you need to check for <code>ma_backend_null</code>
+If you want to retrieve the number of backends so you can determine the capacity of `pBackends` buffer, you can call
+this function with `pBackends` set to NULL.
+
+This will also enumerate the null backend. If you don't want to include this you need to check for `ma_backend_null`
 when you enumerate over the returned backends and handle it appropriately. Alternatively, you can disable it at
-compile time with <code>MA_NO_NULL</code>.</p>
-<p>The returned backends are determined based on compile time settings, not the platform it's currently running on. For
+compile time with `MA_NO_NULL`.
+
+The returned backends are determined based on compile time settings, not the platform it's currently running on. For
 example, PulseAudio will be returned if it was enabled at compile time, even when the user doesn't actually have
-PulseAudio installed.</p>
-<p>Example 1
+PulseAudio installed.
+
+
+Example 1
 ---------
 The example below retrieves the enabled backend count using a fixed sized buffer allocated on the stack. The buffer is
-given a capacity of <code>MA_BACKEND_COUNT</code> which will guarantee it'll be large enough to store all available backends.
-Since <code>MA_BACKEND_COUNT</code> is always a relatively small value, this should be suitable for most scenarios.</p>
-<p><code></code>`
+given a capacity of `MA_BACKEND_COUNT` which will guarantee it'll be large enough to store all available backends.
+Since `MA_BACKEND_COUNT` is always a relatively small value, this should be suitable for most scenarios.
+
+```
 ma_backend enabledBackends[MA_BACKEND_COUNT];
-size_t enabledBackendCount;</p>
-<p>result = ma_get_enabled_backends(enabledBackends, MA_BACKEND_COUNT, &enabledBackendCount);
-if (result != MA_SUCCESS) {</p>
-<pre>	// Failed to retrieve enabled backends. Should never happen in this example since all inputs are valid.
-</pre>
-<p>}
-<code></code>`</p>
-<p>See Also
+size_t enabledBackendCount;
+
+result = ma_get_enabled_backends(enabledBackends, MA_BACKEND_COUNT, &enabledBackendCount);
+if (result != MA_SUCCESS) {
+		// Failed to retrieve enabled backends. Should never happen in this example since all inputs are valid.
+}
+```
+
+
+See Also
 --------
-ma_is_backend_enabled()</p>
+ma_is_backend_enabled()
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -13228,7 +13440,8 @@ ma_is_backend_enabled()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Mixes the specified number of frames in floating point format with a volume factor.</p>
-<p>This will run on an optimized path when the volume is equal to 1.</p>
+<pre>This will run on an optimized path when the volume is equal to 1.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -13249,7 +13462,8 @@ ma_is_backend_enabled()</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Creates a mutex.</p>
-<p>A mutex must be created from a valid context. A mutex is initially unlocked.</p>
+<pre>A mutex must be created from a valid context. A mutex is initially unlocked.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -14314,8 +14528,9 @@ ma_is_backend_enabled()</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Calculates the number of whole output frames that would be output after fully reading and consuming the specified number of
-input frames.</p>
+<p>Calculates the number of whole output frames that would be output after fully reading and consuming the specified number of</p>
+<pre>input frames.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -14351,10 +14566,12 @@ input frames.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Calculates the number of whole input frames that would need to be read from the client in order to output the specified
-number of output frames.</p>
-<p>The returned value does not include cached input frames. It only returns the number of extra frames that would need to be
-read from the input buffer in order to output the specified number of output frames.</p>
+<p>Calculates the number of whole input frames that would need to be read from the client in order to output the specified</p>
+<pre>number of output frames.
+
+The returned value does not include cached input frames. It only returns the number of extra frames that would need to be
+read from the input buffer in order to output the specified number of output frames.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -14381,19 +14598,25 @@ read from the input buffer in order to output the specified number of output fra
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Converts the given input data.</p>
-<p>Both the input and output frames must be in the format specified in the config when the resampler was initialized.</p>
-<p>On input, [pFrameCountOut] contains the number of output frames to process. On output it contains the number of output frames that
+<pre>Both the input and output frames must be in the format specified in the config when the resampler was initialized.
+
+On input, [pFrameCountOut] contains the number of output frames to process. On output it contains the number of output frames that
 were actually processed, which may be less than the requested amount which will happen if there's not enough input data. You can use
-ma_resampler_get_expected_output_frame_count() to know how many output frames will be processed for a given number of input frames.</p>
-<p>On input, [pFrameCountIn] contains the number of input frames contained in [pFramesIn]. On output it contains the number of whole
+ma_resampler_get_expected_output_frame_count() to know how many output frames will be processed for a given number of input frames.
+
+On input, [pFrameCountIn] contains the number of input frames contained in [pFramesIn]. On output it contains the number of whole
 input frames that were actually processed. You can use ma_resampler_get_required_input_frame_count() to know how many input frames
-you should provide for a given number of output frames. [pFramesIn] can be NULL, in which case zeroes will be used instead.</p>
-<p>If [pFramesOut] is NULL, a seek is performed. In this case, if [pFrameCountOut] is not NULL it will seek by the specified number of
+you should provide for a given number of output frames. [pFramesIn] can be NULL, in which case zeroes will be used instead.
+
+If [pFramesOut] is NULL, a seek is performed. In this case, if [pFrameCountOut] is not NULL it will seek by the specified number of
 output frames. Otherwise, if [pFramesCountOut] is NULL and [pFrameCountIn] is not NULL, it will seek by the specified number of input
 frames. When seeking, [pFramesIn] is allowed to NULL, in which case the internal timing state will be updated, but no input will be
-processed. In this case, any internal filter state will be updated as if zeroes were passed in.</p>
-<p>It is an error for [pFramesOut] to be non-NULL and [pFrameCountOut] to be NULL.</p>
-<p>It is an error for both [pFrameCountOut] and [pFrameCountIn] to be NULL.</p>
+processed. In this case, any internal filter state will be updated as if zeroes were passed in.
+
+It is an error for [pFramesOut] to be non-NULL and [pFrameCountOut] to be NULL.
+
+It is an error for both [pFrameCountOut] and [pFrameCountIn] to be NULL.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -14424,7 +14647,8 @@ processed. In this case, any internal filter state will be updated as if zeroes 
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Sets the input and output sample rate as a ratio.</p>
-<p>The ration is in/out.</p>
+<pre>The ration is in/out.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -14982,10 +15206,11 @@ processed. In this case, any internal filter state will be updated as if zeroes 
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Copies silent frames into the given buffer.</p>
-<p>Remarks
+<pre>Remarks
 -------
-For all formats except <code>ma_format_u8</code>, the output buffer will be filled with 0. For <code>ma_format_u8</code> it will be filled with 128. The reason for this is that it
-makes more sense for the purpose of mixing to initialize it to the center point.</p>
+For all formats except `ma_format_u8`, the output buffer will be filled with 0. For `ma_format_u8` it will be filled with 128. The reason for this is that it
+makes more sense for the purpose of mixing to initialize it to the center point.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -16455,7 +16680,7 @@ makes more sense for the purpose of mixing to initialize it to the center point.
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 09:49:18.422958500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 10:18:50.306010000 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

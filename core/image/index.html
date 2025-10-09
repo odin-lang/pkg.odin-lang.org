@@ -1495,12 +1495,15 @@ without putting it in BMP_Header</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>67_108_864 pixels max by default.</p>
-<p>For QOI, the Worst case scenario means all pixels will be encoded as RGBA literals, costing 5 bytes each.
-This caps memory usage at 320 MiB.</p>
-<p>The tunable is limited to 4_294_836_225 pixels maximum, or 4 GiB per 8-bit channel.
-It is not advised to tune it this large.</p>
-<p>The 64 Megapixel default is considered to be a decent upper bound you won't run into in practice,
-except in very specific circumstances.</p>
+<pre>For QOI, the Worst case scenario means all pixels will be encoded as RGBA literals, costing 5 bytes each.
+This caps memory usage at 320 MiB.
+
+The tunable is limited to 4_294_836_225 pixels maximum, or 4 GiB per 8-bit channel.
+It is not advised to tune it this large.
+
+The 64 Megapixel default is considered to be a decent upper bound you won't run into in practice,
+except in very specific circumstances.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1565,15 +1568,16 @@ except in very specific circumstances.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Add alpha channel if missing, in-place.</p>
-<p>Expects 1..4 channels (Gray, Gray + Alpha, RGB, RGBA).
-Any other number of channels will be considered an error, returning <code>false</code> without modifying the image.
-If the input image already has an alpha channel, it'll return <code>true</code> early (without considering optional keyed alpha).</p>
-<p>If an image doesn't already have an alpha channel:
-If the optional <code>alpha_key</code> is provided, it will be resolved as follows:</p>
-<pre>- For RGB,  if pix = key.rgb -&gt; pix = {0, 0, 0, key.a}
-- For Gray, if pix = key.r  -&gt; pix = {0, key.g}
+<pre>Expects 1..4 channels (Gray, Gray + Alpha, RGB, RGBA).
+Any other number of channels will be considered an error, returning `false` without modifying the image.
+If the input image already has an alpha channel, it'll return `true` early (without considering optional keyed alpha).
+
+If an image doesn't already have an alpha channel:
+If the optional `alpha_key` is provided, it will be resolved as follows:
+	- For RGB,  if pix = key.rgb -&gt; pix = {0, 0, 0, key.a}
+	- For Gray, if pix = key.r  -&gt; pix = {0, key.g}
+Otherwise, an opaque alpha channel will be added.
 </pre>
-<p>Otherwise, an opaque alpha channel will be added.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1584,15 +1588,16 @@ If the optional <code>alpha_key</code> is provided, it will be resolved as follo
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Add alpha channel if missing, in-place.</p>
-<p>Expects 1..4 channels (Gray, Gray + Alpha, RGB, RGBA).
-Any other number of channels will be considered an error, returning <code>false</code> without modifying the image.
-If the input image already has an alpha channel, it'll return <code>true</code> early (without considering optional keyed alpha).</p>
-<p>If an image doesn't already have an alpha channel:
-If the optional <code>alpha_key</code> is provided, it will be resolved as follows:</p>
-<pre>- For RGB,  if pix = key.rgb -&gt; pix = {0, 0, 0, key.a}
-- For Gray, if pix = key.r  -&gt; pix = {0, key.g}
+<pre>Expects 1..4 channels (Gray, Gray + Alpha, RGB, RGBA).
+Any other number of channels will be considered an error, returning `false` without modifying the image.
+If the input image already has an alpha channel, it'll return `true` early (without considering optional keyed alpha).
+
+If an image doesn't already have an alpha channel:
+If the optional `alpha_key` is provided, it will be resolved as follows:
+	- For RGB,  if pix = key.rgb -&gt; pix = {0, 0, 0, key.a}
+	- For Gray, if pix = key.r  -&gt; pix = {0, key.g}
+Otherwise, an opaque alpha channel will be added.
 </pre>
-<p>Otherwise, an opaque alpha channel will be added.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1603,22 +1608,23 @@ If the optional <code>alpha_key</code> is provided, it will be resolved as follo
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Drop alpha channel if present, in-place.</p>
-<p>Expects 1..4 channels (Gray, Gray + Alpha, RGB, RGBA).
-Any other number of channels will be considered an error, returning <code>false</code> without modifying the image.</p>
-<p>Of the <code>options</code>, the following are considered:
-<code>.alpha_premultiply</code></p>
-<pre>If the image has an alpha channel, returns image data as follows:
-	RGB *= A, Gray = Gray *= A
+<pre>Expects 1..4 channels (Gray, Gray + Alpha, RGB, RGBA).
+Any other number of channels will be considered an error, returning `false` without modifying the image.
 
-</pre>
-<p><code>.blend_background</code></p>
-<pre>If `img.background` is set, it'll be blended in like this:
-	RGB = (1 - A) * Background + A * RGB
+Of the `options`, the following are considered:
+`.alpha_premultiply`
+	If the image has an alpha channel, returns image data as follows:
+		RGB *= A, Gray = Gray *= A
 
+`.blend_background`
+	If `img.background` is set, it'll be blended in like this:
+		RGB = (1 - A) * Background + A * RGB
+
+If an image has 1 (Gray) or 3 (RGB) channels, it'll return early without modifying the image,
+with one exception: `alpha_key` and `img.background` are present, and `.blend_background` is set.
+
+In this case a keyed alpha pixel will be replaced with the background color.
 </pre>
-<p>If an image has 1 (Gray) or 3 (RGB) channels, it'll return early without modifying the image,
-with one exception: <code>alpha_key</code> and <code>img.background</code> are present, and <code>.blend_background</code> is set.</p>
-<p>In this case a keyed alpha pixel will be replaced with the background color.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1849,7 +1855,7 @@ Note that some image formats like QOI explicitly do NOT support premultiplied al
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/image/general_os.odin">general_os.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 09:49:15.473826100 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 10:18:47.539056300 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

@@ -826,10 +826,11 @@ Procedure Groups (2)</summary>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Streaming state.</p>
-<p>IMPORTANT: This structure has a strict alignment requirement of 64 bytes!! **
-Default allocators will align it correctly if created via <code>new</code>, as will
+<pre>IMPORTANT: This structure has a strict alignment requirement of 64 bytes!! **
+Default allocators will align it correctly if created via `new`, as will
 placing this struct on the stack, but if using a custom allocator make sure
-that it handles the alignment correctly!</p>
+that it handles the alignment correctly!
+</pre>
 </details>
 <h5>Related Procedures With Parameters</h5>
 <ul>
@@ -1021,8 +1022,9 @@ that it handles the alignment correctly!</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>false</code> - Use this on platforms where unaligned reads are fast
-<code>true</code>  - Use this on platforms where unaligned reads are slow</p>
+<p><code>false</code> - Use this on platforms where unaligned reads are fast</p>
+<pre>`true`  - Use this on platforms where unaligned reads are slow
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1032,8 +1034,9 @@ that it handles the alignment correctly!</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>0 - Use memcopy, for platforms where unaligned reads are a problem
-2 - Direct cast, for platforms where unaligned are allowed (default)</p>
+<p>0 - Use memcopy, for platforms where unaligned reads are a problem</p>
+<pre>2 - Direct cast, for platforms where unaligned are allowed (default)
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1171,8 +1174,9 @@ that it handles the alignment correctly!</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Custom secrets have a default length of 192, but can be set to a different size.
-The minimum secret size is 136 bytes. It must also be a multiple of 64.</p>
+<p>Custom secrets have a default length of 192, but can be set to a different size.</p>
+<pre>The minimum secret size is 136 bytes. It must also be a multiple of 64.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1267,13 +1271,17 @@ The minimum secret size is 136 bytes. It must also be a multiple of 64.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p><b></b>*<i>   Canonical representation   </i>*<b></b></p>
-<p>The default return values from XXH functions are unsigned 32 and 64 bit integers.</p>
-<p>The canonical representation uses big endian convention,
-the same convention as human-readable numbers (large digits first).</p>
-<p>This way, hash values can be written into a file or buffer, remaining
-comparable across different systems.</p>
-<p>The following functions allow transformation of hash values to and from their
-canonical format.</p>
+<pre>The default return values from XXH functions are unsigned 32 and 64 bit integers.
+
+The canonical representation uses big endian convention,
+the same convention as human-readable numbers (large digits first).
+
+This way, hash values can be written into a file or buffer, remaining
+comparable across different systems.
+
+The following functions allow transformation of hash values to and from their
+canonical format.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1382,8 +1390,9 @@ canonical format.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>===   XXH3 128-bit streaming   ===</p>
-<p>All the functions are actually the same as for 64-bit streaming variant.
-The only difference is the finalization routine.</p>
+<pre>All the functions are actually the same as for 64-bit streaming variant.
+The only difference is the finalization routine.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1446,8 +1455,9 @@ The only difference is the finalization routine.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>===   XXH3 128-bit streaming   ===</p>
-<p>All the functions are actually the same as for 64-bit streaming variant.
-The only difference is the finalization routine.</p>
+<pre>All the functions are actually the same as for 64-bit streaming variant.
+The only difference is the finalization routine.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1636,11 +1646,12 @@ The only difference is the finalization routine.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>It's important for performance that XXH3_hashLong is not inlined.
-Since the function is not inlined, the compiler may not be able to understand that,
-in some scenarios, its <code>secret</code> argument is actually a compile time constant.
+<p>It's important for performance that XXH3_hashLong is not inlined.</p>
+<pre>Since the function is not inlined, the compiler may not be able to understand that,
+in some scenarios, its `secret` argument is actually a compile time constant.
 This variant enforces that the compiler can detect that,
-and uses this opportunity to streamline the generated code for better performance.</p>
+and uses this opportunity to streamline the generated code for better performance.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1666,13 +1677,16 @@ and uses this opportunity to streamline the generated code for better performanc
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>XXH3_hashLong_64b_withSeed():
-Generate a custom key based on alteration of default XXH3_kSecret with the seed,
-and then use this key for long mode hashing.</p>
-<p>This operation is decently fast but nonetheless costs a little bit of time.
-Try to avoid it whenever possible (typically when seed==0).</p>
-<p>It's important for performance that XXH3_hashLong is not inlined. Not sure
-why (uop cache maybe?), but the difference is large and easily measurable.</p>
+<p>XXH3_hashLong_64b_withSeed():</p>
+<pre>Generate a custom key based on alteration of default XXH3_kSecret with the seed,
+and then use this key for long mode hashing.
+
+This operation is decently fast but nonetheless costs a little bit of time.
+Try to avoid it whenever possible (typically when seed==0).
+
+It's important for performance that XXH3_hashLong is not inlined. Not sure
+why (uop cache maybe?), but the difference is large and easily measurable.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1769,12 +1783,15 @@ why (uop cache maybe?), but the difference is large and easily measurable.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>At very short lengths, there isn't enough input to fully hide secrets, or use the entire secret.</p>
-<p>There is also only a limited amount of mixing we can do before significantly impacting performance.</p>
-<p>Therefore, we use different sections of the secret and always mix two secret samples with an XOR.
+<pre>There is also only a limited amount of mixing we can do before significantly impacting performance.
+
+Therefore, we use different sections of the secret and always mix two secret samples with an XOR.
 This should have no effect on performance on the seedless or withSeed variants because everything
-_should_ be constant folded by modern compilers.</p>
-<p>The XOR mixing hides individual parts of the secret and increases entropy.
-This adds an extra layer of strength for custom secrets.</p>
+_should_ be constant folded by modern compilers.
+
+The XOR mixing hides individual parts of the secret and increases entropy.
+This adds an extra layer of strength for custom secrets.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1814,24 +1831,31 @@ This adds an extra layer of strength for custom secrets.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>DISCLAIMER: There are known <i>seed-dependent</i> multicollisions here due to
-multiplication by zero, affecting hashes of lengths 17 to 240.</p>
-<p>However, they are very unlikely.</p>
-<p>Keep this in mind when using the unseeded XXH3_64bits() variant: As with all
+<p>DISCLAIMER: There are known <i>seed-dependent</i> multicollisions here due to</p>
+<pre>multiplication by zero, affecting hashes of lengths 17 to 240.
+
+However, they are very unlikely.
+
+Keep this in mind when using the unseeded XXH3_64bits() variant: As with all
 unseeded non-cryptographic hashes, it does not attempt to defend itself
-against specially crafted inputs, only random inputs.</p>
-<p>Compared to classic UMAC where a 1 in 2^31 chance of 4 consecutive bytes
+against specially crafted inputs, only random inputs.
+
+Compared to classic UMAC where a 1 in 2^31 chance of 4 consecutive bytes
 cancelling out the secret is taken an arbitrary number of times (addressed
 in XXH3_accumulate_512), this collision is very unlikely with random inputs
-and/or proper seeding:</p>
-<p>This only has a 1 in 2^63 chance of 8 consecutive bytes cancelling out, in a
+and/or proper seeding:
+
+This only has a 1 in 2^63 chance of 8 consecutive bytes cancelling out, in a
 function that is only called up to 16 times per hash with up to 240 bytes of
-input.</p>
-<p>This is not too bad for a non-cryptographic hash function, especially with
-only 64 bit outputs.</p>
-<p>The 128-bit variant (which trades some speed for strength) is NOT affected
+input.
+
+This is not too bad for a non-cryptographic hash function, especially with
+only 64 bit outputs.
+
+The 128-bit variant (which trades some speed for strength) is NOT affected
 by this, although it is always a good idea to use a proper seed if you care
-about strength.</p>
+about strength.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1853,8 +1877,9 @@ about strength.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This is a stronger avalanche, inspired by Pelle Evensen's rrmxmx
-preferable when input has not been previously mixed</p>
+<p>This is a stronger avalanche, inspired by Pelle Evensen's rrmxmx</p>
+<pre>preferable when input has not been previously mixed
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1905,13 +1930,17 @@ preferable when input has not been previously mixed</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p><b></b>*<i>   Canonical representation   </i>*<b></b></p>
-<p>The default return values from XXH functions are unsigned 32 and 64 bit integers.</p>
-<p>The canonical representation uses big endian convention,
-the same convention as human-readable numbers (large digits first).</p>
-<p>This way, hash values can be written into a file or buffer, remaining
-comparable across different systems.</p>
-<p>The following functions allow transformation of hash values to and from their
-canonical format.</p>
+<pre>The default return values from XXH functions are unsigned 32 and 64 bit integers.
+
+The canonical representation uses big endian convention,
+the same convention as human-readable numbers (large digits first).
+
+This way, hash values can be written into a file or buffer, remaining
+comparable across different systems.
+
+The following functions allow transformation of hash values to and from their
+canonical format.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2009,10 +2038,12 @@ canonical format.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>The reason for the separate function is to prevent passing too many structs
-around by value. This will hopefully inline the multiply, but we don't force it.</p>
-<p>@param lhs, rhs The 64-bit integers to multiply
-@return The low 64 bits of the product XOR'd by the high 64 bits.</p>
+<p>The reason for the separate function is to prevent passing too many structs</p>
+<pre>around by value. This will hopefully inline the multiply, but we don't force it.
+
+@param lhs, rhs The 64-bit integers to multiply
+@return The low 64 bits of the product XOR'd by the high 64 bits.
+</pre>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2091,7 +2122,7 @@ around by value. This will hopefully inline the multiply, but we don't force it.
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/hash/xxhash/xxhash_64.odin">xxhash_64.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 09:49:15.468186500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 10:18:47.534326300 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
