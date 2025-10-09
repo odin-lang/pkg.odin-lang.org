@@ -518,6 +518,7 @@ intrinsics_table := []Builtin{
 	},
 
 	// SIMD related
+	// IMPORTANT NOTE(bill): All of these docs are generated from the `core:simd` package (if available)
 	{name = "simd_add",                kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
 	{name = "simd_sub",                kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
 	{name = "simd_mul",                kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T"},
@@ -589,19 +590,7 @@ intrinsics_table := []Builtin{
 	{name = "simd_masked_expand_load",    kind = "b", type = "proc(ptr: rawptr, val: #simd[N]T, mask: #simd[N]U) -> #simd[N]T where type_is_integer(U) || type_is_boolean(U)"},
 	{name = "simd_masked_compress_store", kind = "b", type = "proc(ptr: rawptr, val: #simd[N]T, mask: #simd[N]U) where type_is_integer(U) || type_is_boolean(U)"},
 
-	{name = "simd_shuffle",            kind = "b", type = "proc(a, b: #simd[N]T, $indices: ..int) -> #simd[len(indices)]T",
-		comment =
-		"The first two operators of `simd_shuffle` are `#simd` vectors of the same type. The indices following these represent the shuffle mask values. The mask elements must be constant integers. The result of the procedure is a vector whose length is the same as the number of indices passed to the procedure type.\n\n"+
-		"The elements of the two input `#simd` vectors are numbers from left to right across both of the vectors. For each element of the result `#simd` vector, the shuffle indices selement an element from one of the two input vectors to copy to the result.\n\n"+
-		"Example:\n"+
-		"\ta, b: #simd[4]T = ...\n"+
-		"\tx: #simd[4]T = intrinsics.simd_shuffle(a, b, 0, 1, 2, 3) // identity shuffle of `a`\n"+
-		"\ty: #simd[4]T = intrinsics.simd_shuffle(a, b, 4, 5, 6, 7) // identity shuffle of `b`\n"+
-		"\tz: #simd[4]T = intrinsics.simd_shuffle(a, b, 0, 4, 1, 5)\n"+
-		"\tw: #simd[8]T = intrinsics.simd_shuffle(a, b, 0, 1, 2, 3, 4, 5, 6, 7)\n"+
-		"\tv: #simd[6]T = intrinsics.simd_shuffle(a, b, 0, 1, 0, 3, 0, 4) // repeated indices and different sized vector\n"+
-		"",
-	},
+	{name = "simd_shuffle",            kind = "b", type = "proc(a, b: #simd[N]T, $indices: ..int) -> #simd[len(indices)]T"},
 	{name = "simd_select",             kind = "b", type = "proc(cond: #simd[N]boolean_or_integer, true, false: #simd[N]T) -> #simd[N]T"},
 
 	// Lane-wise operations
@@ -663,6 +652,9 @@ intrinsics_table := []Builtin{
 	{name = "objc_register_selector", kind = "b", type="proc($name: string) -> objc_SEL", comment = DARWIN_COMMENT + "\nWill register a selector value at run-time for the given constant string value."},
 	{name = "objc_find_class",        kind = "b", type="proc($name: string) -> objc_Class", comment = DARWIN_COMMENT + "\nWill return a run-time cached class value for the given constant string value."},
 	{name = "objc_register_class",    kind = "b", type="proc($name: string) -> objc_Class", comment = DARWIN_COMMENT + "\nWill register a class value at run-time for the given constant string value."},
+	{name = "objc_ivar_get",          kind = "b", type="proc(self: $T) ^$U", comment = DARWIN_COMMENT},
+	{name = "objc_block",             kind = "b", type="proc(invoke: $T, ..any) -> ^Objc_Block(T) where type_is_proc(T)", comment = DARWIN_COMMENT},
+	{name = "objc_super",             kind = "b", type="proc(obj: ^$T) -> ^$U where type_is_subtype_of(T, objc_object), type_is_subtype_of(U, objc_object)", comment = DARWIN_COMMENT},
 
 	{name = "valgrind_client_request", kind = "b", type = "proc(default: uintptr, request: uintptr, a0, a1, a2, a3, a4: uintptr) -> uintptr" },
 }
