@@ -565,6 +565,23 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 				}
 			}
 
+			// NOTE(bill): This gets the comments from the `core:sync` package, to minimize documentation duplication
+			atomic_docs: if strings.has_prefix(name, "atomic_") {
+				atomic_name := name
+
+				core     := (&cfg._collections["core"]) or_break atomic_docs
+				sync_pkg := core.pkgs["sync"]           or_break atomic_docs
+				for e in array(sync_pkg.entries) {
+					if str(e.name) == atomic_name {
+						atomic_entity := &cfg.entities[e.entity]
+						core_comment = str(atomic_entity.docs)
+						core_comment = strings.trim_space(core_comment)
+						break
+					}
+				}
+			}
+
+
 			if core_comment == "" || the_comment == "" || extra_comment == "" {
 				fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
 				fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
