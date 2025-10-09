@@ -303,6 +303,11 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 			entry_count += 1
 		}
 
+		slice.sort_by_key(builtin_entities[:], proc(entry: doc.Scope_Entry) -> string {
+			e := &cfg.entities[entry.entity]
+			return str(e.name)
+		})
+
 
 		fmt.wprintln(w, `<div>`)
 		defer fmt.wprintln(w, `</div>`)
@@ -544,6 +549,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 			core_comment := ""
 
 
+			// NOTE(bill): This gets the comments from the `core:simd` package, to minimize documentation duplication
 			simd_docs: if strings.has_prefix(name, "simd_") {
 				simd_name := name[len("simd_"):]
 
