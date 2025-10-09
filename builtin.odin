@@ -222,12 +222,18 @@ builtins := []Builtin{
 }
 
 write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg, collection: ^Collection, pkg_name: string, pkg_docs: string) {
-	// slice.sort_by(builtins, proc(a, b: Builtin) -> bool {
-	// 	if a.kind == b.kind {
-	// 		return a.name < b.name
-	// 	}
-	// 	return a.kind < b.kind
-	// })
+	slice.sort_by(builtins, proc(a, b: Builtin) -> bool {
+		if a.kind == b.kind {
+			return a.name < b.name
+		}
+		return a.kind < b.kind
+	})
+	slice.sort_by(intrinsics_table, proc(a, b: Builtin) -> bool {
+		if a.kind == b.kind {
+			return a.name < b.name
+		}
+		return a.kind < b.kind
+	})
 
 	fmt.wprintln(w, `<div class="row odin-main" id="pkg">`)
 	defer fmt.wprintln(w, `</div>`)
@@ -303,11 +309,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 			entry_count += 1
 		}
 
-		slice.sort_by_key(builtin_entities[:], proc(entry: doc.Scope_Entry) -> string {
-			e := &cfg.entities[entry.entity]
-			return str(e.name)
-		})
-
+		slice.sort_by_key(builtin_entities^[:], entity_key)
 
 		fmt.wprintln(w, `<div>`)
 		defer fmt.wprintln(w, `</div>`)
@@ -348,7 +350,9 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 		entry_table = intrinsics_table
 	}
 
-	runtime_entries := array(runtime_pkg.entries)
+	runtime_entries := slice.clone(array(runtime_pkg.entries))
+	defer delete(runtime_entries)
+	slice.sort_by_key(runtime_entries, entity_key)
 
 	runtime_consts: [dynamic]doc.Scope_Entry
 	runtime_types:  [dynamic]doc.Scope_Entry
@@ -358,11 +362,6 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 	defer delete(runtime_types)
 	defer delete(runtime_procs)
 	defer delete(runtime_groups)
-
-	slice.sort_by_key(runtime_consts[:], entity_key)
-	slice.sort_by_key(runtime_types[:],  entity_key)
-	slice.sort_by_key(runtime_procs[:],  entity_key)
-	slice.sort_by_key(runtime_groups[:], entity_key)
 
 	write_index(w, runtime_entries, "Constants",        "c", &runtime_consts, pkg_name, entry_table)
 	write_index(w, runtime_entries, "Types",            "t", &runtime_types,  pkg_name, entry_table)
