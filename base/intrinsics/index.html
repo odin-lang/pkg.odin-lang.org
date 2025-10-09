@@ -160,7 +160,7 @@ Types (7)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (214)</summary>
+Procedures (220)</summary>
 <ul>
 <li><a href="#transpose">transpose</a></li>
 <li><a href="#outer_product">outer_product</a></li>
@@ -176,6 +176,7 @@ Procedures (214)</summary>
 <li><a href="#alloca">alloca</a></li>
 <li><a href="#cpu_relax">cpu_relax</a></li>
 <li><a href="#read_cycle_counter">read_cycle_counter</a></li>
+<li><a href="#read_cycle_counter_frequency">read_cycle_counter_frequency</a></li>
 <li><a href="#count_ones">count_ones</a></li>
 <li><a href="#count_zeros">count_zeros</a></li>
 <li><a href="#count_trailing_zeros">count_trailing_zeros</a></li>
@@ -242,9 +243,12 @@ Procedures (214)</summary>
 <li><a href="#type_is_float">type_is_float</a></li>
 <li><a href="#type_is_complex">type_is_complex</a></li>
 <li><a href="#type_is_quaternion">type_is_quaternion</a></li>
-<li><a href="#type_is_string">type_is_string</a></li>
 <li><a href="#type_is_typeid">type_is_typeid</a></li>
 <li><a href="#type_is_any">type_is_any</a></li>
+<li><a href="#type_is_string">type_is_string</a></li>
+<li><a href="#type_is_string16">type_is_string16</a></li>
+<li><a href="#type_is_cstring">type_is_cstring</a></li>
+<li><a href="#type_is_cstring16">type_is_cstring16</a></li>
 <li><a href="#type_is_endian_platform">type_is_endian_platform</a></li>
 <li><a href="#type_is_endian_little">type_is_endian_little</a></li>
 <li><a href="#type_is_endian_big">type_is_endian_big</a></li>
@@ -256,6 +260,7 @@ Procedures (214)</summary>
 <li><a href="#type_is_sliceable">type_is_sliceable</a></li>
 <li><a href="#type_is_comparable">type_is_comparable</a></li>
 <li><a href="#type_is_simple_compare">type_is_simple_compare</a></li>
+<li><a href="#type_is_nearly_simple_compare">type_is_nearly_simple_compare</a></li>
 <li><a href="#type_is_dereferenceable">type_is_dereferenceable</a></li>
 <li><a href="#type_is_valid_map_key">type_is_valid_map_key</a></li>
 <li><a href="#type_is_valid_matrix_elements">type_is_valid_matrix_elements</a></li>
@@ -274,6 +279,7 @@ Procedures (214)</summary>
 <li><a href="#type_is_bit_set">type_is_bit_set</a></li>
 <li><a href="#type_is_simd_vector">type_is_simd_vector</a></li>
 <li><a href="#type_is_matrix">type_is_matrix</a></li>
+<li><a href="#type_is_raw_union">type_is_raw_union</a></li>
 <li><a href="#type_has_nil">type_has_nil</a></li>
 <li><a href="#type_is_matrix_row_major">type_is_matrix_row_major</a></li>
 <li><a href="#type_is_matrix_column_major">type_is_matrix_column_major</a></li>
@@ -517,7 +523,7 @@ Represents an Objective-C <code>Class</code> type.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Tells the optimizing backend of a compiler to not change the number of 'volatile' operations nor change their order of execution relative to other 'volatile' operations. Optimizers are allowed to change the order of volatile operations relative to non-volatile operations.</p>
-<p>NOTE: This has nothing to do with Java's 'volatile' and has no cross-thread synchronization behaviour. Use atomics if this behaviour is wanted.</p>
+<p>Note: This has nothing to do with Java's 'volatile' and has no cross-thread synchronization behaviour. Use atomics if this behaviour is wanted.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -528,7 +534,7 @@ Represents an Objective-C <code>Class</code> type.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Tells the optimizing backend of a compiler to not change the number of 'volatile' operations nor change their order of execution relative to other 'volatile' operations. Optimizers are allowed to change the order of volatile operations relative to non-volatile operations.</p>
-<p>NOTE: This has nothing to do with Java's 'volatile' and has no cross-thread synchronization behaviour. Use atomics if this behaviour is wanted.</p>
+<p>Note: This has nothing to do with Java's 'volatile' and has no cross-thread synchronization behaviour. Use atomics if this behaviour is wanted.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -599,6 +605,16 @@ Represents an Objective-C <code>Class</code> type.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>This provides access to the cycle counter register (or similar low latency, high accuracy clocks) on the targets that support it. On i386/amd64, it should map to the <code>rdtsc</code> instruction. On arm64, it should map to the <code>cntvct_el0</code> instruction.</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="read_cycle_counter_frequency"><span><a class="doc-id-link" href="#read_cycle_counter_frequency">read_cycle_counter_frequency<span class="a-hidden">&nbsp;¶</span></a></span></h3>
+<div>
+<pre class="doc-code">read_cycle_counter_frequency :: <span class="keyword-type">proc</span>() -> <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>This provides access to the frequency that the cycle counter register (or similar low latency, high accuracy clocks) uses on the targets that support it.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -908,7 +924,7 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Linux and Darwin Only</p>
+<p>system call for Linux and Darwin Only</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -918,7 +934,7 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>FreeBSD, NetBSD, etc.</p>
+<p>system call FreeBSD, NetBSD, etc.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1096,7 +1112,7 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Returns the type without any <code>distinct</code> indirection and the underlying integer type for an enum e.g. <code>Foo :: distinct int</code>, <code>type_core_type(Foo) == int</code>, or <code>Bar :: enum u8 {A}</code>, <code>type_core_type(Bar) == u8</code></p>
+<p>Returns the type without any <code>distinct</code> indirection and the underlying integer type for an enum or bit_set e.g. <code>Foo :: distinct int</code>, <code>type_core_type(Foo) == int</code>, or <code>Bar :: enum u8 {A}</code>, <code>type_core_type(Bar) == u8</code>, or <code>Baz :: bit_set[Bar; u32]</code>, <code>type_core_type(Baz) == u32</code></p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1121,78 +1137,160 @@ Represents an Objective-C <code>Class</code> type.</p>
 <div>
 <pre class="doc-code">type_is_boolean :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Return true if the type is derived from any boolean type: <code>bool</code>, <code>b8</code>, <code>b16</code>, <code>b32</code>, <code>b64</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_integer"><span><a class="doc-id-link" href="#type_is_integer">type_is_integer<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_integer :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Return true if the type is derived from any integer type</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_rune"><span><a class="doc-id-link" href="#type_is_rune">type_is_rune<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_rune :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Return true if the type is derived from the <code>rune</code> type</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_float"><span><a class="doc-id-link" href="#type_is_float">type_is_float<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_float :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Return true if the type is derived from any float type</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_complex"><span><a class="doc-id-link" href="#type_is_complex">type_is_complex<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_complex :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Return true if the type is derived from any complex type: <code>complex32</code>, <code>complex64</code>, <code>complex128</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_quaternion"><span><a class="doc-id-link" href="#type_is_quaternion">type_is_quaternion<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_quaternion :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
-</div>
-<div class="pkg-entity">
-<h3 id="type_is_string"><span><a class="doc-id-link" href="#type_is_string">type_is_string<span class="a-hidden">&nbsp;¶</span></a></span></h3>
-<div>
-<pre class="doc-code">type_is_string :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
-</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Return true if the type is derived from any quaternion type: <code>quaternion64</code>, <code>quaternion128</code>, <code>quaternion256</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_typeid"><span><a class="doc-id-link" href="#type_is_typeid">type_is_typeid<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_typeid :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Return true if the type is derived from <code>typeid</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_any"><span><a class="doc-id-link" href="#type_is_any">type_is_any<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_any :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Return true if the type is derived from <code>any</code></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="type_is_string"><span><a class="doc-id-link" href="#type_is_string">type_is_string<span class="a-hidden">&nbsp;¶</span></a></span></h3>
+<div>
+<pre class="doc-code">type_is_string :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the type is derived from any string type: <code>string</code>, <code>cstring</code>, <code>string16</code>, <code>cstring16</code></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="type_is_string16"><span><a class="doc-id-link" href="#type_is_string16">type_is_string16<span class="a-hidden">&nbsp;¶</span></a></span></h3>
+<div>
+<pre class="doc-code">type_is_string16 :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the type is derived from the <code>string16</code> type AND not <code>cstring16</code></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="type_is_cstring"><span><a class="doc-id-link" href="#type_is_cstring">type_is_cstring<span class="a-hidden">&nbsp;¶</span></a></span></h3>
+<div>
+<pre class="doc-code">type_is_cstring :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the type is derived from the <code>cstring</code> type</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="type_is_cstring16"><span><a class="doc-id-link" href="#type_is_cstring16">type_is_cstring16<span class="a-hidden">&nbsp;¶</span></a></span></h3>
+<div>
+<pre class="doc-code">type_is_cstring16 :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the type is derived from the <code>cstring16</code> type</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_endian_platform"><span><a class="doc-id-link" href="#type_is_endian_platform">type_is_endian_platform<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_endian_platform :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the type uses the platform native layout rather than a specific layout. Example: <code>type_is_endian_platform(u32) == true</code>, <code>type_is_endian_platform(u32le) == false</code>, <code>type_is_endian_platform(u32be) == false</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_endian_little"><span><a class="doc-id-link" href="#type_is_endian_little">type_is_endian_little<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_endian_little :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the type is little endian specific or it is a platform native layout which is also little endian. Example: <code>type_is_endian_little(u32le) == true</code>, <code>type_is_endian_little(u32be) == false</code>, <code>type_is_endian_little(u32) == (ODIN_ENDIAN == .Little)</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_endian_big"><span><a class="doc-id-link" href="#type_is_endian_big">type_is_endian_big<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_endian_big :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the type is big endian specific or it is a platform native layout which is also big endian. Example: <code>type_is_endian_big(u32be) == true</code>, <code>type_is_endian_big(u32le) == false</code>, <code>type_is_endian_big(u32) == (ODIN_ENDIAN == .Big)</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_unsigned"><span><a class="doc-id-link" href="#type_is_unsigned">type_is_unsigned<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_unsigned :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the type is an unsigned integer or an enum backed by an unsigned integer, and false otherwise for any other type</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_numeric"><span><a class="doc-id-link" href="#type_is_numeric">type_is_numeric<span class="a-hidden">&nbsp;¶</span></a></span></h3>
@@ -1201,13 +1299,13 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Returns true if a "numeric" in nature:</p>
+<p>Returns true if it is a "numeric" type in nature:</p>
 <p><span class="doc-list">Any integer</span>
 <span class="doc-list">Any float</span>
 <span class="doc-list">Any complex number</span>
 <span class="doc-list">Any quaternion</span>
 <span class="doc-list">Any enum</span>
-<span class="doc-list">Any fixed-array of a numeric type</span></p>
+<span class="doc-list">Any fixed-length array of a numeric type</span></p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1215,24 +1313,53 @@ Represents an Objective-C <code>Class</code> type.</p>
 <div>
 <pre class="doc-code">type_is_ordered :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the type is an integer, float, rune, any string, pointer, or multi-pointer</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_ordered_numeric"><span><a class="doc-id-link" href="#type_is_ordered_numeric">type_is_ordered_numeric<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_ordered_numeric :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the type is an integer, float, or rune</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_indexable"><span><a class="doc-id-link" href="#type_is_indexable">type_is_indexable<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_indexable :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if a value of this type can indexed:</p>
+<p><span class="doc-list"><code>string</code> or <code>string16</code></span>
+<span class="doc-list">Any fixed-length array</span>
+<span class="doc-list">Any slice</span>
+<span class="doc-list">Any dynamic array</span>
+<span class="doc-list">Any map</span>
+<span class="doc-list">Any multi-pointer</span>
+<span class="doc-list">Any enumerated array</span>
+<span class="doc-list">Any matrix</span></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_sliceable"><span><a class="doc-id-link" href="#type_is_sliceable">type_is_sliceable<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_sliceable :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if a value of this type can indexed:</p>
+<p><span class="doc-list"><code>string</code> or <code>string16</code></span>
+<span class="doc-list">Any fixed-length array</span>
+<span class="doc-list">Any slice</span>
+<span class="doc-list">Any dynamic array</span>
+<span class="doc-list">Any multi-pointer</span></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_comparable"><span><a class="doc-id-link" href="#type_is_comparable">type_is_comparable<span class="a-hidden">&nbsp;¶</span></a></span></h3>
@@ -1242,7 +1369,7 @@ Represents an Objective-C <code>Class</code> type.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Returns true if the type is comparable, which allows for the use of <code>==</code> and <code>!=</code> binary operators.</p>
-<p>One of the following non-compound types (as well as any <code>distinct</code> forms): <code>rune</code>, <code>string</code>, <code>cstring</code>, <code>typeid</code>, pointer, <code>#soa</code> related pointer, multi-pointer, enum, procedure, matrix, <code>bit_set</code>, <code>#simd</code> vector.</p>
+<p>One of the following non-compound types (as well as any <code>distinct</code> forms): <code>rune</code>, <code>string</code>, <code>cstring</code>, <code>string16</code>, <code>cstring16</code>, <code>typeid</code>, pointer, <code>#soa</code> related pointer, multi-pointer, enum, procedure, matrix, <code>bit_set</code>, <code>#simd</code> vector.</p>
 <p>One of the following compound types (as well as any <code>distinct</code> forms): any array or enumerated array where its element type is also comparable; any <code>struct</code> where all of its fields are comparable; any <code>struct #raw_union</code> were all of its fields are simply comparable (see <code>type_is_simple_compare</code>); any <code>union</code> where all of its variants are comparable.</p>
 </details>
 </div>
@@ -1253,7 +1380,17 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>easily compared using memcmp (== and !=)</p>
+<p>easily compared using memcmp (<code>==</code> and <code>!=</code>) (not including floats)</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="type_is_nearly_simple_compare"><span><a class="doc-id-link" href="#type_is_nearly_simple_compare">type_is_nearly_simple_compare<span class="a-hidden">&nbsp;¶</span></a></span></h3>
+<div>
+<pre class="doc-code">type_is_nearly_simple_compare :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>easily compared using memcmp (<code>==</code> and <code>!=</code>) (including floats)</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1291,90 +1428,160 @@ Represents an Objective-C <code>Class</code> type.</p>
 <div>
 <pre class="doc-code">type_is_named :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the type is a named</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_pointer"><span><a class="doc-id-link" href="#type_is_pointer">type_is_pointer<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_pointer :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the base-type is a pointer, i.e. <code>^T</code> or <code>rawptr</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_multi_pointer"><span><a class="doc-id-link" href="#type_is_multi_pointer">type_is_multi_pointer<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_multi_pointer :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the base-type is a multi pointer, i.e. <code>[^]T</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_array"><span><a class="doc-id-link" href="#type_is_array">type_is_array<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_array :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the base-type is a fixed-length array, i.e. <code>[N]T</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_enumerated_array"><span><a class="doc-id-link" href="#type_is_enumerated_array">type_is_enumerated_array<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_enumerated_array :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the base-type is a enumerated array, i.e. <code>[Some_Enum]T</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_slice"><span><a class="doc-id-link" href="#type_is_slice">type_is_slice<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_slice :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the base-type is a slice, i.e. <code>[]T</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_dynamic_array"><span><a class="doc-id-link" href="#type_is_dynamic_array">type_is_dynamic_array<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_dynamic_array :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the base-type is a dynamic array, i.e. <code>[dynamic]T</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_map"><span><a class="doc-id-link" href="#type_is_map">type_is_map<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_map :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the base-type is a <code>map</code>, i.e. <code>map[K]V</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_struct"><span><a class="doc-id-link" href="#type_is_struct">type_is_struct<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_struct :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the base-type is a <code>struct</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_union"><span><a class="doc-id-link" href="#type_is_union">type_is_union<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_union :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the base-type is a <code>union</code>, but not <code>struct #raw_union</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_enum"><span><a class="doc-id-link" href="#type_is_enum">type_is_enum<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_enum :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the base-type is a <code>enum</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_proc"><span><a class="doc-id-link" href="#type_is_proc">type_is_proc<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_proc :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the base-type is a <code>proc</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_bit_set"><span><a class="doc-id-link" href="#type_is_bit_set">type_is_bit_set<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_bit_set :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the base-type is a <code>bit_set</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_simd_vector"><span><a class="doc-id-link" href="#type_is_simd_vector">type_is_simd_vector<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_simd_vector :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the base-type is a simd vector, i.e. <code>#simd[N]T</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_matrix"><span><a class="doc-id-link" href="#type_is_matrix">type_is_matrix<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_matrix :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the base-type is a <code>matrix</code></p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="type_is_raw_union"><span><a class="doc-id-link" href="#type_is_raw_union">type_is_raw_union<span class="a-hidden">&nbsp;¶</span></a></span></h3>
+<div>
+<pre class="doc-code">type_is_raw_union :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the base-type is a <code>struct #raw_union</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_has_nil"><span><a class="doc-id-link" href="#type_has_nil">type_has_nil<span class="a-hidden">&nbsp;¶</span></a></span></h3>
@@ -1387,6 +1594,7 @@ Represents an Objective-C <code>Class</code> type.</p>
 <p><span class="doc-list"><code>rawptr</code></span>
 <span class="doc-list"><code>any</code></span>
 <span class="doc-list"><code>cstring</code></span>
+<span class="doc-list"><code>cstring16</code></span>
 <span class="doc-list"><code>typeid</code></span>
 <span class="doc-list"><code>enum</code></span>
 <span class="doc-list"><code>bit_set</code></span>
@@ -1407,150 +1615,330 @@ Represents an Objective-C <code>Class</code> type.</p>
 <div>
 <pre class="doc-code">type_is_matrix_row_major :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_matrix"><span class="code-procedure">type_is_matrix</span></a>(T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the type passed is a matrix using <code>#row_major</code> ordering, this intrinsic only allows for matrices and will not compile otherwise. Note: The default matrix layout is <code>#column_major</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_matrix_column_major"><span><a class="doc-id-link" href="#type_is_matrix_column_major">type_is_matrix_column_major<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_matrix_column_major :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_matrix"><span class="code-procedure">type_is_matrix</span></a>(T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the type passed is a matrix using <code>#column_major</code> ordering, this intrinsic only allows for matrices and will not compile otherwise. Note: The default matrix layout is <code>#column_major</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_specialization_of"><span><a class="doc-id-link" href="#type_is_specialization_of">type_is_specialization_of<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_specialization_of :: <span class="keyword-type">proc</span>($T, $S: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the type passed is a specialization of a parametric polymorphic type.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">Foo :: struct($T: typeid) {x: T}
+assert(type_is_specialization_of(Foo(int)) == true)
+assert(type_is_specialization_of(Foo)      == false)
+assert(type_is_specialization_of(i32)      == false)
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_variant_of"><span><a class="doc-id-link" href="#type_is_variant_of">type_is_variant_of<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_variant_of :: <span class="keyword-type">proc</span>($U, $V: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_union"><span class="code-procedure">type_is_union</span></a>(U) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the <code>V</code> is a variant of the union type <code>U</code>.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">Foo:: union {i32, f32}
+assert(type_is_variant_of(Foo, i32)    == true)
+assert(type_is_variant_of(Foo, f32)    == true)
+assert(type_is_variant_of(Foo, string) == false)
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_union_tag_type"><span><a class="doc-id-link" href="#type_union_tag_type">type_union_tag_type<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_union_tag_type :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <span class="keyword-type">typeid</span> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_union"><span class="code-procedure">type_is_union</span></a>(T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the type used to store the tag for a union. If no tag is used (e.g. <code>Maybe(Pointer_Like_Type)</code>), then <code>u8</code> is returned.</p>
+<p>Possible tag types: <code>u8</code>, <code>u16</code>, <code>u32</code>, <code>u64</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_union_tag_offset"><span><a class="doc-id-link" href="#type_union_tag_offset">type_union_tag_offset<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_union_tag_offset :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#uintptr"><span class="doc-builtin">uintptr</span></a> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_union"><span class="code-procedure">type_is_union</span></a>(T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the offset to the tag in bytes from the start of the union. If no tag is used (e.g. 'Maybe(Pointer_Like_Type)`), then size of the variant block space is returned.</p>
+<p>Note: unions store the tag after the variant block space.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_union_base_tag_value"><span><a class="doc-id-link" href="#type_union_base_tag_value">type_union_base_tag_value<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_union_base_tag_value :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_union"><span class="code-procedure">type_is_union</span></a>(U) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the first valid tag value for the first variant. If <code>#no_nil</code> is used, the returned value will be <code>0</code>, otherwise <code>1</code> will be returned.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">assert(type_union_base_tag_value(union {i32, f32})         == 1)
+assert(type_union_base_tag_value(union #no_nil {i32, f32}) == 0)
+assert(type_union_base_tag_value(Maybe(rawptr})            == 1)
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_union_variant_count"><span><a class="doc-id-link" href="#type_union_variant_count">type_union_variant_count<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_union_variant_count :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_union"><span class="code-procedure">type_is_union</span></a>(T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the number of possible variants a union can be (excluding a possible <code>nil</code> state).</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">assert(type_union_variant_count(union {i32, f32})      == 2)
+assert(type_union_variant_count(union {i32, f32, b32}) == 3)
+assert(type_union_variant_count(union {})              == 0)
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_variant_type_of"><span><a class="doc-id-link" href="#type_variant_type_of">type_variant_type_of<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_variant_type_of :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>, $index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <span class="keyword-type">typeid</span> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_union"><span class="code-procedure">type_is_union</span></a>(T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the type of a union <code>T</code>'s variant at a specified <code>index</code>.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">Foo :: union{i32, f32, string}
+assert(type_variant_type_of(Foo, 0) == i32)
+assert(type_variant_type_of(Foo, 1) == f32)
+assert(type_variant_type_of(Foo, 2) == string)
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_variant_index_of"><span><a class="doc-id-link" href="#type_variant_index_of">type_variant_index_of<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_variant_index_of :: <span class="keyword-type">proc</span>($U, $V: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_union"><span class="code-procedure">type_is_union</span></a>(U) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the index of a variant <code>V</code> of a union <code>U</code>.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">Foo :: union{i32, f32, string}
+assert(type_variant_type_of(Foo, i32)    == 0)
+assert(type_variant_type_of(Foo, f32)    == 1)
+assert(type_variant_type_of(Foo, string) == 2)
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_bit_set_elem_type"><span><a class="doc-id-link" href="#type_bit_set_elem_type">type_bit_set_elem_type<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_bit_set_elem_type :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <span class="keyword-type">typeid</span> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_bit_set"><span class="code-procedure">type_is_bit_set</span></a>(T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the element type of a <code>bit_set</code> <code>T</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_bit_set_underlying_type"><span><a class="doc-id-link" href="#type_bit_set_underlying_type">type_bit_set_underlying_type<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_bit_set_underlying_type :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <span class="keyword-type">typeid</span> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_bit_set"><span class="code-procedure">type_is_bit_set</span></a>(T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the underlying/backing type of a <code>bit_set</code> <code>T</code> rather than the element type.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">assert(type_bit_set_underlying_type(bit_set[0..&lt;8])     == u8)
+assert(type_bit_set_underlying_type(bit_set[Enum; int]) == int)
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_has_field"><span><a class="doc-id-link" href="#type_has_field">type_has_field<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_has_field :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>, $name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the field <code>name</code> exists on the type <code>T</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_field_type"><span><a class="doc-id-link" href="#type_field_type">type_field_type<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_field_type :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>, $name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> <span class="keyword-type">typeid</span> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns type of the field <code>name</code> on the type <code>T</code>. Note: the field must exist otherwise this will not compile.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_proc_parameter_count"><span><a class="doc-id-link" href="#type_proc_parameter_count">type_proc_parameter_count<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_proc_parameter_count :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_proc"><span class="code-procedure">type_is_proc</span></a>(T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the number of parameters a procedure type has.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">assert(type_proc_parameter_count(proc(i32, f32) -&gt; bool) == 2)
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_proc_return_count"><span><a class="doc-id-link" href="#type_proc_return_count">type_proc_return_count<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_proc_return_count :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_proc"><span class="code-procedure">type_is_proc</span></a>(T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the number of return values a procedure type has.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">assert(type_proc_return_count(proc(i32, f32) -&gt; bool) == 1)
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_proc_parameter_type"><span><a class="doc-id-link" href="#type_proc_parameter_type">type_proc_parameter_type<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_proc_parameter_type :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>, index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <span class="keyword-type">typeid</span> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_proc"><span class="code-procedure">type_is_proc</span></a>(T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the type of a parameter of a procedure type at the specified <code>index</code>.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">assert(type_proc_parameter_type(proc(i32, f32) -&gt; bool, 1) == f32)
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_proc_return_type"><span><a class="doc-id-link" href="#type_proc_return_type">type_proc_return_type<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_proc_return_type :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>, index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <span class="keyword-type">typeid</span> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_proc"><span class="code-procedure">type_is_proc</span></a>(T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the type of a return value of a procedure type at the specified <code>index</code>.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">assert(type_proc_return_type(proc(i32, f32) -&gt; bool, 0) == bool)
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_struct_field_count"><span><a class="doc-id-link" href="#type_struct_field_count">type_struct_field_count<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_struct_field_count :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_struct"><span class="code-procedure">type_is_struct</span></a>(T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the number of fields in a <code>struct</code> type.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_struct_has_implicit_padding"><span><a class="doc-id-link" href="#type_struct_has_implicit_padding">type_struct_has_implicit_padding<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_struct_has_implicit_padding :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> <span class="keyword">where</span> <a href="/base/intrinsics#type_is_struct"><span class="code-procedure">type_is_struct</span></a>(T) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns whether the struct has any implicit padding to ensure correct alignment for the fields.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">Foo :: struct {x: u8, y: u32}
+assert(type_struct_has_implicit_padding(Foo) == true)
+</code></pre>
+</details>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_polymorphic_record_parameter_count"><span><a class="doc-id-link" href="#type_polymorphic_record_parameter_count">type_polymorphic_record_parameter_count<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_polymorphic_record_parameter_count :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <span class="keyword-type">typeid</span> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the number of parametric polymorphic parameters to a parametric polymorphic record type (<code>struct</code> or <code>union</code>). Fails if the type is not such a type.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_polymorphic_record_parameter_value"><span><a class="doc-id-link" href="#type_polymorphic_record_parameter_value">type_polymorphic_record_parameter_value<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_polymorphic_record_parameter_value :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>, index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> $V {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the value of a specifialized parametric polymorphic record type (<code>struct</code> or <code>union</code>) at a specified <code>index</code>. Fails if the type is not such a type.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_specialized_polymorphic_record"><span><a class="doc-id-link" href="#type_is_specialized_polymorphic_record">type_is_specialized_polymorphic_record<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_specialized_polymorphic_record :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the record type (<code>struct</code> or <code>union</code>) passed is a specialized polymorphic record. Returns false when the type is not polymorphic in the first place.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_unspecialized_polymorphic_record"><span><a class="doc-id-link" href="#type_is_unspecialized_polymorphic_record">type_is_unspecialized_polymorphic_record<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_unspecialized_polymorphic_record :: <span class="keyword-type">proc</span>($T: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if the record type (<code>struct</code> or <code>union</code>) passed is a unspecialized polymorphic record. Returns false when the type is not polymorphic in the first place.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_is_subtype_of"><span><a class="doc-id-link" href="#type_is_subtype_of">type_is_subtype_of<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">type_is_subtype_of :: <span class="keyword-type">proc</span>($T, $U: <span class="keyword-type">typeid</span>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if <code>T</code> is a subtype (i.e. <code>using</code> was applied on a field) to type <code>U</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="type_field_index_of"><span><a class="doc-id-link" href="#type_field_index_of">type_field_index_of<span class="a-hidden">&nbsp;¶</span></a></span></h3>
@@ -2316,6 +2704,7 @@ Will register a class value at run-time for the given constant string value.</p>
 <li><a href="#alloca">alloca</a></li>
 <li><a href="#cpu_relax">cpu_relax</a></li>
 <li><a href="#read_cycle_counter">read_cycle_counter</a></li>
+<li><a href="#read_cycle_counter_frequency">read_cycle_counter_frequency</a></li>
 <li><a href="#count_ones">count_ones</a></li>
 <li><a href="#count_zeros">count_zeros</a></li>
 <li><a href="#count_trailing_zeros">count_trailing_zeros</a></li>
@@ -2382,9 +2771,12 @@ Will register a class value at run-time for the given constant string value.</p>
 <li><a href="#type_is_float">type_is_float</a></li>
 <li><a href="#type_is_complex">type_is_complex</a></li>
 <li><a href="#type_is_quaternion">type_is_quaternion</a></li>
-<li><a href="#type_is_string">type_is_string</a></li>
 <li><a href="#type_is_typeid">type_is_typeid</a></li>
 <li><a href="#type_is_any">type_is_any</a></li>
+<li><a href="#type_is_string">type_is_string</a></li>
+<li><a href="#type_is_string16">type_is_string16</a></li>
+<li><a href="#type_is_cstring">type_is_cstring</a></li>
+<li><a href="#type_is_cstring16">type_is_cstring16</a></li>
 <li><a href="#type_is_endian_platform">type_is_endian_platform</a></li>
 <li><a href="#type_is_endian_little">type_is_endian_little</a></li>
 <li><a href="#type_is_endian_big">type_is_endian_big</a></li>
@@ -2396,6 +2788,7 @@ Will register a class value at run-time for the given constant string value.</p>
 <li><a href="#type_is_sliceable">type_is_sliceable</a></li>
 <li><a href="#type_is_comparable">type_is_comparable</a></li>
 <li><a href="#type_is_simple_compare">type_is_simple_compare</a></li>
+<li><a href="#type_is_nearly_simple_compare">type_is_nearly_simple_compare</a></li>
 <li><a href="#type_is_dereferenceable">type_is_dereferenceable</a></li>
 <li><a href="#type_is_valid_map_key">type_is_valid_map_key</a></li>
 <li><a href="#type_is_valid_matrix_elements">type_is_valid_matrix_elements</a></li>
@@ -2414,6 +2807,7 @@ Will register a class value at run-time for the given constant string value.</p>
 <li><a href="#type_is_bit_set">type_is_bit_set</a></li>
 <li><a href="#type_is_simd_vector">type_is_simd_vector</a></li>
 <li><a href="#type_is_matrix">type_is_matrix</a></li>
+<li><a href="#type_is_raw_union">type_is_raw_union</a></li>
 <li><a href="#type_has_nil">type_has_nil</a></li>
 <li><a href="#type_is_matrix_row_major">type_is_matrix_row_major</a></li>
 <li><a href="#type_is_matrix_column_major">type_is_matrix_column_major</a></li>

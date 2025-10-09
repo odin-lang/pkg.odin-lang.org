@@ -350,8 +350,9 @@
 <div>
 <details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
 <summary id="#doc-index-Types-header">
-Types (4)</summary>
+Types (5)</summary>
 <ul>
+<li><a href="#Generic_Cmp">Generic_Cmp</a></li>
 <li><a href="#Map_Entry">Map_Entry</a></li>
 <li><a href="#Map_Entry_Info">Map_Entry_Info</a></li>
 <li><a href="#Ordering">Ordering</a></li>
@@ -376,7 +377,7 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (105)</summary>
+Procedures (110)</summary>
 <ul>
 <li><a href="#all_of">all_of</a></li>
 <li><a href="#all_of_proc">all_of_proc</a></li>
@@ -462,10 +463,15 @@ Procedures (105)</summary>
 <li><a href="#sort">sort</a></li>
 <li><a href="#sort_by">sort_by</a></li>
 <li><a href="#sort_by_cmp">sort_by_cmp</a></li>
+<li><a href="#sort_by_cmp_with_data">sort_by_cmp_with_data</a></li>
+<li><a href="#sort_by_generic_cmp">sort_by_generic_cmp</a></li>
 <li><a href="#sort_by_indices_allocate">sort_by_indices_allocate</a></li>
 <li><a href="#sort_by_indices_overwrite">sort_by_indices_overwrite</a></li>
 <li><a href="#sort_by_key">sort_by_key</a></li>
+<li><a href="#sort_by_with_data">sort_by_with_data</a></li>
 <li><a href="#sort_by_with_indices">sort_by_with_indices</a></li>
+<li><a href="#sort_by_with_indices_with_data">sort_by_with_indices_with_data</a></li>
+<li><a href="#sort_from_permutation_indices">sort_from_permutation_indices</a></li>
 <li><a href="#sort_with_indices">sort_with_indices</a></li>
 <li><a href="#split_at">split_at</a></li>
 <li><a href="#split_first">split_first</a></li>
@@ -500,6 +506,16 @@ Procedure Groups (2)</summary>
 </div>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
+<div class="pkg-entity">
+<h3 id="Generic_Cmp"><span><a class="doc-id-link" href="#Generic_Cmp">Generic_Cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L9"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Generic_Cmp :: <span class="keyword-type">proc</span>(lhs, rhs: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, user_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a class="code-typename" href="/core/slice/#Ordering">Ordering</a></pre>
+</div>
+<h5>Related Procedures With Parameters</h5>
+<ul>
+<li><a href="/core/slice/#sort_by_generic_cmp">sort_by_generic_cmp</a></li>
+</ul>
+</div>
 <div class="pkg-entity">
 <h3 id="Map_Entry"><span><a class="doc-id-link" href="#Map_Entry">Map_Entry<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/map.odin#L28"><em>Source</em></a></div></h3>
 <div>
@@ -702,13 +718,13 @@ e.g.:
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="cmp"><span><a class="doc-id-link" href="#cmp">cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L10"><em>Source</em></a></div></h3>
+<h3 id="cmp"><span><a class="doc-id-link" href="#cmp">cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L12"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">cmp :: <span class="keyword-type">proc</span>(a, b: $E) -> <a class="code-typename" href="/core/slice/#Ordering">Ordering</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="cmp_proc"><span><a class="doc-id-link" href="#cmp_proc">cmp_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L21"><em>Source</em></a></div></h3>
+<h3 id="cmp_proc"><span><a class="doc-id-link" href="#cmp_proc">cmp_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L23"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">cmp_proc :: <span class="keyword-type">proc</span>($E: <a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a>) -> <span class="keyword-type">proc</span>(<a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a>, <a href="/base/builtin#typeid"><span class="doc-builtin">typeid</span></a>) -> <a class="code-typename" href="/core/slice/#Ordering">Ordering</a> {…}</pre>
 </div>
@@ -864,31 +880,31 @@ e.g.:
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="is_sorted"><span><a class="doc-id-link" href="#is_sorted">is_sorted<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L150"><em>Source</em></a></div></h3>
+<h3 id="is_sorted"><span><a class="doc-id-link" href="#is_sorted">is_sorted<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L312"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_sorted :: <span class="keyword-type">proc</span>(array: $T/[]$E) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="is_sorted_by"><span><a class="doc-id-link" href="#is_sorted_by">is_sorted_by<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L160"><em>Source</em></a></div></h3>
+<h3 id="is_sorted_by"><span><a class="doc-id-link" href="#is_sorted_by">is_sorted_by<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L322"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_sorted_by :: <span class="keyword-type">proc</span>(array: $T/[]$E, less: <span class="keyword-type">proc</span>(i, j: $E) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="is_sorted_by_cmp"><span><a class="doc-id-link" href="#is_sorted_by_cmp">is_sorted_by_cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L172"><em>Source</em></a></div></h3>
+<h3 id="is_sorted_by_cmp"><span><a class="doc-id-link" href="#is_sorted_by_cmp">is_sorted_by_cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L334"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_sorted_by_cmp :: <a class="code-procedure" href="/core/slice/#is_sorted_cmp">is_sorted_cmp</a></pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="is_sorted_by_key"><span><a class="doc-id-link" href="#is_sorted_by_key">is_sorted_by_key<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L225"><em>Source</em></a></div></h3>
+<h3 id="is_sorted_by_key"><span><a class="doc-id-link" href="#is_sorted_by_key">is_sorted_by_key<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L410"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_sorted_by_key :: <span class="keyword-type">proc</span>(array: $T/[]$E, key: <span class="keyword-type">proc</span>($E) -> $K) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="is_sorted_cmp"><span><a class="doc-id-link" href="#is_sorted_cmp">is_sorted_cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L172"><em>Source</em></a></div></h3>
+<h3 id="is_sorted_cmp"><span><a class="doc-id-link" href="#is_sorted_cmp">is_sorted_cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L334"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_sorted_cmp :: <span class="keyword-type">proc</span>(array: $T/[]$E, cmp: <span class="keyword-type">proc</span>(i, j: $E) -> <a class="code-typename" href="/core/slice/#Ordering">Ordering</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -1133,31 +1149,31 @@ slice.prefix_length([]u8{1, 2, 3, 4}, []u8{2, 3, 4}) -&gt; 0</p>
 <div class="pkg-entity">
 <h3 id="ptr_add"><span><a class="doc-id-link" href="#ptr_add">ptr_add<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/ptr.odin#L6"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">ptr_add :: <span class="keyword-type">proc</span>(p: ^$T, x: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> ^$T {…}</pre>
+<pre class="doc-code">ptr_add :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (p: ^$T, x: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> ^$T {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="ptr_rotate"><span><a class="doc-id-link" href="#ptr_rotate">ptr_rotate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/ptr.odin#L71"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">ptr_rotate :: <span class="keyword-type">proc</span>(left: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, mid: ^$T, right: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+<pre class="doc-code">ptr_rotate :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (left: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, mid: ^$T, right: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="ptr_sub"><span><a class="doc-id-link" href="#ptr_sub">ptr_sub<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/ptr.odin#L9"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">ptr_sub :: <span class="keyword-type">proc</span>(p: ^$T, x: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> ^$T {…}</pre>
+<pre class="doc-code">ptr_sub :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (p: ^$T, x: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> ^$T {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="ptr_swap_non_overlapping"><span><a class="doc-id-link" href="#ptr_swap_non_overlapping">ptr_swap_non_overlapping<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/ptr.odin#L13"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">ptr_swap_non_overlapping :: <span class="keyword-type">proc</span>(x, y: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+<pre class="doc-code">ptr_swap_non_overlapping :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (x, y: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
 <h3 id="ptr_swap_overlapping"><span><a class="doc-id-link" href="#ptr_swap_overlapping">ptr_swap_overlapping<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/ptr.odin#L47"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">ptr_swap_overlapping :: <span class="keyword-type">proc</span>(x, y: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+<pre class="doc-code">ptr_swap_overlapping :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (x, y: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -1228,25 +1244,25 @@ reinterpret_example :: proc() {
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="reverse_sort"><span><a class="doc-id-link" href="#reverse_sort">reverse_sort<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L183"><em>Source</em></a></div></h3>
+<h3 id="reverse_sort"><span><a class="doc-id-link" href="#reverse_sort">reverse_sort<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L345"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">reverse_sort :: <span class="keyword-type">proc</span>(data: $T/[]$E) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="reverse_sort_by"><span><a class="doc-id-link" href="#reverse_sort_by">reverse_sort_by<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L190"><em>Source</em></a></div></h3>
+<h3 id="reverse_sort_by"><span><a class="doc-id-link" href="#reverse_sort_by">reverse_sort_by<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L352"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">reverse_sort_by :: <span class="keyword-type">proc</span>(data: $T/[]$E, less: <span class="keyword-type">proc</span>(i, j: $E) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="reverse_sort_by_cmp"><span><a class="doc-id-link" href="#reverse_sort_by_cmp">reverse_sort_by_cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L198"><em>Source</em></a></div></h3>
+<h3 id="reverse_sort_by_cmp"><span><a class="doc-id-link" href="#reverse_sort_by_cmp">reverse_sort_by_cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L359"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">reverse_sort_by_cmp :: <span class="keyword-type">proc</span>(data: $T/[]$E, cmp: <span class="keyword-type">proc</span>(i, j: $E) -> <a class="code-typename" href="/core/slice/#Ordering">Ordering</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="reverse_sort_by_key"><span><a class="doc-id-link" href="#reverse_sort_by_key">reverse_sort_by_key<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L216"><em>Source</em></a></div></h3>
+<h3 id="reverse_sort_by_key"><span><a class="doc-id-link" href="#reverse_sort_by_key">reverse_sort_by_key<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L389"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">reverse_sort_by_key :: <span class="keyword-type">proc</span>(data: $T/[]$E, key: <span class="keyword-type">proc</span>($E) -> $K) {…}</pre>
 </div>
@@ -1286,7 +1302,7 @@ reinterpret_example :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="sort"><span><a class="doc-id-link" href="#sort">sort<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L35"><em>Source</em></a></div></h3>
+<h3 id="sort"><span><a class="doc-id-link" href="#sort">sort<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L37"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sort :: <span class="keyword-type">proc</span>(data: $T/[]$E) {…}</pre>
 </div>
@@ -1297,7 +1313,7 @@ This sort is not guaranteed to be stable</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="sort_by"><span><a class="doc-id-link" href="#sort_by">sort_by<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L91"><em>Source</em></a></div></h3>
+<h3 id="sort_by"><span><a class="doc-id-link" href="#sort_by">sort_by<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L134"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sort_by :: <span class="keyword-type">proc</span>(data: $T/[]$E, less: <span class="keyword-type">proc</span>(i, j: $E) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1308,25 +1324,37 @@ This sort is not guaranteed to be stable</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="sort_by_cmp"><span><a class="doc-id-link" href="#sort_by_cmp">sort_by_cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L115"><em>Source</em></a></div></h3>
+<h3 id="sort_by_cmp"><span><a class="doc-id-link" href="#sort_by_cmp">sort_by_cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L241"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sort_by_cmp :: <span class="keyword-type">proc</span>(data: $T/[]$E, cmp: <span class="keyword-type">proc</span>(i, j: $E) -> <a class="code-typename" href="/core/slice/#Ordering">Ordering</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="sort_by_indices_allocate"><span><a class="doc-id-link" href="#sort_by_indices_allocate">sort_by_indices_allocate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L46"><em>Source</em></a></div></h3>
+<h3 id="sort_by_cmp_with_data"><span><a class="doc-id-link" href="#sort_by_cmp_with_data">sort_by_cmp_with_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L255"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">sort_by_cmp_with_data :: <span class="keyword-type">proc</span>(data: $T/[]$E, cmp: <span class="keyword-type">proc</span>(i, j: $E, user_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a class="code-typename" href="/core/slice/#Ordering">Ordering</a>, user_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="sort_by_generic_cmp"><span><a class="doc-id-link" href="#sort_by_generic_cmp">sort_by_generic_cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L275"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">sort_by_generic_cmp :: <span class="keyword-type">proc</span>(data: $T/[]$E, cmp: <a class="code-typename" href="/core/slice/#Generic_Cmp">Generic_Cmp</a>, user_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="sort_by_indices_allocate"><span><a class="doc-id-link" href="#sort_by_indices_allocate">sort_by_indices_allocate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L57"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sort_by_indices_allocate :: <span class="keyword-type">proc</span>(data: $T/[]$E, indices: []<a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (sorted: $T/[]$E) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="sort_by_indices_overwrite"><span><a class="doc-id-link" href="#sort_by_indices_overwrite">sort_by_indices_overwrite<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L63"><em>Source</em></a></div></h3>
+<h3 id="sort_by_indices_overwrite"><span><a class="doc-id-link" href="#sort_by_indices_overwrite">sort_by_indices_overwrite<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L74"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sort_by_indices_overwrite :: <span class="keyword-type">proc</span>(data: $T/[]$E, indices: []<a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="sort_by_key"><span><a class="doc-id-link" href="#sort_by_key">sort_by_key<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L208"><em>Source</em></a></div></h3>
+<h3 id="sort_by_key"><span><a class="doc-id-link" href="#sort_by_key">sort_by_key<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L369"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sort_by_key :: <span class="keyword-type">proc</span>(data: $T/[]$E, key: <span class="keyword-type">proc</span>($E) -> $K) {…}</pre>
 </div>
@@ -1336,7 +1364,13 @@ This sort is not guaranteed to be stable</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="sort_by_with_indices"><span><a class="doc-id-link" href="#sort_by_with_indices">sort_by_with_indices<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L101"><em>Source</em></a></div></h3>
+<h3 id="sort_by_with_data"><span><a class="doc-id-link" href="#sort_by_with_data">sort_by_with_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L151"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">sort_by_with_data :: <span class="keyword-type">proc</span>(data: $T/[]$E, less: <span class="keyword-type">proc</span>(i, j: $E, user_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, user_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="sort_by_with_indices"><span><a class="doc-id-link" href="#sort_by_with_indices">sort_by_with_indices<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L176"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sort_by_with_indices :: <span class="keyword-type">proc</span>(data: $T/[]$E, less: <span class="keyword-type">proc</span>(i, j: $E) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (indices: []<a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
@@ -1347,7 +1381,19 @@ This sort is not guaranteed to be stable</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="sort_with_indices"><span><a class="doc-id-link" href="#sort_with_indices">sort_with_indices<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L75"><em>Source</em></a></div></h3>
+<h3 id="sort_by_with_indices_with_data"><span><a class="doc-id-link" href="#sort_by_with_indices_with_data">sort_by_with_indices_with_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L208"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">sort_by_with_indices_with_data :: <span class="keyword-type">proc</span>(data: $T/[]$E, less: <span class="keyword-type">proc</span>(i, j: $E, user_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>, user_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (indices: []<a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="sort_from_permutation_indices"><span><a class="doc-id-link" href="#sort_from_permutation_indices">sort_from_permutation_indices<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L84"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">sort_from_permutation_indices :: <span class="keyword-type">proc</span>(data: $T/[]$E, indices: []<a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="sort_with_indices"><span><a class="doc-id-link" href="#sort_with_indices">sort_with_indices<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L103"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sort_with_indices :: <span class="keyword-type">proc</span>(data: $T/[]$E, allocator := <a href="/base/runtime/#Context">context.allocator</a>) -> (indices: []<a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) {…}</pre>
 </div>
@@ -1376,7 +1422,7 @@ This sort is not guaranteed to be stable</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="stable_sort"><span><a class="doc-id-link" href="#stable_sort">stable_sort<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L124"><em>Source</em></a></div></h3>
+<h3 id="stable_sort"><span><a class="doc-id-link" href="#stable_sort">stable_sort<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L286"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stable_sort :: <span class="keyword-type">proc</span>(data: $T/[]$E) {…}</pre>
 </div>
@@ -1386,7 +1432,7 @@ This sort is not guaranteed to be stable</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="stable_sort_by"><span><a class="doc-id-link" href="#stable_sort_by">stable_sort_by<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L133"><em>Source</em></a></div></h3>
+<h3 id="stable_sort_by"><span><a class="doc-id-link" href="#stable_sort_by">stable_sort_by<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L295"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stable_sort_by :: <span class="keyword-type">proc</span>(data: $T/[]$E, less: <span class="keyword-type">proc</span>(i, j: $E) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -1396,7 +1442,7 @@ This sort is not guaranteed to be stable</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="stable_sort_by_cmp"><span><a class="doc-id-link" href="#stable_sort_by_cmp">stable_sort_by_cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L141"><em>Source</em></a></div></h3>
+<h3 id="stable_sort_by_cmp"><span><a class="doc-id-link" href="#stable_sort_by_cmp">stable_sort_by_cmp<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L303"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stable_sort_by_cmp :: <span class="keyword-type">proc</span>(data: $T/[]$E, cmp: <span class="keyword-type">proc</span>(i, j: $E) -> <a class="code-typename" href="/core/slice/#Ordering">Ordering</a>) {…}</pre>
 </div>
@@ -1505,7 +1551,7 @@ The procedures modifies the slice in-place and returns the modified slice.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="sort_by_indices"><span><a class="doc-id-link" href="#sort_by_indices">sort_by_indices<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L44"><em>Source</em></a></div></h3>
+<h3 id="sort_by_indices"><span><a class="doc-id-link" href="#sort_by_indices">sort_by_indices<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort.odin#L55"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sort_by_indices :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/slice/#sort_by_indices_allocate">sort_by_indices_allocate</a>,
@@ -1525,12 +1571,13 @@ The procedures modifies the slice in-place and returns the modified slice.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/slice/sort_private.odin">sort_private.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-08 21:13:18.743077300 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 09:49:15.786203600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
 <ul>
 <li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#Generic_Cmp">Generic_Cmp</a></li>
 <li><a href="#Map_Entry">Map_Entry</a></li>
 <li><a href="#Map_Entry_Info">Map_Entry_Info</a></li>
 <li><a href="#Ordering">Ordering</a></li>
@@ -1622,10 +1669,15 @@ The procedures modifies the slice in-place and returns the modified slice.</p>
 <li><a href="#sort">sort</a></li>
 <li><a href="#sort_by">sort_by</a></li>
 <li><a href="#sort_by_cmp">sort_by_cmp</a></li>
+<li><a href="#sort_by_cmp_with_data">sort_by_cmp_with_data</a></li>
+<li><a href="#sort_by_generic_cmp">sort_by_generic_cmp</a></li>
 <li><a href="#sort_by_indices_allocate">sort_by_indices_allocate</a></li>
 <li><a href="#sort_by_indices_overwrite">sort_by_indices_overwrite</a></li>
 <li><a href="#sort_by_key">sort_by_key</a></li>
+<li><a href="#sort_by_with_data">sort_by_with_data</a></li>
 <li><a href="#sort_by_with_indices">sort_by_with_indices</a></li>
+<li><a href="#sort_by_with_indices_with_data">sort_by_with_indices_with_data</a></li>
+<li><a href="#sort_from_permutation_indices">sort_from_permutation_indices</a></li>
 <li><a href="#sort_with_indices">sort_with_indices</a></li>
 <li><a href="#split_at">split_at</a></li>
 <li><a href="#split_first">split_first</a></li>
