@@ -349,58 +349,7 @@
 <div id="pkg-top">
 <h2>Overview</h2>
 <div id="pkg-overview">
-<p>Package list implements an intrusive doubly-linked list.</p>
-<p>An intrusive container requires a <code>Node</code> to be embedded in your own structure, like this.</p>
-<details open class="code-example">
-<summary><b>Example:</b></summary>
-<pre><code class="hljs language-odin" data-lang="odin">My_String :: struct {
-	node:  list.Node,
-	value: string,
-}
-</code></pre>
-</details>
-<p>Embedding the members of a <code>list.Node</code> in your structure with the <code>using</code> keyword is also allowed.</p>
-<details open class="code-example">
-<summary><b>Example:</b></summary>
-<pre><code class="hljs language-odin" data-lang="odin">My_String :: struct {
-	using node: list.Node,
-	value: string,
-}
-</code></pre>
-</details>
-<p>Here is a full example.</p>
-<details open class="code-example">
-<summary><b>Example:</b></summary>
-<pre><code class="hljs language-odin" data-lang="odin">package test
-
-import "core:fmt"
-import "core:container/intrusive/list"
-
-main :: proc() {
-    l: list.List
-
-    one := My_String{value="Hello"}
-    two := My_String{value="World"}
-
-    list.push_back(&l, &one.node)
-    list.push_back(&l, &two.node)
-
-    iter := list.iterator_head(l, My_String, "node")
-    for s in list.iterate_next(&iter) {
-        fmt.println(s.value)
-    }
-}
-
-My_String :: struct {
-    node:  list.Node,
-    value: string,
-}
-</code></pre>
-</details>
-<b>Output:</b>
-<pre class="doc-code">Hello
-World
-</pre>
+<p>package list implements an intrusive doubly-linked list.</p>
 </div>
 <div id="pkg-index">
 <h2>Index</h2>
@@ -793,7 +742,7 @@ My_Prev_Struct :: struct {
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/container/intrusive/list/intrusive_list.odin">intrusive_list.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 12:37:57.159776000 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 13:33:48.127182600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

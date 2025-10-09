@@ -695,6 +695,7 @@ Procedure Groups (2)</summary>
 	<span class="keyword-type">using</span> node: <a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	open:  odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	tag:   ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	len:   ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	<span class="comment">// Unary_Expr node for [?]T array types, nil for slice types</span>
 	close: odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
@@ -937,6 +938,7 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">Bit_Field_Field :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node: <a class="code-typename" href="/core/odin/ast/#Node">Node</a>,
 	docs:     ^<a class="code-typename" href="/core/odin/ast/#Comment_Group">Comment_Group</a>,
+	<span class="comment">// possibly nil</span>
 	name:     ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	type:     ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	bit_size: ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
@@ -991,6 +993,7 @@ Procedure Groups (2)</summary>
 	open:       odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	elem:       ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	underlying: ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	close:      odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 }</pre>
 </div>
@@ -1137,6 +1140,7 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">Comp_Lit :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node: <a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	type:  ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// nil when type is inferred</span>
 	open:  odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	elems: []^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	close: odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
@@ -1262,6 +1266,7 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">Dynamic_Array_Type :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node:  <a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	tag:         ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	open:        odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	dynamic_pos: odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	close:       odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
@@ -1338,6 +1343,7 @@ Procedure Groups (2)</summary>
 	<span class="keyword-type">using</span> node: <a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	tok_pos:   odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	base_type: ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	open:      odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	fields:    []^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	close:     odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
@@ -1412,10 +1418,12 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">Field :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node:    <a class="code-typename" href="/core/odin/ast/#Node">Node</a>,
 	docs:          ^<a class="code-typename" href="/core/odin/ast/#Comment_Group">Comment_Group</a>,
+	<span class="comment">// possibly nil</span>
 	names:         []^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	<span class="comment">// Could be polymorphic</span>
 	type:          ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	default_value: ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	tag:           odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Token">Token</a>,
 	flags:         <a class="code-typename" href="/core/odin/ast/#Field_Flags">Field_Flags</a>,
 	comment:       ^<a class="code-typename" href="/core/odin/ast/#Comment_Group">Comment_Group</a>,
@@ -1525,6 +1533,7 @@ Procedure Groups (2)</summary>
 	src:                  <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
 	tags:                 [<span class="keyword">dynamic</span>]odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Token">Token</a>,
 	docs:                 ^<a class="code-typename" href="/core/odin/ast/#Comment_Group">Comment_Group</a>,
+	<span class="comment">// possibly nil</span>
 	pkg_decl:             ^<a class="code-typename" href="/core/odin/ast/#Package_Decl">Package_Decl</a>,
 	pkg_token:            odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Token">Token</a>,
 	pkg_name:             <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
@@ -1552,10 +1561,14 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">For_Stmt :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node: <a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
 	label:   ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	for_pos: odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	init:    ^<a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
+	<span class="comment">// possibly nil</span>
 	cond:    ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	post:    ^<a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
+	<span class="comment">// possibly nil</span>
 	body:    ^<a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
 }</pre>
 </div>
@@ -1579,10 +1592,12 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">Foreign_Block_Decl :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node:      <a class="code-typename" href="/core/odin/ast/#Decl">Decl</a>,
 	docs:            ^<a class="code-typename" href="/core/odin/ast/#Comment_Group">Comment_Group</a>,
+	<span class="comment">// possibly nil</span>
 	attributes:      [<span class="keyword">dynamic</span>]^<a class="code-typename" href="/core/odin/ast/#Attribute">Attribute</a>,
 	<span class="comment">// dynamic as parsing will add to them lazily</span>
 	tok:             odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Token">Token</a>,
 	foreign_library: ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	body:            ^<a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
 }</pre>
 </div>
@@ -1610,11 +1625,13 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">Foreign_Import_Decl :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node:      <a class="code-typename" href="/core/odin/ast/#Decl">Decl</a>,
 	docs:            ^<a class="code-typename" href="/core/odin/ast/#Comment_Group">Comment_Group</a>,
+	<span class="comment">// possibly nil</span>
 	attributes:      [<span class="keyword">dynamic</span>]^<a class="code-typename" href="/core/odin/ast/#Attribute">Attribute</a>,
 	<span class="comment">// dynamic as parsing will add to them lazily</span>
 	foreign_tok:     odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Token">Token</a>,
 	import_tok:      odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Token">Token</a>,
 	name:            ^<a class="code-typename" href="/core/odin/ast/#Ident">Ident</a>,
+	<span class="comment">// possibly nil</span>
 	collection_name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
 	fullpaths:       []^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	comment:         ^<a class="code-typename" href="/core/odin/ast/#Comment_Group">Comment_Group</a>,
@@ -1693,8 +1710,10 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">If_Stmt :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node: <a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
 	label:     ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	if_pos:    odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	init:      ^<a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
+	<span class="comment">// possibly nil</span>
 	cond:      ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	body:      ^<a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
 	else_pos:  odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
@@ -1769,6 +1788,7 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">Import_Decl :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node: <a class="code-typename" href="/core/odin/ast/#Decl">Decl</a>,
 	docs:       ^<a class="code-typename" href="/core/odin/ast/#Comment_Group">Comment_Group</a>,
+	<span class="comment">// possibly nil</span>
 	attributes: [<span class="keyword">dynamic</span>]^<a class="code-typename" href="/core/odin/ast/#Attribute">Attribute</a>,
 	<span class="comment">// dynamic as parsing will add to them lazily</span>
 	is_using:   <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
@@ -2137,6 +2157,7 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">Package_Decl :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node: <a class="code-typename" href="/core/odin/ast/#Decl">Decl</a>,
 	docs:    ^<a class="code-typename" href="/core/odin/ast/#Comment_Group">Comment_Group</a>,
+	<span class="comment">// possibly nil</span>
 	token:   odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Token">Token</a>,
 	name:    <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
 	comment: ^<a class="code-typename" href="/core/odin/ast/#Comment_Group">Comment_Group</a>,
@@ -2202,6 +2223,7 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">Pointer_Type :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node: <a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	tag:     ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	pointer: odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	elem:    ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 }</pre>
@@ -2309,6 +2331,7 @@ Procedure Groups (2)</summary>
 	<span class="keyword-type">using</span> node:    <a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	type:          ^<a class="code-typename" href="/core/odin/ast/#Proc_Type">Proc_Type</a>,
 	body:          ^<a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
+	<span class="comment">// nil when it represents a foreign procedure</span>
 	tags:          <a class="code-typename" href="/core/odin/ast/#Proc_Tags">Proc_Tags</a>,
 	inlining:      <a class="code-typename" href="/core/odin/ast/#Proc_Inlining">Proc_Inlining</a>,
 	where_token:   odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Token">Token</a>,
@@ -2385,6 +2408,7 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">Range_Stmt :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node: <a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
 	label:   ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	for_pos: odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	vals:    []^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	in_pos:  odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
@@ -2514,8 +2538,10 @@ Procedure Groups (2)</summary>
 	expr:     ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	open:     odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	low:      ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	interval: odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Token">Token</a>,
 	high:     ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	close:    odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 }</pre>
 </div>
@@ -2564,9 +2590,13 @@ Procedure Groups (2)</summary>
 	<span class="keyword-type">using</span> node:      <a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	tok_pos:         odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	poly_params:     ^<a class="code-typename" href="/core/odin/ast/#Field_List">Field_List</a>,
+	<span class="comment">// possibly nil</span>
 	align:           ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	min_field_align: ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	max_field_align: ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	where_token:     odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Token">Token</a>,
 	where_clauses:   []^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	is_packed:       <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
@@ -2598,8 +2628,10 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">Switch_Stmt :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node: <a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
 	label:      ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	switch_pos: odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	init:       ^<a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
+	<span class="comment">// possibly nil</span>
 	cond:       ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	body:       ^<a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
 	partial:    <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
@@ -2787,6 +2819,7 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">Type_Switch_Stmt :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node: <a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
 	label:      ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	switch_pos: odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	tag:        ^<a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
 	expr:       ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
@@ -2893,7 +2926,9 @@ Procedure Groups (2)</summary>
 	<span class="keyword-type">using</span> node:    <a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	tok_pos:       odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	poly_params:   ^<a class="code-typename" href="/core/odin/ast/#Field_List">Field_List</a>,
+	<span class="comment">// possibly nil</span>
 	align:         ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	kind:          <a class="code-typename" href="/core/odin/ast/#Union_Type_Kind">Union_Type_Kind</a>,
 	where_token:   odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Token">Token</a>,
 	where_clauses: []^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
@@ -2933,11 +2968,13 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">Unroll_Range_Stmt :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node: <a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
 	label:      ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	unroll_pos: odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	args:       []^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	for_pos:    odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	val0:       ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	val1:       ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	in_pos:     odin_tokenizer.<a class="code-typename" href="/core/odin/tokenizer/#Pos">Pos</a>,
 	expr:       ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	body:       ^<a class="code-typename" href="/core/odin/ast/#Stmt">Stmt</a>,
@@ -2985,12 +3022,15 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">Value_Decl :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> node: <a class="code-typename" href="/core/odin/ast/#Decl">Decl</a>,
 	docs:       ^<a class="code-typename" href="/core/odin/ast/#Comment_Group">Comment_Group</a>,
+	<span class="comment">// possibly nil</span>
 	attributes: [<span class="keyword">dynamic</span>]^<a class="code-typename" href="/core/odin/ast/#Attribute">Attribute</a>,
 	<span class="comment">// dynamic as parsing will add to them lazily</span>
 	names:      []^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	type:       ^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
+	<span class="comment">// possibly nil</span>
 	values:     []^<a class="code-typename" href="/core/odin/ast/#Expr">Expr</a>,
 	comment:    ^<a class="code-typename" href="/core/odin/ast/#Comment_Group">Comment_Group</a>,
+	<span class="comment">// possibly nil</span>
 	is_using:   <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
 	is_mutable: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
 }</pre>
@@ -3227,7 +3267,7 @@ each of the non-nil children of node, followed by a call of the new visit proced
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/odin/ast/walk.odin">walk.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 12:37:57.522216200 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 13:33:48.453479800 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
