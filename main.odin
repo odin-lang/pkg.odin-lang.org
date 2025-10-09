@@ -767,6 +767,14 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 			first, _, _ := strings.partition(intrinsics_docs, ".")
 			write_doc_line(w, first)
 			io.write_string(w, `.`)
+		} else if dir.name == "runtime" {
+			first := "package runtime provides all of the declarations needed by all Odin code-bases"
+			write_doc_line(w, first)
+			io.write_string(w, `.`)
+		} else if dir.name == "sanitizer" {
+			first := "package sanitizer implements various procedures for interacting with sanitizers from user code"
+			write_doc_line(w, first)
+			io.write_string(w, `.`)
 		} else {
 			if dir.dir == "sys" {
 				io.write_string(w, `Platform specific packages - documentation may be for a specific platform only`)
