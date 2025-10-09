@@ -153,8 +153,6 @@ intrinsics_table := []Builtin{
 	Acq_Rel = 4,
 	Seq_Cst = 5,
 }`,
-		comment = "An enumeration of atomic memory orderings used by the `atomic_*_explicit` intrinsics that determines which atomic instructions on the same address they synchronize with."+
-		"This follows the same memory model as C11/C++11.",
 	},
 
 

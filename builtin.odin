@@ -566,7 +566,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 			}
 
 			// NOTE(bill): This gets the comments from the `core:sync` package, to minimize documentation duplication
-			atomic_docs: if strings.has_prefix(name, "atomic_") {
+			atomic_docs: if strings.has_prefix(name, "atomic_") || strings.has_prefix(name, "Atomic_") {
 				atomic_name := name
 
 				core     := (&cfg._collections["core"]) or_break atomic_docs
