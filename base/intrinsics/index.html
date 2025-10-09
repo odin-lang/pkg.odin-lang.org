@@ -972,6 +972,9 @@ Represents an Objective-C <code>Class</code> type.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Adds a "fence" to introduce a "happens-before" edges between operations.</p>
+<p>Establish memory ordering.</p>
+<p>This procedure establishes memory ordering, without an associated atomic
+operation.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -982,6 +985,11 @@ Represents an Objective-C <code>Class</code> type.</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Adds a "fence" to introduce a "happens-before" edges between operations.</p>
+<p>Establish memory ordering between a current thread and a signal handler.</p>
+<p>This procedure establishes memory ordering between a thread and a signal
+handler, that run on the same thread, without an associated atomic operation.
+This procedure is equivalent to <code>atomic_thread_fence</code>, except it doesn't
+issue any CPU instructions for memory ordering.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -991,6 +999,9 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically store a value into memory.</p>
+<p>This procedure stores a value to a memory location in such a way that no other
+thread is able to see partial reads. This operation is sequentially-consistent.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1000,6 +1011,10 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically store a value into memory with explicit memory ordering.</p>
+<p>This procedure stores a value to a memory location in such a way that no other
+thread is able to see partial reads. The memory ordering of this operation is
+as specified by the <code>order</code> parameter.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1009,6 +1024,10 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically load a value from memory.</p>
+<p>This procedure loads a value from a memory location in such a way that the
+received value is not a partial read. The memory ordering of this operation is
+sequentially-consistent.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1018,6 +1037,10 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically load a value from memory with explicit memory ordering.</p>
+<p>This procedure loads a value from a memory location in such a way that the
+received value is not a partial read. The memory ordering of this operation
+is as specified by the <code>order</code> parameter.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1027,6 +1050,14 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically add a value to the value stored in memory.</p>
+<p>This procedure loads a value from memory, adds the specified value to it, and
+stores it back as an atomic operation. This operation is an atomic equivalent
+of the following:</p>
+<pre>dst^ += val
+
+</pre>
+<p>The memory ordering of this operation is sequentially-consistent.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1036,6 +1067,14 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically add a value to the value stored in memory.</p>
+<p>This procedure loads a value from memory, adds the specified value to it, and
+stores it back as an atomic operation. This operation is an atomic equivalent
+of the following:</p>
+<pre>dst^ += val
+
+</pre>
+<p>The memory ordering of this operation is as specified by the <code>order</code> parameter.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1045,6 +1084,14 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically subtract a value from the value stored in memory.</p>
+<p>This procedure loads a value from memory, subtracts the specified value from it,
+and stores the result back as an atomic operation. This operation is an atomic
+equivalent of the following:</p>
+<pre>dst^ -= val
+
+</pre>
+<p>The memory ordering of this operation is sequentially-consistent.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1054,6 +1101,14 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically subtract a value from the value stored in memory.</p>
+<p>This procedure loads a value from memory, subtracts the specified value from it,
+and stores the result back as an atomic operation. This operation is an atomic
+equivalent of the following:</p>
+<pre>dst^ -= val
+
+</pre>
+<p>The memory ordering of this operation is as specified by the <code>order</code> parameter.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1063,6 +1118,16 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically replace the memory location with the result of AND operation with
+the specified value.</p>
+<p>This procedure loads a value from memory, calculates the result of AND operation
+between the loaded value and the specified value, and stores it back into the
+same memory location as an atomic operation. This operation is an atomic
+equivalent of the following:</p>
+<pre>dst^ &= val
+
+</pre>
+<p>The memory ordering of this operation is sequentially-consistent.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1072,6 +1137,16 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically replace the memory location with the result of AND operation with
+the specified value.</p>
+<p>This procedure loads a value from memory, calculates the result of AND operation
+between the loaded value and the specified value, and stores it back into the
+same memory location as an atomic operation. This operation is an atomic
+equivalent of the following:</p>
+<pre>dst^ &= val
+
+</pre>
+<p>The memory ordering of this operation is as specified by the <code>order</code> parameter.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1081,6 +1156,16 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically replace the memory location with the result of NAND operation with
+the specified value.</p>
+<p>This procedure loads a value from memory, calculates the result of NAND operation
+between the loaded value and the specified value, and stores it back into the
+same memory location as an atomic operation. This operation is an atomic
+equivalent of the following:</p>
+<pre>dst^ = ~(dst^ & val)
+
+</pre>
+<p>The memory ordering of this operation is sequentially-consistent.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1090,6 +1175,16 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically replace the memory location with the result of NAND operation with
+the specified value.</p>
+<p>This procedure loads a value from memory, calculates the result of NAND operation
+between the loaded value and the specified value, and stores it back into the
+same memory location as an atomic operation. This operation is an atomic
+equivalent of the following:</p>
+<pre>dst^ = ~(dst^ & val)
+
+</pre>
+<p>The memory ordering of this operation is as specified by the <code>order</code> parameter.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1099,6 +1194,16 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically replace the memory location with the result of OR operation with
+the specified value.</p>
+<p>This procedure loads a value from memory, calculates the result of OR operation
+between the loaded value and the specified value, and stores it back into the
+same memory location as an atomic operation. This operation is an atomic
+equivalent of the following:</p>
+<pre>dst^ |= val
+
+</pre>
+<p>The memory ordering of this operation is sequentially-consistent.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1108,6 +1213,16 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically replace the memory location with the result of OR operation with
+the specified value.</p>
+<p>This procedure loads a value from memory, calculates the result of OR operation
+between the loaded value and the specified value, and stores it back into the
+same memory location as an atomic operation. This operation is an atomic
+equivalent of the following:</p>
+<pre>dst^ |= val
+
+</pre>
+<p>The memory ordering of this operation is as specified by the <code>order</code> parameter.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1117,6 +1232,16 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically replace the memory location with the result of XOR operation with
+the specified value.</p>
+<p>This procedure loads a value from memory, calculates the result of XOR operation
+between the loaded value and the specified value, and stores it back into the
+same memory location as an atomic operation. This operation is an atomic
+equivalent of the following:</p>
+<pre>dst^ ~= val
+
+</pre>
+<p>The memory ordering of this operation is sequentially-consistent.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1126,6 +1251,16 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically replace the memory location with the result of XOR operation with
+the specified value.</p>
+<p>This procedure loads a value from memory, calculates the result of XOR operation
+between the loaded value and the specified value, and stores it back into the
+same memory location as an atomic operation. This operation is an atomic
+equivalent of the following:</p>
+<pre>dst^ ~= val
+
+</pre>
+<p>The memory ordering of this operation is as specified by the <code>order</code> parameter.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1135,6 +1270,17 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically exchange the value in a memory location, with the specified value.</p>
+<p>This procedure loads a value from the specified memory location, and stores the
+specified value into that memory location. Then the loaded value is returned,
+all done in a single atomic operation. This operation is an atomic equivalent
+of the following:</p>
+<pre>tmp := dst^
+dst^ = val
+return tmp
+
+</pre>
+<p>The memory ordering of this operation is sequentially-consistent.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1144,6 +1290,17 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically exchange the value in a memory location, with the specified value.</p>
+<p>This procedure loads a value from the specified memory location, and stores the
+specified value into that memory location. Then the loaded value is returned,
+all done in a single atomic operation. This operation is an atomic equivalent
+of the following:</p>
+<pre>tmp := dst^
+dst^ = val
+return tmp
+
+</pre>
+<p>The memory ordering of this operation is as specified by the <code>order</code> parameter.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1153,6 +1310,29 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically compare and exchange the value with a memory location.</p>
+<p>This procedure checks if the value pointed to by the <code>dst</code> parameter is equal
+to <code>old</code>, and if they are, it stores the value <code>new</code> into the memory location,
+all done in a single atomic operation. This procedure returns the old value
+stored in a memory location and a boolean value signifying whether <code>old</code> was
+equal to <code>new</code>.</p>
+<p>This procedure is an atomic equivalent of the following operation:</p>
+<pre>old_dst := dst^
+if old_dst == old {
+	dst^ = new
+	return old_dst, true
+} else {
+	return old_dst, false
+}
+
+</pre>
+<p>The strong version of compare exchange always returns true, when the returned
+old value stored in location pointed to by <code>dst</code> and the <code>old</code> parameter are
+equal.</p>
+<p>Atomic compare exchange has two memory orderings: One is for the
+read-modify-write operation, if the comparison succeeds, and the other is for
+the load operation, if the comparison fails. The memory ordering for both of
+of these operations is sequentially-consistent.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1162,6 +1342,29 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically compare and exchange the value with a memory location.</p>
+<p>This procedure checks if the value pointed to by the <code>dst</code> parameter is equal
+to <code>old</code>, and if they are, it stores the value <code>new</code> into the memory location,
+all done in a single atomic operation. This procedure returns the old value
+stored in a memory location and a boolean value signifying whether <code>old</code> was
+equal to <code>new</code>.</p>
+<p>This procedure is an atomic equivalent of the following operation:</p>
+<pre>old_dst := dst^
+if old_dst == old {
+	dst^ = new
+	return old_dst, true
+} else {
+	return old_dst, false
+}
+
+</pre>
+<p>The strong version of compare exchange always returns true, when the returned
+old value stored in location pointed to by <code>dst</code> and the <code>old</code> parameter are
+equal.</p>
+<p>Atomic compare exchange has two memory orderings: One is for the
+read-modify-write operation, if the comparison succeeds, and the other is for
+the load operation, if the comparison fails. The memory ordering for these
+operations is as specified by <code>success</code> and <code>failure</code> parameters respectively.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1171,6 +1374,30 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically compare and exchange the value with a memory location.</p>
+<p>This procedure checks if the value pointed to by the <code>dst</code> parameter is equal
+to <code>old</code>, and if they are, it stores the value <code>new</code> into the memory location,
+all done in a single atomic operation. This procedure returns the old value
+stored in a memory location and a boolean value signifying whether <code>old</code> was
+equal to <code>new</code>.</p>
+<p>This procedure is an atomic equivalent of the following operation:</p>
+<pre>old_dst := dst^
+if old_dst == old {
+	// may return false here
+	dst^ = new
+	return old_dst, true
+} else {
+	return old_dst, false
+}
+
+</pre>
+<p>The weak version of compare exchange may return false, even if <code>dst^ == old</code>.
+On some platforms running weak compare exchange in a loop is faster than a
+strong version.</p>
+<p>Atomic compare exchange has two memory orderings: One is for the
+read-modify-write operation, if the comparison succeeds, and the other is for
+the load operation, if the comparison fails. The memory ordering for both
+of these operations is sequentially-consistent.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1180,6 +1407,31 @@ Represents an Objective-C <code>Class</code> type.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+<p>Atomically compare and exchange the value with a memory location.</p>
+<p>This procedure checks if the value pointed to by the <code>dst</code> parameter is equal
+to <code>old</code>, and if they are, it stores the value <code>new</code> into the memory location,
+all done in a single atomic operation. This procedure returns the old value
+stored in a memory location and a boolean value signifying whether <code>old</code> was
+equal to <code>new</code>.</p>
+<p>This procedure is an atomic equivalent of the following operation:</p>
+<pre>old_dst := dst^
+if old_dst == old {
+	// may return false here
+	dst^ = new
+	return old_dst, true
+} else {
+	return old_dst, false
+}
+
+</pre>
+<p>The weak version of compare exchange may return false, even if <code>dst^ == old</code>.
+On some platforms running weak compare exchange in a loop is faster than a
+strong version.</p>
+<p>Atomic compare exchange has two memory orderings: One is for the
+read-modify-write operation, if the comparison succeeds, and the other is for
+the load operation, if the comparison fails. The memory ordering for these
+operations is as specified by the <code>success</code> and <code>failure</code> parameters
+respectively.</p>
 </details>
 </div>
 <div class="pkg-entity">
