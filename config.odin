@@ -31,7 +31,7 @@ Config :: struct {
 
 	pkg_to_collection:   map[^doc.Pkg]^Collection,
 	pkg_to_header:       map[^doc.Pkg]^doc.Header,
-	handled_packages:    map[string]struct{},
+	handled_packages:    map[string]int,
 
 	pkgs_line_docs:     map[string]string,
 }

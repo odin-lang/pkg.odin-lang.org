@@ -148,6 +148,8 @@ init_cfg_from_pkg :: proc(pkg: ^doc.Pkg, loc := #caller_location) {
 
 
 generate_from_path :: proc(path: string, all_packages: bool) {
+	log.debugf("reading %q", path)
+
 	{
 		data, ok := os.read_entire_file(path)
 		if !ok {
@@ -204,11 +206,20 @@ generate_from_path :: proc(path: string, all_packages: bool) {
 
 		for &pkg in cfg.pkgs[1:] {
 			fp := str(pkg.fullpath)
+
 			if fp in cfg.handled_packages {
-				continue
+				if cfg.handled_packages[fp] >= len(array(pkg.entries)) {
+					log.debugf("package already handled: %q", fp)
+					continue
+				} else {
+					log.debugf("package already handled but this instance has more entries: %q", fp)
+				}
+			} else {
+				log.debugf("new package: %q", fp)
 			}
+
 			append(&pkgs, &pkg)
-			cfg.handled_packages[fp] = {}
+			cfg.handled_packages[fp] = len(array(pkg.entries))
 			cfg.pkg_to_header[&pkg] = cfg.header
 		}
 
@@ -253,23 +264,30 @@ generate_from_path :: proc(path: string, all_packages: bool) {
 
 			log.debugf("Final package path for %s: %q", str(pkg.name), trimmed)
 
-			if trimmed not_in collection.pkgs {
-				collection.pkgs[trimmed] = pkg
-			}
+			collection.pkgs[trimmed] = pkg
 			collection.pkg_to_path[pkg] = trimmed
 			cfg.pkg_to_collection[pkg] = collection
 			cfg.pkg_to_header[pkg] = cfg.header
 		}
-	}
 
+		collection_pkgs: [dynamic]^doc.Pkg
+		defer delete(collection_pkgs)
+		for c in cfg.collections {
+			if c.root == nil {
+				assert(all_packages)
+				c.root = new(Dir_Node)
+				c.root.children = make([dynamic]^Dir_Node)
+			}
 
-	for c in cfg.collections {
-		if c.root == nil {
-			assert(all_packages)
-			c.root = new(Dir_Node)
-			c.root.children = make([dynamic]^Dir_Node)
+			clear(&collection_pkgs)
+			for pkg in pkgs {
+				if pkg in c.pkg_to_path {
+					append(&collection_pkgs, pkg)
+				}
+			}
+
+			insert_into_directory_tree(c, collection_pkgs)
 		}
-		insert_into_directory_tree(c.root, c.pkgs)
 	}
 }
 

@@ -5,6 +5,7 @@ import "core:fmt"
 import "core:os"
 import "core:slice"
 import "core:strings"
+import "core:log"
 
 import doc "core:odin/doc-format"
 
@@ -72,13 +73,19 @@ Dir_Node :: struct {
 	children: [dynamic]^Dir_Node,
 }
 sort_directory_tree :: proc(node: ^Dir_Node) {
-	slice.sort_by_key(node.children[:], proc(node: ^Dir_Node) -> string {
-		return strings.to_lower(node.name, context.temp_allocator)
+	slice.sort_by(node.children[:], proc(a, b: ^Dir_Node) -> bool {
+		name_cmp := slice.cmp(strings.to_lower(a.name, context.temp_allocator), strings.to_lower(b.name, context.temp_allocator))
+		if name_cmp != .Equal {
+			return name_cmp == .Less
+		}
+
+		return slice.cmp(len(array(a.pkg.entries)), len(array(b.pkg.entries))) != .Less
 	})
 
 	// Remove duplicates
 	for i := 1; i < len(node.children); /**/ {
 		if node.children[i-1].name == node.children[i].name {
+			log.infof("duplicate: %v", node.children[i].name)
 			ordered_remove(&node.children, i)
 		} else {
 			i += 1
@@ -90,17 +97,17 @@ sort_directory_tree :: proc(node: ^Dir_Node) {
 	}
 }
 
-insert_into_directory_tree :: proc(root: ^Dir_Node, pkgs_to_use: map[string]^doc.Pkg) {
+insert_into_directory_tree :: proc(c: ^Collection, pkgs_to_use: [dynamic]^doc.Pkg) {
+	root := c.root
+	assert(root != nil)
+
 	children := make([dynamic]^Dir_Node)
-	pkgs_to_use_loop: for path, pkg in pkgs_to_use {
+	pkgs_to_use_loop: for pkg in pkgs_to_use {
+		path, has_pkg := c.pkg_to_path[pkg]
+		assert(has_pkg)
+
 		dir, _, inner := strings.partition(path, "/")
 		if inner == "" {
-			for child in root.children {
-				if child.name == dir {
-					continue pkgs_to_use_loop
-				}
-			}
-
 			node := new_clone(Dir_Node{
 				dir  = dir,
 				name = dir,
@@ -123,18 +130,7 @@ insert_into_directory_tree :: proc(root: ^Dir_Node, pkgs_to_use: map[string]^doc
 		dir, _, _ := strings.partition(child.path, "/")
 		for node in root.children {
 			if node.dir == dir {
-				for c in node.children {
-					if c.name == child.name {
-						continue child_loop
-					}
-				}
 				append(&node.children, child)
-				continue child_loop
-			}
-		}
-
-		for other_parent in root.children {
-			if other_parent.name == dir {
 				continue child_loop
 			}
 		}

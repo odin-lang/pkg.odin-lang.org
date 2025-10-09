@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: windows-2019
+    runs-on: windows-2025
     steps:
       - uses: actions/checkout@v1
       - name: Make initial directories
@@ -23,35 +23,33 @@ jobs:
       - name: build Odin
         shell: cmd
         run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2025\Enterprise\VC\Auxiliary\Build\vcvars64.bat
           cd Odin
           call .\build.bat 1 1
       - name: Odin run
         shell: cmd
         run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2025\Enterprise\VC\Auxiliary\Build\vcvars64.bat
           cd Odin
           odin run examples/demo
       - name: Generation doc format for examples/all
         shell: cmd
         # SDL3 Needs to be separate because it can't be added into examples/all without conflicting with sdl2 symbols.
         run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2025\Enterprise\VC\Auxiliary\Build\vcvars64.bat
           cd Odin
           odin doc examples/all                      -all-packages -doc-format -show-debug-messages -target:windows_amd64
           odin doc examples/all/all_posix.odin -file -all-packages -doc-format -show-debug-messages -target:darwin_arm64
+          odin doc examples/all/all_linux.odin -file -all-packages -doc-format -show-debug-messages -target:linux_amd64
+          odin doc examples/all/sdl3                 -all-packages -doc-format -show-debug-messages -target:windows_amd64
           odin doc core/sys/darwin                   -all-packages -doc-format -show-debug-messages -target:darwin_arm64
           odin doc core/sys/freebsd                  -all-packages -doc-format -show-debug-messages -target:freebsd_amd64
-          odin doc core/sys/linux                    -all-packages -doc-format -show-debug-messages -target:linux_amd64
           odin doc core/sys/unix                     -all-packages -doc-format -show-debug-messages -target:linux_amd64
           odin doc core/sys/haiku                    -all-packages -doc-format -show-debug-messages -target:haiku_amd64
-          odin doc vendor/sdl3                       -all-packages -doc-format -show-debug-messages
-          odin doc vendor/sdl3/image                 -all-packages -doc-format -show-debug-messages
-          odin doc vendor/sdl3/ttf                   -all-packages -doc-format -show-debug-messages
       - name: Generate Tool
         shell: cmd
         run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2025\Enterprise\VC\Auxiliary\Build\vcvars64.bat
           Odin\odin build . -debug -out:odin-html-docs.exe
       - name: Generate Website
         shell: cmd
@@ -61,7 +59,7 @@ jobs:
           copy resources\CNAME       website\static\CNAME
           copy resources\favicon.svg website\static\favicon.svg
           pushd website\static
-          ..\odin-html-docs.exe ..\all.odin-doc --merge ..\darwin.odin-doc ..\all_posix.odin-doc ..\freebsd.odin-doc ..\linux.odin-doc ..\unix.odin-doc ..\haiku.odin-doc ..\sdl3.odin-doc ..\sdl3_image.odin-doc ..\sdl3_ttf.odin-doc
+          ..\odin-html-docs.exe ..\all.odin-doc --merge ..\darwin.odin-doc ..\all_posix.odin-doc ..\freebsd.odin-doc ..\all_linux.odin-doc ..\unix.odin-doc ..\haiku.odin-doc ..\sdl3.odin-doc
           popd
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
