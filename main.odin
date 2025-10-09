@@ -1716,6 +1716,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 		Paragraph,
 		Code,
 		Example,
+		Operation,
 		Output,
 		Possible_Output,
 	}
@@ -1731,6 +1732,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 
 	has_any_output: bool
 	has_example: bool
+	has_operation: bool
 
 	// Find the minimum common prefix length of tabs, so an entire doc comment can be indented
 	// without it rendering in a <pre> tag.
@@ -1772,6 +1774,9 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 			case strings.has_prefix(line, "Example:"):
 				next_block_kind = .Example
 				has_example = true
+			case strings.has_prefix(line, "Operation:"):
+				next_block_kind = .Operation
+				has_operation = true
 			case strings.has_prefix(line, "Output:"):
 				next_block_kind = .Output
 				has_any_output = true
@@ -1791,6 +1796,9 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 			case strings.has_prefix(line, "Example:"):
 				next_block_kind = .Example
 				has_example = true
+			case strings.has_prefix(line, "Operation:"):
+				next_block_kind = .Operation
+				has_operation = true
 			case strings.has_prefix(line, "Output:"):
 				next_block_kind = .Output
 				has_any_output = true
@@ -1802,6 +1810,9 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 			}
 		case .Example:
 			switch {
+			case strings.has_prefix(line, "Operation:"):
+				next_block_kind = .Operation
+				has_operation = true
 			case strings.has_prefix(line, "Output:"):
 				next_block_kind = .Output
 				has_any_output = true
@@ -1811,7 +1822,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 			case !strings.has_prefix(line, "\t") && text != "":
 				next_block_kind = .Paragraph
 			}
-		case .Output, .Possible_Output:
+		case .Output, .Possible_Output, .Operation:
 			switch {
 			case strings.has_prefix(line, "Example:"):
 				next_block_kind = .Example
@@ -1935,6 +1946,20 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 			io.write_string(w, "<summary><b>Example:</b></summary>\n")
 			io.write_string(w, `<pre><code class="hljs language-odin" data-lang="odin">`)
 			for line in example_lines {
+				io.write_string(w, strings.trim_prefix(line, "\t"))
+				io.write_string(w, "\n")
+			}
+			io.write_string(w, "</code></pre>\n")
+
+		case .Operation:
+			// Operation block starts with `Operation:` and a number of white spaces,
+			operation_lines := trim_empty_and_subtitle_lines_and_replace_lt(block.lines, "Operation:")
+
+			io.write_string(w, "<details open class=\"code-example\">\n")
+			defer io.write_string(w, "</details>\n")
+			io.write_string(w, "<summary><b>Operation:</b></summary>\n")
+			io.write_string(w, `<pre><code class="hljs language-odin" data-lang="odin">`)
+			for line in operation_lines {
 				io.write_string(w, strings.trim_prefix(line, "\t"))
 				io.write_string(w, "\n")
 			}
