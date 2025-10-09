@@ -348,7 +348,8 @@
 <div id="pkg-top">
 <h2>Overview</h2>
 <div id="pkg-overview">
-<p>package topological_sort implements a generic O(V+E) topological sorter.</p>
+<p>A generic <code>O(V+E)</code> topological sorter implementation. This is the fastest known method for topological sorting.
+Odin's map type is being used to accelerate lookups.</p>
 </div>
 <div id="pkg-index">
 <h2>Index</h2>
@@ -401,7 +402,7 @@ Procedure Groups (0)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Relations"><span><a class="doc-id-link" href="#Relations">Relations<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/topological_sort.odin#L15"><em>Source</em></a></div></h3>
+<h3 id="Relations"><span><a class="doc-id-link" href="#Relations">Relations<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/topological_sort.odin#L11"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Relations :: <span class="keyword-type">struct</span>($K: <span class="keyword-type">typeid</span>) <span class="keyword">where</span> intrinsics.type_is_valid_map_key(K) {
 	<span class="comment">… // See source for fields</span>
@@ -409,7 +410,7 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Sorter"><span><a class="doc-id-link" href="#Sorter">Sorter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/topological_sort.odin#L20"><em>Source</em></a></div></h3>
+<h3 id="Sorter"><span><a class="doc-id-link" href="#Sorter">Sorter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/topological_sort.odin#L16"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Sorter :: <span class="keyword-type">struct</span>($K: <span class="keyword-type">typeid</span>) <span class="keyword">where</span> intrinsics.type_is_valid_map_key(K) {
 	<span class="comment">… // See source for fields</span>
@@ -430,31 +431,31 @@ Procedure Groups (0)</summary>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="add_dependency"><span><a class="doc-id-link" href="#add_dependency">add_dependency<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/topological_sort.odin#L52"><em>Source</em></a></div></h3>
+<h3 id="add_dependency"><span><a class="doc-id-link" href="#add_dependency">add_dependency<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/topological_sort.odin#L48"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">add_dependency :: <span class="keyword-type">proc</span>(sorter: ^$S/<a class="code-typename" href="/core/container/topological_sort/#Sorter">Sorter</a>($K), key, dependency: $K) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="add_key"><span><a class="doc-id-link" href="#add_key">add_key<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/topological_sort.odin#L44"><em>Source</em></a></div></h3>
+<h3 id="add_key"><span><a class="doc-id-link" href="#add_key">add_key<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/topological_sort.odin#L40"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">add_key :: <span class="keyword-type">proc</span>(sorter: ^$S/<a class="code-typename" href="/core/container/topological_sort/#Sorter">Sorter</a>($K), key: $K) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/topological_sort.odin#L37"><em>Source</em></a></div></h3>
+<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/topological_sort.odin#L33"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy :: <span class="keyword-type">proc</span>(sorter: ^$S/<a class="code-typename" href="/core/container/topological_sort/#Sorter">Sorter</a>($K)) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="init"><span><a class="doc-id-link" href="#init">init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/topological_sort.odin#L32"><em>Source</em></a></div></h3>
+<h3 id="init"><span><a class="doc-id-link" href="#init">init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/topological_sort.odin#L28"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">init :: <span class="keyword-type">proc</span>(sorter: ^$S/<a class="code-typename" href="/core/container/topological_sort/#Sorter">Sorter</a>($K)) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="sort"><span><a class="doc-id-link" href="#sort">sort<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/topological_sort.odin#L77"><em>Source</em></a></div></h3>
+<h3 id="sort"><span><a class="doc-id-link" href="#sort">sort<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/topological_sort.odin#L73"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sort :: <span class="keyword-type">proc</span>(sorter: ^$S/<a class="code-typename" href="/core/container/topological_sort/#Sorter">Sorter</a>($K)) -> (sorted, cycled: [<span class="keyword">dynamic</span>]$K) {…}</pre>
 </div>
@@ -464,11 +465,10 @@ Procedure Groups (0)</summary>
 </section>
 <h2 id="pkg-source-files">Source Files</h2>
 <ul>
-<li><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/doc.odin">doc.odin</a></li>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/container/topological_sort/topological_sort.odin">topological_sort.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 18:46:03.686406300 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 21:12:54.654371200 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
