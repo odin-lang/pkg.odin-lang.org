@@ -27,6 +27,18 @@ intrinsics_table := []Builtin{
 		comment = "A call-like way to construct an #soa struct. Possibly to be deprecated in the future.",
 	},
 
+
+	{name = "concatenate", kind = "b", type = " proc(x, y: $T, z: ..T) -> T where type_is_array(T) || type_is_slice(T)",
+		comment = "concatenates 2+ constant slices or arrays values together to form a new one.\n\n"+
+		"Example:\n"+
+		"\tx :: intrinsics.concatenate([]int{1, 2, 3}, []int{4, 5, 6}, {1, 1, -1})\n"+
+		"\t#assert(type_of(x) == []int)\n"+
+		"\t\n"+
+		"\ty :: intrinsics.concatenate([3]int{1, 2, 3}, [?]int{4, 5}, [?]int{6, 1, 1, -1})\n"+
+		"\t#assert(type_of(y) == [9]int)\n"+
+		"",
+	},
+
 	// Volatile
 	{name = "volatile_load", kind = "b", type = "proc(dst: ^$T) -> T", comment = VOLATILE_COMMENT},
 	{name = "volatile_store", kind = "b", type = "proc(dst: ^$T, val: T)", comment = VOLATILE_COMMENT},
