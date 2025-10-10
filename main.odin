@@ -712,7 +712,7 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 	fmt.wprintln(w, `<div class="row odin-main my-4">`)
 	defer fmt.wprintln(w, `</div>`)
 
-	write_pkg_sidebar(w, nil, collection, "")
+	write_pkg_sidebar(w, nil, collection, "", "")
 
 	fmt.wprintln(w, `<article class="col-lg-10 p-4">`)
 	defer fmt.wprintln(w, `</article>`)
@@ -1987,12 +1987,18 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 	}
 }
 
-write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collection, pkg_name: string) {
+write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collection, pkg_name: string, path: string) {
 
 	fmt.wprintln(w, `<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">`)
 	defer fmt.wprintln(w, `</nav>`)
+
+
 	fmt.wprintln(w, `<div class="py-3">`)
 	defer fmt.wprintln(w, `</div>`)
+
+	if pkg_name != "" {
+		fmt.wprintf(w, `<div>Current Package: <em><a href="%s/%s">%s</a></em></div>` + "<br>\n", collection.base_url, path, pkg_name)
+	}
 
 	fmt.wprintf(
 		w,
@@ -2936,7 +2942,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	fmt.wprintln(w, `<div class="row odin-main my-4" id="pkg">`)
 	defer fmt.wprintln(w, `</div>`)
 
-	write_pkg_sidebar(w, pkg, collection, str(pkg.name))
+	write_pkg_sidebar(w, pkg, collection, str(pkg.name), path)
 
 	fmt.wprintln(w, `<article class="col-lg-8 p-4 documentation odin-article">`)
 

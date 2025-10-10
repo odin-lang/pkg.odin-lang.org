@@ -242,7 +242,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 	fmt.wprintln(w, `<div class="row odin-main" id="pkg">`)
 	defer fmt.wprintln(w, `</div>`)
 
-	write_pkg_sidebar(w, nil, collection, pkg_name)
+	write_pkg_sidebar(w, nil, collection, pkg_name, path)
 
 	fmt.wprintln(w, `<article class="col-lg-8 p-4 documentation odin-article">`)
 
