@@ -590,6 +590,7 @@ intrinsics_table := []Builtin{
 
 	{name = "simd_shuffle",            kind = "b", type = "proc(a, b: #simd[N]T, $indices: ..int) -> #simd[len(indices)]T"},
 	{name = "simd_select",             kind = "b", type = "proc(cond: #simd[N]boolean_or_integer, true, false: #simd[N]T) -> #simd[N]T"},
+	{name = "simd_runtime_swizzle",    kind = "b", type = "proc(table: #simd[N]T, indices: #simd[N]T) -> #simd[N]T where type_is_integer(T)"},
 
 	// Lane-wise operations
 	{name = "simd_ceil",               kind = "b", type = "proc(a: #simd[N]any_float) -> #simd[N]any_float", comment = "lane-wise ceil"},
