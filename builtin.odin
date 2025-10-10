@@ -92,7 +92,11 @@ builtins := []Builtin{
 	{name = "rawptr",  kind = "t", comment = "`rawptr` represents a pointer to an arbitrary type. It is equivalent to `void *` in C."},
 
 	{name = "string",  kind = "t", comment = "`string` is the set of all strings of 8-bit bytes, conventionally but not necessarily representing UTF-8 encoding text. A `string` may be empty but not `nil`. Elements of `string` type are immutable and indexable."},
-	{name = "cstring", kind = "t", comment = "`cstring` is the set of all strings of 8-bit bytes terminated with a NUL (0) byte, conventionally but not necessarily representing UTF-8 encoding text. A `cstring` may be empty or `nil`. Elements of `string` type are immutable but not indexable."},
+	{name = "cstring", kind = "t", comment = "`cstring` is the set of all strings of 8-bit bytes terminated with a NUL (0) byte, conventionally but not necessarily representing UTF-8 encoding text. A `cstring` may be empty or `nil`. Elements of `cstring` type are immutable but not indexable."},
+
+	{name = "string16",  kind = "t", comment = "`string16` is the set of all strings of 16-bit code units, conventionally but not necessarily representing UTF-16 encoding text. A `string` may be empty but not `nil`. Elements of `string` type are immutable and indexable."},
+	{name = "cstring16", kind = "t", comment = "`cstring16` is the set of all strings of 16-bit code units terminated with a NUL (0) code unit, conventionally but not necessarily representing UTF-16 encoding text. A `cstring16` may be empty or `nil`. Elements of `cstring16` type are immutable but not indexable."},
+
 
 	{name = "typeid", kind = "t", comment = "`typeid` is a unique identifier for an Odin type at runtime. It can be mapped to relevant type information through `type_info_of`."},
 	{name = "any",    kind = "t",
