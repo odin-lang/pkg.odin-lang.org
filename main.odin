@@ -1,9 +1,11 @@
 package odin_html_docs
 
 import "base:intrinsics"
+import "base:runtime"
 import "core:fmt"
 import "core:io"
 import "core:log"
+import "core:net"
 import "core:os"
 import "core:path/slashpath"
 import "core:slice"
@@ -1618,6 +1620,8 @@ write_markup_text :: proc(w: io.Writer, s_: string, code_inline := false) {
 	}
 	defer if need_break do io.write_string(w, "<br>")
 
+	runtime.DEFAULT_TEMP_ALLOCATOR_TEMP_GUARD()
+
 	latest_index := 0
 	for index := 0; index < len(s); index += 1 {
 		switch s[index] {
@@ -1648,7 +1652,15 @@ write_markup_text :: proc(w: io.Writer, s_: string, code_inline := false) {
 					url  = strings.trim_space(url)
 
 					io.write_string(w, s[latest_index:index])
-					fmt.wprintf(w, `<a href="%s">`, url)
+
+					_, host, _, _, _ := net.split_url(url, context.temp_allocator)
+					if strings.equal_fold(cfg.domain, host) {
+						// Same domain as cfg.domain
+						fmt.wprintf(w, `<a href="%s">`, url)
+					} else {
+						// External domain, open in new tab.
+						fmt.wprintf(w, `<a href="%s" target="_blank">`, url)
+					}
 					io.write_string(w, text)
 					io.write_string(w, "</a>")
 					latest_index = end_bracket + 1

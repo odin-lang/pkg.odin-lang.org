@@ -15,6 +15,7 @@ Config :: struct {
 	hide_core:    bool,
 	_collections: map[string]Collection `json:"collections"`,
 	url_prefix:   string,
+	domain:       string, // Used to determine if a link is external, to add `target="_blank"`.
 
 
 	// -- Start non configurable --
