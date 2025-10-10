@@ -1588,26 +1588,10 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 }
 
 write_doc_line :: proc(w: io.Writer, text: string) {
-	text := text
-	text = escape_html_string(text)
-	for len(text) != 0 {
-		if strings.count(text, "`") >= 2 {
-			n := strings.index_byte(text, '`')
-			io.write_string(w, text[:n])
-			io.write_string(w, "<code class=\"code-inline\">")
-			remaining := text[n+1:]
-			m := strings.index_byte(remaining, '`')
-			io.write_string(w, remaining[:m])
-			io.write_string(w, "</code>")
-			text = remaining[m+1:]
-		} else {
-			io.write_string(w, text)
-			return
-		}
-	}
+	write_markup_text(w, text, true)
 }
 
-write_markup_text :: proc(w: io.Writer, s_: string) {
+write_markup_text :: proc(w: io.Writer, s_: string, code_inline := false) {
 	// We need to ensure that we don't escape html tags in our docs
 	s := escape_html_string(s_)
 	// Consume '- ' if the string begins with one
@@ -1636,7 +1620,7 @@ write_markup_text :: proc(w: io.Writer, s_: string) {
 			if next_tick >= 0 {
 				next_tick += index + 1
 				io.write_string(w, s[latest_index:index])
-				io.write_string(w, "<code>")
+				io.write_string(w, "<code class=\"code-inline\">" if code_inline else "<code>")
 				io.write_string(w, s[index + 1:next_tick])
 				io.write_string(w, "</code>")
 				latest_index = next_tick + 1
