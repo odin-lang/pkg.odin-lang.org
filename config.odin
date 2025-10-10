@@ -34,6 +34,8 @@ Config :: struct {
 	handled_packages:    map[string]int,
 
 	pkgs_line_docs:     map[string]string,
+
+	entity_to_pkg:      map[^doc.Entity]^doc.Pkg,
 }
 
 Collection :: struct {

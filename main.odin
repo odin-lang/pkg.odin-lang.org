@@ -140,6 +140,12 @@ init_cfg_from_header :: proc(header: ^doc.Header, loc := #caller_location) {
 	cfg.pkgs     = array(cfg.header.pkgs)
 	cfg.entities = array(cfg.header.entities)
 	cfg.types    = array(cfg.header.types)
+
+	for &pkg in cfg.pkgs {
+		for &entry in array(pkg.entries) {
+			cfg.entity_to_pkg[&cfg.entities[entry.entity]] = &pkg
+		}
+	}
 }
 init_cfg_from_pkg :: proc(pkg: ^doc.Pkg, loc := #caller_location) {
 	assert(pkg != nil, loc=loc)
@@ -2493,6 +2499,7 @@ the_sort_proc :: proc(a, b: ^doc.Entity) -> (cmp: slice.Ordering) {
 	return
 }
 
+MAX_PROCS_BEFORE_HIDING :: 24
 
 print_procs :: proc(w:               io.Writer,
                     pkg:             ^doc.Pkg,
@@ -2515,10 +2522,16 @@ print_procs :: proc(w:               io.Writer,
 
 		proc_names_seen[proc_name] = true
 		if !seen_item {
+			if len(related_procs) < MAX_PROCS_BEFORE_HIDING {
+				fmt.wprintln(w, "<details class=\"odin-doc-toggle\" open>")
+			} else {
+				fmt.wprintln(w, "<details class=\"odin-doc-toggle\" close>")
+			}
+			fmt.wprintln(w, `<summary class="hideme">`)
 			if is_inherited {
 				fmt.wprintf(
 					w,
-					"<h6>Procedures Through `using` From "+`<a href="%s/%s/#%s">%s</a></h6>`,
+					"<h6 style=\"display:inline-block\">Procedures Through `using` From "+`<a href="%s/%s/#%s">%s</a></h6>`,
 					collection.base_url,
 					collection.pkg_to_path[pkg],
 					parent_name,
@@ -2526,8 +2539,9 @@ print_procs :: proc(w:               io.Writer,
 				)
 				fmt.wprintln(w)
 			} else {
-				fmt.wprintf(w, "<h5>%s</h5>\n", title)
+				fmt.wprintf(w, "<h5 style=\"display:inline-block\">%s</h5>\n", title)
 			}
+			fmt.wprintln(w, "</summary>")
 			fmt.wprintln(w, "<ul>")
 			seen_item = true
 		}
@@ -2553,6 +2567,7 @@ print_procs :: proc(w:               io.Writer,
 
 	if seen_item {
 		fmt.wprintln(w, "</ul>")
+		fmt.wprintln(w, "</details>")
 	}
 }
 
@@ -2568,18 +2583,31 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 
 			parent_name := str(parent.name)
 
+			e_pkg      := cfg.entity_to_pkg[e]
+			parent_pkg := cfg.entity_to_pkg[parent]
+			check_for_identical_types := true
+
 			pt := base_type(cfg.types[e.type])
 			(pt.kind == .Proc) or_return
 			params := array(cfg.types[array(pt.types)[int(is_output)]].entities)
 			for param_idx in params {
-				t := cfg.types[cfg.entities[param_idx].type]
+				t := &cfg.types[cfg.entities[param_idx].type]
+
+				if check_for_identical_types && e_pkg == parent_pkg && t == &cfg.types[parent.type] {
+					return e, true
+				}
+
 				#partial switch t.kind {
 				case .Named, .Generic:
 					// okay
 				case .Pointer, .Multi_Pointer:
-					t = cfg.types[array(t.types)[0]]
+					t = &cfg.types[array(t.types)[0]]
 				case:
 					continue
+				}
+
+				if check_for_identical_types && e_pkg == parent_pkg && t == &cfg.types[parent.type] {
+					return e, true
 				}
 
 				#partial switch t.kind {
