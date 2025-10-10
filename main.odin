@@ -2495,8 +2495,80 @@ write_related_constants :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity
 
 }
 
+
+the_sort_proc :: proc(a, b: ^doc.Entity) -> (cmp: slice.Ordering) {
+	cmp = slice.cmp(a.kind, b.kind)
+	if cmp != .Equal { return }
+	cmp = slice.cmp(str(a.name), str(b.name))
+	return
+}
+
+
+print_procs :: proc(w:               io.Writer,
+                    pkg:             ^doc.Pkg,
+                    parent:          ^doc.Entity,
+                    related_procs:   []^doc.Entity,
+                    proc_names_seen: ^map[string]bool,
+                    is_inherited:    bool,
+                    title:           string,
+                    ignore_procedure_group_suffix: bool = false) {
+	parent_name := str(parent.name)
+	seen_item := false
+	parameter_loop: for e in related_procs {
+		proc_name := str(e.name)
+
+		if proc_names_seen[proc_name] {
+			continue parameter_loop
+		}
+
+		collection := cfg.pkg_to_collection[pkg]
+
+		proc_names_seen[proc_name] = true
+		if !seen_item {
+			if is_inherited {
+				fmt.wprintf(
+					w,
+					"<h6>Procedures Through `using` From "+`<a href="%s/%s/#%s">%s</a></h6>`,
+					collection.base_url,
+					collection.pkg_to_path[pkg],
+					parent_name,
+					parent_name,
+				)
+				fmt.wprintln(w)
+			} else {
+				fmt.wprintf(w, "<h5>%s</h5>\n", title)
+			}
+			fmt.wprintln(w, "<ul>")
+			seen_item = true
+		}
+
+		fmt.wprintf(w, "<li>")
+		fmt.wprintf(
+			w,
+			`<a href="%s/%s/#%s">%s</a>`,
+			collection.base_url,
+			collection.pkg_to_path[pkg],
+			proc_name,
+			proc_name,
+		)
+
+		if e.kind == .Proc_Group && !ignore_procedure_group_suffix {
+			fmt.wprintf(w, `&nbsp;<em>(procedure groups)</em>`)
+		}
+
+		fmt.wprintf(w, "</li>")
+
+		fmt.wprintln(w)
+	}
+
+	if seen_item {
+		fmt.wprintln(w, "</ul>")
+	}
+}
+
 write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, proc_names_seen: ^map[string]bool, is_inherited := false) {
-	related_procs_in_parameters, related_procs_in_return_types: [dynamic]^doc.Entity
+	related_procs_in_parameters:   [dynamic]^doc.Entity
+	related_procs_in_return_types: [dynamic]^doc.Entity
 
 	for entry in array(pkg.entries) {
 		check_proc :: proc(e: ^doc.Entity, parent: ^doc.Entity, is_output: bool) -> (related_proc: ^doc.Entity, ok: bool) {
@@ -2551,9 +2623,10 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 		}
 
 		e := &cfg.entities[entry.entity]
+		e_name := str(e.name)
 		#partial switch e.kind {
 		case .Procedure:
-			if strings.has_prefix(str(e.name), "_") {
+			if strings.has_prefix(e_name, "_") {
 				continue
 			}
 			if p, ok := check_proc(e, parent, false); ok {
@@ -2565,9 +2638,10 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 				}
 			}
 		case .Proc_Group:
-			if strings.has_prefix(str(e.name), "_") {
+			if strings.has_prefix(e_name, "_") {
 				continue
 			}
+
 			for entity_idx in array(e.grouped_entities) {
 				pe := &cfg.entities[entity_idx]
 				if _, ok := check_proc(pe, parent, false); ok {
@@ -2585,76 +2659,8 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 		}
 	}
 
-	the_sort_proc :: proc(a, b: ^doc.Entity) -> (cmp: slice.Ordering) {
-		cmp = slice.cmp(a.kind, b.kind)
-		if cmp != .Equal { return }
-		cmp = slice.cmp(str(a.name), str(b.name))
-		return
-	}
-
 	slice.sort_by_cmp(related_procs_in_parameters[:],   the_sort_proc)
 	slice.sort_by_cmp(related_procs_in_return_types[:], the_sort_proc)
-
-	print_procs :: proc(w:               io.Writer,
-	                    pkg:             ^doc.Pkg,
-	                    parent:          ^doc.Entity,
-	                    related_procs:   []^doc.Entity,
-	                    proc_names_seen: ^map[string]bool,
-	                    is_inherited:    bool,
-	                    title:           string) {
-		parent_name := str(parent.name)
-		seen_item := false
-		parameter_loop: for e in related_procs {
-			proc_name := str(e.name)
-
-			if proc_names_seen[proc_name] {
-				continue parameter_loop
-			}
-
-			collection := cfg.pkg_to_collection[pkg]
-
-			proc_names_seen[proc_name] = true
-			if !seen_item {
-				if is_inherited {
-					fmt.wprintf(
-						w,
-						"<h6>Procedures Through `using` From "+`<a href="%s/%s/#%s">%s</a></h6>`,
-						collection.base_url,
-						collection.pkg_to_path[pkg],
-						parent_name,
-						parent_name,
-					)
-					fmt.wprintln(w)
-				} else {
-					fmt.wprintf(w, "<h5>%s</h5>\n", title)
-				}
-				fmt.wprintln(w, "<ul>")
-				seen_item = true
-			}
-
-			fmt.wprintf(w, "<li>")
-			fmt.wprintf(
-				w,
-				`<a href="%s/%s/#%s">%s</a>`,
-				collection.base_url,
-				collection.pkg_to_path[pkg],
-				proc_name,
-				proc_name,
-			)
-
-			if e.kind == .Proc_Group {
-				fmt.wprintf(w, `&nbsp;<em>(procedure groups)</em>`)
-			}
-
-			fmt.wprintf(w, "</li>")
-
-			fmt.wprintln(w)
-		}
-
-		if seen_item {
-			fmt.wprintln(w, "</ul>")
-		}
-	}
 
 	print_procs(w, pkg, parent, related_procs_in_parameters[:],   proc_names_seen, is_inherited, title="Related Procedures With Parameters")
 	print_procs(w, pkg, parent, related_procs_in_return_types[:], proc_names_seen, is_inherited, title="Related Procedures With Returns")
@@ -2685,6 +2691,33 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 		}
 	}
 }
+
+write_related_procedure_groups :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, proc_names_seen: ^map[string]bool, is_inherited := false) {
+	groups: [dynamic]^doc.Entity
+	defer delete(groups)
+
+	for entry in array(pkg.entries) {
+		e := &cfg.entities[entry.entity]
+		e_name := str(e.name)
+		if e.kind != .Proc_Group ||
+		   strings.has_prefix(e_name, "_") {
+			continue
+		}
+
+		for entity_idx in array(e.grouped_entities) {
+			pe := &cfg.entities[entity_idx]
+			if pe == parent {
+				append(&groups, e)
+				break
+			}
+		}
+	}
+
+	slice.sort_by_cmp(groups[:], the_sort_proc)
+
+	print_procs(w, pkg, parent, groups[:],   proc_names_seen, is_inherited, title="Related Procedure Groups", ignore_procedure_group_suffix=true)
+}
+
 
 write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	write_attributes :: proc(w: io.Writer, e: ^doc.Entity) {
@@ -2906,6 +2939,11 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		proc_names_seen: map[string]bool
 		write_related_procedures(w, pkg, e, &proc_names_seen)
 		write_related_constants(w, pkg, e)
+		delete(proc_names_seen)
+	}
+	if e.kind == .Procedure {
+		proc_names_seen: map[string]bool
+		write_related_procedure_groups(w, pkg, e, &proc_names_seen)
 		delete(proc_names_seen)
 	}
 }
