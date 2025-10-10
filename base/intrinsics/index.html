@@ -160,7 +160,7 @@ Types (7)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (224)</summary>
+Procedures (225)</summary>
 <ul>
 <li><a href="#alloca">alloca</a></li>
 <li><a href="#atomic_add">atomic_add</a></li>
@@ -189,6 +189,7 @@ Procedures (224)</summary>
 <li><a href="#atomic_xor">atomic_xor</a></li>
 <li><a href="#atomic_xor_explicit">atomic_xor_explicit</a></li>
 <li><a href="#byte_swap">byte_swap</a></li>
+<li><a href="#concatenate">concatenate</a></li>
 <li><a href="#constant_log2">constant_log2</a></li>
 <li><a href="#constant_utf16_cstring">constant_utf16_cstring</a></li>
 <li><a href="#count_leading_zeros">count_leading_zeros</a></li>
@@ -1035,6 +1036,25 @@ equivalent of the following:</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Reverses the bytes from ascending order to descending order e.g. 0xfe_ed_01_12 -&gt; `0x12_01_ed_fe</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="concatenate"><span><a class="doc-id-link" href="#concatenate">concatenate<span class="a-hidden">&nbsp;¶</span></a></span></h3>
+<div>
+<pre class="doc-code">concatenate ::  <span class="keyword-type">proc</span>(x, y: $T, z: ..T) -> T <span class="keyword">where</span> <a href="/base/intrinsics#type_is_array"><span class="code-procedure">type_is_array</span></a>(T) || <a href="/base/intrinsics#type_is_slice"><span class="code-procedure">type_is_slice</span></a>(T) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>concatenates 2+ constant slices or arrays values together to form a new one.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">x :: intrinsics.concatenate([]int{1, 2, 3}, []int{4, 5, 6}, {1, 1, -1})
+#assert(type_of(x) == []int)
+
+y :: intrinsics.concatenate([3]int{1, 2, 3}, [?]int{4, 5}, [?]int{6, 1, 1, -1})
+#assert(type_of(y) == [9]int)
+</code></pre>
+</details>
 </details>
 </div>
 <div class="pkg-entity">
@@ -4906,6 +4926,7 @@ Implements in <code>xgetbv</code> instruction.</p>
 <li><a href="#atomic_xor">atomic_xor</a></li>
 <li><a href="#atomic_xor_explicit">atomic_xor_explicit</a></li>
 <li><a href="#byte_swap">byte_swap</a></li>
+<li><a href="#concatenate">concatenate</a></li>
 <li><a href="#constant_log2">constant_log2</a></li>
 <li><a href="#constant_utf16_cstring">constant_utf16_cstring</a></li>
 <li><a href="#count_leading_zeros">count_leading_zeros</a></li>

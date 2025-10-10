@@ -349,6 +349,59 @@
 <h2>Overview</h2>
 <div id="pkg-overview">
 <p>A dynamically-sized array of bits.</p>
+<p>The Bit Array can be used in several ways:</p>
+<p>By default you don't need to instantiate a <code>Bit_Array</code>.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">package test
+
+import "core:fmt"
+import "core:container/bit_array"
+
+main :: proc() {
+	using bit_array
+
+	bits: Bit_Array
+
+	// returns `true`
+	fmt.println(set(&bits, 42))
+
+	// returns `false`, `false`, because this Bit Array wasn't created to allow negative indices.
+	was_set, was_retrieved := get(&bits, -1)
+	fmt.println(was_set, was_retrieved)
+	destroy(&bits)
+}
+</code></pre>
+</details>
+<p>A <code>Bit_Array</code> can optionally allow for negative indices, if the minimum value was given during creation.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">package test
+
+import "core:fmt"
+import "core:container/bit_array"
+
+main :: proc() {
+	Foo :: enum int {
+		Negative_Test = -42,
+		Bar           = 420,
+		Leaves        = 69105,
+	}
+
+	using bit_array
+
+	bits := create(int(max(Foo)), int(min(Foo)))
+	defer destroy(bits)
+
+	fmt.printf("Set(Bar):           %v\n",     set(bits, Foo.Bar))
+	fmt.printf("Get(Bar):           %v, %v\n", get(bits, Foo.Bar))
+	fmt.printf("Set(Negative_Test): %v\n",     set(bits, Foo.Negative_Test))
+	fmt.printf("Get(Leaves):        %v, %v\n", get(bits, Foo.Leaves))
+	fmt.printf("Get(Negative_Test): %v, %v\n", get(bits, Foo.Negative_Test))
+	fmt.printf("Freed.\n")
+}
+</code></pre>
+</details>
 </div>
 <div id="pkg-index">
 <h2>Index</h2>
@@ -690,7 +743,7 @@ array will be able to expand beyond <code>max_index</code> if needed.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/container/bit_array/doc.odin">doc.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-10 10:23:43.823084200 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-10 11:59:26.020540800 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

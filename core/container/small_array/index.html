@@ -349,6 +349,55 @@
 <h2>Overview</h2>
 <div id="pkg-overview">
 <p>A dynamic array-like interface on a stack-allocated, fixed-size array.</p>
+<p>The <code>Small_Array</code> type is optimal for scenarios where you need
+a container for a fixed number of elements of a specific type,
+with the total number known at compile time but the exact
+number to be used determined at runtime.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:fmt"
+import "core:container/small_array"
+
+create :: proc() -&gt; (result: small_array.Small_Array(10, rune)) {
+	// appending single elements
+	small_array.push(&result, 'e')
+	// pushing a bunch of elements at once
+	small_array.push(&result, 'l', 'i', 'x', '-', 'e')
+	// pre-pending
+	small_array.push_front(&result, 'H')
+	// removing elements
+	small_array.ordered_remove(&result, 4)
+	// resizing to the desired length (the capacity will stay unchanged)
+	small_array.resize(&result, 7)
+	// inserting elements
+	small_array.inject_at(&result, 'p', 5)
+	// updating elements
+	small_array.set(&result, 3, 'l')
+	// getting pointers to elements
+	o := small_array.get_ptr(&result, 4)
+	o^ = 'o'
+	// and much more ....
+	return
+}
+
+// the `Small_Array` can be an ordinary parameter 'generic' over
+// the actual length to be usable with different sizes
+print_elements :: proc(arr: ^small_array.Small_Array($N, rune)) {
+	for r in small_array.slice(arr) {
+		fmt.print(r)
+	}
+}
+
+main :: proc() {
+	arr := create()
+	// ...
+	print_elements(&arr)
+}
+</code></pre>
+</details>
+<b>Output:</b>
+<pre class="doc-code">Hellope
+</pre>
 </div>
 <div id="pkg-index">
 <h2>Index</h2>
@@ -1323,7 +1372,7 @@ push_example :: proc() {
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/container/small_array/small_array.odin">small_array.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-10 10:23:43.836121600 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-10 11:59:26.029222700 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
