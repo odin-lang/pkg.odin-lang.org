@@ -224,6 +224,96 @@
 <p>Bindings for <a href="https://github.com/commonmark/cmark">CMark</a>.</p>
 <p>Original authors: John MacFarlane, Vicent Marti, Kārlis Gaņģis, Nick Wellnhofer.
 See LICENSE for license details.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import cm "vendor:commonmark"
+
+// Parsing - Simple interface
+hellope_world :: proc() {
+	fmt.printf("CMark version: %v\n", cm.version_string())
+
+	str := "Hellope *world*!"
+	root := cm.parse_document(raw_data(str), len(str), cm.DEFAULT_OPTIONS)
+	defer cm.node_free(root)
+
+	html := cm.render_html(root, cm.DEFAULT_OPTIONS)
+	defer cm.free(html)
+
+	fmt.println(html)
+}
+
+// Parsing - Streaming interface
+streaming :: proc() {
+	using cm
+
+	STR :: "Hellope *world*!\n\n"
+	N   :: 50
+	STREAM_SIZE :: 42
+
+	str_buf: [len(STR) * N]u8
+	for i in 0..&lt;N {
+		copy(str_buf[i*len(STR):], STR)
+	}
+
+	parser := parser_new(DEFAULT_OPTIONS)
+	defer parser_free(parser)
+
+	buf := str_buf[:]
+	for len(buf) &gt; STREAM_SIZE {
+		parser_feed(parser, raw_data(buf), STREAM_SIZE)
+		buf = buf[STREAM_SIZE:]
+	}
+
+	if len(buf) &gt; 0 {
+		parser_feed(parser, raw_data(buf), len(buf))
+		buf = buf[len(buf):]
+	}
+
+	root := parser_finish(parser)
+	defer cm.node_free(root)
+
+	html := cm.render_html(root, cm.DEFAULT_OPTIONS)
+	defer cm.free(html)
+
+	fmt.println(html)
+}
+</code></pre>
+</details>
+<p>An iterator will walk through a tree of nodes, starting from a root
+node, returning one node at a time, together with information about
+whether the node is being entered or exited.</p>
+<p>The iterator will first descend to a child node, if there is one.
+When there is no child, the iterator will go to the next sibling.
+When there is no next sibling, the iterator will return to the parent
+(but with an <code>Event_Type.Exit</code>).</p>
+<p>The iterator will return <code>.Done</code> when it reaches the root node again.</p>
+<p>One natural application is an HTML renderer, where an <code>.Enter</code> event
+outputs an open tag and an <code>.Exit</code> event outputs a close tag.</p>
+<p>An iterator might also be used to transform an AST in some systematic
+way, for example, turning all level-3 headings into regular paragraphs.</p>
+<p>    usage_example(root: ^Node) {
+        ev_type: Event_Type
+        iter := iter_new(root)
+        defer iter_free(iter)
+        for {
+            ev_type = iter_next(iter)
+            if ev_type == .Done do break
+            cur := iter_get_node(iter)
+            // Do something with <code>cur</code> and <code>ev_type</code>
+        }
+    }</p>
+<p>Iterators will never return <code>.Exit</code> events for leaf nodes,
+which are nodes of type:</p>
+<p>HTML_Block
+Thematic_Break
+Code_Block
+Text
+Soft_Break
+Line_Break
+Code
+HTML_Inline</p>
+<p>Nodes must only be modified after an <code>.Exit</code> event, or an <code>.Enter</code> event for
+leaf nodes.</p>
 </div>
 <div id="pkg-index">
 <h2>Index</h2>
@@ -369,7 +459,7 @@ Procedure Groups (1)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Allocator"><span><a class="doc-id-link" href="#Allocator">Allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L126"><em>Source</em></a></div></h3>
+<h3 id="Allocator"><span><a class="doc-id-link" href="#Allocator">Allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L120"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Allocator :: <span class="keyword-type">struct</span> {
 	calloc:  <span class="keyword-type">proc</span> <span class="string">"c"</span> (num: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, size: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) -> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
@@ -382,18 +472,26 @@ Procedure Groups (1)</summary>
 <p>Custom allocator - Defines the memory allocation functions to be used by CMark
 when parsing and allocating a document tree</p>
 </details>
-<h5>Related Procedures With Parameters</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#node_new_with_mem">node_new_with_mem</a></li>
 <li><a href="/vendor/commonmark/#parser_new_with_mem">parser_new_with_mem</a></li>
 </ul>
-<h5>Related Procedures With Returns</h5>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#get_default_mem_allocator">get_default_mem_allocator</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="Code"><span><a class="doc-id-link" href="#Code">Code<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L189"><em>Source</em></a></div></h3>
+<h3 id="Code"><span><a class="doc-id-link" href="#Code">Code<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L183"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Code :: <span class="keyword-type">struct</span> {
 	info:         <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -405,7 +503,7 @@ when parsing and allocating a document tree</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Custom"><span><a class="doc-id-link" href="#Custom">Custom<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L209"><em>Source</em></a></div></h3>
+<h3 id="Custom"><span><a class="doc-id-link" href="#Custom">Custom<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L203"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Custom :: <span class="keyword-type">struct</span> {
 	on_enter: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -414,7 +512,7 @@ when parsing and allocating a document tree</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Delim_Type"><span><a class="doc-id-link" href="#Delim_Type">Delim_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L91"><em>Source</em></a></div></h3>
+<h3 id="Delim_Type"><span><a class="doc-id-link" href="#Delim_Type">Delim_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L85"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Delim_Type :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	None, 
@@ -422,17 +520,25 @@ when parsing and allocating a document tree</p>
 	Paren, 
 }</pre>
 </div>
-<h5>Related Procedures With Parameters</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#node_set_list_delim">node_set_list_delim</a></li>
 </ul>
-<h5>Related Procedures With Returns</h5>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#node_get_list_delim">node_get_list_delim</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="Event_Type"><span><a class="doc-id-link" href="#Event_Type">Event_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L250"><em>Source</em></a></div></h3>
+<h3 id="Event_Type"><span><a class="doc-id-link" href="#Event_Type">Event_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L244"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Event_Type :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	None, 
@@ -441,18 +547,26 @@ when parsing and allocating a document tree</p>
 	Exit, 
 }</pre>
 </div>
-<h5>Related Procedures With Parameters</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#iter_reset">iter_reset</a></li>
 </ul>
-<h5>Related Procedures With Returns</h5>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#iter_get_event_type">iter_get_event_type</a></li>
 <li><a href="/vendor/commonmark/#iter_next">iter_next</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="Heading"><span><a class="doc-id-link" href="#Heading">Heading<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L197"><em>Source</em></a></div></h3>
+<h3 id="Heading"><span><a class="doc-id-link" href="#Heading">Heading<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L191"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Heading :: <span class="keyword-type">struct</span> {
 	internal_offset: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
@@ -462,11 +576,14 @@ when parsing and allocating a document tree</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Iter"><span><a class="doc-id-link" href="#Iter">Iter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L248"><em>Source</em></a></div></h3>
+<h3 id="Iter"><span><a class="doc-id-link" href="#Iter">Iter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L242"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Iter :: <span class="keyword-type">distinct</span> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a></pre>
 </div>
-<h5>Related Procedures With Parameters</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#iter_free">iter_free</a></li>
 <li><a href="/vendor/commonmark/#iter_get_event_type">iter_get_event_type</a></li>
@@ -475,13 +592,18 @@ when parsing and allocating a document tree</p>
 <li><a href="/vendor/commonmark/#iter_next">iter_next</a></li>
 <li><a href="/vendor/commonmark/#iter_reset">iter_reset</a></li>
 </ul>
-<h5>Related Procedures With Returns</h5>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#iter_new">iter_new</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="Link"><span><a class="doc-id-link" href="#Link">Link<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L204"><em>Source</em></a></div></h3>
+<h3 id="Link"><span><a class="doc-id-link" href="#Link">Link<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L198"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Link :: <span class="keyword-type">struct</span> {
 	url:   <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
@@ -490,7 +612,7 @@ when parsing and allocating a document tree</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="List"><span><a class="doc-id-link" href="#List">List<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L179"><em>Source</em></a></div></h3>
+<h3 id="List"><span><a class="doc-id-link" href="#List">List<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L173"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">List :: <span class="keyword-type">struct</span> {
 	marker_offset: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
@@ -504,7 +626,7 @@ when parsing and allocating a document tree</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="List_Type"><span><a class="doc-id-link" href="#List_Type">List_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L85"><em>Source</em></a></div></h3>
+<h3 id="List_Type"><span><a class="doc-id-link" href="#List_Type">List_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L79"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">List_Type :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	None, 
@@ -512,17 +634,25 @@ when parsing and allocating a document tree</p>
 	Ordered, 
 }</pre>
 </div>
-<h5>Related Procedures With Parameters</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#node_set_list_type">node_set_list_type</a></li>
 </ul>
-<h5>Related Procedures With Returns</h5>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#node_get_list_type">node_get_list_type</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="Node"><span><a class="doc-id-link" href="#Node">Node<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L141"><em>Source</em></a></div></h3>
+<h3 id="Node"><span><a class="doc-id-link" href="#Node">Node<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L135"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Node :: <span class="keyword-type">struct</span> {
 	mem:          ^<a class="code-typename" href="/vendor/commonmark/#Allocator">Allocator</a>,
@@ -554,7 +684,10 @@ when parsing and allocating a document tree</p>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Node creation, destruction, and tree traversal</p>
 </details>
-<h5>Related Procedures With Parameters</h5>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#consolidate_text_nodes">consolidate_text_nodes</a></li>
 <li><a href="/vendor/commonmark/#iter_new">iter_new</a></li>
@@ -607,7 +740,11 @@ when parsing and allocating a document tree</p>
 <li><a href="/vendor/commonmark/#render_man">render_man</a></li>
 <li><a href="/vendor/commonmark/#render_xml">render_xml</a></li>
 </ul>
-<h5>Related Procedures With Returns</h5>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#iter_get_node">iter_get_node</a></li>
 <li><a href="/vendor/commonmark/#iter_get_root">iter_get_root</a></li>
@@ -618,9 +755,10 @@ when parsing and allocating a document tree</p>
 <li><a href="/vendor/commonmark/#parse_from_libc_file">parse_from_libc_file</a></li>
 <li><a href="/vendor/commonmark/#parser_finish">parser_finish</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="Node_Flag"><span><a class="doc-id-link" href="#Node_Flag">Node_Flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L172"><em>Source</em></a></div></h3>
+<h3 id="Node_Flag"><span><a class="doc-id-link" href="#Node_Flag">Node_Flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L166"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Node_Flag :: <span class="keyword-type">enum</span> <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> {
 	Open              = 0, 
@@ -630,13 +768,13 @@ when parsing and allocating a document tree</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Node_Flags"><span><a class="doc-id-link" href="#Node_Flags">Node_Flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L177"><em>Source</em></a></div></h3>
+<h3 id="Node_Flags"><span><a class="doc-id-link" href="#Node_Flags">Node_Flags<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L171"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Node_Flags :: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/commonmark/#Node_Flag">Node_Flag</a>; <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>]</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Node_Type"><span><a class="doc-id-link" href="#Node_Type">Node_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L50"><em>Source</em></a></div></h3>
+<h3 id="Node_Type"><span><a class="doc-id-link" href="#Node_Type">Node_Type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L44"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Node_Type :: <span class="keyword-type">enum</span> <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> {
 	<span class="comment">// Error status</span>
@@ -669,18 +807,26 @@ when parsing and allocating a document tree</p>
 	Last_Inline    = 20, 
 }</pre>
 </div>
-<h5>Related Procedures With Parameters</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#node_new">node_new</a></li>
 <li><a href="/vendor/commonmark/#node_new_with_mem">node_new_with_mem</a></li>
 </ul>
-<h5>Related Procedures With Returns</h5>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#node_get_type">node_get_type</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="Option"><span><a class="doc-id-link" href="#Option">Option<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L31"><em>Source</em></a></div></h3>
+<h3 id="Option"><span><a class="doc-id-link" href="#Option">Option<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L25"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Option :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	Source_Position = 1,  <span class="comment">// Include a `data-sourcepos` attribute on all block elements.</span>
@@ -700,35 +846,62 @@ when parsing and allocating a document tree</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Options"><span><a class="doc-id-link" href="#Options">Options<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L46"><em>Source</em></a></div></h3>
+<h3 id="Options"><span><a class="doc-id-link" href="#Options">Options<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L40"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Options :: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/commonmark/#Option">Option</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/vendor/commonmark/#markdown_to_html">markdown_to_html</a></li>
+<li><a href="/vendor/commonmark/#markdown_to_html_from_string">markdown_to_html_from_string</a></li>
+<li><a href="/vendor/commonmark/#parse_document">parse_document</a></li>
+<li><a href="/vendor/commonmark/#parse_document_from_string">parse_document_from_string</a></li>
+<li><a href="/vendor/commonmark/#parse_from_libc_file">parse_from_libc_file</a></li>
+<li><a href="/vendor/commonmark/#parser_new">parser_new</a></li>
+<li><a href="/vendor/commonmark/#parser_new_with_mem">parser_new_with_mem</a></li>
+<li><a href="/vendor/commonmark/#render_commonmark">render_commonmark</a></li>
+<li><a href="/vendor/commonmark/#render_html">render_html</a></li>
+<li><a href="/vendor/commonmark/#render_latex">render_latex</a></li>
+<li><a href="/vendor/commonmark/#render_man">render_man</a></li>
+<li><a href="/vendor/commonmark/#render_xml">render_xml</a></li>
+</ul>
+</details>
 <h5>Related Constants</h5>
 <ul>
 <li><a href="/vendor/commonmark/#DEFAULT_OPTIONS">DEFAULT_OPTIONS</a></li>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Parser"><span><a class="doc-id-link" href="#Parser">Parser<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L421"><em>Source</em></a></div></h3>
+<h3 id="Parser"><span><a class="doc-id-link" href="#Parser">Parser<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L415"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Parser :: <span class="keyword-type">distinct</span> <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a></pre>
 </div>
-<h5>Related Procedures With Parameters</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#parser_feed">parser_feed</a></li>
 <li><a href="/vendor/commonmark/#parser_feed_from_string">parser_feed_from_string</a></li>
 <li><a href="/vendor/commonmark/#parser_finish">parser_finish</a></li>
 <li><a href="/vendor/commonmark/#parser_free">parser_free</a></li>
 </ul>
-<h5>Related Procedures With Returns</h5>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#parser_new">parser_new</a></li>
 <li><a href="/vendor/commonmark/#parser_new_with_mem">parser_new_with_mem</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="Version_Info"><span><a class="doc-id-link" href="#Version_Info">Version_Info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L98"><em>Source</em></a></div></h3>
+<h3 id="Version_Info"><span><a class="doc-id-link" href="#Version_Info">Version_Info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L92"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Version_Info :: <span class="keyword-type">struct</span> {
 	patch: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
@@ -741,36 +914,40 @@ when parsing and allocating a document tree</p>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Version information</p>
 </details>
-<h5>Related Procedures With Returns</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#version">version</a></li>
 </ul>
+</details>
 <h5>Related Constants</h5>
 <ul>
 <li><a href="/vendor/commonmark/#BINDING_VERSION">BINDING_VERSION</a></li>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="bufsize_t"><span><a class="doc-id-link" href="#bufsize_t">bufsize_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L138"><em>Source</em></a></div></h3>
+<h3 id="bufsize_t"><span><a class="doc-id-link" href="#bufsize_t">bufsize_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L132"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">bufsize_t :: <span class="keyword-type">distinct</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a></pre>
 </div>
 </div>
 <h2 id="pkg-Constants" class="pkg-header">Constants</h2>
 <div class="pkg-entity">
-<h3 id="BINDING_VERSION"><span><a class="doc-id-link" href="#BINDING_VERSION">BINDING_VERSION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L13"><em>Source</em></a></div></h3>
+<h3 id="BINDING_VERSION"><span><a class="doc-id-link" href="#BINDING_VERSION">BINDING_VERSION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L7"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">BINDING_VERSION :: Version_Info{major = 0, minor = 30, patch = 2}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="COMMONMARK_SHARED"><span><a class="doc-id-link" href="#COMMONMARK_SHARED">COMMONMARK_SHARED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L12"><em>Source</em></a></div></h3>
+<h3 id="COMMONMARK_SHARED"><span><a class="doc-id-link" href="#COMMONMARK_SHARED">COMMONMARK_SHARED<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L6"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">COMMONMARK_SHARED: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> : #config(COMMONMARK_SHARED, false)</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="DEFAULT_OPTIONS"><span><a class="doc-id-link" href="#DEFAULT_OPTIONS">DEFAULT_OPTIONS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L48"><em>Source</em></a></div></h3>
+<h3 id="DEFAULT_OPTIONS"><span><a class="doc-id-link" href="#DEFAULT_OPTIONS">DEFAULT_OPTIONS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L42"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DEFAULT_OPTIONS: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/commonmark/#Option">Option</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>] : Options{}</pre>
 </div>
@@ -779,7 +956,7 @@ when parsing and allocating a document tree</p>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="consolidate_text_nodes"><span><a class="doc-id-link" href="#consolidate_text_nodes">consolidate_text_nodes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L418"><em>Source</em></a></div></h3>
+<h3 id="consolidate_text_nodes"><span><a class="doc-id-link" href="#consolidate_text_nodes">consolidate_text_nodes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L412"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">consolidate_text_nodes :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (root: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) ---</pre>
 </div>
@@ -789,17 +966,21 @@ when parsing and allocating a document tree</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="free_cstring"><span><a class="doc-id-link" href="#free_cstring">free_cstring<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L492"><em>Source</em></a></div></h3>
+<h3 id="free_cstring"><span><a class="doc-id-link" href="#free_cstring">free_cstring<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L486"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">free_cstring :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (str: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) {…}</pre>
 </div>
-<h5>Related Procedure Groups</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedure Groups</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#free">free</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="free_rawptr"><span><a class="doc-id-link" href="#free_rawptr">free_rawptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L488"><em>Source</em></a></div></h3>
+<h3 id="free_rawptr"><span><a class="doc-id-link" href="#free_rawptr">free_rawptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L482"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">free_rawptr :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (ptr: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) {…}</pre>
 </div>
@@ -807,19 +988,23 @@ when parsing and allocating a document tree</p>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Helpers to free results from <code>render_*</code>.</p>
 </details>
-<h5>Related Procedure Groups</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedure Groups</h5>
+</summary>
 <ul>
 <li><a href="/vendor/commonmark/#free">free</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="free_string"><span><a class="doc-id-link" href="#free_string">free_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L495"><em>Source</em></a></div></h3>
+<h3 id="free_string"><span><a class="doc-id-link" href="#free_string">free_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L489"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">free_string :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="get_default_mem_allocator"><span><a class="doc-id-link" href="#get_default_mem_allocator">get_default_mem_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L135"><em>Source</em></a></div></h3>
+<h3 id="get_default_mem_allocator"><span><a class="doc-id-link" href="#get_default_mem_allocator">get_default_mem_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L129"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">get_default_mem_allocator :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> (mem: ^<a class="code-typename" href="/vendor/commonmark/#Allocator">Allocator</a>) ---</pre>
 </div>
@@ -829,13 +1014,13 @@ when parsing and allocating a document tree</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="get_default_mem_allocator_as_odin"><span><a class="doc-id-link" href="#get_default_mem_allocator_as_odin">get_default_mem_allocator_as_odin<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L540"><em>Source</em></a></div></h3>
+<h3 id="get_default_mem_allocator_as_odin"><span><a class="doc-id-link" href="#get_default_mem_allocator_as_odin">get_default_mem_allocator_as_odin<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L534"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">get_default_mem_allocator_as_odin :: <span class="keyword-type">proc</span>() -> runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="iter_free"><span><a class="doc-id-link" href="#iter_free">iter_free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L266"><em>Source</em></a></div></h3>
+<h3 id="iter_free"><span><a class="doc-id-link" href="#iter_free">iter_free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L260"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">iter_free :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (iter: ^<a class="code-typename" href="/vendor/commonmark/#Iter">Iter</a>) ---</pre>
 </div>
@@ -845,7 +1030,7 @@ when parsing and allocating a document tree</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="iter_get_event_type"><span><a class="doc-id-link" href="#iter_get_event_type">iter_get_event_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L275"><em>Source</em></a></div></h3>
+<h3 id="iter_get_event_type"><span><a class="doc-id-link" href="#iter_get_event_type">iter_get_event_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L269"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">iter_get_event_type :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (iter: ^<a class="code-typename" href="/vendor/commonmark/#Iter">Iter</a>) -> (event_type: <a class="code-typename" href="/vendor/commonmark/#Event_Type">Event_Type</a>) ---</pre>
 </div>
@@ -855,7 +1040,7 @@ when parsing and allocating a document tree</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="iter_get_node"><span><a class="doc-id-link" href="#iter_get_node">iter_get_node<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L272"><em>Source</em></a></div></h3>
+<h3 id="iter_get_node"><span><a class="doc-id-link" href="#iter_get_node">iter_get_node<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L266"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">iter_get_node :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (iter: ^<a class="code-typename" href="/vendor/commonmark/#Iter">Iter</a>) -> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) ---</pre>
 </div>
@@ -865,7 +1050,7 @@ when parsing and allocating a document tree</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="iter_get_root"><span><a class="doc-id-link" href="#iter_get_root">iter_get_root<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L278"><em>Source</em></a></div></h3>
+<h3 id="iter_get_root"><span><a class="doc-id-link" href="#iter_get_root">iter_get_root<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L272"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">iter_get_root :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (iter: ^<a class="code-typename" href="/vendor/commonmark/#Iter">Iter</a>) -> (root: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) ---</pre>
 </div>
@@ -875,7 +1060,7 @@ when parsing and allocating a document tree</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="iter_new"><span><a class="doc-id-link" href="#iter_new">iter_new<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L263"><em>Source</em></a></div></h3>
+<h3 id="iter_new"><span><a class="doc-id-link" href="#iter_new">iter_new<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L257"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">iter_new :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (root: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (iter: ^<a class="code-typename" href="/vendor/commonmark/#Iter">Iter</a>) ---</pre>
 </div>
@@ -888,7 +1073,7 @@ The memory allocated for the iterator should be released using
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="iter_next"><span><a class="doc-id-link" href="#iter_next">iter_next<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L269"><em>Source</em></a></div></h3>
+<h3 id="iter_next"><span><a class="doc-id-link" href="#iter_next">iter_next<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L263"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">iter_next :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (iter: ^<a class="code-typename" href="/vendor/commonmark/#Iter">Iter</a>) -> (event_type: <a class="code-typename" href="/vendor/commonmark/#Event_Type">Event_Type</a>) ---</pre>
 </div>
@@ -898,7 +1083,7 @@ The memory allocated for the iterator should be released using
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="iter_reset"><span><a class="doc-id-link" href="#iter_reset">iter_reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L283"><em>Source</em></a></div></h3>
+<h3 id="iter_reset"><span><a class="doc-id-link" href="#iter_reset">iter_reset<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L277"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">iter_reset :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (iter: ^<a class="code-typename" href="/vendor/commonmark/#Iter">Iter</a>, current: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, event_type: <a class="code-typename" href="/vendor/commonmark/#Event_Type">Event_Type</a>) ---</pre>
 </div>
@@ -910,7 +1095,7 @@ descendant of the root node or the root node itself.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="markdown_to_html"><span><a class="doc-id-link" href="#markdown_to_html">markdown_to_html<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L117"><em>Source</em></a></div></h3>
+<h3 id="markdown_to_html"><span><a class="doc-id-link" href="#markdown_to_html">markdown_to_html<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L111"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">markdown_to_html :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (text: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>, length: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, options: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/commonmark/#Option">Option</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]) -> (html: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
@@ -922,13 +1107,13 @@ to free the returned buffer.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="markdown_to_html_from_string"><span><a class="doc-id-link" href="#markdown_to_html_from_string">markdown_to_html_from_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L120"><em>Source</em></a></div></h3>
+<h3 id="markdown_to_html_from_string"><span><a class="doc-id-link" href="#markdown_to_html_from_string">markdown_to_html_from_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L114"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">markdown_to_html_from_string :: <span class="keyword-type">proc</span>(text: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, options: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/commonmark/#Option">Option</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]) -> (html: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="node_append_child"><span><a class="doc-id-link" href="#node_append_child">node_append_child<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L415"><em>Source</em></a></div></h3>
+<h3 id="node_append_child"><span><a class="doc-id-link" href="#node_append_child">node_append_child<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L409"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_append_child :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, child: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -939,7 +1124,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_first_child"><span><a class="doc-id-link" href="#node_first_child">node_first_child<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L241"><em>Source</em></a></div></h3>
+<h3 id="node_first_child"><span><a class="doc-id-link" href="#node_first_child">node_first_child<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L235"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_first_child :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (child: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) ---</pre>
 </div>
@@ -949,7 +1134,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_free"><span><a class="doc-id-link" href="#node_free">node_free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L226"><em>Source</em></a></div></h3>
+<h3 id="node_free"><span><a class="doc-id-link" href="#node_free">node_free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L220"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_free :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) ---</pre>
 </div>
@@ -959,7 +1144,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_end_column"><span><a class="doc-id-link" href="#node_get_end_column">node_get_end_column<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L388"><em>Source</em></a></div></h3>
+<h3 id="node_get_end_column"><span><a class="doc-id-link" href="#node_get_end_column">node_get_end_column<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L382"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_end_column :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (column: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) ---</pre>
 </div>
@@ -969,7 +1154,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_end_line"><span><a class="doc-id-link" href="#node_get_end_line">node_get_end_line<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L385"><em>Source</em></a></div></h3>
+<h3 id="node_get_end_line"><span><a class="doc-id-link" href="#node_get_end_line">node_get_end_line<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L379"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_end_line :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (line: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) ---</pre>
 </div>
@@ -979,7 +1164,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_fence_info"><span><a class="doc-id-link" href="#node_get_fence_info">node_get_fence_info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L340"><em>Source</em></a></div></h3>
+<h3 id="node_get_fence_info"><span><a class="doc-id-link" href="#node_get_fence_info">node_get_fence_info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L334"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_fence_info :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (fence_info: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
@@ -989,7 +1174,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_heading_level"><span><a class="doc-id-link" href="#node_get_heading_level">node_get_heading_level<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L309"><em>Source</em></a></div></h3>
+<h3 id="node_get_heading_level"><span><a class="doc-id-link" href="#node_get_heading_level">node_get_heading_level<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L303"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_heading_level :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (level: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) ---</pre>
 </div>
@@ -999,7 +1184,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_list_delim"><span><a class="doc-id-link" href="#node_get_list_delim">node_get_list_delim<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L321"><em>Source</em></a></div></h3>
+<h3 id="node_get_list_delim"><span><a class="doc-id-link" href="#node_get_list_delim">node_get_list_delim<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L315"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_list_delim :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (delim_type: <a class="code-typename" href="/vendor/commonmark/#Delim_Type">Delim_Type</a>) ---</pre>
 </div>
@@ -1009,7 +1194,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_list_start"><span><a class="doc-id-link" href="#node_get_list_start">node_get_list_start<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L327"><em>Source</em></a></div></h3>
+<h3 id="node_get_list_start"><span><a class="doc-id-link" href="#node_get_list_start">node_get_list_start<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L321"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_list_start :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (start: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) ---</pre>
 </div>
@@ -1019,7 +1204,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_list_tight"><span><a class="doc-id-link" href="#node_get_list_tight">node_get_list_tight<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L334"><em>Source</em></a></div></h3>
+<h3 id="node_get_list_tight"><span><a class="doc-id-link" href="#node_get_list_tight">node_get_list_tight<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L328"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_list_tight :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (tight: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1029,7 +1214,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_list_type"><span><a class="doc-id-link" href="#node_get_list_type">node_get_list_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L315"><em>Source</em></a></div></h3>
+<h3 id="node_get_list_type"><span><a class="doc-id-link" href="#node_get_list_type">node_get_list_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L309"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_list_type :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (list_type: <a class="code-typename" href="/vendor/commonmark/#List_Type">List_Type</a>) ---</pre>
 </div>
@@ -1039,7 +1224,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_literal"><span><a class="doc-id-link" href="#node_get_literal">node_get_literal<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L303"><em>Source</em></a></div></h3>
+<h3 id="node_get_literal"><span><a class="doc-id-link" href="#node_get_literal">node_get_literal<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L297"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_literal :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (content: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
@@ -1050,7 +1235,7 @@ Returns <code>nil</code> if called on a node that does not have string content.<
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_on_enter"><span><a class="doc-id-link" href="#node_get_on_enter">node_get_on_enter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L361"><em>Source</em></a></div></h3>
+<h3 id="node_get_on_enter"><span><a class="doc-id-link" href="#node_get_on_enter">node_get_on_enter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L355"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_on_enter :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (on_enter: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
@@ -1061,7 +1246,7 @@ Returns nil if called on a non-custom node.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_on_exit"><span><a class="doc-id-link" href="#node_get_on_exit">node_get_on_exit<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L371"><em>Source</em></a></div></h3>
+<h3 id="node_get_on_exit"><span><a class="doc-id-link" href="#node_get_on_exit">node_get_on_exit<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L365"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_on_exit :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (on_exit: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
@@ -1073,7 +1258,7 @@ called on a non-custom node.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_start_column"><span><a class="doc-id-link" href="#node_get_start_column">node_get_start_column<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L382"><em>Source</em></a></div></h3>
+<h3 id="node_get_start_column"><span><a class="doc-id-link" href="#node_get_start_column">node_get_start_column<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L376"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_start_column :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (column: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) ---</pre>
 </div>
@@ -1083,7 +1268,7 @@ called on a non-custom node.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_start_line"><span><a class="doc-id-link" href="#node_get_start_line">node_get_start_line<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L379"><em>Source</em></a></div></h3>
+<h3 id="node_get_start_line"><span><a class="doc-id-link" href="#node_get_start_line">node_get_start_line<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L373"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_start_line :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (line: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) ---</pre>
 </div>
@@ -1093,7 +1278,7 @@ called on a non-custom node.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_title"><span><a class="doc-id-link" href="#node_get_title">node_get_title<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L354"><em>Source</em></a></div></h3>
+<h3 id="node_get_title"><span><a class="doc-id-link" href="#node_get_title">node_get_title<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L348"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_title :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (title: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
@@ -1104,7 +1289,7 @@ Returns nil if called on a node that is not a link or image.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_type"><span><a class="doc-id-link" href="#node_get_type">node_get_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L296"><em>Source</em></a></div></h3>
+<h3 id="node_get_type"><span><a class="doc-id-link" href="#node_get_type">node_get_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L290"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_type :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (node_type: <a class="code-typename" href="/vendor/commonmark/#Node_Type">Node_Type</a>) ---</pre>
 </div>
@@ -1114,7 +1299,7 @@ Returns nil if called on a node that is not a link or image.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_type_string"><span><a class="doc-id-link" href="#node_get_type_string">node_get_type_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L299"><em>Source</em></a></div></h3>
+<h3 id="node_get_type_string"><span><a class="doc-id-link" href="#node_get_type_string">node_get_type_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L293"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_type_string :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (node_type: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
@@ -1124,7 +1309,7 @@ Returns nil if called on a node that is not a link or image.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_url"><span><a class="doc-id-link" href="#node_get_url">node_get_url<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L347"><em>Source</em></a></div></h3>
+<h3 id="node_get_url"><span><a class="doc-id-link" href="#node_get_url">node_get_url<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L341"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_url :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (url: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
@@ -1135,7 +1320,7 @@ Returns nil if called on a node that is not a link or image.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_get_user_data"><span><a class="doc-id-link" href="#node_get_user_data">node_get_user_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L290"><em>Source</em></a></div></h3>
+<h3 id="node_get_user_data"><span><a class="doc-id-link" href="#node_get_user_data">node_get_user_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L284"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_get_user_data :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (user_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) ---</pre>
 </div>
@@ -1145,7 +1330,7 @@ Returns nil if called on a node that is not a link or image.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_insert_after"><span><a class="doc-id-link" href="#node_insert_after">node_insert_after<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L402"><em>Source</em></a></div></h3>
+<h3 id="node_insert_after"><span><a class="doc-id-link" href="#node_insert_after">node_insert_after<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L396"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_insert_after :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, sibling: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1155,7 +1340,7 @@ Returns nil if called on a node that is not a link or image.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_insert_before"><span><a class="doc-id-link" href="#node_insert_before">node_insert_before<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L399"><em>Source</em></a></div></h3>
+<h3 id="node_insert_before"><span><a class="doc-id-link" href="#node_insert_before">node_insert_before<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L393"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_insert_before :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, sibling: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1165,7 +1350,7 @@ Returns nil if called on a node that is not a link or image.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_last_child"><span><a class="doc-id-link" href="#node_last_child">node_last_child<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L244"><em>Source</em></a></div></h3>
+<h3 id="node_last_child"><span><a class="doc-id-link" href="#node_last_child">node_last_child<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L238"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_last_child :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (child: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) ---</pre>
 </div>
@@ -1175,7 +1360,7 @@ Returns nil if called on a node that is not a link or image.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_new"><span><a class="doc-id-link" href="#node_new">node_new<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L219"><em>Source</em></a></div></h3>
+<h3 id="node_new"><span><a class="doc-id-link" href="#node_new">node_new<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L213"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_new :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (type: <a class="code-typename" href="/vendor/commonmark/#Node_Type">Node_Type</a>) -> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) ---</pre>
 </div>
@@ -1187,7 +1372,7 @@ to assign.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_new_with_mem"><span><a class="doc-id-link" href="#node_new_with_mem">node_new_with_mem<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L223"><em>Source</em></a></div></h3>
+<h3 id="node_new_with_mem"><span><a class="doc-id-link" href="#node_new_with_mem">node_new_with_mem<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L217"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_new_with_mem :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (type: <a class="code-typename" href="/vendor/commonmark/#Node_Type">Node_Type</a>, mem: ^<a class="code-typename" href="/vendor/commonmark/#Allocator">Allocator</a>) -> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) ---</pre>
 </div>
@@ -1198,7 +1383,7 @@ Note: be sure to use the same allocator for every node in a tree, or bad things 
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_next"><span><a class="doc-id-link" href="#node_next">node_next<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L232"><em>Source</em></a></div></h3>
+<h3 id="node_next"><span><a class="doc-id-link" href="#node_next">node_next<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L226"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_next :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (next: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) ---</pre>
 </div>
@@ -1209,7 +1394,7 @@ Note: be sure to use the same allocator for every node in a tree, or bad things 
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_parent"><span><a class="doc-id-link" href="#node_parent">node_parent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L238"><em>Source</em></a></div></h3>
+<h3 id="node_parent"><span><a class="doc-id-link" href="#node_parent">node_parent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L232"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_parent :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (parent: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) ---</pre>
 </div>
@@ -1219,7 +1404,7 @@ Note: be sure to use the same allocator for every node in a tree, or bad things 
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_prepend_child"><span><a class="doc-id-link" href="#node_prepend_child">node_prepend_child<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L411"><em>Source</em></a></div></h3>
+<h3 id="node_prepend_child"><span><a class="doc-id-link" href="#node_prepend_child">node_prepend_child<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L405"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_prepend_child :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, child: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1230,7 +1415,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_previous"><span><a class="doc-id-link" href="#node_previous">node_previous<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L235"><em>Source</em></a></div></h3>
+<h3 id="node_previous"><span><a class="doc-id-link" href="#node_previous">node_previous<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L229"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_previous :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (prev: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) ---</pre>
 </div>
@@ -1240,7 +1425,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_replace"><span><a class="doc-id-link" href="#node_replace">node_replace<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L407"><em>Source</em></a></div></h3>
+<h3 id="node_replace"><span><a class="doc-id-link" href="#node_replace">node_replace<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L401"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_replace :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (old_node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, new_node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1252,7 +1437,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_set_fence_info"><span><a class="doc-id-link" href="#node_set_fence_info">node_set_fence_info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L343"><em>Source</em></a></div></h3>
+<h3 id="node_set_fence_info"><span><a class="doc-id-link" href="#node_set_fence_info">node_set_fence_info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L337"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_set_fence_info :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, fence_info: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1262,7 +1447,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_set_heading_level"><span><a class="doc-id-link" href="#node_set_heading_level">node_set_heading_level<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L312"><em>Source</em></a></div></h3>
+<h3 id="node_set_heading_level"><span><a class="doc-id-link" href="#node_set_heading_level">node_set_heading_level<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L306"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_set_heading_level :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, level: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1272,7 +1457,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_set_list_delim"><span><a class="doc-id-link" href="#node_set_list_delim">node_set_list_delim<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L324"><em>Source</em></a></div></h3>
+<h3 id="node_set_list_delim"><span><a class="doc-id-link" href="#node_set_list_delim">node_set_list_delim<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L318"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_set_list_delim :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, delim_type: <a class="code-typename" href="/vendor/commonmark/#Delim_Type">Delim_Type</a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1282,7 +1467,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_set_list_start"><span><a class="doc-id-link" href="#node_set_list_start">node_set_list_start<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L331"><em>Source</em></a></div></h3>
+<h3 id="node_set_list_start"><span><a class="doc-id-link" href="#node_set_list_start">node_set_list_start<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L325"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_set_list_start :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, start: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1293,7 +1478,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_set_list_tight"><span><a class="doc-id-link" href="#node_set_list_tight">node_set_list_tight<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L337"><em>Source</em></a></div></h3>
+<h3 id="node_set_list_tight"><span><a class="doc-id-link" href="#node_set_list_tight">node_set_list_tight<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L331"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_set_list_tight :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, tight: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1303,7 +1488,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_set_list_type"><span><a class="doc-id-link" href="#node_set_list_type">node_set_list_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L318"><em>Source</em></a></div></h3>
+<h3 id="node_set_list_type"><span><a class="doc-id-link" href="#node_set_list_type">node_set_list_type<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L312"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_set_list_type :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, list_type: <a class="code-typename" href="/vendor/commonmark/#List_Type">List_Type</a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1313,7 +1498,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_set_literal"><span><a class="doc-id-link" href="#node_set_literal">node_set_literal<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L306"><em>Source</em></a></div></h3>
+<h3 id="node_set_literal"><span><a class="doc-id-link" href="#node_set_literal">node_set_literal<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L300"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_set_literal :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, content: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1323,7 +1508,7 @@ Returns <code>true</code> on success, <code>false</code> on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_set_on_enter"><span><a class="doc-id-link" href="#node_set_on_enter">node_set_on_enter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L366"><em>Source</em></a></div></h3>
+<h3 id="node_set_on_enter"><span><a class="doc-id-link" href="#node_set_on_enter">node_set_on_enter<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L360"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_set_on_enter :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, on_enter: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1335,7 +1520,7 @@ Returns <code>true</code> on success, <code>false</code>on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_set_on_exit"><span><a class="doc-id-link" href="#node_set_on_exit">node_set_on_exit<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L376"><em>Source</em></a></div></h3>
+<h3 id="node_set_on_exit"><span><a class="doc-id-link" href="#node_set_on_exit">node_set_on_exit<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L370"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_set_on_exit :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, on_exit: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1347,7 +1532,7 @@ Returns 1 on success 0 on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_set_title"><span><a class="doc-id-link" href="#node_set_title">node_set_title<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L357"><em>Source</em></a></div></h3>
+<h3 id="node_set_title"><span><a class="doc-id-link" href="#node_set_title">node_set_title<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L351"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_set_title :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, title: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1357,7 +1542,7 @@ Returns 1 on success 0 on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_set_url"><span><a class="doc-id-link" href="#node_set_url">node_set_url<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L350"><em>Source</em></a></div></h3>
+<h3 id="node_set_url"><span><a class="doc-id-link" href="#node_set_url">node_set_url<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L344"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_set_url :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, url: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1367,7 +1552,7 @@ Returns 1 on success 0 on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_set_user_data"><span><a class="doc-id-link" href="#node_set_user_data">node_set_user_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L293"><em>Source</em></a></div></h3>
+<h3 id="node_set_user_data"><span><a class="doc-id-link" href="#node_set_user_data">node_set_user_data<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L287"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_set_user_data :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, user_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> (success: <a href="/base/builtin#b32"><span class="doc-builtin">b32</span></a>) ---</pre>
 </div>
@@ -1377,7 +1562,7 @@ Returns 1 on success 0 on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="node_unlink"><span><a class="doc-id-link" href="#node_unlink">node_unlink<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L396"><em>Source</em></a></div></h3>
+<h3 id="node_unlink"><span><a class="doc-id-link" href="#node_unlink">node_unlink<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L390"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">node_unlink :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (node: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) ---</pre>
 </div>
@@ -1388,7 +1573,7 @@ Returns 1 on success 0 on failure.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="parse_document"><span><a class="doc-id-link" href="#parse_document">parse_document<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L443"><em>Source</em></a></div></h3>
+<h3 id="parse_document"><span><a class="doc-id-link" href="#parse_document">parse_document<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L437"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parse_document :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (buffer: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, len: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>, options: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/commonmark/#Option">Option</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]) -> (root: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) ---</pre>
 </div>
@@ -1400,19 +1585,19 @@ the node tree should be released using 'node_free' when it is no longer needed.<
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="parse_document_from_string"><span><a class="doc-id-link" href="#parse_document_from_string">parse_document_from_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L458"><em>Source</em></a></div></h3>
+<h3 id="parse_document_from_string"><span><a class="doc-id-link" href="#parse_document_from_string">parse_document_from_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L452"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parse_document_from_string :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, options: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/commonmark/#Option">Option</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]) -> (root: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="parse_from_libc_file"><span><a class="doc-id-link" href="#parse_from_libc_file">parse_from_libc_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L452"><em>Source</em></a></div></h3>
+<h3 id="parse_from_libc_file"><span><a class="doc-id-link" href="#parse_from_libc_file">parse_from_libc_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L446"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parse_from_libc_file :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (file: ^c.<a class="code-typename" href="/core/c/#FILE">FILE</a>, options: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/commonmark/#Option">Option</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]) -> (root: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="parser_feed"><span><a class="doc-id-link" href="#parser_feed">parser_feed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L435"><em>Source</em></a></div></h3>
+<h3 id="parser_feed"><span><a class="doc-id-link" href="#parser_feed">parser_feed<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L429"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parser_feed :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (parser: ^<a class="code-typename" href="/vendor/commonmark/#Parser">Parser</a>, buffer: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, len: <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>) ---</pre>
 </div>
@@ -1422,13 +1607,13 @@ the node tree should be released using 'node_free' when it is no longer needed.<
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="parser_feed_from_string"><span><a class="doc-id-link" href="#parser_feed_from_string">parser_feed_from_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L455"><em>Source</em></a></div></h3>
+<h3 id="parser_feed_from_string"><span><a class="doc-id-link" href="#parser_feed_from_string">parser_feed_from_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L449"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parser_feed_from_string :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (parser: ^<a class="code-typename" href="/vendor/commonmark/#Parser">Parser</a>, s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="parser_finish"><span><a class="doc-id-link" href="#parser_finish">parser_finish<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L438"><em>Source</em></a></div></h3>
+<h3 id="parser_finish"><span><a class="doc-id-link" href="#parser_finish">parser_finish<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L432"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parser_finish :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (parser: ^<a class="code-typename" href="/vendor/commonmark/#Parser">Parser</a>) -> (root: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>) ---</pre>
 </div>
@@ -1438,7 +1623,7 @@ the node tree should be released using 'node_free' when it is no longer needed.<
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="parser_free"><span><a class="doc-id-link" href="#parser_free">parser_free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L432"><em>Source</em></a></div></h3>
+<h3 id="parser_free"><span><a class="doc-id-link" href="#parser_free">parser_free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L426"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parser_free :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (parser: ^<a class="code-typename" href="/vendor/commonmark/#Parser">Parser</a>) ---</pre>
 </div>
@@ -1448,7 +1633,7 @@ the node tree should be released using 'node_free' when it is no longer needed.<
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="parser_new"><span><a class="doc-id-link" href="#parser_new">parser_new<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L426"><em>Source</em></a></div></h3>
+<h3 id="parser_new"><span><a class="doc-id-link" href="#parser_new">parser_new<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L420"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parser_new :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (options: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/commonmark/#Option">Option</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]) -> (parser: ^<a class="code-typename" href="/vendor/commonmark/#Parser">Parser</a>) ---</pre>
 </div>
@@ -1458,7 +1643,7 @@ the node tree should be released using 'node_free' when it is no longer needed.<
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="parser_new_with_mem"><span><a class="doc-id-link" href="#parser_new_with_mem">parser_new_with_mem<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L429"><em>Source</em></a></div></h3>
+<h3 id="parser_new_with_mem"><span><a class="doc-id-link" href="#parser_new_with_mem">parser_new_with_mem<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L423"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">parser_new_with_mem :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (options: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/commonmark/#Option">Option</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>], mem: ^<a class="code-typename" href="/vendor/commonmark/#Allocator">Allocator</a>) -> (parser: ^<a class="code-typename" href="/vendor/commonmark/#Parser">Parser</a>) ---</pre>
 </div>
@@ -1468,7 +1653,7 @@ the node tree should be released using 'node_free' when it is no longer needed.<
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="render_commonmark"><span><a class="doc-id-link" href="#render_commonmark">render_commonmark<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L480"><em>Source</em></a></div></h3>
+<h3 id="render_commonmark"><span><a class="doc-id-link" href="#render_commonmark">render_commonmark<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L474"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">render_commonmark :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (root: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, options: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/commonmark/#Option">Option</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>], width: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> (commonmark: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
@@ -1479,7 +1664,7 @@ It is the caller's responsibility to free the returned buffer.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="render_html"><span><a class="doc-id-link" href="#render_html">render_html<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L472"><em>Source</em></a></div></h3>
+<h3 id="render_html"><span><a class="doc-id-link" href="#render_html">render_html<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L466"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">render_html :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (root: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, options: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/commonmark/#Option">Option</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]) -> (html: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
@@ -1491,7 +1676,7 @@ It is the caller's responsibility to free the returned buffer.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="render_latex"><span><a class="doc-id-link" href="#render_latex">render_latex<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L484"><em>Source</em></a></div></h3>
+<h3 id="render_latex"><span><a class="doc-id-link" href="#render_latex">render_latex<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L478"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">render_latex :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (root: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, options: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/commonmark/#Option">Option</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>], width: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> (latex: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
@@ -1502,7 +1687,7 @@ It is the caller's responsibility to free the returned buffer.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="render_man"><span><a class="doc-id-link" href="#render_man">render_man<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L476"><em>Source</em></a></div></h3>
+<h3 id="render_man"><span><a class="doc-id-link" href="#render_man">render_man<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L470"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">render_man :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (root: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, options: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/commonmark/#Option">Option</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>], width: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> (groff: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
@@ -1513,7 +1698,7 @@ It is the caller's responsibility to free the returned buffer.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="render_xml"><span><a class="doc-id-link" href="#render_xml">render_xml<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L467"><em>Source</em></a></div></h3>
+<h3 id="render_xml"><span><a class="doc-id-link" href="#render_xml">render_xml<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L461"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">render_xml :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (root: ^<a class="code-typename" href="/vendor/commonmark/#Node">Node</a>, options: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/commonmark/#Option">Option</a>; <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>]) -> (xml: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
@@ -1524,20 +1709,20 @@ It is the caller's responsibilityto free the returned buffer.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="version"><span><a class="doc-id-link" href="#version">version<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L107"><em>Source</em></a></div></h3>
+<h3 id="version"><span><a class="doc-id-link" href="#version">version<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L101"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">version :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> (res: <a class="code-typename" href="/vendor/commonmark/#Version_Info">Version_Info</a>) ---</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="version_string"><span><a class="doc-id-link" href="#version_string">version_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L108"><em>Source</em></a></div></h3>
+<h3 id="version_string"><span><a class="doc-id-link" href="#version_string">version_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L102"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">version_string :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> (res: <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>) ---</pre>
 </div>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="free"><span><a class="doc-id-link" href="#free">free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L498"><em>Source</em></a></div></h3>
+<h3 id="free"><span><a class="doc-id-link" href="#free">free<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin#L492"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">free :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/vendor/commonmark/#free_rawptr">free_rawptr</a>,
@@ -1550,9 +1735,10 @@ It is the caller's responsibilityto free the returned buffer.</p>
 <h2 id="pkg-source-files">Source Files</h2>
 <ul>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/cmark.odin">cmark.odin</a></li>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/commonmark/doc.odin">doc.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-10 14:20:31.253801900 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-10 15:58:38.797823100 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

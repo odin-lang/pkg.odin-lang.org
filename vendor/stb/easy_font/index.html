@@ -220,6 +220,47 @@
 </div>
 <ul id="odin-search-results"></ul>
 <div id="pkg-top">
+<h2>Overview</h2>
+<div id="pkg-overview">
+<p>An Odin-native source port of <a href="https://github.com/nothings/stb/blob/master/stb_easy_font.h">stb_easy_font.h</a>.</p>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">quads: [999]easy_font.Quad = ---
+
+color := rl.GREEN
+c     := transmute(easy_font.Color)color
+num_quads := easy_font.print(10, 60, TEXT, c, quads[:])
+
+for q in quads[:num_quads] {
+	tl    := q.tl.v
+	br    := q.br.v
+	color  = transmute(rl.Color)q.tl.c
+
+	r := rl.Rectangle{x = tl.x, y = tl.y, width = br.x - tl.x, height = br.y - tl.y}
+
+	// Yes, we could just use the `color` from above, but this shows how to get it back from the vertex.
+	// And in practice this code will likely not live as close to the `easy_font` call.
+	rl.DrawRectangleRec(r, color)
+}
+</code></pre>
+</details>
+<p>Changelog:</p>
+<pre>2022-04-03
+	Bug fixes
+	Add `print(x, y, text, color, quad_buffer)` version that takes `[]quad`.
+		(Same internal memory layout as []u8 API, but more convenient for the caller.)
+	Add optional `scale := f32(1.0)` param to `print` to embiggen the glyph quads.
+
+2021-09-14
+	Original Odin version
+
+</pre>
+<p>Credits:</p>
+<pre>Original port: gingerBill
+Bugfixes:      Florian Behr & Jeroen van Rijn
+Additions:     Jeroen van Rijn
+</pre>
+</div>
 <div id="pkg-index">
 <h2>Index</h2>
 <div>
@@ -278,13 +319,26 @@ Procedure Groups (2)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Color"><span><a class="doc-id-link" href="#Color">Color<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L46"><em>Source</em></a></div></h3>
+<h3 id="Color"><span><a class="doc-id-link" href="#Color">Color<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L44"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Color :: [4]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/vendor/stb/easy_font/#draw_segs_quad_buffer">draw_segs_quad_buffer</a></li>
+<li><a href="/vendor/stb/easy_font/#draw_segs_vertex_buffer">draw_segs_vertex_buffer</a></li>
+<li><a href="/vendor/stb/easy_font/#print_quad_buffer">print_quad_buffer</a></li>
+<li><a href="/vendor/stb/easy_font/#print_vertex_buffer">print_vertex_buffer</a></li>
+<li><a href="/vendor/stb/easy_font/#draw_segs">draw_segs</a>&nbsp;<em>(procedure groups)</em></li>
+<li><a href="/vendor/stb/easy_font/#print">print</a>&nbsp;<em>(procedure groups)</em></li>
+</ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="Quad"><span><a class="doc-id-link" href="#Quad">Quad<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L54"><em>Source</em></a></div></h3>
+<h3 id="Quad"><span><a class="doc-id-link" href="#Quad">Quad<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L52"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Quad :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
 	tl: <a class="code-typename" href="/vendor/stb/easy_font/#Vertex">Vertex</a>,
@@ -295,7 +349,7 @@ Procedure Groups (2)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Vertex"><span><a class="doc-id-link" href="#Vertex">Vertex<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L48"><em>Source</em></a></div></h3>
+<h3 id="Vertex"><span><a class="doc-id-link" href="#Vertex">Vertex<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L46"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Vertex :: <span class="keyword-type">struct</span> {
 	v: [3]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
@@ -304,7 +358,7 @@ Procedure Groups (2)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="info_struct"><span><a class="doc-id-link" href="#info_struct">info_struct<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L190"><em>Source</em></a></div></h3>
+<h3 id="info_struct"><span><a class="doc-id-link" href="#info_struct">info_struct<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L188"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">info_struct :: <span class="keyword-type">struct</span> {
 	advance: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
@@ -319,7 +373,7 @@ Procedure Groups (2)</summary>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="draw_segs_quad_buffer"><span><a class="doc-id-link" href="#draw_segs_quad_buffer">draw_segs_quad_buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L63"><em>Source</em></a></div></h3>
+<h3 id="draw_segs_quad_buffer"><span><a class="doc-id-link" href="#draw_segs_quad_buffer">draw_segs_quad_buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L61"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">draw_segs_quad_buffer :: <span class="keyword-type">proc</span>(
 	x, y:         <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, 
@@ -335,13 +389,17 @@ Procedure Groups (2)</summary>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Same memory layout, but takes a []quad instead of []byte</p>
 </details>
-<h5>Related Procedure Groups</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedure Groups</h5>
+</summary>
 <ul>
 <li><a href="/vendor/stb/easy_font/#draw_segs">draw_segs</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="draw_segs_vertex_buffer"><span><a class="doc-id-link" href="#draw_segs_vertex_buffer">draw_segs_vertex_buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L95"><em>Source</em></a></div></h3>
+<h3 id="draw_segs_vertex_buffer"><span><a class="doc-id-link" href="#draw_segs_vertex_buffer">draw_segs_vertex_buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L93"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">draw_segs_vertex_buffer :: <span class="keyword-type">proc</span>(
 	x, y:         <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, 
@@ -357,25 +415,29 @@ Procedure Groups (2)</summary>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Compatible with original C API</p>
 </details>
-<h5>Related Procedure Groups</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedure Groups</h5>
+</summary>
 <ul>
 <li><a href="/vendor/stb/easy_font/#draw_segs">draw_segs</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="font_spacing"><span><a class="doc-id-link" href="#font_spacing">font_spacing<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L106"><em>Source</em></a></div></h3>
+<h3 id="font_spacing"><span><a class="doc-id-link" href="#font_spacing">font_spacing<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L104"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">font_spacing :: <span class="keyword-type">proc</span>(spacing: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="height"><span><a class="doc-id-link" href="#height">height<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L174"><em>Source</em></a></div></h3>
+<h3 id="height"><span><a class="doc-id-link" href="#height">height<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L172"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">height :: <span class="keyword-type">proc</span>(text: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="print_quad_buffer"><span><a class="doc-id-link" href="#print_quad_buffer">print_quad_buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L111"><em>Source</em></a></div></h3>
+<h3 id="print_quad_buffer"><span><a class="doc-id-link" href="#print_quad_buffer">print_quad_buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L109"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">print_quad_buffer :: <span class="keyword-type">proc</span>(
 	x, y:        <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, 
@@ -389,13 +451,17 @@ Procedure Groups (2)</summary>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Same memory layout, but takes a []quad instead of []byte</p>
 </details>
-<h5>Related Procedure Groups</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedure Groups</h5>
+</summary>
 <ul>
 <li><a href="/vendor/stb/easy_font/#print">print</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="print_vertex_buffer"><span><a class="doc-id-link" href="#print_vertex_buffer">print_vertex_buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L146"><em>Source</em></a></div></h3>
+<h3 id="print_vertex_buffer"><span><a class="doc-id-link" href="#print_vertex_buffer">print_vertex_buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L144"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">print_vertex_buffer :: <span class="keyword-type">proc</span>(
 	x, y:          <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, 
@@ -409,20 +475,24 @@ Procedure Groups (2)</summary>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Compatible with original C API</p>
 </details>
-<h5>Related Procedure Groups</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedure Groups</h5>
+</summary>
 <ul>
 <li><a href="/vendor/stb/easy_font/#print">print</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="width"><span><a class="doc-id-link" href="#width">width<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L153"><em>Source</em></a></div></h3>
+<h3 id="width"><span><a class="doc-id-link" href="#width">width<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L151"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">width :: <span class="keyword-type">proc</span>(text: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {…}</pre>
 </div>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
-<h3 id="draw_segs"><span><a class="doc-id-link" href="#draw_segs">draw_segs<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L101"><em>Source</em></a></div></h3>
+<h3 id="draw_segs"><span><a class="doc-id-link" href="#draw_segs">draw_segs<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L99"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">draw_segs :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/vendor/stb/easy_font/#draw_segs_quad_buffer">draw_segs_quad_buffer</a>,
@@ -432,7 +502,7 @@ Procedure Groups (2)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="print"><span><a class="doc-id-link" href="#print">print<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L151"><em>Source</em></a></div></h3>
+<h3 id="print"><span><a class="doc-id-link" href="#print">print<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin#L149"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">print :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/vendor/stb/easy_font/#print_quad_buffer">print_quad_buffer</a>,
@@ -447,12 +517,12 @@ Procedure Groups (2)</summary>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/stb/easy_font/stb_easy_font.odin">stb_easy_font.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-10 14:20:33.244165600 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-10 15:58:41.137231000 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
 <ul>
-<li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#pkg-overview">Overview</a><li><a href="#pkg-Types">Types</a><ul>
 <li><a href="#Color">Color</a></li>
 <li><a href="#Quad">Quad</a></li>
 <li><a href="#Vertex">Vertex</a></li>
