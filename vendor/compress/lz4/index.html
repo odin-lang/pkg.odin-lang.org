@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>package compress/lz4 - pkg.odin-lang.org</title>	<link rel="icon" href="/favicon.svg">
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/scss/custom.min.css">
+	<link rel=stylesheet href="//odin-lang.org/lib/highlight/styles/github-dark.min.css">
+	<script src="//odin-lang.org/lib/highlight/highlight.min.js"></script>
+
+	<script>hljs.registerLanguage("odin",function(a){return{aliases:["odin","odinlang","odin-lang"],keywords:{keyword:"auto_cast bit_set break case cast context continue defer distinct do dynamic else enum fallthrough for foreign if import in map not_in or_else or_return package proc return struct switch transmute type_of typeid union using when where",literal:"true false nil",built_in:"abs align_of cap clamp complex conj expand_to_tuple imag jmag kmag len max min offset_of quaternion real size_of soa_unzip soa_zip swizzle type_info_of type_of typeid_of"},illegal:"</",contains:[a.C_LINE_COMMENT_MODE,a.C_BLOCK_COMMENT_MODE,{className:"string",variants:[a.QUOTE_STRING_MODE,{begin:"'",end:"[^\\\\]'"},{begin:"`",end:"`"}]},{className:"number",variants:[{begin:a.C_NUMBER_RE+"[ijk]",relevance:1},a.C_NUMBER_MODE]}]}})</script>
+	<script>hljs.highlightAll()</script>
+	<script>
+		function OSDarkModeQuery() {
+			return window.matchMedia?.("(prefers-color-scheme: dark)");
+		}
+		function setDarkMode() {
+			document.body.classList.add("dark-mode");
+			window.localStorage.setItem("theme", "dark");
+		}
+		function removeDarkMode() {
+			document.body.classList.remove("dark-mode");
+			window.localStorage.setItem("theme", "light");
+		}
+		function toggleDarkMode() {
+			if (document.body.classList.contains("dark-mode")) removeDarkMode()
+			else setDarkMode()
+		}
+		function syncThemeToOS() {
+			if (OSDarkModeQuery().matches) setDarkMode()
+			else removeDarkMode()
+		}
+		document.addEventListener("DOMContentLoaded", () => {
+			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+		});
+	</script>
+	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
+
+	<link rel="stylesheet" type="text/css" href="/style.css">
+
+	</style>
+</head>
+<body>
+<script>
+	const themeSet = window.localStorage.getItem("theme");
+	if (themeSet === null) {
+		syncThemeToOS();
+	} else if (themeSet === "dark") {
+		setDarkMode();
+	} else if (themeSet === "light") {
+		removeDarkMode();
+	}
+</script>
+<header class="sticky-top">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
+		<div class="container">
+			<a class="navbar-brand" href="https://odin-lang.org/">
+			<img src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#odin-navbar-content" aria-controls="odin-navbar-content" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+			<div class="collapse navbar-collapse" id="odin-navbar-content">
+			<ul class="navbar-nav ms-md-auto">
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/">Home</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/docs">Docs</a></li>
+				<li class="nav-item"><a class="nav-link active" href="/">Packages</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/news">News</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/showcase">Showcase</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://forum.odin-lang.org">Forum</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://odin-lang.org/community">Community</a></li>
+				<li class="nav-item"><a class="nav-link" href="https://github.com/odin-lang/Odin" target="_blank">GitHub</a></li>
+				<li class="nav-item">
+					<a
+						class="nav-link btn-dark-mode"
+						onclick="toggleDarkMode();"
+						title="Toggle Light/Dark Mode"
+					>
+						<span class="dark-mode-appearance">Appearance:</span>
+						<svg fill="white" id="dark-mode-icon" viewBox="0 0 384 512"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"/></svg>
+						<svg fill="white" id="light-mode-icon" viewBox="0 0 16 16">
+						  <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+						</svg>
+					</button>
+					</a>
+				</li>
+			</ul>
+		</div>
+		</div>
+	</nav>
+</header>
+<main>
+<div class="container full-width">
+<div class="row odin-main my-4" id="pkg">
+<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">
+<div class="py-3">
+<div>Current Package: <em><a href="/vendor/compress/lz4">vendor_compress_lz4</a></em></div><br>
+<h4><a style="text-transform: capitalize; color: inherit;" href="/vendor">vendor Library</a></h4>
+<ul>
+<li class="nav-item"><a href="/vendor/box2d">box2d</a></li>
+<li class="nav-item"><a href="/vendor/cgltf">cgltf</a></li>
+<li class="nav-item"><a href="/vendor/commonmark">commonmark</a></li>
+<li class="nav-item">compress<ul>
+<li><a class="active" href="/vendor/compress/lz4">lz4</a></li>
+</ul>
+
+</li>
+<li class="nav-item">darwin<ul>
+<li><a href="/vendor/darwin/CoreVideo">CoreVideo</a></li>
+<li><a href="/vendor/darwin/Metal">Metal</a></li>
+<li><a href="/vendor/darwin/MetalKit">MetalKit</a></li>
+<li><a href="/vendor/darwin/QuartzCore">QuartzCore</a></li>
+</ul>
+
+</li>
+<li class="nav-item">directx<ul>
+<li><a href="/vendor/directx/d3d11">d3d11</a></li>
+<li><a href="/vendor/directx/d3d12">d3d12</a></li>
+<li><a href="/vendor/directx/d3d_compiler">d3d_compiler</a></li>
+<li><a href="/vendor/directx/dxc">dxc</a></li>
+<li><a href="/vendor/directx/dxgi">dxgi</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/ENet">ENet</a></li>
+<li class="nav-item"><a href="/vendor/fontstash">fontstash</a></li>
+<li class="nav-item"><a href="/vendor/ggpo">ggpo</a></li>
+<li class="nav-item"><a href="/vendor/glfw">glfw</a><ul>
+<li><a href="/vendor/glfw/bindings">bindings</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/kb_text_shape">kb_text_shape</a></li>
+<li class="nav-item">lua<ul>
+<li><a href="/vendor/lua/5.4">5.4</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/microui">microui</a></li>
+<li class="nav-item"><a href="/vendor/miniaudio">miniaudio</a></li>
+<li class="nav-item"><a href="/vendor/nanovg">nanovg</a><ul>
+<li><a href="/vendor/nanovg/gl">gl</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/OpenEXRCore">OpenEXRCore</a></li>
+<li class="nav-item"><a href="/vendor/OpenGL">OpenGL</a></li>
+<li class="nav-item"><a href="/vendor/portmidi">portmidi</a></li>
+<li class="nav-item"><a href="/vendor/raylib">raylib</a></li>
+<li class="nav-item"><a href="/vendor/sdl2">sdl2</a><ul>
+<li><a href="/vendor/sdl2/image">image</a></li>
+<li><a href="/vendor/sdl2/mixer">mixer</a></li>
+<li><a href="/vendor/sdl2/net">net</a></li>
+<li><a href="/vendor/sdl2/ttf">ttf</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/sdl3">sdl3</a><ul>
+<li><a href="/vendor/sdl3/image">image</a></li>
+<li><a href="/vendor/sdl3/ttf">ttf</a></li>
+</ul>
+
+</li>
+<li class="nav-item">stb<ul>
+<li><a href="/vendor/stb/easy_font">easy_font</a></li>
+<li><a href="/vendor/stb/image">image</a></li>
+<li><a href="/vendor/stb/rect_pack">rect_pack</a></li>
+<li><a href="/vendor/stb/truetype">truetype</a></li>
+<li><a href="/vendor/stb/vorbis">vorbis</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/vulkan">vulkan</a></li>
+<li class="nav-item"><a href="/vendor/wgpu">wgpu</a><ul>
+<li><a href="/vendor/wgpu/glfwglue">glfwglue</a></li>
+<li><a href="/vendor/wgpu/sdl2glue">sdl2glue</a></li>
+<li><a href="/vendor/wgpu/sdl3glue">sdl3glue</a></li>
+</ul>
+
+</li>
+<li class="nav-item">windows<ul>
+<li><a href="/vendor/windows/GameInput">GameInput</a></li>
+<li><a href="/vendor/windows/XAudio2">XAudio2</a></li>
+</ul>
+
+</li>
+<li class="nav-item">x11<ul>
+<li><a href="/vendor/x11/xlib">xlib</a></li>
+</ul>
+
+</li>
+<li class="nav-item"><a href="/vendor/zlib">zlib</a></li>
+</ul>
+</div>
+</nav>
+<article class="col-lg-8 p-4 documentation odin-article">
+<nav class="pkg-breadcrumb" aria-label="breadcrumb">
+<ol class="breadcrumb">
+<li class="breadcrumb-item"><a href="/vendor">vendor</a></li>
+<li class="breadcrumb-item">compress</li>
+<li class="breadcrumb-item active" aria-current="page"><a href="/vendor/compress/lz4">lz4</a></li>
+</ol>
+</nav>
+<h1>package vendor:compress/lz4<div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4"><em>Source</em></a></div></h1>
+
+		<div class="odin-search-wrapper">
+			<input type="search" id="odin-search" class="odin-search-package" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">
+			<div class="odin-search-shortcut">
+				<div class="odin-search-key key-macos">⌘K</div>
+				<div class="odin-search-key key-windows">Ctrl+K</div>
+				<span class="odin-search-or">or</span>
+				<div class="odin-search-key">/</div>
+			</div>
+		</div>
+	
+<div id="odin-search-info">
+<div id="odin-search-time"></div>
+
+		<div id="odin-search-options">
+			<input type="checkbox" id="odin-search-filter" name="odin-search-filter">
+			<label for="odin-search-filter">Filter Results</label>
+		</div>
+</div>
+<ul id="odin-search-results"></ul>
+<div id="pkg-top">
+<h2>Overview</h2>
+<div id="pkg-overview">
+<p>Bindings for <a href="https://github.com/lz4/lz4">LZ4</a>.</p>
+</div>
+<div id="pkg-index">
+<h2>Index</h2>
+<div>
+<details class="doc-index" id="doc-index-Types" aria-labelledby="#doc-index-Types-header">
+<summary id="#doc-index-Types-header">
+Types (6)</summary>
+<ul>
+<li><a href="#streamDecode_t">streamDecode_t</a></li>
+<li><a href="#streamDecode_t_internal">streamDecode_t_internal</a></li>
+<li><a href="#streamHC_internal_t">streamHC_internal_t</a></li>
+<li><a href="#streamHC_t">streamHC_t</a></li>
+<li><a href="#stream_t">stream_t</a></li>
+<li><a href="#stream_t_internal">stream_t_internal</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Constants" aria-labelledby="#doc-index-Constants-header">
+<summary id="#doc-index-Constants-header">
+Constants (25)</summary>
+<ul>
+<li><a href="#CLEVEL_DEFAULT">CLEVEL_DEFAULT</a></li>
+<li><a href="#CLEVEL_MAX">CLEVEL_MAX</a></li>
+<li><a href="#CLEVEL_MIN">CLEVEL_MIN</a></li>
+<li><a href="#CLEVEL_OPT_MIN">CLEVEL_OPT_MIN</a></li>
+<li><a href="#HASHLOG">HASHLOG</a></li>
+<li><a href="#HASHTABLESIZE">HASHTABLESIZE</a></li>
+<li><a href="#HASH_SIZE_U32">HASH_SIZE_U32</a></li>
+<li><a href="#HC_DICTIONARY_LOGSIZE">HC_DICTIONARY_LOGSIZE</a></li>
+<li><a href="#HC_HASHTABLESIZE">HC_HASHTABLESIZE</a></li>
+<li><a href="#HC_HASH_LOG">HC_HASH_LOG</a></li>
+<li><a href="#HC_HASH_MASK">HC_HASH_MASK</a></li>
+<li><a href="#HC_MAXD">HC_MAXD</a></li>
+<li><a href="#HC_MAXD_MASK">HC_MAXD_MASK</a></li>
+<li><a href="#MAX_INPUT_SIZE">MAX_INPUT_SIZE</a></li>
+<li><a href="#MEMORY_USAGE">MEMORY_USAGE</a></li>
+<li><a href="#MEMORY_USAGE_DEFAULT">MEMORY_USAGE_DEFAULT</a></li>
+<li><a href="#MEMORY_USAGE_MAX">MEMORY_USAGE_MAX</a></li>
+<li><a href="#MEMORY_USAGE_MIN">MEMORY_USAGE_MIN</a></li>
+<li><a href="#STREAMDECODE_MINSIZE">STREAMDECODE_MINSIZE</a></li>
+<li><a href="#STREAMHC_MINSIZE">STREAMHC_MINSIZE</a></li>
+<li><a href="#STREAM_MINSIZE">STREAM_MINSIZE</a></li>
+<li><a href="#VERSION_MAJOR">VERSION_MAJOR</a></li>
+<li><a href="#VERSION_MINOR">VERSION_MINOR</a></li>
+<li><a href="#VERSION_NUMBER">VERSION_NUMBER</a></li>
+<li><a href="#VERSION_RELEASE">VERSION_RELEASE</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Variables" aria-labelledby="#doc-index-Variables-header">
+<summary id="#doc-index-Variables-header">
+Variables (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
+<summary id="#doc-index-Procedures-header">
+Procedures (39)</summary>
+<ul>
+<li><a href="#COMPRESSBOUND">COMPRESSBOUND</a></li>
+<li><a href="#DECODER_RING_BUFFER_SIZE">DECODER_RING_BUFFER_SIZE</a></li>
+<li><a href="#attach_HC_dictionary">attach_HC_dictionary</a></li>
+<li><a href="#attach_dictionary">attach_dictionary</a></li>
+<li><a href="#compressBound">compressBound</a></li>
+<li><a href="#compress_HC">compress_HC</a></li>
+<li><a href="#compress_HC_continue">compress_HC_continue</a></li>
+<li><a href="#compress_HC_continue_destSize">compress_HC_continue_destSize</a></li>
+<li><a href="#compress_HC_destSize">compress_HC_destSize</a></li>
+<li><a href="#compress_HC_extStateHC">compress_HC_extStateHC</a></li>
+<li><a href="#compress_default">compress_default</a></li>
+<li><a href="#compress_destSize">compress_destSize</a></li>
+<li><a href="#compress_fast">compress_fast</a></li>
+<li><a href="#compress_fast_continue">compress_fast_continue</a></li>
+<li><a href="#compress_fast_extState">compress_fast_extState</a></li>
+<li><a href="#createStream">createStream</a></li>
+<li><a href="#createStreamDecode">createStreamDecode</a></li>
+<li><a href="#createStreamHC">createStreamHC</a></li>
+<li><a href="#decoderRingBufferSize">decoderRingBufferSize</a></li>
+<li><a href="#decompress_safe">decompress_safe</a></li>
+<li><a href="#decompress_safe_continue">decompress_safe_continue</a></li>
+<li><a href="#decompress_safe_partial">decompress_safe_partial</a></li>
+<li><a href="#decompress_safe_partial_usingDict">decompress_safe_partial_usingDict</a></li>
+<li><a href="#decompress_safe_usingDict">decompress_safe_usingDict</a></li>
+<li><a href="#freeStream">freeStream</a></li>
+<li><a href="#freeStreamDecode">freeStreamDecode</a></li>
+<li><a href="#freeStreamHC">freeStreamHC</a></li>
+<li><a href="#loadDict">loadDict</a></li>
+<li><a href="#loadDictHC">loadDictHC</a></li>
+<li><a href="#loadDictSlow">loadDictSlow</a></li>
+<li><a href="#resetStreamHC_fast">resetStreamHC_fast</a></li>
+<li><a href="#resetStream_fast">resetStream_fast</a></li>
+<li><a href="#saveDict">saveDict</a></li>
+<li><a href="#saveDictHC">saveDictHC</a></li>
+<li><a href="#setStreamDecode">setStreamDecode</a></li>
+<li><a href="#sizeofState">sizeofState</a></li>
+<li><a href="#sizeofStateHC">sizeofStateHC</a></li>
+<li><a href="#versionNumber">versionNumber</a></li>
+<li><a href="#versionString">versionString</a></li>
+</ul>
+</details>
+</div>
+<div>
+<details class="doc-index" id="doc-index-Procedure Groups" aria-labelledby="#doc-index-Procedure Groups-header">
+<summary id="#doc-index-Procedure Groups-header">
+Procedure Groups (0)</summary>
+<p class="pkg-empty-section">This section is empty.</p>
+</details>
+</div>
+</div>
+</div>
+<section class="documentation">
+<h2 id="pkg-Types" class="pkg-header">Types</h2>
+<div class="pkg-entity">
+<h3 id="streamDecode_t"><span><a class="doc-id-link" href="#streamDecode_t">streamDecode_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L400"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">streamDecode_t :: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
+	minStateSize:      [32]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	internal_donotuse: <a class="code-typename" href="/vendor/compress/lz4/#streamDecode_t_internal">streamDecode_t_internal</a>,
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/vendor/compress/lz4/#decompress_safe_continue">decompress_safe_continue</a></li>
+<li><a href="/vendor/compress/lz4/#freeStreamDecode">freeStreamDecode</a></li>
+<li><a href="/vendor/compress/lz4/#setStreamDecode">setStreamDecode</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/vendor/compress/lz4/#createStreamDecode">createStreamDecode</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="streamDecode_t_internal"><span><a class="doc-id-link" href="#streamDecode_t_internal">streamDecode_t_internal<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L405"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">streamDecode_t_internal :: <span class="keyword-type">struct</span> {
+	externalDict: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	prefixEnd:    [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	extDictSize:  <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
+	prefixSize:   <a href="/base/builtin#uint"><span class="doc-builtin">uint</span></a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="streamHC_internal_t"><span><a class="doc-id-link" href="#streamHC_internal_t">streamHC_internal_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L522"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">streamHC_internal_t :: <span class="keyword-type">struct</span> {
+	hashTable:        [32768]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	chainTable:       [65536]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
+	end:              [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	<span class="comment">// next block here to continue on current prefix </span>
+	prefixStart:      [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	<span class="comment">// Indexes relative to this position </span>
+	dictStart:        [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	<span class="comment">// alternate reference for extDict </span>
+	dictLimit:        <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	<span class="comment">// below that point, need extDict </span>
+	lowLimit:         <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	<span class="comment">// below that point, no more history </span>
+	nextToUpdate:     <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	<span class="comment">// index from which to continue dictionary update </span>
+	compressionLevel: <a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>,
+	favorDecSpeed:    <a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a>,
+	<span class="comment">// favor decompression speed if this flag set,</span>
+	<span class="comment">// 	                               otherwise, favor compression ratio </span>
+	dirty:            <a href="/base/builtin#i8"><span class="doc-builtin">i8</span></a>,
+	<span class="comment">// stream has to be fully reset if this flag is set </span>
+	dictCtx:          ^<a class="code-typename" href="/vendor/compress/lz4/#streamHC_internal_t">streamHC_internal_t</a>,
+}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="streamHC_t"><span><a class="doc-id-link" href="#streamHC_t">streamHC_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L540"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">streamHC_t :: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
+	minStateSize:      [262200]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	internal_donotuse: <a class="code-typename" href="/vendor/compress/lz4/#streamHC_internal_t">streamHC_internal_t</a>,
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/vendor/compress/lz4/#attach_HC_dictionary">attach_HC_dictionary</a></li>
+<li><a href="/vendor/compress/lz4/#compress_HC_continue">compress_HC_continue</a></li>
+<li><a href="/vendor/compress/lz4/#compress_HC_continue_destSize">compress_HC_continue_destSize</a></li>
+<li><a href="/vendor/compress/lz4/#freeStreamHC">freeStreamHC</a></li>
+<li><a href="/vendor/compress/lz4/#loadDictHC">loadDictHC</a></li>
+<li><a href="/vendor/compress/lz4/#resetStreamHC_fast">resetStreamHC_fast</a></li>
+<li><a href="/vendor/compress/lz4/#saveDictHC">saveDictHC</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/vendor/compress/lz4/#createStreamHC">createStreamHC</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="stream_t"><span><a class="doc-id-link" href="#stream_t">stream_t<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L378"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">stream_t :: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
+	minStateSize:      [16416]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	internal_donotuse: <a class="code-typename" href="/vendor/compress/lz4/#stream_t_internal">stream_t_internal</a>,
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/vendor/compress/lz4/#attach_dictionary">attach_dictionary</a></li>
+<li><a href="/vendor/compress/lz4/#compress_fast_continue">compress_fast_continue</a></li>
+<li><a href="/vendor/compress/lz4/#freeStream">freeStream</a></li>
+<li><a href="/vendor/compress/lz4/#loadDict">loadDict</a></li>
+<li><a href="/vendor/compress/lz4/#loadDictSlow">loadDictSlow</a></li>
+<li><a href="/vendor/compress/lz4/#resetStream_fast">resetStream_fast</a></li>
+<li><a href="/vendor/compress/lz4/#saveDict">saveDict</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/vendor/compress/lz4/#createStream">createStream</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="stream_t_internal"><span><a class="doc-id-link" href="#stream_t_internal">stream_t_internal<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L388"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">stream_t_internal :: <span class="keyword-type">struct</span> {
+	hashTable:     [4096]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	dictionary:    [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	dictCtx:       ^<a class="code-typename" href="/vendor/compress/lz4/#stream_t_internal">stream_t_internal</a>,
+	currentOffset: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	tableType:     <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+	dictSize:      <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
+}</pre>
+</div>
+</div>
+<h2 id="pkg-Constants" class="pkg-header">Constants</h2>
+<div class="pkg-entity">
+<h3 id="CLEVEL_DEFAULT"><span><a class="doc-id-link" href="#CLEVEL_DEFAULT">CLEVEL_DEFAULT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L418"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CLEVEL_DEFAULT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 9</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="CLEVEL_MAX"><span><a class="doc-id-link" href="#CLEVEL_MAX">CLEVEL_MAX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L420"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CLEVEL_MAX: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 12</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="CLEVEL_MIN"><span><a class="doc-id-link" href="#CLEVEL_MIN">CLEVEL_MIN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L417"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CLEVEL_MIN: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 2</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="CLEVEL_OPT_MIN"><span><a class="doc-id-link" href="#CLEVEL_OPT_MIN">CLEVEL_OPT_MIN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L419"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">CLEVEL_OPT_MIN: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 10</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HASHLOG"><span><a class="doc-id-link" href="#HASHLOG">HASHLOG<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L384"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HASHLOG: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : MEMORY_USAGE - 2</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HASHTABLESIZE"><span><a class="doc-id-link" href="#HASHTABLESIZE">HASHTABLESIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L385"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HASHTABLESIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1 &lt;&lt; MEMORY_USAGE</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HASH_SIZE_U32"><span><a class="doc-id-link" href="#HASH_SIZE_U32">HASH_SIZE_U32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L386"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HASH_SIZE_U32: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1 &lt;&lt; HASHLOG</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>required as macro for static allocation</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="HC_DICTIONARY_LOGSIZE"><span><a class="doc-id-link" href="#HC_DICTIONARY_LOGSIZE">HC_DICTIONARY_LOGSIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L513"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HC_DICTIONARY_LOGSIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 16</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HC_HASHTABLESIZE"><span><a class="doc-id-link" href="#HC_HASHTABLESIZE">HC_HASHTABLESIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L518"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HC_HASHTABLESIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1 &lt;&lt; HC_HASH_LOG</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HC_HASH_LOG"><span><a class="doc-id-link" href="#HC_HASH_LOG">HC_HASH_LOG<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L517"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HC_HASH_LOG: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 15</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HC_HASH_MASK"><span><a class="doc-id-link" href="#HC_HASH_MASK">HC_HASH_MASK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L519"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HC_HASH_MASK: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : HC_HASHTABLESIZE - 1</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HC_MAXD"><span><a class="doc-id-link" href="#HC_MAXD">HC_MAXD<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L514"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HC_MAXD: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1 &lt;&lt; HC_DICTIONARY_LOGSIZE</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="HC_MAXD_MASK"><span><a class="doc-id-link" href="#HC_MAXD_MASK">HC_MAXD_MASK<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L515"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">HC_MAXD_MASK: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : HC_MAXD - 1</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MAX_INPUT_SIZE"><span><a class="doc-id-link" href="#MAX_INPUT_SIZE">MAX_INPUT_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L23"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MAX_INPUT_SIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0x7E000000</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>2_113_929_216 bytes</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="MEMORY_USAGE"><span><a class="doc-id-link" href="#MEMORY_USAGE">MEMORY_USAGE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L21"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MEMORY_USAGE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : MEMORY_USAGE_DEFAULT</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MEMORY_USAGE_DEFAULT"><span><a class="doc-id-link" href="#MEMORY_USAGE_DEFAULT">MEMORY_USAGE_DEFAULT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L18"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MEMORY_USAGE_DEFAULT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 14</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MEMORY_USAGE_MAX"><span><a class="doc-id-link" href="#MEMORY_USAGE_MAX">MEMORY_USAGE_MAX<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L19"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MEMORY_USAGE_MAX: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 20</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="MEMORY_USAGE_MIN"><span><a class="doc-id-link" href="#MEMORY_USAGE_MIN">MEMORY_USAGE_MIN<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L17"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">MEMORY_USAGE_MIN: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 10</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="STREAMDECODE_MINSIZE"><span><a class="doc-id-link" href="#STREAMDECODE_MINSIZE">STREAMDECODE_MINSIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L399"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">STREAMDECODE_MINSIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 32</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="STREAMHC_MINSIZE"><span><a class="doc-id-link" href="#STREAMHC_MINSIZE">STREAMHC_MINSIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L538"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">STREAMHC_MINSIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 262200</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="STREAM_MINSIZE"><span><a class="doc-id-link" href="#STREAM_MINSIZE">STREAM_MINSIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L376"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">STREAM_MINSIZE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : (1 &lt;&lt; MEMORY_USAGE) + 32</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>static size, for inter-version compatibility</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="VERSION_MAJOR"><span><a class="doc-id-link" href="#VERSION_MAJOR">VERSION_MAJOR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L11"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">VERSION_MAJOR: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 1</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>for breaking interface changes</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="VERSION_MINOR"><span><a class="doc-id-link" href="#VERSION_MINOR">VERSION_MINOR<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L12"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">VERSION_MINOR: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 10</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>for new (non-breaking) interface capabilities</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="VERSION_NUMBER"><span><a class="doc-id-link" href="#VERSION_NUMBER">VERSION_NUMBER<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L15"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">VERSION_NUMBER: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : VERSION_MAJOR * 100 * 100 + VERSION_MINOR * 100 + VERSION_RELEASE</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="VERSION_RELEASE"><span><a class="doc-id-link" href="#VERSION_RELEASE">VERSION_RELEASE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L13"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">VERSION_RELEASE: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>for tweaks, bug-fixes, or development</p>
+</details>
+</div>
+<h2 id="pkg-Variables" class="pkg-header">Variables</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+<h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
+<div class="pkg-entity">
+<h3 id="COMPRESSBOUND"><span><a class="doc-id-link" href="#COMPRESSBOUND">COMPRESSBOUND<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L26"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">COMPRESSBOUND :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (isize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="DECODER_RING_BUFFER_SIZE"><span><a class="doc-id-link" href="#DECODER_RING_BUFFER_SIZE">DECODER_RING_BUFFER_SIZE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L31"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">DECODER_RING_BUFFER_SIZE :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (maxBlockSize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {…}</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="attach_HC_dictionary"><span><a class="doc-id-link" href="#attach_HC_dictionary">attach_HC_dictionary<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L509"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">attach_HC_dictionary :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (working_stream, dictionary_stream: ^<a class="code-typename" href="/vendor/compress/lz4/#streamHC_t">streamHC_t</a>) ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_attach_HC_dictionary() : stable since v1.10.0</p>
+<pre> *  This API allows for the efficient re-use of a static dictionary many times.
+ *
+ *  Rather than re-loading the dictionary buffer into a working context before
+ *  each compression, or copying a pre-loaded dictionary's LZ4_streamHC_t into a
+ *  working LZ4_streamHC_t, this function introduces a no-copy setup mechanism,
+ *  in which the working stream references the dictionary stream in-place.
+ *
+ *  Several assumptions are made about the state of the dictionary stream.
+ *  Currently, only streams which have been prepared by LZ4_loadDictHC() should
+ *  be expected to work.
+ *
+ *  Alternatively, the provided dictionary stream pointer may be NULL, in which
+ *  case any existing dictionary stream is unset.
+ *
+ *  A dictionary should only be attached to a stream without any history (i.e.,
+ *  a stream that has just been reset).
+ *
+ *  The dictionary will remain attached to the working stream only for the
+ *  current stream session. Calls to LZ4_resetStreamHC(_fast) will remove the
+ *  dictionary context association from the working stream. The dictionary
+ *  stream (and source buffer) must remain in-place / accessible / unchanged
+ *  through the lifetime of the stream session.
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="attach_dictionary"><span><a class="doc-id-link" href="#attach_dictionary">attach_dictionary<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L252"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">attach_dictionary :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (workingStream, dictionaryStream: ^<a class="code-typename" href="/vendor/compress/lz4/#stream_t">stream_t</a>) ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_attach_dictionary() : stable since v1.10.0</p>
+<pre> *
+ *  This allows efficient re-use of a static dictionary multiple times.
+ *
+ *  Rather than re-loading the dictionary buffer into a working context before
+ *  each compression, or copying a pre-loaded dictionary's LZ4_stream_t into a
+ *  working LZ4_stream_t, this function introduces a no-copy setup mechanism,
+ *  in which the working stream references @dictionaryStream in-place.
+ *
+ *  Several assumptions are made about the state of @dictionaryStream.
+ *  Currently, only states which have been prepared by LZ4_loadDict() or
+ *  LZ4_loadDictSlow() should be expected to work.
+ *
+ *  Alternatively, the provided @dictionaryStream may be NULL,
+ *  in which case any existing dictionary stream is unset.
+ *
+ *  If a dictionary is provided, it replaces any pre-existing stream history.
+ *  The dictionary contents are the only history that can be referenced and
+ *  logically immediately precede the data compressed in the first subsequent
+ *  compression call.
+ *
+ *  The dictionary will only remain attached to the working stream through the
+ *  first compression call, at the end of which it is cleared.
+ * @dictionaryStream stream (and source buffer) must remain in-place / accessible / unchanged
+ *  through the completion of the compression session.
+ *
+ *  Note: there is no equivalent LZ4_attach_*() method on the decompression side
+ *  because there is no initialization cost, hence no need to share the cost across multiple sessions.
+ *  To decompress LZ4 blocks using dictionary, attached or not,
+ *  just employ the regular LZ4_setStreamDecode() for streaming,
+ *  or the stateless LZ4_decompress_safe_usingDict() for one-shot decompression.
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="compressBound"><span><a class="doc-id-link" href="#compressBound">compressBound<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L83"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">compressBound :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (inputSize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_compressBound() :</p>
+<pre>    Provides the maximum size that LZ4 compression may output in a "worst case" scenario (input data not compressible)
+    This function is primarily useful for memory allocation purposes (destination buffer size).
+    Macro LZ4_COMPRESSBOUND() is also provided for compilation-time evaluation (stack memory allocation for example).
+    Note that LZ4_compress_default() compresses faster when dstCapacity is &gt;= LZ4_compressBound(srcSize)
+        inputSize  : max supported value is LZ4_MAX_INPUT_SIZE
+        return : maximum output size in a "worst case" scenario
+              or 0, if input size is incorrect (too large or negative)
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="compress_HC"><span><a class="doc-id-link" href="#compress_HC">compress_HC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L435"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">compress_HC :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src, dst: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, srcSize, dstCapacity, compressionLevel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_compress_HC() :</p>
+<pre> *  Compress data from `src` into `dst`, using the powerful but slower "HC" algorithm.
+ * `dst` must be already allocated.
+ *  Compression is guaranteed to succeed if `dstCapacity &gt;= LZ4_compressBound(srcSize)` (see "lz4.h")
+ *  Max supported `srcSize` value is LZ4_MAX_INPUT_SIZE (see "lz4.h")
+ * `compressionLevel` : any value between 1 and LZ4HC_CLEVEL_MAX will work.
+ *                      Values &gt; LZ4HC_CLEVEL_MAX behave the same as LZ4HC_CLEVEL_MAX.
+ * @return : the number of bytes written into 'dst'
+ *           or 0 if compression fails.
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="compress_HC_continue"><span><a class="doc-id-link" href="#compress_HC_continue">compress_HC_continue<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L469"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">compress_HC_continue :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (streamHCPtr: ^<a class="code-typename" href="/vendor/compress/lz4/#streamHC_t">streamHC_t</a>, src, dst: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, srcSize, maxDstSize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="compress_HC_continue_destSize"><span><a class="doc-id-link" href="#compress_HC_continue_destSize">compress_HC_continue_destSize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L481"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">compress_HC_continue_destSize :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (LZ4_streamHCPtr: ^<a class="code-typename" href="/vendor/compress/lz4/#streamHC_t">streamHC_t</a>, src, dst: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, srcSizePtr: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, targetDstSize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_compress_HC_continue_destSize() : v1.9.0+</p>
+<pre> *  Similar to LZ4_compress_HC_continue(),
+ *  but will read as much data as possible from `src`
+ *  to fit into `targetDstSize` budget.
+ *  Result is provided into 2 parts :
+ * @return : the number of bytes written into 'dst' (necessarily &lt;= targetDstSize)
+ *           or 0 if compression fails.
+ * `srcSizePtr` : on success, *srcSizePtr will be updated to indicate how much bytes were read from `src`.
+ *           Note that this function may not consume the entire input.
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="compress_HC_destSize"><span><a class="doc-id-link" href="#compress_HC_destSize">compress_HC_destSize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L455"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">compress_HC_destSize :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
+	stateHC:          <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
+	src, dst:         [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
+	srcSizePtr:       ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+	targetDstSize:    <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+	compressionLevel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_compress_HC_destSize() : v1.9.0+</p>
+<pre> *  Will compress as much data as possible from `src`
+ *  to fit into `targetDstSize` budget.
+ *  Result is provided in 2 parts :
+ * @return : the number of bytes written into 'dst' (necessarily &lt;= targetDstSize)
+ *           or 0 if compression fails.
+ * `srcSizePtr` : on success, *srcSizePtr is updated to indicate how much bytes were read from `src`
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="compress_HC_extStateHC"><span><a class="doc-id-link" href="#compress_HC_extStateHC">compress_HC_extStateHC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L444"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">compress_HC_extStateHC :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
+	stateHC:             <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
+	src, dst:            [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
+	srcSize, maxDstSize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+	compressionLevel:    <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="compress_default"><span><a class="doc-id-link" href="#compress_default">compress_default<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L54"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">compress_default :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src, dst: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, srcSize, dstCapacity: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_compress_default() :</p>
+<pre> *  Compresses 'srcSize' bytes from buffer 'src'
+ *  into already allocated 'dst' buffer of size 'dstCapacity'.
+ *  Compression is guaranteed to succeed if 'dstCapacity' &gt;= LZ4_compressBound(srcSize).
+ *  It also runs faster, so it's a recommended setting.
+ *  If the function cannot compress 'src' into a more limited 'dst' budget,
+ *  compression stops *immediately*, and the function result is zero.
+ *  In which case, 'dst' content is undefined (invalid).
+ *      srcSize : max supported value is LZ4_MAX_INPUT_SIZE.
+ *      dstCapacity : size of buffer 'dst' (which must be already allocated)
+ *     @return  : the number of bytes written into buffer 'dst' (necessarily &lt;= dstCapacity)
+ *                or 0 if compression fails
+ * Note : This function is protected against buffer overflow scenarios (never writes outside 'dst' buffer, nor read outside 'source' buffer).
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="compress_destSize"><span><a class="doc-id-link" href="#compress_destSize">compress_destSize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L130"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">compress_destSize :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src, dst: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, srcSizePtr: ^<a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, targetDstSize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_compress_destSize() :</p>
+<pre> *  Reverse the logic : compresses as much data as possible from 'src' buffer
+ *  into already allocated buffer 'dst', of size &gt;= 'dstCapacity'.
+ *  This function either compresses the entire 'src' content into 'dst' if it's large enough,
+ *  or fill 'dst' buffer completely with as much data as possible from 'src'.
+ *  note: acceleration parameter is fixed to "default".
+ *
+ * *srcSizePtr : in+out parameter. Initially contains size of input.
+ *               Will be modified to indicate how many bytes where read from 'src' to fill 'dst'.
+ *               New value is necessarily &lt;= input value.
+ * @return : Nb bytes written into 'dst' (necessarily &lt;= dstCapacity)
+ *           or 0 if compression fails.
+ *
+ * Note : from v1.8.2 to v1.9.1, this function had a bug (fixed in v1.9.2+):
+ *        the produced compressed content could, in specific circumstances,
+ *        require to be decompressed into a destination buffer larger
+ *        by at least 1 byte than the content to decompress.
+ *        If an application uses `LZ4_compress_destSize()`,
+ *        it's highly recommended to update liblz4 to v1.9.2 or better.
+ *        If this can't be done or ensured,
+ *        the receiving decompression function should provide
+ *        a dstCapacity which is &gt; decompressedSize, by at least 1 byte.
+ *        See https://github.com/lz4/lz4/issues/859 for details
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="compress_fast"><span><a class="doc-id-link" href="#compress_fast">compress_fast<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L93"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">compress_fast :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src, dst: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, srcSize, dstCapacity: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, acceleration: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_compress_fast() :</p>
+<pre>    Same as LZ4_compress_default(), but allows selection of "acceleration" factor.
+    The larger the acceleration value, the faster the algorithm, but also the lesser the compression.
+    It's a trade-off. It can be fine tuned, with each successive value providing roughly +~3% to speed.
+    An acceleration value of "1" is the same as regular LZ4_compress_default()
+    Values &lt;= 0 will be replaced by LZ4_ACCELERATION_DEFAULT (currently == 1, see lz4.c).
+    Values &gt; LZ4_ACCELERATION_MAX will be replaced by LZ4_ACCELERATION_MAX (currently == 65537, see lz4.c).
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="compress_fast_continue"><span><a class="doc-id-link" href="#compress_fast_continue">compress_fast_continue<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L277"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">compress_fast_continue :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
+	streamPtr:            ^<a class="code-typename" href="/vendor/compress/lz4/#stream_t">stream_t</a>, 
+	src, dst:             [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
+	srcSize, dstCapacity: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+	acceleration:         <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_compress_fast_continue() :</p>
+<pre> *  Compress 'src' content using data from previously compressed blocks, for better compression ratio.
+ * 'dst' buffer must be already allocated.
+ *  If dstCapacity &gt;= LZ4_compressBound(srcSize), compression is guaranteed to succeed, and runs faster.
+ *
+ * @return : size of compressed block
+ *           or 0 if there is an error (typically, cannot fit into 'dst').
+ *
+ *  Note 1 : Each invocation to LZ4_compress_fast_continue() generates a new block.
+ *           Each block has precise boundaries.
+ *           Each block must be decompressed separately, calling LZ4_decompress_*() with relevant metadata.
+ *           It's not possible to append blocks together and expect a single invocation of LZ4_decompress_*() to decompress them together.
+ *
+ *  Note 2 : The previous 64KB of source data is __assumed__ to remain present, unmodified, at same address in memory !
+ *
+ *  Note 3 : When input is structured as a double-buffer, each buffer can have any size, including &lt; 64 KB.
+ *           Make sure that buffers are separated, by at least one byte.
+ *           This construction ensures that each block only depends on previous block.
+ *
+ *  Note 4 : If input buffer is a ring-buffer, it can have any size, including &lt; 64 KB.
+ *
+ *  Note 5 : After an error, the stream status is undefined (invalid), it can only be reset or freed.
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="compress_fast_extState"><span><a class="doc-id-link" href="#compress_fast_extState">compress_fast_extState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L103"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">compress_fast_extState :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
+	state:                <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
+	src, dst:             [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
+	srcSize, dstCapacity: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+	acceleration:         <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="createStream"><span><a class="doc-id-link" href="#createStream">createStream<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L170"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">createStream :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> ^<a class="code-typename" href="/vendor/compress/lz4/#stream_t">stream_t</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="createStreamDecode"><span><a class="doc-id-link" href="#createStreamDecode">createStreamDecode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L289"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">createStreamDecode :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> ^<a class="code-typename" href="/vendor/compress/lz4/#streamDecode_t">streamDecode_t</a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="createStreamHC"><span><a class="doc-id-link" href="#createStreamHC">createStreamHC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L463"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">createStreamHC :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> ^<a class="code-typename" href="/vendor/compress/lz4/#streamHC_t">streamHC_t</a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_createStreamHC() and LZ4_freeStreamHC() :</p>
+<pre> *  These functions create and release memory for LZ4 HC streaming state.
+ *  Newly created states are automatically initialized.
+ *  A same state can be used multiple times consecutively,
+ *  starting with LZ4_resetStreamHC_fast() to start a new stream of blocks.
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="decoderRingBufferSize"><span><a class="doc-id-link" href="#decoderRingBufferSize">decoderRingBufferSize<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L312"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">decoderRingBufferSize :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (maxBlockSize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_decoderRingBufferSize() : v1.8.2+</p>
+<pre> *  Note : in a ring buffer scenario (optional),
+ *  blocks are presumed decompressed next to each other
+ *  up to the moment there is not enough remaining space for next block (remainingSize &lt; maxBlockSize),
+ *  at which stage it resumes from beginning of ring buffer.
+ *  When setting such a ring buffer for streaming decompression,
+ *  provides the minimum size of this ring buffer
+ *  to be compatible with any source respecting maxBlockSize condition.
+ * @return : minimum ring buffer size,
+ *           or 0 if there is an error (invalid maxBlockSize).
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="decompress_safe"><span><a class="doc-id-link" href="#decompress_safe">decompress_safe<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L71"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">decompress_safe :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src, dst: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, compressedSize, dstCapacity: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_decompress_safe() :</p>
+<pre> * @compressedSize : is the exact complete size of the compressed block.
+ * @dstCapacity : is the size of destination buffer (which must be already allocated),
+ *                presumed an upper bound of decompressed size.
+ * @return : the number of bytes decompressed into destination buffer (necessarily &lt;= dstCapacity)
+ *           If destination buffer is not large enough, decoding will stop and output an error code (negative value).
+ *           If the source stream is detected malformed, the function will stop decoding and return a negative result.
+ * Note 1 : This function is protected against malicious data packets :
+ *          it will never writes outside 'dst' buffer, nor read outside 'source' buffer,
+ *          even if the compressed block is maliciously modified to order the decoder to do these actions.
+ *          In such case, the decoder stops immediately, and considers the compressed block malformed.
+ * Note 2 : compressedSize and dstCapacity must be provided to the function, the compressed block does not contain them.
+ *          The implementation is free to send / store / derive this information in whichever way is most beneficial.
+ *          If there is a need for a different format which bundles together both compressed data and its metadata, consider looking at lz4frame.h instead.
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="decompress_safe_continue"><span><a class="doc-id-link" href="#decompress_safe_continue">decompress_safe_continue<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L352"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">decompress_safe_continue :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (LZ4_streamDecode: ^<a class="code-typename" href="/vendor/compress/lz4/#streamDecode_t">streamDecode_t</a>, src, dst: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, srcSize, dstCapacity: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_decompress_safe_continue() :</p>
+<pre> *  This decoding function allows decompression of consecutive blocks in "streaming" mode.
+ *  The difference with the usual independent blocks is that
+ *  new blocks are allowed to find references into former blocks.
+ *  A block is an unsplittable entity, and must be presented entirely to the decompression function.
+ *  LZ4_decompress_safe_continue() only accepts one block at a time.
+ *  It's modeled after `LZ4_decompress_safe()` and behaves similarly.
+ *
+ * @LZ4_streamDecode : decompression state, tracking the position in memory of past data
+ * @compressedSize : exact complete size of one compressed block.
+ * @dstCapacity : size of destination buffer (which must be already allocated),
+ *                must be an upper bound of decompressed size.
+ * @return : number of bytes decompressed into destination buffer (necessarily &lt;= dstCapacity)
+ *           If destination buffer is not large enough, decoding will stop and output an error code (negative value).
+ *           If the source stream is detected malformed, the function will stop decoding and return a negative result.
+ *
+ *  The last 64KB of previously decoded data *must* remain available and unmodified
+ *  at the memory position where they were previously decoded.
+ *  If less than 64KB of data has been decoded, all the data must be present.
+ *
+ *  Special : if decompression side sets a ring buffer, it must respect one of the following conditions :
+ *  - Decompression buffer size is _at least_ LZ4_decoderRingBufferSize(maxBlockSize).
+ *    maxBlockSize is the maximum size of any single block. It can have any value &gt; 16 bytes.
+ *    In which case, encoding and decoding buffers do not need to be synchronized.
+ *    Actually, data can be produced by any source compliant with LZ4 format specification, and respecting maxBlockSize.
+ *  - Synchronized mode :
+ *    Decompression buffer size is _exactly_ the same as compression buffer size,
+ *    and follows exactly same update rule (block boundaries at same positions),
+ *    and decoding function is provided with exact decompressed size of each block (exception for last block of the stream),
+ *    _then_ decoding & encoding ring buffer can have any size, including small ones ( &lt; 64 KB).
+ *  - Decompression buffer is larger than encoding buffer, by a minimum of maxBlockSize more bytes.
+ *    In which case, encoding and decoding buffers do not need to be synchronized,
+ *    and encoding ring buffer can have any size, including small ones ( &lt; 64 KB).
+ *
+ *  Whenever these conditions are not possible,
+ *  save the last 64KB of decoded data into a safe buffer where it can't be modified during decompression,
+ *  then indicate where this data is saved using LZ4_setStreamDecode(), before decompressing next block.
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="decompress_safe_partial"><span><a class="doc-id-link" href="#decompress_safe_partial">decompress_safe_partial<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L167"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">decompress_safe_partial :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (src, dst: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, srcSize, targetOutputSize, dstCapacity: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_decompress_safe_partial() :</p>
+<pre> *  Decompress an LZ4 compressed block, of size 'srcSize' at position 'src',
+ *  into destination buffer 'dst' of size 'dstCapacity'.
+ *  Up to 'targetOutputSize' bytes will be decoded.
+ *  The function stops decoding on reaching this objective.
+ *  This can be useful to boost performance
+ *  whenever only the beginning of a block is required.
+ *
+ * @return : the number of bytes decoded in `dst` (necessarily &lt;= targetOutputSize)
+ *           If source stream is detected malformed, function returns a negative result.
+ *
+ *  Note 1 : @return can be &lt; targetOutputSize, if compressed block contains less data.
+ *
+ *  Note 2 : targetOutputSize must be &lt;= dstCapacity
+ *
+ *  Note 3 : this function effectively stops decoding on reaching targetOutputSize,
+ *           so dstCapacity is kind of redundant.
+ *           This is because in older versions of this function,
+ *           decoding operation would still write complete sequences.
+ *           Therefore, there was no guarantee that it would stop writing at exactly targetOutputSize,
+ *           it could write more bytes, though only up to dstCapacity.
+ *           Some "margin" used to be required for this operation to work properly.
+ *           Thankfully, this is no longer necessary.
+ *           The function nonetheless keeps the same signature, in an effort to preserve API compatibility.
+ *
+ *  Note 4 : If srcSize is the exact size of the block,
+ *           then targetOutputSize can be any value,
+ *           including larger than the block's decompressed size.
+ *           The function will, at most, generate block's decompressed size.
+ *
+ *  Note 5 : If srcSize is _larger_ than block's compressed size,
+ *           then targetOutputSize **MUST** be &lt;= block's decompressed size.
+ *           Otherwise, *silent corruption will occur*.
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="decompress_safe_partial_usingDict"><span><a class="doc-id-link" href="#decompress_safe_partial_usingDict">decompress_safe_partial_usingDict<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L371"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">decompress_safe_partial_usingDict :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
+	src, dst:                                        [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
+	compressedSize, targetOutputSize, maxOutputSize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+	dictStart:                                       [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
+	dictSize:                                        <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_decompress_safe_partial_usingDict() :</p>
+<pre> *  Behaves the same as LZ4_decompress_safe_partial()
+ *  with the added ability to specify a memory segment for past data.
+ *  Performance tip : Decompression speed can be substantially increased
+ *                    when dst == dictStart + dictSize.
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="decompress_safe_usingDict"><span><a class="doc-id-link" href="#decompress_safe_usingDict">decompress_safe_usingDict<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L363"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">decompress_safe_usingDict :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (
+	src, dst:             [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
+	srcSize, dstCapacity: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+	dictStart:            [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, 
+	dictSize:             <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, 
+) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_decompress_safe_usingDict() :</p>
+<pre> *  Works the same as
+ *  a combination of LZ4_setStreamDecode() followed by LZ4_decompress_safe_continue()
+ *  However, it's stateless: it doesn't need any LZ4_streamDecode_t state.
+ *  Dictionary is presumed stable : it must remain accessible and unmodified during decompression.
+ *  Performance tip : Decompression speed can be substantially increased
+ *                    when dst == dictStart + dictSize.
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="freeStream"><span><a class="doc-id-link" href="#freeStream">freeStream<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L171"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">freeStream :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (streamPtr: ^<a class="code-typename" href="/vendor/compress/lz4/#stream_t">stream_t</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="freeStreamDecode"><span><a class="doc-id-link" href="#freeStreamDecode">freeStreamDecode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L290"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">freeStreamDecode :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (LZ4_stream: ^<a class="code-typename" href="/vendor/compress/lz4/#streamDecode_t">streamDecode_t</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="freeStreamHC"><span><a class="doc-id-link" href="#freeStreamHC">freeStreamHC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L464"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">freeStreamHC :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (streamHCPtr: ^<a class="code-typename" href="/vendor/compress/lz4/#streamHC_t">streamHC_t</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="loadDict"><span><a class="doc-id-link" href="#loadDict">loadDict<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L209"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">loadDict :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (streamPtr: ^<a class="code-typename" href="/vendor/compress/lz4/#stream_t">stream_t</a>, dictionary: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, dictSize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_loadDict() :</p>
+<pre> *  Use this function to reference a static dictionary into LZ4_stream_t.
+ *  The dictionary must remain available during compression.
+ *  LZ4_loadDict() triggers a reset, so any previous data will be forgotten.
+ *  The same dictionary will have to be loaded on decompression side for successful decoding.
+ *  Dictionary are useful for better compression of small data (KB range).
+ *  While LZ4 itself accepts any input as dictionary, dictionary efficiency is also a topic.
+ *  When in doubt, employ the Zstandard's Dictionary Builder.
+ *  Loading a size of 0 is allowed, and is the same as reset.
+ * @return : loaded dictionary size, in bytes (note: only the last 64 KB are loaded)
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="loadDictHC"><span><a class="doc-id-link" href="#loadDictHC">loadDictHC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L467"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">loadDictHC :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (streamHCPtr: ^<a class="code-typename" href="/vendor/compress/lz4/#streamHC_t">streamHC_t</a>, dictionary: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, dictSize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="loadDictSlow"><span><a class="doc-id-link" href="#loadDictSlow">loadDictSlow<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L218"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">loadDictSlow :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (streamPtr: ^<a class="code-typename" href="/vendor/compress/lz4/#stream_t">stream_t</a>, dictionary: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, dictSize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_loadDictSlow() : v1.10.0+</p>
+<pre> *  Same as LZ4_loadDict(),
+ *  but uses a bit more cpu to reference the dictionary content more thoroughly.
+ *  This is expected to slightly improve compression ratio.
+ *  The extra-cpu cost is likely worth it if the dictionary is re-used across multiple sessions.
+ * @return : loaded dictionary size, in bytes (note: only the last 64 KB are loaded)
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="resetStreamHC_fast"><span><a class="doc-id-link" href="#resetStreamHC_fast">resetStreamHC_fast<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L466"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">resetStreamHC_fast :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (streamHCPtr: ^<a class="code-typename" href="/vendor/compress/lz4/#streamHC_t">streamHC_t</a>, compressionLevel: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>v1.9.0+</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="resetStream_fast"><span><a class="doc-id-link" href="#resetStream_fast">resetStream_fast<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L195"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">resetStream_fast :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (streamPtr: ^<a class="code-typename" href="/vendor/compress/lz4/#stream_t">stream_t</a>) ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_resetStream_fast() : v1.9.0+</p>
+<pre> *  Use this to prepare an LZ4_stream_t for a new chain of dependent blocks
+ *  (e.g., LZ4_compress_fast_continue()).
+ *
+ *  An LZ4_stream_t must be initialized once before usage.
+ *  This is automatically done when created by LZ4_createStream().
+ *  However, should the LZ4_stream_t be simply declared on stack (for example),
+ *  it's necessary to initialize it first, using LZ4_initStream().
+ *
+ *  After init, start any new stream with LZ4_resetStream_fast().
+ *  A same LZ4_stream_t can be re-used multiple times consecutively
+ *  and compress multiple streams,
+ *  provided that it starts each new stream with LZ4_resetStream_fast().
+ *
+ *  LZ4_resetStream_fast() is much faster than LZ4_initStream(),
+ *  but is not compatible with memory regions containing garbage data.
+ *
+ *  Note: it's only useful to call LZ4_resetStream_fast()
+ *        in the context of streaming compression.
+ *        The *extState* functions perform their own resets.
+ *        Invoking LZ4_resetStream_fast() before is redundant, and even counterproductive.
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="saveDict"><span><a class="doc-id-link" href="#saveDict">saveDict<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L286"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">saveDict :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (streamPtr: ^<a class="code-typename" href="/vendor/compress/lz4/#stream_t">stream_t</a>, safeBuffer: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, maxDictSize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_saveDict() :</p>
+<pre> *  If last 64KB data cannot be guaranteed to remain available at its current memory location,
+ *  save it into a safer place (char* safeBuffer).
+ *  This is schematically equivalent to a memcpy() followed by LZ4_loadDict(),
+ *  but is much faster, because LZ4_saveDict() doesn't need to rebuild tables.
+ * @return : saved dictionary size in bytes (necessarily &lt;= maxDictSize), or 0 if error.
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="saveDictHC"><span><a class="doc-id-link" href="#saveDictHC">saveDictHC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L483"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">saveDictHC :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (streamHCPtr: ^<a class="code-typename" href="/vendor/compress/lz4/#streamHC_t">streamHC_t</a>, safeBuffer: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, maxDictSize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+</div>
+<div class="pkg-entity">
+<h3 id="setStreamDecode"><span><a class="doc-id-link" href="#setStreamDecode">setStreamDecode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L299"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">setStreamDecode :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (LZ4_streamDecode: ^<a class="code-typename" href="/vendor/compress/lz4/#streamDecode_t">streamDecode_t</a>, dictionary: [^]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, dictSize: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_setStreamDecode() :</p>
+<pre> *  An LZ4_streamDecode_t context can be allocated once and re-used multiple times.
+ *  Use this function to start decompression of a new stream of blocks.
+ *  A dictionary can optionally be set. Use NULL or size 0 for a reset order.
+ *  Dictionary is presumed stable : it must remain accessible and unmodified during next decompression.
+ * @return : 1 if OK, 0 if error
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="sizeofState"><span><a class="doc-id-link" href="#sizeofState">sizeofState<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L102"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">sizeofState :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_compress_fast_extState() :</p>
+<pre> *  Same as LZ4_compress_fast(), using an externally allocated memory space for its state.
+ *  Use LZ4_sizeofState() to know how much memory must be allocated,
+ *  and allocate it on 8-bytes boundaries (using `malloc()` typically).
+ *  Then, provide this buffer as `void* state` to compression function.
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="sizeofStateHC"><span><a class="doc-id-link" href="#sizeofStateHC">sizeofStateHC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L443"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">sizeofStateHC :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>! LZ4_compress_HC_extStateHC() :</p>
+<pre> *  Same as LZ4_compress_HC(), but using an externally allocated memory segment for `state`.
+ * `state` size is provided by LZ4_sizeofStateHC().
+ *  Memory segment must be aligned on 8-bytes boundaries (which a normal malloc() should do properly).
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="versionNumber"><span><a class="doc-id-link" href="#versionNumber">versionNumber<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L37"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">versionNumber :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>*&lt; library version number; useful to check dll version; requires v1.3.0+</p>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="versionString"><span><a class="doc-id-link" href="#versionString">versionString<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin#L38"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">versionString :: <span class="keyword-type">proc</span> <span class="string">"c"</span> () -> <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a> ---</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>*&lt; library version string; useful to check dll version; requires v1.7.5+</p>
+</details>
+</div>
+<h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
+<p class="pkg-empty-section">This section is empty.</p>
+</section>
+<h2 id="pkg-source-files">Source Files</h2>
+<ul>
+<li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/compress/lz4/lz4.odin">lz4.odin</a></li>
+</ul>
+<h2 id="pkg-generation-information">Generation Information</h2>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-10 14:20:04.416505400 +0000 UTC</code></p>
+</article>
+<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
+<nav id="TableOfContents">
+<ul>
+<li><a href="#pkg-overview">Overview</a><li><a href="#pkg-Types">Types</a><ul>
+<li><a href="#streamDecode_t">streamDecode_t</a></li>
+<li><a href="#streamDecode_t_internal">streamDecode_t_internal</a></li>
+<li><a href="#streamHC_internal_t">streamHC_internal_t</a></li>
+<li><a href="#streamHC_t">streamHC_t</a></li>
+<li><a href="#stream_t">stream_t</a></li>
+<li><a href="#stream_t_internal">stream_t_internal</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Constants">Constants</a><ul>
+<li><a href="#CLEVEL_DEFAULT">CLEVEL_DEFAULT</a></li>
+<li><a href="#CLEVEL_MAX">CLEVEL_MAX</a></li>
+<li><a href="#CLEVEL_MIN">CLEVEL_MIN</a></li>
+<li><a href="#CLEVEL_OPT_MIN">CLEVEL_OPT_MIN</a></li>
+<li><a href="#HASHLOG">HASHLOG</a></li>
+<li><a href="#HASHTABLESIZE">HASHTABLESIZE</a></li>
+<li><a href="#HASH_SIZE_U32">HASH_SIZE_U32</a></li>
+<li><a href="#HC_DICTIONARY_LOGSIZE">HC_DICTIONARY_LOGSIZE</a></li>
+<li><a href="#HC_HASHTABLESIZE">HC_HASHTABLESIZE</a></li>
+<li><a href="#HC_HASH_LOG">HC_HASH_LOG</a></li>
+<li><a href="#HC_HASH_MASK">HC_HASH_MASK</a></li>
+<li><a href="#HC_MAXD">HC_MAXD</a></li>
+<li><a href="#HC_MAXD_MASK">HC_MAXD_MASK</a></li>
+<li><a href="#MAX_INPUT_SIZE">MAX_INPUT_SIZE</a></li>
+<li><a href="#MEMORY_USAGE">MEMORY_USAGE</a></li>
+<li><a href="#MEMORY_USAGE_DEFAULT">MEMORY_USAGE_DEFAULT</a></li>
+<li><a href="#MEMORY_USAGE_MAX">MEMORY_USAGE_MAX</a></li>
+<li><a href="#MEMORY_USAGE_MIN">MEMORY_USAGE_MIN</a></li>
+<li><a href="#STREAMDECODE_MINSIZE">STREAMDECODE_MINSIZE</a></li>
+<li><a href="#STREAMHC_MINSIZE">STREAMHC_MINSIZE</a></li>
+<li><a href="#STREAM_MINSIZE">STREAM_MINSIZE</a></li>
+<li><a href="#VERSION_MAJOR">VERSION_MAJOR</a></li>
+<li><a href="#VERSION_MINOR">VERSION_MINOR</a></li>
+<li><a href="#VERSION_NUMBER">VERSION_NUMBER</a></li>
+<li><a href="#VERSION_RELEASE">VERSION_RELEASE</a></li>
+</ul>
+</li>
+<li><a href="#pkg-Procedures">Procedures</a><ul>
+<li><a href="#COMPRESSBOUND">COMPRESSBOUND</a></li>
+<li><a href="#DECODER_RING_BUFFER_SIZE">DECODER_RING_BUFFER_SIZE</a></li>
+<li><a href="#attach_HC_dictionary">attach_HC_dictionary</a></li>
+<li><a href="#attach_dictionary">attach_dictionary</a></li>
+<li><a href="#compressBound">compressBound</a></li>
+<li><a href="#compress_HC">compress_HC</a></li>
+<li><a href="#compress_HC_continue">compress_HC_continue</a></li>
+<li><a href="#compress_HC_continue_destSize">compress_HC_continue_destSize</a></li>
+<li><a href="#compress_HC_destSize">compress_HC_destSize</a></li>
+<li><a href="#compress_HC_extStateHC">compress_HC_extStateHC</a></li>
+<li><a href="#compress_default">compress_default</a></li>
+<li><a href="#compress_destSize">compress_destSize</a></li>
+<li><a href="#compress_fast">compress_fast</a></li>
+<li><a href="#compress_fast_continue">compress_fast_continue</a></li>
+<li><a href="#compress_fast_extState">compress_fast_extState</a></li>
+<li><a href="#createStream">createStream</a></li>
+<li><a href="#createStreamDecode">createStreamDecode</a></li>
+<li><a href="#createStreamHC">createStreamHC</a></li>
+<li><a href="#decoderRingBufferSize">decoderRingBufferSize</a></li>
+<li><a href="#decompress_safe">decompress_safe</a></li>
+<li><a href="#decompress_safe_continue">decompress_safe_continue</a></li>
+<li><a href="#decompress_safe_partial">decompress_safe_partial</a></li>
+<li><a href="#decompress_safe_partial_usingDict">decompress_safe_partial_usingDict</a></li>
+<li><a href="#decompress_safe_usingDict">decompress_safe_usingDict</a></li>
+<li><a href="#freeStream">freeStream</a></li>
+<li><a href="#freeStreamDecode">freeStreamDecode</a></li>
+<li><a href="#freeStreamHC">freeStreamHC</a></li>
+<li><a href="#loadDict">loadDict</a></li>
+<li><a href="#loadDictHC">loadDictHC</a></li>
+<li><a href="#loadDictSlow">loadDictSlow</a></li>
+<li><a href="#resetStreamHC_fast">resetStreamHC_fast</a></li>
+<li><a href="#resetStream_fast">resetStream_fast</a></li>
+<li><a href="#saveDict">saveDict</a></li>
+<li><a href="#saveDictHC">saveDictHC</a></li>
+<li><a href="#setStreamDecode">setStreamDecode</a></li>
+<li><a href="#sizeofState">sizeofState</a></li>
+<li><a href="#sizeofStateHC">sizeofStateHC</a></li>
+<li><a href="#versionNumber">versionNumber</a></li>
+<li><a href="#versionString">versionString</a></li>
+</ul>
+</li>
+<li><a href="#pkg-source-files">Source Files</a></ul>
+</nav>
+</div></div>
+<script type="text/javascript">var odin_pkg_name = "vendor_compress_lz4";</script>
+</div>
+
+</div>
+</main>
+
+<footer class="odin-footer">
+	<div class="container pb-5 pt-5">
+		<div class="row g-4">
+		<div class="col">
+		<a class="navbar-brand" href="https://odin-lang.org">
+		<img class="mb-3" src="https://odin-lang.org/logo.svg" height="30" alt="Odin"></a>
+		<p>
+		The Data-Oriented Language for Sane Software Development.
+		</p>
+		</div>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Resources</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://odin-lang.org/docs" class="link-light">Docs</a></li>
+			<li><a href="https://pkg.odin-lang.org/" class="link-light">Packages</a></li>
+			<li><a href="https://odin-lang.org/news" class="link-light">News</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Community</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin" target="_blank" class="link-light">GitHub</a></li>
+			<li><a href="https://forum.odin-lang.org" target="_blank" class="link-light">Forum</a></li>
+			<li><a href="https://discord.com/invite/sVBPHEv" target="_blank" class="link-light">Discord</a></li>
+			<li><a href="https://www.twitch.tv/ginger_bill" target="_blank" class="link-light">Twitch</a></li>
+			<li><a href="https://www.youtube.com/channel/UCUSck1dOH7VKmG4lRW7tZXg" target="_blank" class="link-light">YouTube</a></li>
+			<li><a href="https://odin-lang.org/showcase" target="_blank" class="link-light">Showcase</a></li>
+			</ul>
+		</nav>
+		<nav class="col-md-auto">
+			<h4 class="fw-normal">Contribute</h4>
+			<ul class="list-unstyled">
+			<li><a href="https://github.com/odin-lang/Odin/issues" target="_blank" class="link-light">Issues</a></li>
+			<li><a href="https://www.patreon.com/gingerbill" target="_blank" class="link-light">Donate</a></li>
+			</ul>
+			</nav>
+		</div>
+		<div class="mt-4 text-muted">© 2016–2023 Ginger Bill</div>
+	</div>
+</footer>
+
+<script src="https://odin-lang.org/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="https://odin-lang.org/js/script.js"></script>
+<script src="/pkg-data.js"></script>
+<script src="/search.js"></script>
+</body>
+</html>

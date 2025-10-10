@@ -91,6 +91,7 @@
 <div class="row odin-main my-4" id="pkg">
 <nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">
 <div class="py-3">
+<div>Current Package: <em><a href="/core/io">io</a></em></div><br>
 <h4><a style="text-transform: capitalize; color: inherit;" href="/core">core Library</a></h4>
 <ul>
 <li class="nav-item"><a href="/core/bufio">bufio</a></li>
@@ -493,230 +494,10 @@ Procedure Groups (0)</summary>
 <div>
 <pre class="doc-code">Closer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
-</div>
-<div class="pkg-entity">
-<h3 id="Error"><span><a class="doc-id-link" href="#Error">Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L17"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
-	<span class="comment">// No Error</span>
-	None           = 0, 
-	<span class="comment">// EOF is the error returned by `read` when no more input is available</span>
-	EOF, 
-	<span class="comment">// Unexpected_EOF means that EOF was encountered in the middle of reading a fixed-sized block of data</span>
-	Unexpected_EOF, 
-	<span class="comment">// Short_Write means that a write accepted fewer bytes than requested but failed to return an explicit error</span>
-	Short_Write, 
-	<span class="comment">// Invalid_Write means that a write returned an impossible count</span>
-	Invalid_Write, 
-	<span class="comment">// Short_Buffer means that a read/write required a longer buffer than was provided</span>
-	Short_Buffer, 
-	<span class="comment">// No_Progress is returned by some implementations of `io.Reader` when many calls</span>
-	<span class="comment">// to `read` have failed to return any data or error.</span>
-	<span class="comment">// This is usually a sign of a broken `io.Reader` implementation</span>
-	No_Progress, 
-	Invalid_Whence, 
-	Invalid_Offset, 
-	Invalid_Unread, 
-	Negative_Read, 
-	Negative_Write, 
-	Negative_Count, 
-	Buffer_Full, 
-	<span class="comment">// Unknown means that an error has occurred but cannot be categorized</span>
-	Unknown, 
-	<span class="comment">// Empty is returned when a procedure has not been implemented for an io.Stream</span>
-	Empty          = -1, 
-}</pre>
-</div>
-<h5>Related Procedures With Parameters</h5>
-<ul>
-<li><a href="/core/io/#n_wrapper">n_wrapper</a></li>
-</ul>
-<h5>Related Procedures With Returns</h5>
-<ul>
-<li><a href="/core/io/#close">close</a></li>
-<li><a href="/core/io/#copy">copy</a></li>
-<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
-<li><a href="/core/io/#copy_n">copy_n</a></li>
-<li><a href="/core/io/#destroy">destroy</a></li>
-<li><a href="/core/io/#flush">flush</a></li>
-<li><a href="/core/io/#query_utility">query_utility</a></li>
-<li><a href="/core/io/#read">read</a></li>
-<li><a href="/core/io/#read_at">read_at</a></li>
-<li><a href="/core/io/#read_at_least">read_at_least</a></li>
-<li><a href="/core/io/#read_byte">read_byte</a></li>
-<li><a href="/core/io/#read_full">read_full</a></li>
-<li><a href="/core/io/#read_ptr">read_ptr</a></li>
-<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
-<li><a href="/core/io/#read_rune">read_rune</a></li>
-<li><a href="/core/io/#seek">seek</a></li>
-<li><a href="/core/io/#size">size</a></li>
-<li><a href="/core/io/#write">write</a></li>
-<li><a href="/core/io/#write_at">write_at</a></li>
-<li><a href="/core/io/#write_at_least">write_at_least</a></li>
-<li><a href="/core/io/#write_byte">write_byte</a></li>
-<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
-<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
-<li><a href="/core/io/#write_f16">write_f16</a></li>
-<li><a href="/core/io/#write_f32">write_f32</a></li>
-<li><a href="/core/io/#write_f64">write_f64</a></li>
-<li><a href="/core/io/#write_full">write_full</a></li>
-<li><a href="/core/io/#write_i128">write_i128</a></li>
-<li><a href="/core/io/#write_i64">write_i64</a></li>
-<li><a href="/core/io/#write_int">write_int</a></li>
-<li><a href="/core/io/#write_ptr">write_ptr</a></li>
-<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
-<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
-<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
-<li><a href="/core/io/#write_rune">write_rune</a></li>
-<li><a href="/core/io/#write_string">write_string</a></li>
-<li><a href="/core/io/#write_string16">write_string16</a></li>
-<li><a href="/core/io/#write_u128">write_u128</a></li>
-<li><a href="/core/io/#write_u64">write_u64</a></li>
-<li><a href="/core/io/#write_uint">write_uint</a></li>
-</ul>
-</div>
-<div class="pkg-entity">
-<h3 id="Flusher"><span><a class="doc-id-link" href="#Flusher">Flusher<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L82"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Flusher :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="Limited_Reader"><span><a class="doc-id-link" href="#Limited_Reader">Limited_Reader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/util.odin#L381"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Limited_Reader :: <span class="keyword-type">struct</span> {
-	r: <a class="code-typename" href="/core/io/#Stream">Stream</a>,
-	<span class="comment">// underlying reader</span>
-	n: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
-}</pre>
-</div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>A Limited_Reader reads from r but limits the amount of data returned to just n bytes.
-Each call to read updates n to reflect the new amount remaining.
-read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
-</details>
-<h5>Related Procedures With Parameters</h5>
-<ul>
-<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
-<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
-</ul>
-</div>
-<div class="pkg-entity">
-<h3 id="Multi_Reader"><span><a class="doc-id-link" href="#Multi_Reader">Multi_Reader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/multi.odin#L3"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Multi_Reader :: <span class="keyword-type">struct</span> {
-	readers: [<span class="keyword">dynamic</span>]<a class="code-typename" href="/core/io/#Stream">Stream</a>,
-}</pre>
-</div>
-<h5>Related Procedures With Parameters</h5>
-<ul>
-<li><a href="/core/io/#multi_reader_destroy">multi_reader_destroy</a></li>
-<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
-</ul>
-</div>
-<div class="pkg-entity">
-<h3 id="Multi_Writer"><span><a class="doc-id-link" href="#Multi_Writer">Multi_Writer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/multi.odin#L56"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Multi_Writer :: <span class="keyword-type">struct</span> {
-	writers: [<span class="keyword">dynamic</span>]<a class="code-typename" href="/core/io/#Stream">Stream</a>,
-}</pre>
-</div>
-<h5>Related Procedures With Parameters</h5>
-<ul>
-<li><a href="/core/io/#multi_writer_destroy">multi_writer_destroy</a></li>
-<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
-</ul>
-</div>
-<div class="pkg-entity">
-<h3 id="Read_Closer"><span><a class="doc-id-link" href="#Read_Closer">Read_Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L86"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Read_Closer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="Read_Write_Closer"><span><a class="doc-id-link" href="#Read_Write_Closer">Read_Write_Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L87"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Read_Write_Closer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="Read_Write_Seeker"><span><a class="doc-id-link" href="#Read_Write_Seeker">Read_Write_Seeker<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L88"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Read_Write_Seeker :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="Read_Writer"><span><a class="doc-id-link" href="#Read_Writer">Read_Writer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L85"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Read_Writer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="Reader"><span><a class="doc-id-link" href="#Reader">Reader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L79"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Reader :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="Reader_At"><span><a class="doc-id-link" href="#Reader_At">Reader_At<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L95"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Reader_At :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="Section_Reader"><span><a class="doc-id-link" href="#Section_Reader">Section_Reader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/util.odin#L423"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Section_Reader :: <span class="keyword-type">struct</span> {
-	r:     <a class="code-typename" href="/core/io/#Stream">Stream</a>,
-	base:  <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
-	off:   <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
-	limit: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
-}</pre>
-</div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>Section_Reader implements read, seek, and read_at on a section of an underlying Reader_At</p>
-</details>
-<h5>Related Procedures With Parameters</h5>
-<ul>
-<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
-<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
-</ul>
-</div>
-<div class="pkg-entity">
-<h3 id="Seek_From"><span><a class="doc-id-link" href="#Seek_From">Seek_From<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L11"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Seek_From :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
-	Start   = 0, <span class="comment">// seek relative to the origin of the file</span>
-	Current = 1, <span class="comment">// seek relative to the current offset</span>
-	End     = 2, <span class="comment">// seek relative to the end</span>
-}</pre>
-</div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme"><span>&nbsp;</span></summary>
-<p>Seek whence values</p>
-</details>
-<h5>Related Procedures With Parameters</h5>
-<ul>
-<li><a href="/core/io/#seek">seek</a></li>
-</ul>
-</div>
-<div class="pkg-entity">
-<h3 id="Seeker"><span><a class="doc-id-link" href="#Seeker">Seeker<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L83"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Seeker :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
-</div>
-</div>
-<div class="pkg-entity">
-<h3 id="Stream"><span><a class="doc-id-link" href="#Stream">Stream<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L74"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">Stream :: <span class="keyword-type">struct</span> {
-	procedure: <a class="code-typename" href="/core/io/#Stream_Proc">Stream_Proc</a>,
-	data:      <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
-}</pre>
-</div>
-<h5>Related Procedures With Parameters</h5>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
 <ul>
 <li><a href="/core/io/#close">close</a></li>
 <li><a href="/core/io/#copy">copy</a></li>
@@ -778,7 +559,11 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 <li><a href="/core/io/#write_u64">write_u64</a></li>
 <li><a href="/core/io/#write_uint">write_uint</a></li>
 </ul>
-<h5>Related Procedures With Returns</h5>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
 <ul>
 <li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
 <li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
@@ -786,6 +571,960 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 <li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
 <li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
 </ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Error"><span><a class="doc-id-link" href="#Error">Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L17"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	<span class="comment">// No Error</span>
+	None           = 0, 
+	<span class="comment">// EOF is the error returned by `read` when no more input is available</span>
+	EOF, 
+	<span class="comment">// Unexpected_EOF means that EOF was encountered in the middle of reading a fixed-sized block of data</span>
+	Unexpected_EOF, 
+	<span class="comment">// Short_Write means that a write accepted fewer bytes than requested but failed to return an explicit error</span>
+	Short_Write, 
+	<span class="comment">// Invalid_Write means that a write returned an impossible count</span>
+	Invalid_Write, 
+	<span class="comment">// Short_Buffer means that a read/write required a longer buffer than was provided</span>
+	Short_Buffer, 
+	<span class="comment">// No_Progress is returned by some implementations of `io.Reader` when many calls</span>
+	<span class="comment">// to `read` have failed to return any data or error.</span>
+	<span class="comment">// This is usually a sign of a broken `io.Reader` implementation</span>
+	No_Progress, 
+	Invalid_Whence, 
+	Invalid_Offset, 
+	Invalid_Unread, 
+	Negative_Read, 
+	Negative_Write, 
+	Negative_Count, 
+	Buffer_Full, 
+	<span class="comment">// Unknown means that an error has occurred but cannot be categorized</span>
+	Unknown, 
+	<span class="comment">// Empty is returned when a procedure has not been implemented for an io.Stream</span>
+	Empty          = -1, 
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#n_wrapper">n_wrapper</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#query_utility">query_utility</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Flusher"><span><a class="doc-id-link" href="#Flusher">Flusher<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L82"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Flusher :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
+</div>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#query">query</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
+<li><a href="/core/io/#to_closer">to_closer</a></li>
+<li><a href="/core/io/#to_flusher">to_flusher</a></li>
+<li><a href="/core/io/#to_read_closer">to_read_closer</a></li>
+<li><a href="/core/io/#to_read_write_closer">to_read_write_closer</a></li>
+<li><a href="/core/io/#to_read_write_seeker">to_read_write_seeker</a></li>
+<li><a href="/core/io/#to_read_writer">to_read_writer</a></li>
+<li><a href="/core/io/#to_reader">to_reader</a></li>
+<li><a href="/core/io/#to_reader_at">to_reader_at</a></li>
+<li><a href="/core/io/#to_seeker">to_seeker</a></li>
+<li><a href="/core/io/#to_write_closer">to_write_closer</a></li>
+<li><a href="/core/io/#to_write_flush_closer">to_write_flush_closer</a></li>
+<li><a href="/core/io/#to_write_flusher">to_write_flusher</a></li>
+<li><a href="/core/io/#to_write_seeker">to_write_seeker</a></li>
+<li><a href="/core/io/#to_writer">to_writer</a></li>
+<li><a href="/core/io/#to_writer_at">to_writer_at</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_rune">write_quoted_rune</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+<li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Limited_Reader"><span><a class="doc-id-link" href="#Limited_Reader">Limited_Reader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/util.odin#L381"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Limited_Reader :: <span class="keyword-type">struct</span> {
+	r: <a class="code-typename" href="/core/io/#Stream">Stream</a>,
+	<span class="comment">// underlying reader</span>
+	n: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>A Limited_Reader reads from r but limits the amount of data returned to just n bytes.
+Each call to read updates n to reflect the new amount remaining.
+read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Multi_Reader"><span><a class="doc-id-link" href="#Multi_Reader">Multi_Reader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/multi.odin#L3"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Multi_Reader :: <span class="keyword-type">struct</span> {
+	readers: [<span class="keyword">dynamic</span>]<a class="code-typename" href="/core/io/#Stream">Stream</a>,
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#multi_reader_destroy">multi_reader_destroy</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Multi_Writer"><span><a class="doc-id-link" href="#Multi_Writer">Multi_Writer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/multi.odin#L56"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Multi_Writer :: <span class="keyword-type">struct</span> {
+	writers: [<span class="keyword">dynamic</span>]<a class="code-typename" href="/core/io/#Stream">Stream</a>,
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#multi_writer_destroy">multi_writer_destroy</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Read_Closer"><span><a class="doc-id-link" href="#Read_Closer">Read_Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L86"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Read_Closer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
+</div>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#query">query</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
+<li><a href="/core/io/#to_closer">to_closer</a></li>
+<li><a href="/core/io/#to_flusher">to_flusher</a></li>
+<li><a href="/core/io/#to_read_closer">to_read_closer</a></li>
+<li><a href="/core/io/#to_read_write_closer">to_read_write_closer</a></li>
+<li><a href="/core/io/#to_read_write_seeker">to_read_write_seeker</a></li>
+<li><a href="/core/io/#to_read_writer">to_read_writer</a></li>
+<li><a href="/core/io/#to_reader">to_reader</a></li>
+<li><a href="/core/io/#to_reader_at">to_reader_at</a></li>
+<li><a href="/core/io/#to_seeker">to_seeker</a></li>
+<li><a href="/core/io/#to_write_closer">to_write_closer</a></li>
+<li><a href="/core/io/#to_write_flush_closer">to_write_flush_closer</a></li>
+<li><a href="/core/io/#to_write_flusher">to_write_flusher</a></li>
+<li><a href="/core/io/#to_write_seeker">to_write_seeker</a></li>
+<li><a href="/core/io/#to_writer">to_writer</a></li>
+<li><a href="/core/io/#to_writer_at">to_writer_at</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_rune">write_quoted_rune</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+<li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Read_Write_Closer"><span><a class="doc-id-link" href="#Read_Write_Closer">Read_Write_Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L87"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Read_Write_Closer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
+</div>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#query">query</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
+<li><a href="/core/io/#to_closer">to_closer</a></li>
+<li><a href="/core/io/#to_flusher">to_flusher</a></li>
+<li><a href="/core/io/#to_read_closer">to_read_closer</a></li>
+<li><a href="/core/io/#to_read_write_closer">to_read_write_closer</a></li>
+<li><a href="/core/io/#to_read_write_seeker">to_read_write_seeker</a></li>
+<li><a href="/core/io/#to_read_writer">to_read_writer</a></li>
+<li><a href="/core/io/#to_reader">to_reader</a></li>
+<li><a href="/core/io/#to_reader_at">to_reader_at</a></li>
+<li><a href="/core/io/#to_seeker">to_seeker</a></li>
+<li><a href="/core/io/#to_write_closer">to_write_closer</a></li>
+<li><a href="/core/io/#to_write_flush_closer">to_write_flush_closer</a></li>
+<li><a href="/core/io/#to_write_flusher">to_write_flusher</a></li>
+<li><a href="/core/io/#to_write_seeker">to_write_seeker</a></li>
+<li><a href="/core/io/#to_writer">to_writer</a></li>
+<li><a href="/core/io/#to_writer_at">to_writer_at</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_rune">write_quoted_rune</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+<li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Read_Write_Seeker"><span><a class="doc-id-link" href="#Read_Write_Seeker">Read_Write_Seeker<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L88"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Read_Write_Seeker :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
+</div>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#query">query</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
+<li><a href="/core/io/#to_closer">to_closer</a></li>
+<li><a href="/core/io/#to_flusher">to_flusher</a></li>
+<li><a href="/core/io/#to_read_closer">to_read_closer</a></li>
+<li><a href="/core/io/#to_read_write_closer">to_read_write_closer</a></li>
+<li><a href="/core/io/#to_read_write_seeker">to_read_write_seeker</a></li>
+<li><a href="/core/io/#to_read_writer">to_read_writer</a></li>
+<li><a href="/core/io/#to_reader">to_reader</a></li>
+<li><a href="/core/io/#to_reader_at">to_reader_at</a></li>
+<li><a href="/core/io/#to_seeker">to_seeker</a></li>
+<li><a href="/core/io/#to_write_closer">to_write_closer</a></li>
+<li><a href="/core/io/#to_write_flush_closer">to_write_flush_closer</a></li>
+<li><a href="/core/io/#to_write_flusher">to_write_flusher</a></li>
+<li><a href="/core/io/#to_write_seeker">to_write_seeker</a></li>
+<li><a href="/core/io/#to_writer">to_writer</a></li>
+<li><a href="/core/io/#to_writer_at">to_writer_at</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_rune">write_quoted_rune</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+<li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Read_Writer"><span><a class="doc-id-link" href="#Read_Writer">Read_Writer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L85"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Read_Writer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
+</div>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#query">query</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
+<li><a href="/core/io/#to_closer">to_closer</a></li>
+<li><a href="/core/io/#to_flusher">to_flusher</a></li>
+<li><a href="/core/io/#to_read_closer">to_read_closer</a></li>
+<li><a href="/core/io/#to_read_write_closer">to_read_write_closer</a></li>
+<li><a href="/core/io/#to_read_write_seeker">to_read_write_seeker</a></li>
+<li><a href="/core/io/#to_read_writer">to_read_writer</a></li>
+<li><a href="/core/io/#to_reader">to_reader</a></li>
+<li><a href="/core/io/#to_reader_at">to_reader_at</a></li>
+<li><a href="/core/io/#to_seeker">to_seeker</a></li>
+<li><a href="/core/io/#to_write_closer">to_write_closer</a></li>
+<li><a href="/core/io/#to_write_flush_closer">to_write_flush_closer</a></li>
+<li><a href="/core/io/#to_write_flusher">to_write_flusher</a></li>
+<li><a href="/core/io/#to_write_seeker">to_write_seeker</a></li>
+<li><a href="/core/io/#to_writer">to_writer</a></li>
+<li><a href="/core/io/#to_writer_at">to_writer_at</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_rune">write_quoted_rune</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+<li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Reader"><span><a class="doc-id-link" href="#Reader">Reader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L79"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Reader :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
+</div>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#query">query</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
+<li><a href="/core/io/#to_closer">to_closer</a></li>
+<li><a href="/core/io/#to_flusher">to_flusher</a></li>
+<li><a href="/core/io/#to_read_closer">to_read_closer</a></li>
+<li><a href="/core/io/#to_read_write_closer">to_read_write_closer</a></li>
+<li><a href="/core/io/#to_read_write_seeker">to_read_write_seeker</a></li>
+<li><a href="/core/io/#to_read_writer">to_read_writer</a></li>
+<li><a href="/core/io/#to_reader">to_reader</a></li>
+<li><a href="/core/io/#to_reader_at">to_reader_at</a></li>
+<li><a href="/core/io/#to_seeker">to_seeker</a></li>
+<li><a href="/core/io/#to_write_closer">to_write_closer</a></li>
+<li><a href="/core/io/#to_write_flush_closer">to_write_flush_closer</a></li>
+<li><a href="/core/io/#to_write_flusher">to_write_flusher</a></li>
+<li><a href="/core/io/#to_write_seeker">to_write_seeker</a></li>
+<li><a href="/core/io/#to_writer">to_writer</a></li>
+<li><a href="/core/io/#to_writer_at">to_writer_at</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_rune">write_quoted_rune</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+<li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Reader_At"><span><a class="doc-id-link" href="#Reader_At">Reader_At<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L95"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Reader_At :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
+</div>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#query">query</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
+<li><a href="/core/io/#to_closer">to_closer</a></li>
+<li><a href="/core/io/#to_flusher">to_flusher</a></li>
+<li><a href="/core/io/#to_read_closer">to_read_closer</a></li>
+<li><a href="/core/io/#to_read_write_closer">to_read_write_closer</a></li>
+<li><a href="/core/io/#to_read_write_seeker">to_read_write_seeker</a></li>
+<li><a href="/core/io/#to_read_writer">to_read_writer</a></li>
+<li><a href="/core/io/#to_reader">to_reader</a></li>
+<li><a href="/core/io/#to_reader_at">to_reader_at</a></li>
+<li><a href="/core/io/#to_seeker">to_seeker</a></li>
+<li><a href="/core/io/#to_write_closer">to_write_closer</a></li>
+<li><a href="/core/io/#to_write_flush_closer">to_write_flush_closer</a></li>
+<li><a href="/core/io/#to_write_flusher">to_write_flusher</a></li>
+<li><a href="/core/io/#to_write_seeker">to_write_seeker</a></li>
+<li><a href="/core/io/#to_writer">to_writer</a></li>
+<li><a href="/core/io/#to_writer_at">to_writer_at</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_rune">write_quoted_rune</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+<li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Section_Reader"><span><a class="doc-id-link" href="#Section_Reader">Section_Reader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/util.odin#L423"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Section_Reader :: <span class="keyword-type">struct</span> {
+	r:     <a class="code-typename" href="/core/io/#Stream">Stream</a>,
+	base:  <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+	off:   <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+	limit: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Section_Reader implements read, seek, and read_at on a section of an underlying Reader_At</p>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Seek_From"><span><a class="doc-id-link" href="#Seek_From">Seek_From<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L11"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Seek_From :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
+	Start   = 0, <span class="comment">// seek relative to the origin of the file</span>
+	Current = 1, <span class="comment">// seek relative to the current offset</span>
+	End     = 2, <span class="comment">// seek relative to the end</span>
+}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Seek whence values</p>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#seek">seek</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Seeker"><span><a class="doc-id-link" href="#Seeker">Seeker<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L83"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Seeker :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
+</div>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#query">query</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
+<li><a href="/core/io/#to_closer">to_closer</a></li>
+<li><a href="/core/io/#to_flusher">to_flusher</a></li>
+<li><a href="/core/io/#to_read_closer">to_read_closer</a></li>
+<li><a href="/core/io/#to_read_write_closer">to_read_write_closer</a></li>
+<li><a href="/core/io/#to_read_write_seeker">to_read_write_seeker</a></li>
+<li><a href="/core/io/#to_read_writer">to_read_writer</a></li>
+<li><a href="/core/io/#to_reader">to_reader</a></li>
+<li><a href="/core/io/#to_reader_at">to_reader_at</a></li>
+<li><a href="/core/io/#to_seeker">to_seeker</a></li>
+<li><a href="/core/io/#to_write_closer">to_write_closer</a></li>
+<li><a href="/core/io/#to_write_flush_closer">to_write_flush_closer</a></li>
+<li><a href="/core/io/#to_write_flusher">to_write_flusher</a></li>
+<li><a href="/core/io/#to_write_seeker">to_write_seeker</a></li>
+<li><a href="/core/io/#to_writer">to_writer</a></li>
+<li><a href="/core/io/#to_writer_at">to_writer_at</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_rune">write_quoted_rune</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+<li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="Stream"><span><a class="doc-id-link" href="#Stream">Stream<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L74"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">Stream :: <span class="keyword-type">struct</span> {
+	procedure: <a class="code-typename" href="/core/io/#Stream_Proc">Stream_Proc</a>,
+	data:      <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
+}</pre>
+</div>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#query">query</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
+<li><a href="/core/io/#to_closer">to_closer</a></li>
+<li><a href="/core/io/#to_flusher">to_flusher</a></li>
+<li><a href="/core/io/#to_read_closer">to_read_closer</a></li>
+<li><a href="/core/io/#to_read_write_closer">to_read_write_closer</a></li>
+<li><a href="/core/io/#to_read_write_seeker">to_read_write_seeker</a></li>
+<li><a href="/core/io/#to_read_writer">to_read_writer</a></li>
+<li><a href="/core/io/#to_reader">to_reader</a></li>
+<li><a href="/core/io/#to_reader_at">to_reader_at</a></li>
+<li><a href="/core/io/#to_seeker">to_seeker</a></li>
+<li><a href="/core/io/#to_write_closer">to_write_closer</a></li>
+<li><a href="/core/io/#to_write_flush_closer">to_write_flush_closer</a></li>
+<li><a href="/core/io/#to_write_flusher">to_write_flusher</a></li>
+<li><a href="/core/io/#to_write_seeker">to_write_seeker</a></li>
+<li><a href="/core/io/#to_writer">to_writer</a></li>
+<li><a href="/core/io/#to_writer_at">to_writer_at</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_rune">write_quoted_rune</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+<li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
+</ul>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="Stream_Mode"><span><a class="doc-id-link" href="#Stream_Mode">Stream_Mode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L57"><em>Source</em></a></div></h3>
@@ -809,14 +1548,22 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 <div>
 <pre class="doc-code">Stream_Mode_Set :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/core/io/#Stream_Mode">Stream_Mode</a>; <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>]</pre>
 </div>
-<h5>Related Procedures With Parameters</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
 <ul>
 <li><a href="/core/io/#query_utility">query_utility</a></li>
 </ul>
-<h5>Related Procedures With Returns</h5>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
 <ul>
 <li><a href="/core/io/#query">query</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="Stream_Proc"><span><a class="doc-id-link" href="#Stream_Proc">Stream_Proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L72"><em>Source</em></a></div></h3>
@@ -832,47 +1579,519 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 	w: <a class="code-typename" href="/core/io/#Stream">Stream</a>,
 }</pre>
 </div>
-<h5>Related Procedures With Parameters</h5>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
 <ul>
 <li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
 <li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
 </ul>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="Write_Closer"><span><a class="doc-id-link" href="#Write_Closer">Write_Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L90"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Write_Closer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#query">query</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
+<li><a href="/core/io/#to_closer">to_closer</a></li>
+<li><a href="/core/io/#to_flusher">to_flusher</a></li>
+<li><a href="/core/io/#to_read_closer">to_read_closer</a></li>
+<li><a href="/core/io/#to_read_write_closer">to_read_write_closer</a></li>
+<li><a href="/core/io/#to_read_write_seeker">to_read_write_seeker</a></li>
+<li><a href="/core/io/#to_read_writer">to_read_writer</a></li>
+<li><a href="/core/io/#to_reader">to_reader</a></li>
+<li><a href="/core/io/#to_reader_at">to_reader_at</a></li>
+<li><a href="/core/io/#to_seeker">to_seeker</a></li>
+<li><a href="/core/io/#to_write_closer">to_write_closer</a></li>
+<li><a href="/core/io/#to_write_flush_closer">to_write_flush_closer</a></li>
+<li><a href="/core/io/#to_write_flusher">to_write_flusher</a></li>
+<li><a href="/core/io/#to_write_seeker">to_write_seeker</a></li>
+<li><a href="/core/io/#to_writer">to_writer</a></li>
+<li><a href="/core/io/#to_writer_at">to_writer_at</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_rune">write_quoted_rune</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+<li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
+</ul>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="Write_Flush_Closer"><span><a class="doc-id-link" href="#Write_Flush_Closer">Write_Flush_Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L93"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Write_Flush_Closer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#query">query</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
+<li><a href="/core/io/#to_closer">to_closer</a></li>
+<li><a href="/core/io/#to_flusher">to_flusher</a></li>
+<li><a href="/core/io/#to_read_closer">to_read_closer</a></li>
+<li><a href="/core/io/#to_read_write_closer">to_read_write_closer</a></li>
+<li><a href="/core/io/#to_read_write_seeker">to_read_write_seeker</a></li>
+<li><a href="/core/io/#to_read_writer">to_read_writer</a></li>
+<li><a href="/core/io/#to_reader">to_reader</a></li>
+<li><a href="/core/io/#to_reader_at">to_reader_at</a></li>
+<li><a href="/core/io/#to_seeker">to_seeker</a></li>
+<li><a href="/core/io/#to_write_closer">to_write_closer</a></li>
+<li><a href="/core/io/#to_write_flush_closer">to_write_flush_closer</a></li>
+<li><a href="/core/io/#to_write_flusher">to_write_flusher</a></li>
+<li><a href="/core/io/#to_write_seeker">to_write_seeker</a></li>
+<li><a href="/core/io/#to_writer">to_writer</a></li>
+<li><a href="/core/io/#to_writer_at">to_writer_at</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_rune">write_quoted_rune</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+<li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
+</ul>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="Write_Flusher"><span><a class="doc-id-link" href="#Write_Flusher">Write_Flusher<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L92"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Write_Flusher :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#query">query</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
+<li><a href="/core/io/#to_closer">to_closer</a></li>
+<li><a href="/core/io/#to_flusher">to_flusher</a></li>
+<li><a href="/core/io/#to_read_closer">to_read_closer</a></li>
+<li><a href="/core/io/#to_read_write_closer">to_read_write_closer</a></li>
+<li><a href="/core/io/#to_read_write_seeker">to_read_write_seeker</a></li>
+<li><a href="/core/io/#to_read_writer">to_read_writer</a></li>
+<li><a href="/core/io/#to_reader">to_reader</a></li>
+<li><a href="/core/io/#to_reader_at">to_reader_at</a></li>
+<li><a href="/core/io/#to_seeker">to_seeker</a></li>
+<li><a href="/core/io/#to_write_closer">to_write_closer</a></li>
+<li><a href="/core/io/#to_write_flush_closer">to_write_flush_closer</a></li>
+<li><a href="/core/io/#to_write_flusher">to_write_flusher</a></li>
+<li><a href="/core/io/#to_write_seeker">to_write_seeker</a></li>
+<li><a href="/core/io/#to_writer">to_writer</a></li>
+<li><a href="/core/io/#to_writer_at">to_writer_at</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_rune">write_quoted_rune</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+<li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
+</ul>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="Write_Seeker"><span><a class="doc-id-link" href="#Write_Seeker">Write_Seeker<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L91"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Write_Seeker :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#query">query</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
+<li><a href="/core/io/#to_closer">to_closer</a></li>
+<li><a href="/core/io/#to_flusher">to_flusher</a></li>
+<li><a href="/core/io/#to_read_closer">to_read_closer</a></li>
+<li><a href="/core/io/#to_read_write_closer">to_read_write_closer</a></li>
+<li><a href="/core/io/#to_read_write_seeker">to_read_write_seeker</a></li>
+<li><a href="/core/io/#to_read_writer">to_read_writer</a></li>
+<li><a href="/core/io/#to_reader">to_reader</a></li>
+<li><a href="/core/io/#to_reader_at">to_reader_at</a></li>
+<li><a href="/core/io/#to_seeker">to_seeker</a></li>
+<li><a href="/core/io/#to_write_closer">to_write_closer</a></li>
+<li><a href="/core/io/#to_write_flush_closer">to_write_flush_closer</a></li>
+<li><a href="/core/io/#to_write_flusher">to_write_flusher</a></li>
+<li><a href="/core/io/#to_write_seeker">to_write_seeker</a></li>
+<li><a href="/core/io/#to_writer">to_writer</a></li>
+<li><a href="/core/io/#to_writer_at">to_writer_at</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_rune">write_quoted_rune</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+<li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
+</ul>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="Writer"><span><a class="doc-id-link" href="#Writer">Writer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L80"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Writer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#query">query</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
+<li><a href="/core/io/#to_closer">to_closer</a></li>
+<li><a href="/core/io/#to_flusher">to_flusher</a></li>
+<li><a href="/core/io/#to_read_closer">to_read_closer</a></li>
+<li><a href="/core/io/#to_read_write_closer">to_read_write_closer</a></li>
+<li><a href="/core/io/#to_read_write_seeker">to_read_write_seeker</a></li>
+<li><a href="/core/io/#to_read_writer">to_read_writer</a></li>
+<li><a href="/core/io/#to_reader">to_reader</a></li>
+<li><a href="/core/io/#to_reader_at">to_reader_at</a></li>
+<li><a href="/core/io/#to_seeker">to_seeker</a></li>
+<li><a href="/core/io/#to_write_closer">to_write_closer</a></li>
+<li><a href="/core/io/#to_write_flush_closer">to_write_flush_closer</a></li>
+<li><a href="/core/io/#to_write_flusher">to_write_flusher</a></li>
+<li><a href="/core/io/#to_write_seeker">to_write_seeker</a></li>
+<li><a href="/core/io/#to_writer">to_writer</a></li>
+<li><a href="/core/io/#to_writer_at">to_writer_at</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_rune">write_quoted_rune</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+<li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
+</ul>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="Writer_At"><span><a class="doc-id-link" href="#Writer_At">Writer_At<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L96"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Writer_At :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
+<details class="odin-doc-toggle" close>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Parameters</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#close">close</a></li>
+<li><a href="/core/io/#copy">copy</a></li>
+<li><a href="/core/io/#copy_buffer">copy_buffer</a></li>
+<li><a href="/core/io/#copy_n">copy_n</a></li>
+<li><a href="/core/io/#destroy">destroy</a></li>
+<li><a href="/core/io/#flush">flush</a></li>
+<li><a href="/core/io/#limited_reader_init">limited_reader_init</a></li>
+<li><a href="/core/io/#query">query</a></li>
+<li><a href="/core/io/#read">read</a></li>
+<li><a href="/core/io/#read_at">read_at</a></li>
+<li><a href="/core/io/#read_at_least">read_at_least</a></li>
+<li><a href="/core/io/#read_byte">read_byte</a></li>
+<li><a href="/core/io/#read_full">read_full</a></li>
+<li><a href="/core/io/#read_ptr">read_ptr</a></li>
+<li><a href="/core/io/#read_ptr_at">read_ptr_at</a></li>
+<li><a href="/core/io/#read_rune">read_rune</a></li>
+<li><a href="/core/io/#section_reader_init">section_reader_init</a></li>
+<li><a href="/core/io/#seek">seek</a></li>
+<li><a href="/core/io/#size">size</a></li>
+<li><a href="/core/io/#tee_reader_init">tee_reader_init</a></li>
+<li><a href="/core/io/#to_closer">to_closer</a></li>
+<li><a href="/core/io/#to_flusher">to_flusher</a></li>
+<li><a href="/core/io/#to_read_closer">to_read_closer</a></li>
+<li><a href="/core/io/#to_read_write_closer">to_read_write_closer</a></li>
+<li><a href="/core/io/#to_read_write_seeker">to_read_write_seeker</a></li>
+<li><a href="/core/io/#to_read_writer">to_read_writer</a></li>
+<li><a href="/core/io/#to_reader">to_reader</a></li>
+<li><a href="/core/io/#to_reader_at">to_reader_at</a></li>
+<li><a href="/core/io/#to_seeker">to_seeker</a></li>
+<li><a href="/core/io/#to_write_closer">to_write_closer</a></li>
+<li><a href="/core/io/#to_write_flush_closer">to_write_flush_closer</a></li>
+<li><a href="/core/io/#to_write_flusher">to_write_flusher</a></li>
+<li><a href="/core/io/#to_write_seeker">to_write_seeker</a></li>
+<li><a href="/core/io/#to_writer">to_writer</a></li>
+<li><a href="/core/io/#to_writer_at">to_writer_at</a></li>
+<li><a href="/core/io/#write">write</a></li>
+<li><a href="/core/io/#write_at">write_at</a></li>
+<li><a href="/core/io/#write_at_least">write_at_least</a></li>
+<li><a href="/core/io/#write_byte">write_byte</a></li>
+<li><a href="/core/io/#write_encoded_rune">write_encoded_rune</a></li>
+<li><a href="/core/io/#write_escaped_rune">write_escaped_rune</a></li>
+<li><a href="/core/io/#write_f16">write_f16</a></li>
+<li><a href="/core/io/#write_f32">write_f32</a></li>
+<li><a href="/core/io/#write_f64">write_f64</a></li>
+<li><a href="/core/io/#write_full">write_full</a></li>
+<li><a href="/core/io/#write_i128">write_i128</a></li>
+<li><a href="/core/io/#write_i64">write_i64</a></li>
+<li><a href="/core/io/#write_int">write_int</a></li>
+<li><a href="/core/io/#write_ptr">write_ptr</a></li>
+<li><a href="/core/io/#write_ptr_at">write_ptr_at</a></li>
+<li><a href="/core/io/#write_quoted_rune">write_quoted_rune</a></li>
+<li><a href="/core/io/#write_quoted_string">write_quoted_string</a></li>
+<li><a href="/core/io/#write_quoted_string16">write_quoted_string16</a></li>
+<li><a href="/core/io/#write_rune">write_rune</a></li>
+<li><a href="/core/io/#write_string">write_string</a></li>
+<li><a href="/core/io/#write_string16">write_string16</a></li>
+<li><a href="/core/io/#write_u128">write_u128</a></li>
+<li><a href="/core/io/#write_u64">write_u64</a></li>
+<li><a href="/core/io/#write_uint">write_uint</a></li>
+</ul>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedures With Returns</h5>
+</summary>
+<ul>
+<li><a href="/core/io/#limited_reader_to_reader">limited_reader_to_reader</a></li>
+<li><a href="/core/io/#multi_reader_init">multi_reader_init</a></li>
+<li><a href="/core/io/#multi_writer_init">multi_writer_init</a></li>
+<li><a href="/core/io/#section_reader_to_stream">section_reader_to_stream</a></li>
+<li><a href="/core/io/#tee_reader_to_reader">tee_reader_to_reader</a></li>
+</ul>
+</details>
 </div>
 <h2 id="pkg-Constants" class="pkg-header">Constants</h2>
 <p class="pkg-empty-section">This section is empty.</p>
@@ -1416,7 +2635,7 @@ If an error occurs before writing everything it is returned.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/io/util.odin">util.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-10 13:03:14.034993000 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-10 14:20:00.502275600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
