@@ -160,7 +160,7 @@ Types (7)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (223)</summary>
+Procedures (224)</summary>
 <ul>
 <li><a href="#alloca">alloca</a></li>
 <li><a href="#atomic_add">atomic_add</a></li>
@@ -277,6 +277,7 @@ Procedures (223)</summary>
 <li><a href="#simd_reduce_or">simd_reduce_or</a></li>
 <li><a href="#simd_reduce_xor">simd_reduce_xor</a></li>
 <li><a href="#simd_replace">simd_replace</a></li>
+<li><a href="#simd_runtime_swizzle">simd_runtime_swizzle</a></li>
 <li><a href="#simd_saturating_add">simd_saturating_add</a></li>
 <li><a href="#simd_saturating_sub">simd_saturating_sub</a></li>
 <li><a href="#simd_scatter">simd_scatter</a></li>
@@ -3120,6 +3121,57 @@ the vector.</p>
 </details>
 </div>
 <div class="pkg-entity">
+<h3 id="simd_runtime_swizzle"><span><a class="doc-id-link" href="#simd_runtime_swizzle">simd_runtime_swizzle<span class="a-hidden">&nbsp;¶</span></a></span></h3>
+<div>
+<pre class="doc-code">simd_runtime_swizzle :: <span class="keyword-type">proc</span>(table: <span class="directive">#simd</span>[N]T, indices: <span class="directive">#simd</span>[N]T) -> <span class="directive">#simd</span>[N]T <span class="keyword">where</span> <a href="/base/intrinsics#type_is_integer"><span class="code-procedure">type_is_integer</span></a>(T) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Runtime Equivalent to Shuffle.</p>
+<p>Performs element-wise table lookups using runtime indices.
+Each element in the indices vector selects an element from the table vector.
+The indices are automatically masked to prevent out-of-bounds access.</p>
+<p>This operation is hardware-accelerated on most platforms when using 8-bit
+integer vectors. For other element types or unsupported vector sizes, it
+falls back to software emulation.</p>
+<p><b>Inputs:</b><br><span class="doc-list"><code>table</code>: The lookup table vector (should be power-of-2 size for correct masking).</span>
+<span class="doc-list"><code>indices</code>: The indices vector (automatically masked to valid range).</span></p>
+<p><b>Returns:</b><br><span class="doc-list">A vector where <code>result[i] = table[indices[i] & (table_size-1)]</code>.</span></p>
+<details open class="code-example">
+<summary><b>Operation:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">for i in 0 ..&lt; len(indices) {
+	masked_index := indices[i] & (len(table) - 1)
+	result[i] = table[masked_index]
+}
+return result
+</code></pre>
+</details>
+<p>Implementation:</p>
+<pre>| Platform    | Lane Size                                 | Implementation      |
+|-------------|-------------------------------------------|---------------------|
+| x86-64      | pshufb (16B), vpshufb (32B), AVX512 (64B) | Single vector       |
+| ARM64       | tbl1 (16B), tbl2 (32B), tbl4 (64B)        | Automatic splitting |
+| ARM32       | vtbl1 (8B), vtbl2 (16B), vtbl4 (32B)      | Automatic splitting |
+| WebAssembly | i8x16.swizzle (16B), Emulation (&gt;16B)     | Mixed               |
+| Other       | Emulation                                 | Software            |
+
+</pre>
+<details open class="code-example">
+<summary><b>Example:</b></summary>
+<pre><code class="hljs language-odin" data-lang="odin">import "core:simd"
+import "core:fmt"
+
+runtime_swizzle_example :: proc() {
+	table := simd.u8x16{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
+	indices := simd.u8x16{15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}
+	result := simd.runtime_swizzle(table, indices)
+	fmt.println(result) // Expected: {15, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14}
+}
+</code></pre>
+</details>
+</details>
+</div>
+<div class="pkg-entity">
 <h3 id="simd_saturating_add"><span><a class="doc-id-link" href="#simd_saturating_add">simd_saturating_add<span class="a-hidden">&nbsp;¶</span></a></span></h3>
 <div>
 <pre class="doc-code">simd_saturating_add :: <span class="keyword-type">proc</span>(a, b: <span class="directive">#simd</span>[N]T) -> <span class="directive">#simd</span>[N]T <span class="keyword">where</span> <a href="/base/intrinsics#type_is_integer"><span class="code-procedure">type_is_integer</span></a>(T) {…}</pre>
@@ -4942,6 +4994,7 @@ Implements in <code>xgetbv</code> instruction.</p>
 <li><a href="#simd_reduce_or">simd_reduce_or</a></li>
 <li><a href="#simd_reduce_xor">simd_reduce_xor</a></li>
 <li><a href="#simd_replace">simd_replace</a></li>
+<li><a href="#simd_runtime_swizzle">simd_runtime_swizzle</a></li>
 <li><a href="#simd_saturating_add">simd_saturating_add</a></li>
 <li><a href="#simd_saturating_sub">simd_saturating_sub</a></li>
 <li><a href="#simd_scatter">simd_scatter</a></li>

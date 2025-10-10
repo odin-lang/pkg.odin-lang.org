@@ -470,16 +470,21 @@ Fatal   = 40,
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Log_Allocator"><span><a class="doc-id-link" href="#Log_Allocator">Log_Allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log_allocator.odin#L11"><em>Source</em></a></div></h3>
+<h3 id="Log_Allocator"><span><a class="doc-id-link" href="#Log_Allocator">Log_Allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log_allocator.odin#L15"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Log_Allocator :: <span class="keyword-type">struct</span> {
 	allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>,
 	level:     runtime.<a class="code-typename" href="/base/runtime/#Logger_Level">Logger_Level</a>,
 	prefix:    <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
-	locked:    <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>,
+	lock:      sync.<a class="code-typename" href="/core/sync/#Mutex">Mutex</a>,
 	size_fmt:  <a class="code-typename" href="/core/log/#Log_Allocator_Format">Log_Allocator_Format</a>,
 }</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Log_Allocator is an allocator which calls <code>context.logger</code> on each of its allocations operations.
+The format can be changed by setting the <code>size_fmt: Log_Allocator_Format</code> field to either <code>Bytes</code> or <code>Human</code>.</p>
+</details>
 <h5>Related Procedures With Parameters</h5>
 <ul>
 <li><a href="/core/log/#log_allocator">log_allocator</a></li>
@@ -487,7 +492,7 @@ Fatal   = 40,
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Log_Allocator_Format"><span><a class="doc-id-link" href="#Log_Allocator_Format">Log_Allocator_Format<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log_allocator.odin#L6"><em>Source</em></a></div></h3>
+<h3 id="Log_Allocator_Format"><span><a class="doc-id-link" href="#Log_Allocator_Format">Log_Allocator_Format<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log_allocator.odin#L7"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Log_Allocator_Format :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
 	Bytes, <span class="comment">// Actual number of bytes.</span>
@@ -755,19 +760,19 @@ Terminal_Color
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="log_allocator"><span><a class="doc-id-link" href="#log_allocator">log_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log_allocator.odin#L29"><em>Source</em></a></div></h3>
+<h3 id="log_allocator"><span><a class="doc-id-link" href="#log_allocator">log_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log_allocator.odin#L33"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">log_allocator :: <span class="keyword-type">proc</span>(la: ^<a class="code-typename" href="/core/log/#Log_Allocator">Log_Allocator</a>) -> runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="log_allocator_init"><span><a class="doc-id-link" href="#log_allocator_init">log_allocator_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log_allocator.odin#L19"><em>Source</em></a></div></h3>
+<h3 id="log_allocator_init"><span><a class="doc-id-link" href="#log_allocator_init">log_allocator_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log_allocator.odin#L23"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">log_allocator_init :: <span class="keyword-type">proc</span>(la: ^<a class="code-typename" href="/core/log/#Log_Allocator">Log_Allocator</a>, level: runtime.<a class="code-typename" href="/base/runtime/#Logger_Level">Logger_Level</a>, size_fmt: <a class="code-typename" href="/core/log/#Log_Allocator_Format">Log_Allocator_Format</a> = Log_Allocator_Format.Bytes, allocator := <a href="/base/runtime/#Context">context.allocator</a>, prefix: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> = "") {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="log_allocator_proc"><span><a class="doc-id-link" href="#log_allocator_proc">log_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log_allocator.odin#L36"><em>Source</em></a></div></h3>
+<h3 id="log_allocator_proc"><span><a class="doc-id-link" href="#log_allocator_proc">log_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/log/log_allocator.odin#L40"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">log_allocator_proc :: <span class="keyword-type">proc</span>(
 	allocator_data:  <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
@@ -832,7 +837,7 @@ Terminal_Color
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/log/multi_logger.odin">multi_logger.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-09 21:12:54.744292400 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-10 10:13:42.913105600 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
