@@ -1654,7 +1654,10 @@ write_markup_text :: proc(w: io.Writer, s_: string, code_inline := false) {
 					io.write_string(w, s[latest_index:index])
 
 					_, host, _, _, _ := net.split_url(url, context.temp_allocator)
-					if strings.equal_fold(cfg.domain, host) {
+					host  = strings.to_lower(host, context.temp_allocator)
+					_url := strings.to_lower(url,  context.temp_allocator)
+
+					if strings.has_suffix(host, cfg.domain) {
 						// Same domain as cfg.domain
 						fmt.wprintf(w, `<a href="%s">`, url)
 					} else {
