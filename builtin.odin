@@ -225,6 +225,229 @@ builtins := []Builtin{
 
 }
 
+add_styling_to_builtin :: proc(txt: string) -> string {
+	s := scanner.init(&{}, txt)
+	s.flags -= {.Skip_Comments}
+	s.is_ident_rune = proc(ch: rune, i: int) -> bool {
+		if i == 0 {
+			if ch == '#' {
+				return true
+			}
+			if unicode.is_digit(ch) {
+				return false
+			}
+		}
+		return ch == '_' || unicode.is_letter(ch) || unicode.is_digit(ch)
+	}
+
+	b: [dynamic]byte
+	b.allocator = context.temp_allocator
+	prev_offset := 0
+
+
+	loop: for {
+		append_span :: proc(b: ^[dynamic]byte, s: ^scanner.Scanner, class: string, text: string, prev_offset: ^int) {
+			append(b, s.src[prev_offset^:s.tok_pos])
+			append(b, `<span class="`)
+			append(b, class)
+			append(b, `">`)
+			append(b, text)
+			append(b, `</span>`)
+			prev_offset^ = s.tok_end
+		}
+		append_anchored_span :: proc(b: ^[dynamic]byte, s: ^scanner.Scanner, anchor: string, class: string, text: string, prev_offset: ^int) {
+			append(b, s.src[prev_offset^:s.tok_pos])
+			append(b, `<a href="`)
+			append(b, anchor)
+			append(b, `#`)
+			append(b, text)
+			append(b, `">`)
+			append(b, `<span class="`)
+			append(b, class)
+			append(b, `">`)
+			append(b, text)
+			append(b, `</span></a>`)
+			prev_offset^ = s.tok_end
+		}
+
+		switch scanner.scan(s) {
+		case scanner.EOF:
+			break loop
+		case scanner.Ident:
+			ident := scanner.token_text(s)
+			if strings.has_prefix(ident, "type_is_") {
+				append_anchored_span(&b, s, "/base/intrinsics", "code-procedure", ident, &prev_offset)
+			} else {
+				switch ident {
+				case "runtime":
+					if scanner.peek(s) == '.' {
+						_ = scanner.scan(s)
+
+						assert(scanner.scan(s) == scanner.Ident)
+						code_ident := scanner.token_text(s)
+
+						append_anchored_span(&b, s, "/base/runtime", "code-typename", code_ident, &prev_offset)
+					}
+
+				case "where", "distinct":
+					append_span(&b, s, "keyword", ident, &prev_offset)
+					prev_offset = s.tok_end
+				case "proc", "enum", "struct", "union", "map", "typeid", "matrix", "dynamic":
+					append_span(&b, s, "keyword-type", ident, &prev_offset)
+
+				case "#soa", "#simd", "#const", "#optional_ok":
+					append_span(&b, s, "directive", ident, &prev_offset)
+
+				case "Atomic_Memory_Order",
+				     "objc_object", "objc_selector", "objc_class",
+				     "objc_id", "objc_SEL", "objc_Class":
+					append_anchored_span(&b, s, "/base/intrinsics", "code-typename", ident, &prev_offset)
+				case "uintptr", "uint", "int",
+				     "u64", "i64",
+				     "u32", "i32",
+				     "u16", "i16",
+				     "u8",
+				     "bool",
+				     "string", "cstring",
+				     "rawptr":
+					append_anchored_span(&b, s, "/base/builtin", "doc-builtin", ident, &prev_offset)
+				}
+			}
+		case scanner.Comment:
+			comment := scanner.token_text(s)
+			append_span(&b, s, "comment", comment, &prev_offset)
+		}
+	}
+
+	if len(b) != 0 {
+		append(&b, s.src[prev_offset:])
+
+		return string(b[:])
+	}
+
+	return txt
+}
+
+
+write_butilin_entry :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, runtime_url: string, b: Builtin, kind: string) {
+	if b.kind != kind {
+		return
+	}
+
+	fmt.wprintln(w, `<div class="pkg-entity">`)
+	defer fmt.wprintln(w, `</div>`)
+
+	name := b.name
+
+	fmt.wprintf(w, "<h3 id=\"{0:s}\"><span><a class=\"doc-id-link\" href=\"#{0:s}\">{0:s}", name)
+	fmt.wprintf(w, "<span class=\"a-hidden\">&nbsp;¶</span></a></span>")
+	fmt.wprintf(w, "</h3>\n")
+	fmt.wprintln(w, `<div>`)
+
+	the_comment := b.comment
+	extra_comment := ""
+
+
+	switch b.kind {
+	case "c", "t":
+		fmt.wprint(w, `<pre class="doc-code">`)
+		if strings.contains(b.type, ".") {
+			pkg, _, type := strings.partition(b.type, ".")
+			if pkg == str(runtime_pkg.name) {
+				fmt.wprintf(w, `{0:s} : {2:s}.<a href="{1:s}#{3:s}">{3:s}</a> : `, name, runtime_url, pkg, type)
+
+				for entry in array(runtime_pkg.entries) {
+					e := &cfg.entities[entry.entity]
+					if e.kind == .Type_Name && str(e.name) == type {
+						extra_comment = strings.trim_space(str(e.docs))
+						if extra_comment == "" {
+							extra_comment = strings.trim_space(str(e.comment))
+						}
+						break
+					}
+				}
+			} else {
+				fmt.wprintf(w, "%s :: ", name)
+			}
+		} else {
+			fmt.wprintf(w, "%s :: ", name)
+		}
+
+		if len(b.type) != 0 && b.kind == "t" {
+			io.write_string(w, add_styling_to_builtin(b.type))
+		} else if len(b.value) != 0 && b.kind == "t" {
+			io.write_string(w, add_styling_to_builtin(b.value))
+		} else {
+			fmt.wprintf(w, "%s", b.value if len(b.value) != 0 else
+			                     "…"     if b.kind == "c"     else
+			                     name)
+		}
+		if strings.contains(b.type, "untyped") {
+			fmt.wprintf(w, " <span class=\"comment\">// %s</span>", b.type)
+		}
+
+		fmt.wprintln(w, "</pre>")
+	case "b":
+		fmt.wprint(w, `<pre class="doc-code">`)
+		fmt.wprintf(w, "%s :: %s", name, add_styling_to_builtin(b.type))
+		io.write_string(w, " {…}")
+		fmt.wprintln(w, "</pre>")
+	}
+
+	fmt.wprintln(w, `</div>`)
+
+	core_comment := ""
+
+
+	// NOTE(bill): This gets the comments from the `core:simd` package, to minimize documentation duplication
+	simd_docs: if strings.has_prefix(name, "simd_") {
+		simd_name := name[len("simd_"):]
+
+		core     := (&cfg._collections["core"]) or_break simd_docs
+		simd_pkg := core.pkgs["simd"]           or_break simd_docs
+		for e in array(simd_pkg.entries) {
+			if str(e.name) == simd_name {
+				simd_entity := &cfg.entities[e.entity]
+				core_comment = str(simd_entity.docs)
+				core_comment = strings.trim_space(core_comment)
+				break
+			}
+		}
+	}
+
+	// NOTE(bill): This gets the comments from the `core:sync` package, to minimize documentation duplication
+	atomic_docs: if strings.has_prefix(name, "atomic_") || strings.has_prefix(name, "Atomic_") {
+		atomic_name := name
+
+		core     := (&cfg._collections["core"]) or_break atomic_docs
+		sync_pkg := core.pkgs["sync"]           or_break atomic_docs
+		for e in array(sync_pkg.entries) {
+			if str(e.name) == atomic_name {
+				atomic_entity := &cfg.entities[e.entity]
+				core_comment = str(atomic_entity.docs)
+				core_comment = strings.trim_space(core_comment)
+				break
+			}
+		}
+	}
+
+
+	if core_comment == "" || the_comment == "" || extra_comment == "" {
+		fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
+		fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
+		if the_comment != "" {
+			write_docs(w, the_comment, name)
+		}
+		if extra_comment != "" {
+			write_docs(w, extra_comment, name)
+		}
+		if core_comment != "" {
+			write_docs(w, core_comment, name)
+		}
+		fmt.wprintln(w, `</details>`)
+	}
+}
+
 write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg, collection: ^Collection, pkg_name: string, pkg_docs: string) {
 	slice.sort_by(builtins, proc(a, b: Builtin) -> bool {
 		if a.kind == b.kind {
@@ -384,221 +607,8 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 		defer delete(runtime_url)
 
 		// builtin entries
-		for b in entry_table do if b.kind == kind {
-			fmt.wprintln(w, `<div class="pkg-entity">`)
-			defer fmt.wprintln(w, `</div>`)
-
-			name := b.name
-
-			fmt.wprintf(w, "<h3 id=\"{0:s}\"><span><a class=\"doc-id-link\" href=\"#{0:s}\">{0:s}", name)
-			fmt.wprintf(w, "<span class=\"a-hidden\">&nbsp;¶</span></a></span>")
-			fmt.wprintf(w, "</h3>\n")
-			fmt.wprintln(w, `<div>`)
-
-			the_comment := b.comment
-			extra_comment := ""
-
-			add_styling :: proc(txt: string) -> string {
-				s := scanner.init(&{}, txt)
-				s.flags -= {.Skip_Comments}
-				s.is_ident_rune = proc(ch: rune, i: int) -> bool {
-					if i == 0 {
-						if ch == '#' {
-							return true
-						}
-						if unicode.is_digit(ch) {
-							return false
-						}
-					}
-					return ch == '_' || unicode.is_letter(ch) || unicode.is_digit(ch)
-				}
-
-				b: [dynamic]byte
-				b.allocator = context.temp_allocator
-				prev_offset := 0
-
-
-				loop: for {
-					append_span :: proc(b: ^[dynamic]byte, s: ^scanner.Scanner, class: string, text: string, prev_offset: ^int) {
-						append(b, s.src[prev_offset^:s.tok_pos])
-						append(b, `<span class="`)
-						append(b, class)
-						append(b, `">`)
-						append(b, text)
-						append(b, `</span>`)
-						prev_offset^ = s.tok_end
-					}
-					append_anchored_span :: proc(b: ^[dynamic]byte, s: ^scanner.Scanner, anchor: string, class: string, text: string, prev_offset: ^int) {
-						append(b, s.src[prev_offset^:s.tok_pos])
-						append(b, `<a href="`)
-						append(b, anchor)
-						append(b, `#`)
-						append(b, text)
-						append(b, `">`)
-						append(b, `<span class="`)
-						append(b, class)
-						append(b, `">`)
-						append(b, text)
-						append(b, `</span></a>`)
-						prev_offset^ = s.tok_end
-					}
-
-					switch scanner.scan(s) {
-					case scanner.EOF:
-						break loop
-					case scanner.Ident:
-						ident := scanner.token_text(s)
-						if strings.has_prefix(ident, "type_is_") {
-							append_anchored_span(&b, s, "/base/intrinsics", "code-procedure", ident, &prev_offset)
-						} else {
-							switch ident {
-							case "runtime":
-								if scanner.peek(s) == '.' {
-									_ = scanner.scan(s)
-
-									assert(scanner.scan(s) == scanner.Ident)
-									code_ident := scanner.token_text(s)
-
-									append_anchored_span(&b, s, "/base/runtime", "code-typename", code_ident, &prev_offset)
-								}
-
-							case "where", "distinct":
-								append_span(&b, s, "keyword", ident, &prev_offset)
-								prev_offset = s.tok_end
-							case "proc", "enum", "struct", "union", "map", "typeid", "matrix", "dynamic":
-								append_span(&b, s, "keyword-type", ident, &prev_offset)
-
-							case "#soa", "#simd", "#const", "#optional_ok":
-								append_span(&b, s, "directive", ident, &prev_offset)
-
-							case "Atomic_Memory_Order",
-							     "objc_object", "objc_selector", "objc_class",
-							     "objc_id", "objc_SEL", "objc_Class":
-								append_anchored_span(&b, s, "/base/intrinsics", "code-typename", ident, &prev_offset)
-							case "uintptr", "uint", "int",
-							     "u64", "i64",
-							     "u32", "i32",
-							     "u16", "i16",
-							     "u8",
-							     "bool",
-							     "string", "cstring",
-							     "rawptr":
-								append_anchored_span(&b, s, "/base/builtin", "doc-builtin", ident, &prev_offset)
-							}
-						}
-					case scanner.Comment:
-						comment := scanner.token_text(s)
-						append_span(&b, s, "comment", comment, &prev_offset)
-					}
-				}
-
-				if len(b) != 0 {
-					append(&b, s.src[prev_offset:])
-
-					return string(b[:])
-				}
-
-				return txt
-			}
-
-			switch b.kind {
-			case "c", "t":
-				fmt.wprint(w, `<pre class="doc-code">`)
-				if strings.contains(b.type, ".") {
-					pkg, _, type := strings.partition(b.type, ".")
-					if pkg == str(runtime_pkg.name) {
-						fmt.wprintf(w, `{0:s} : {2:s}.<a href="{1:s}#{3:s}">{3:s}</a> : `, name, runtime_url, pkg, type)
-
-						for entry in array(runtime_pkg.entries) {
-							e := &cfg.entities[entry.entity]
-							if e.kind == .Type_Name && str(e.name) == type {
-								extra_comment = strings.trim_space(str(e.docs))
-								if extra_comment == "" {
-									extra_comment = strings.trim_space(str(e.comment))
-								}
-								break
-							}
-						}
-					} else {
-						fmt.wprintf(w, "%s :: ", name)
-					}
-				} else {
-					fmt.wprintf(w, "%s :: ", name)
-				}
-
-				if len(b.type) != 0 && b.kind == "t" {
-					io.write_string(w, add_styling(b.type))
-				} else if len(b.value) != 0 && b.kind == "t" {
-					io.write_string(w, add_styling(b.value))
-				} else {
-					fmt.wprintf(w, "%s", b.value if len(b.value) != 0 else
-					                     "…"     if b.kind == "c"     else
-					                     name)
-				}
-				if strings.contains(b.type, "untyped") {
-					fmt.wprintf(w, " <span class=\"comment\">// %s</span>", b.type)
-				}
-
-				fmt.wprintln(w, "</pre>")
-			case "b":
-				fmt.wprint(w, `<pre class="doc-code">`)
-				fmt.wprintf(w, "%s :: %s", name, add_styling(b.type))
-				io.write_string(w, " {…}")
-				fmt.wprintln(w, "</pre>")
-			}
-
-			fmt.wprintln(w, `</div>`)
-
-			core_comment := ""
-
-
-			// NOTE(bill): This gets the comments from the `core:simd` package, to minimize documentation duplication
-			simd_docs: if strings.has_prefix(name, "simd_") {
-				simd_name := name[len("simd_"):]
-
-				core     := (&cfg._collections["core"]) or_break simd_docs
-				simd_pkg := core.pkgs["simd"]           or_break simd_docs
-				for e in array(simd_pkg.entries) {
-					if str(e.name) == simd_name {
-						simd_entity := &cfg.entities[e.entity]
-						core_comment = str(simd_entity.docs)
-						core_comment = strings.trim_space(core_comment)
-						break
-					}
-				}
-			}
-
-			// NOTE(bill): This gets the comments from the `core:sync` package, to minimize documentation duplication
-			atomic_docs: if strings.has_prefix(name, "atomic_") || strings.has_prefix(name, "Atomic_") {
-				atomic_name := name
-
-				core     := (&cfg._collections["core"]) or_break atomic_docs
-				sync_pkg := core.pkgs["sync"]           or_break atomic_docs
-				for e in array(sync_pkg.entries) {
-					if str(e.name) == atomic_name {
-						atomic_entity := &cfg.entities[e.entity]
-						core_comment = str(atomic_entity.docs)
-						core_comment = strings.trim_space(core_comment)
-						break
-					}
-				}
-			}
-
-
-			if core_comment == "" || the_comment == "" || extra_comment == "" {
-				fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
-				fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
-				if the_comment != "" {
-					write_docs(w, the_comment, name)
-				}
-				if extra_comment != "" {
-					write_docs(w, extra_comment, name)
-				}
-				if core_comment != "" {
-					write_docs(w, core_comment, name)
-				}
-				fmt.wprintln(w, `</details>`)
-			}
+		for b in entry_table {
+			write_butilin_entry(w, runtime_pkg, runtime_url, b, kind)
 		}
 
 		// @builtin package runtime entries

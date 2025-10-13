@@ -276,6 +276,7 @@ generate_from_path :: proc(path: string, all_packages: bool) {
 			collection.pkg_to_path[pkg] = trimmed
 			cfg.pkg_to_collection[pkg] = collection
 			cfg.pkg_to_header[pkg] = cfg.header
+			cfg.name_to_pkg[str(pkg.name)] = pkg
 		}
 
 		collection_pkgs: [dynamic]^doc.Pkg
@@ -1655,14 +1656,14 @@ write_markup_text :: proc(w: io.Writer, s_: string, code_inline := false) {
 
 					_, host, _, _, _ := net.split_url(url, context.temp_allocator)
 					host  = strings.to_lower(host, context.temp_allocator)
-					_url := strings.to_lower(url,  context.temp_allocator)
+					url_ := strings.to_lower(url,  context.temp_allocator)
 
 					if strings.has_suffix(host, cfg.domain) {
 						// Same domain as cfg.domain
-						fmt.wprintf(w, `<a href="%s">`, url)
+						fmt.wprintf(w, `<a href="%s">`, url_)
 					} else {
 						// External domain, open in new tab.
-						fmt.wprintf(w, `<a href="%s" target="_blank">`, url)
+						fmt.wprintf(w, `<a href="%s" target="_blank">`, url_)
 					}
 					io.write_string(w, text)
 					io.write_string(w, "</a>")
@@ -2767,15 +2768,24 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		}
 	}
 
-	write_entity_reference :: proc(w: io.Writer, pkg: ^doc.Pkg, entity: ^doc.Entity) {
+	write_entity_reference :: proc(w: io.Writer, pkg: ^doc.Pkg, entity: ^doc.Entity, entry_name: string) {
 		name := str(entity.name)
 
 		this_pkg := &cfg.pkgs[cfg.files[entity.pos.file].pkg]
 		if .Builtin_Pkg_Builtin in entity.flags {
-			fmt.wprintf(w, `<a href="/base/builtin#{0:s}">builtin</a>.{0:s}`, name)
+			fmt.wprintf(w, `<a href="/base/builtin">builtin</a>.<a href="/base/builtin#{0:s}">{0:s}</a>`, name)
 			return
 		} else if .Builtin_Pkg_Intrinsics in entity.flags {
-			fmt.wprintf(w, `<a href="/base/intrinsics#{0:s}">intrinsics</a>.{0:s}`, name)
+			fmt.wprintf(w, `<a href="/base/intrinsics">intrinsics</a>.<a href="/base/intrinsics#{0:s}">{0:s}</a>`, name)
+			for iname in intrinsics_table {
+				if iname.name == name && iname.type != "" {
+					fmt.wprintf(w, `<br>%s :: %s`, entry_name, add_styling_to_builtin(iname.type))
+					if iname.kind == "b" {
+						io.write_string(w, " {…}")
+					}
+					break
+				}
+			}
 			return
 		} else if pkg != this_pkg {
 			fmt.wprintf(w, "%s.", str(this_pkg.name))
@@ -2820,7 +2830,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	if name != entity_name || entity_pkg != pkg {
 		fmt.wprint(w, `<pre class="doc-code">`)
 		fmt.wprintf(w, "%s :: ", name)
-		write_entity_reference(w, pkg, e)
+		write_entity_reference(w, pkg, e, name)
 		fmt.wprintln(w, "</pre>")
 	} else {
 		switch e.kind {
@@ -2905,7 +2915,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		case .Builtin:
 			fmt.wprint(w, `<pre class="doc-code">`)
 			fmt.wprintf(w, "%s :: ", name)
-			write_entity_reference(w, pkg, e)
+			write_entity_reference(w, pkg, e, name)
 			fmt.wprint(w, `</pre>`)
 		case .Procedure:
 			fmt.wprint(w, `<pre class="doc-code">`)
@@ -2927,7 +2937,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			for entity_index in array(e.grouped_entities) {
 				this_proc := &cfg.entities[entity_index]
 				io.write_byte(w, '\t')
-				write_entity_reference(w, pkg, this_proc)
+				write_entity_reference(w, pkg, this_proc, name)
 				io.write_byte(w, ',')
 				io.write_byte(w, '\n')
 			}
