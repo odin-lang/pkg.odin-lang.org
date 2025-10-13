@@ -1063,7 +1063,7 @@ Procedure Groups (2)</summary>
 <pre class="doc-code">IP4_Address :: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
 	<span class="comment">// NOTE(Feoramund): I have modified this struct from its C definition by</span>
 	<span class="comment">// introducing the byte variant to make it easier to work with.</span>
-	addr8:  [4]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	addr8:  [<span class="number">4</span>]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
 	addr32: <a class="code-typename" href="/core/sys/freebsd/#in_addr_t">in_addr_t</a>,
 }</pre>
 </div>
@@ -1077,9 +1077,9 @@ struct in_addr</p>
 <h3 id="IP6_Address"><span><a class="doc-id-link" href="#IP6_Address">IP6_Address<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/freebsd/types.odin#L1533"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">IP6_Address :: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
-	addr8:  [16]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
-	addr16: [8]<a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a>,
-	addr32: [4]<a href="/base/builtin#u32be"><span class="doc-builtin">u32be</span></a>,
+	addr8:  [<span class="number">16</span>]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	addr16: [<span class="number">8</span>]<a href="/base/builtin#u16be"><span class="doc-builtin">u16be</span></a>,
+	addr32: [<span class="number">4</span>]<a href="/base/builtin#u32be"><span class="doc-builtin">u32be</span></a>,
 }</pre>
 </div>
 <details class="odin-doc-toggle" open>
@@ -2104,7 +2104,7 @@ struct in_addr</p>
 	<span class="comment">// route weight </span>
 	nhidx:    <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
 	<span class="comment">// route nexhop index </span>
-	filler:   [2]<a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
+	filler:   [<span class="number">2</span>]<a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
 }</pre>
 </div>
 <details class="odin-doc-toggle" open>
@@ -2167,7 +2167,7 @@ struct in_addr</p>
 <div>
 <pre class="doc-code">Socket_Address_Basic :: <span class="keyword-type">struct</span> <span class="directive">#packed</span> {
 	<span class="keyword-type">using</span> _: <a class="code-typename" href="/core/sys/freebsd/#Socket_Address_Header">Socket_Address_Header</a>,
-	data: [14]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	data: [<span class="number">14</span>]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
 }</pre>
 </div>
 <details class="odin-doc-toggle" open>
@@ -2190,7 +2190,7 @@ struct in_addr</p>
 	<span class="comment">// link level address length </span>
 	slen:  <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
 	<span class="comment">// link layer selector length </span>
-	data:  [46]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	data:  [<span class="number">46</span>]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
 }</pre>
 </div>
 <details class="odin-doc-toggle" open>
@@ -2222,7 +2222,7 @@ bind(), listen(), et cetera.</p>
 	<span class="keyword-type">using</span> _: <a class="code-typename" href="/core/sys/freebsd/#Socket_Address_Header">Socket_Address_Header</a>,
 	port: <a class="code-typename" href="/core/sys/freebsd/#in_port_t">in_port_t</a>,
 	addr: <a class="code-typename" href="/core/sys/freebsd/#IP4_Address">IP4_Address</a>,
-	zero: [8]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	zero: [<span class="number">8</span>]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
 }</pre>
 </div>
 <details class="odin-doc-toggle" open>
@@ -2256,10 +2256,10 @@ struct sockaddr_in</p>
 <div>
 <pre class="doc-code">Socket_Address_Storage :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> _: <a class="code-typename" href="/core/sys/freebsd/#Socket_Address_Header">Socket_Address_Header</a>,
-	_pad1:  [6]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	_pad1:  [<span class="number">6</span>]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
 	_align: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>,
 	<span class="comment">// force desired struct alignment </span>
-	_pad2:  [112]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	_pad2:  [<span class="number">112</span>]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
 }</pre>
 </div>
 <details class="odin-doc-toggle" open>
@@ -3168,7 +3168,7 @@ The sendmmsg() function appeared in FreeBSD 11.0.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/freebsd/types.odin">types.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-13 09:03:14.816260900 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-13 09:24:09.307904300 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

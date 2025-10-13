@@ -381,8 +381,8 @@ Procedure Groups (1)</summary>
 	descender:      <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	lineHeight:     <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	glyphs:         [<span class="keyword">dynamic</span>]<a class="code-typename" href="/vendor/fontstash/#Glyph">Glyph</a>,
-	lut:            [256]<a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
-	fallbacks:      [20]<a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	lut:            [<span class="number">256</span>]<a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
+	fallbacks:      [<span class="number">20</span>]<a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
 	nfallbacks:     <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
 }</pre>
 </div>
@@ -416,13 +416,13 @@ Procedure Groups (1)</summary>
 	<span class="comment">// used states</span>
 	location:       <a class="code-typename" href="/vendor/fontstash/#QuadLocation">QuadLocation</a>,
 	<span class="comment">// dirty rectangle of the texture region that was updated</span>
-	dirtyRect:      [4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	dirtyRect:      [<span class="number">4</span>]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	<span class="comment">// callbacks with userData passed</span>
 	userData:       <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>,
 	<span class="comment">// called when a texture is expanded and needs handling</span>
 	callbackResize: <span class="keyword-type">proc</span>(data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, w, h: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>),
 	<span class="comment">// called in state_end to update the texture region that changed</span>
-	callbackUpdate: <span class="keyword-type">proc</span>(data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, dirtyRect: [4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, textureData: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>),
+	callbackUpdate: <span class="keyword-type">proc</span>(data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, dirtyRect: [<span class="number">4</span>]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, textureData: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>),
 }</pre>
 </div>
 <details class="odin-doc-toggle" close>
@@ -541,7 +541,7 @@ Procedure Groups (1)</summary>
 <pre class="doc-code">State :: <span class="keyword-type">struct</span> {
 	font:    <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>,
 	size:    <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
-	color:   [4]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	color:   [<span class="number">4</span>]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
 	spacing: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	blur:    <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	ah:      <a class="code-typename" href="/vendor/fontstash/#AlignHorizontal">AlignHorizontal</a>,
@@ -608,7 +608,7 @@ Procedure Groups (1)</summary>
 	y:     <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	u:     <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	v:     <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
-	color: [4]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	color: [<span class="number">4</span>]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
 }</pre>
 </div>
 </div>
@@ -859,7 +859,7 @@ as TTC. Leave it as zero if you are loading a single-font format such as TTF.</p
 <div class="pkg-entity">
 <h3 id="SetColor"><span><a class="doc-id-link" href="#SetColor">SetColor<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/fontstash/fontstash.odin#L917"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">SetColor :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/vendor/fontstash/#FontContext">FontContext</a>, color: [4]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) {…}</pre>
+<pre class="doc-code">SetColor :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/vendor/fontstash/#FontContext">FontContext</a>, color: [<span class="number">4</span>]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -883,7 +883,7 @@ as TTC. Leave it as zero if you are loading a single-font format such as TTF.</p
 <div class="pkg-entity">
 <h3 id="TextBounds"><span><a class="doc-id-link" href="#TextBounds">TextBounds<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/fontstash/fontstash.odin#L1081"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">TextBounds :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/vendor/fontstash/#FontContext">FontContext</a>, text: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, x: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a> = 0, y: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a> = 0, bounds: ^[4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a> = nil) -> <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a> {…}</pre>
+<pre class="doc-code">TextBounds :: <span class="keyword-type">proc</span>(ctx: ^<a class="code-typename" href="/vendor/fontstash/#FontContext">FontContext</a>, text: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, x: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a> = 0, y: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a> = 0, bounds: ^[<span class="number">4</span>]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a> = nil) -> <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -913,7 +913,7 @@ as TTC. Leave it as zero if you are loading a single-font format such as TTF.</p
 <div class="pkg-entity">
 <h3 id="ValidateTexture"><span><a class="doc-id-link" href="#ValidateTexture">ValidateTexture<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/fontstash/fontstash.odin#L764"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">ValidateTexture :: <span class="keyword-type">proc</span>(<span class="keyword-type">using</span> ctx: ^<a class="code-typename" href="/vendor/fontstash/#FontContext">FontContext</a>, dirty: ^[4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
+<pre class="doc-code">ValidateTexture :: <span class="keyword-type">proc</span>(<span class="keyword-type">using</span> ctx: ^<a class="code-typename" href="/vendor/fontstash/#FontContext">FontContext</a>, dirty: ^[<span class="number">4</span>]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -944,7 +944,7 @@ as TTC. Leave it as zero if you are loading a single-font format such as TTF.</p
 <li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/fontstash/fontstash_os.odin">fontstash_os.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-13 09:03:18.778446400 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-13 09:24:13.305211000 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

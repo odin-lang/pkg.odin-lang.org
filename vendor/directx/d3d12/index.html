@@ -1721,7 +1721,7 @@ Procedure Groups (0)</summary>
 <pre class="doc-code">BLEND_DESC :: <span class="keyword-type">struct</span> {
 	AlphaToCoverageEnable:  sys_windows.<a class="code-typename" href="/core/sys/windows/#BOOL">BOOL</a>,
 	IndependentBlendEnable: sys_windows.<a class="code-typename" href="/core/sys/windows/#BOOL">BOOL</a>,
-	RenderTarget:           [8]<a class="code-typename" href="/vendor/directx/d3d12/#RENDER_TARGET_BLEND_DESC">RENDER_TARGET_BLEND_DESC</a>,
+	RenderTarget:           [<span class="number">8</span>]<a class="code-typename" href="/vendor/directx/d3d12/#RENDER_TARGET_BLEND_DESC">RENDER_TARGET_BLEND_DESC</a>,
 }</pre>
 </div>
 </div>
@@ -1893,7 +1893,7 @@ Procedure Groups (0)</summary>
 <pre class="doc-code">CLEAR_VALUE :: <span class="keyword-type">struct</span> {
 	Format: directx_dxgi.<a class="code-typename" href="/vendor/directx/dxgi/#FORMAT">FORMAT</a>,
 	<span class="keyword-type">using</span> _: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
-		Color:        [4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+		Color:        [<span class="number">4</span>]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 		DepthStencil: <a class="code-typename" href="/vendor/directx/d3d12/#DEPTH_STENCIL_VALUE">DEPTH_STENCIL_VALUE</a>,
 	},
 }</pre>
@@ -3558,7 +3558,7 @@ Procedure Groups (0)</summary>
 	IBStripCutValue:       <a class="code-typename" href="/vendor/directx/d3d12/#INDEX_BUFFER_STRIP_CUT_VALUE">INDEX_BUFFER_STRIP_CUT_VALUE</a>,
 	PrimitiveTopologyType: <a class="code-typename" href="/vendor/directx/d3d12/#PRIMITIVE_TOPOLOGY_TYPE">PRIMITIVE_TOPOLOGY_TYPE</a>,
 	NumRenderTargets:      <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
-	RTVFormats:            [8]directx_dxgi.<a class="code-typename" href="/vendor/directx/dxgi/#FORMAT">FORMAT</a>,
+	RTVFormats:            [<span class="number">8</span>]directx_dxgi.<a class="code-typename" href="/vendor/directx/dxgi/#FORMAT">FORMAT</a>,
 	DSVFormat:             directx_dxgi.<a class="code-typename" href="/vendor/directx/dxgi/#FORMAT">FORMAT</a>,
 	SampleDesc:            directx_dxgi.<a class="code-typename" href="/vendor/directx/dxgi/#SAMPLE_DESC">SAMPLE_DESC</a>,
 	NodeMask:              <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
@@ -4696,7 +4696,7 @@ Procedure Groups (0)</summary>
 	IASetPrimitiveTopology:             <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, PrimitiveTopology: <a class="code-typename" href="/vendor/directx/d3d12/#PRIMITIVE_TOPOLOGY">PRIMITIVE_TOPOLOGY</a>),
 	RSSetViewports:                     <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, NumViewports: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, pViewports: [^]<a class="code-typename" href="/vendor/directx/d3d12/#VIEWPORT">VIEWPORT</a>),
 	RSSetScissorRects:                  <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, NumRects: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, pRects: [^]sys_windows.<a class="code-typename" href="/core/sys/windows/#RECT">RECT</a>),
-	OMSetBlendFactor:                   <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, BlendFactor: ^[4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>),
+	OMSetBlendFactor:                   <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, BlendFactor: ^[<span class="number">4</span>]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>),
 	OMSetStencilRef:                    <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, StencilRef: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>),
 	SetPipelineState:                   <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, pPipelineState: ^<a class="code-typename" href="/vendor/directx/d3d12/#IPipelineState">IPipelineState</a>),
 	ResourceBarrier:                    <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, NumBarriers: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, pBarriers: [^]<a class="code-typename" href="/vendor/directx/d3d12/#RESOURCE_BARRIER">RESOURCE_BARRIER</a>),
@@ -4721,9 +4721,9 @@ Procedure Groups (0)</summary>
 	SOSetTargets:                       <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, StartSlot: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, NumViews: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, pViews: [^]<a class="code-typename" href="/vendor/directx/d3d12/#STREAM_OUTPUT_BUFFER_VIEW">STREAM_OUTPUT_BUFFER_VIEW</a>),
 	OMSetRenderTargets:                 <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, NumRenderTargetDescriptors: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, pRenderTargetDescriptors: [^]<a class="code-typename" href="/vendor/directx/d3d12/#CPU_DESCRIPTOR_HANDLE">CPU_DESCRIPTOR_HANDLE</a>, RTsSingleHandleToDescriptorRange: sys_windows.<a class="code-typename" href="/core/sys/windows/#BOOL">BOOL</a>, pDepthStencilDescriptor: ^<a class="code-typename" href="/vendor/directx/d3d12/#CPU_DESCRIPTOR_HANDLE">CPU_DESCRIPTOR_HANDLE</a>),
 	ClearDepthStencilView:              <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, DepthStencilView: <a class="code-typename" href="/vendor/directx/d3d12/#CPU_DESCRIPTOR_HANDLE">CPU_DESCRIPTOR_HANDLE</a>, ClearFlags: <a class="code-typename" href="/vendor/directx/d3d12/#CLEAR_FLAGS">CLEAR_FLAGS</a>, Depth: <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, Stencil: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, NumRects: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, pRects: [^]sys_windows.<a class="code-typename" href="/core/sys/windows/#RECT">RECT</a>),
-	ClearRenderTargetView:              <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, RenderTargetView: <a class="code-typename" href="/vendor/directx/d3d12/#CPU_DESCRIPTOR_HANDLE">CPU_DESCRIPTOR_HANDLE</a>, ColorRGBA: ^[4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, NumRects: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, pRects: [^]sys_windows.<a class="code-typename" href="/core/sys/windows/#RECT">RECT</a>),
-	ClearUnorderedAccessViewUint:       <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, ViewGPUHandleInCurrentHeap: <a class="code-typename" href="/vendor/directx/d3d12/#GPU_DESCRIPTOR_HANDLE">GPU_DESCRIPTOR_HANDLE</a>, ViewCPUHandle: <a class="code-typename" href="/vendor/directx/d3d12/#CPU_DESCRIPTOR_HANDLE">CPU_DESCRIPTOR_HANDLE</a>, pResource: ^<a class="code-typename" href="/vendor/directx/d3d12/#IResource">IResource</a>, Values: ^[4]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, NumRects: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, pRects: [^]sys_windows.<a class="code-typename" href="/core/sys/windows/#RECT">RECT</a>),
-	ClearUnorderedAccessViewFloat:      <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, ViewGPUHandleInCurrentHeap: <a class="code-typename" href="/vendor/directx/d3d12/#GPU_DESCRIPTOR_HANDLE">GPU_DESCRIPTOR_HANDLE</a>, ViewCPUHandle: <a class="code-typename" href="/vendor/directx/d3d12/#CPU_DESCRIPTOR_HANDLE">CPU_DESCRIPTOR_HANDLE</a>, pResource: ^<a class="code-typename" href="/vendor/directx/d3d12/#IResource">IResource</a>, Values: ^[4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, NumRects: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, pRects: [^]sys_windows.<a class="code-typename" href="/core/sys/windows/#RECT">RECT</a>),
+	ClearRenderTargetView:              <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, RenderTargetView: <a class="code-typename" href="/vendor/directx/d3d12/#CPU_DESCRIPTOR_HANDLE">CPU_DESCRIPTOR_HANDLE</a>, ColorRGBA: ^[<span class="number">4</span>]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, NumRects: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, pRects: [^]sys_windows.<a class="code-typename" href="/core/sys/windows/#RECT">RECT</a>),
+	ClearUnorderedAccessViewUint:       <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, ViewGPUHandleInCurrentHeap: <a class="code-typename" href="/vendor/directx/d3d12/#GPU_DESCRIPTOR_HANDLE">GPU_DESCRIPTOR_HANDLE</a>, ViewCPUHandle: <a class="code-typename" href="/vendor/directx/d3d12/#CPU_DESCRIPTOR_HANDLE">CPU_DESCRIPTOR_HANDLE</a>, pResource: ^<a class="code-typename" href="/vendor/directx/d3d12/#IResource">IResource</a>, Values: ^[<span class="number">4</span>]<a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, NumRects: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, pRects: [^]sys_windows.<a class="code-typename" href="/core/sys/windows/#RECT">RECT</a>),
+	ClearUnorderedAccessViewFloat:      <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, ViewGPUHandleInCurrentHeap: <a class="code-typename" href="/vendor/directx/d3d12/#GPU_DESCRIPTOR_HANDLE">GPU_DESCRIPTOR_HANDLE</a>, ViewCPUHandle: <a class="code-typename" href="/vendor/directx/d3d12/#CPU_DESCRIPTOR_HANDLE">CPU_DESCRIPTOR_HANDLE</a>, pResource: ^<a class="code-typename" href="/vendor/directx/d3d12/#IResource">IResource</a>, Values: ^[<span class="number">4</span>]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>, NumRects: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>, pRects: [^]sys_windows.<a class="code-typename" href="/core/sys/windows/#RECT">RECT</a>),
 	DiscardResource:                    <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, pResource: ^<a class="code-typename" href="/vendor/directx/d3d12/#IResource">IResource</a>, pRegion: ^<a class="code-typename" href="/vendor/directx/d3d12/#DISCARD_REGION">DISCARD_REGION</a>),
 	BeginQuery:                         <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, pQueryHeap: ^<a class="code-typename" href="/vendor/directx/d3d12/#IQueryHeap">IQueryHeap</a>, Type: <a class="code-typename" href="/vendor/directx/d3d12/#QUERY_TYPE">QUERY_TYPE</a>, Index: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>),
 	EndQuery:                           <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IGraphicsCommandList">IGraphicsCommandList</a>, pQueryHeap: ^<a class="code-typename" href="/vendor/directx/d3d12/#IQueryHeap">IQueryHeap</a>, Type: <a class="code-typename" href="/vendor/directx/d3d12/#QUERY_TYPE">QUERY_TYPE</a>, Index: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>),
@@ -7404,7 +7404,7 @@ Procedure Groups (0)</summary>
 <h3 id="RAYTRACING_INSTANCE_DESC"><span><a class="doc-id-link" href="#RAYTRACING_INSTANCE_DESC">RAYTRACING_INSTANCE_DESC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/directx/d3d12/d3d12.odin#L3291"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">RAYTRACING_INSTANCE_DESC :: <span class="keyword-type">struct</span> {
-	Transform:                           [3][4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	Transform:                           [<span class="number">3</span>][<span class="number">4</span>]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	InstanceID:                          <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
 	InstanceContributionToHitGroupIndex: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
 	AccelerationStructure:               <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
@@ -8165,7 +8165,7 @@ Procedure Groups (0)</summary>
 <h3 id="RT_FORMAT_ARRAY"><span><a class="doc-id-link" href="#RT_FORMAT_ARRAY">RT_FORMAT_ARRAY<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/directx/d3d12/d3d12.odin#L774"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">RT_FORMAT_ARRAY :: <span class="keyword-type">struct</span> {
-	RTFormats:        [8]directx_dxgi.<a class="code-typename" href="/vendor/directx/dxgi/#FORMAT">FORMAT</a>,
+	RTFormats:        [<span class="number">8</span>]directx_dxgi.<a class="code-typename" href="/vendor/directx/dxgi/#FORMAT">FORMAT</a>,
 	NumRenderTargets: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
 }</pre>
 </div>
@@ -8181,7 +8181,7 @@ Procedure Groups (0)</summary>
 	MipLODBias:     <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	MaxAnisotropy:  <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
 	ComparisonFunc: <a class="code-typename" href="/vendor/directx/d3d12/#COMPARISON_FUNC">COMPARISON_FUNC</a>,
-	BorderColor:    [4]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
+	BorderColor:    [<span class="number">4</span>]<a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	MinLOD:         <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 	MaxLOD:         <a href="/base/builtin#f32"><span class="doc-builtin">f32</span></a>,
 }</pre>
@@ -8211,7 +8211,7 @@ Procedure Groups (0)</summary>
 <div>
 <pre class="doc-code">SERIALIZED_DATA_DRIVER_MATCHING_IDENTIFIER :: <span class="keyword-type">struct</span> {
 	DriverOpaqueGUID:           sys_windows.<a class="code-typename" href="/core/sys/windows/#GUID">GUID</a>,
-	DriverOpaqueVersioningData: [16]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
+	DriverOpaqueVersioningData: [<span class="number">16</span>]<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>,
 }</pre>
 </div>
 </div>
@@ -13725,7 +13725,7 @@ Procedure Groups (0)</summary>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/directx/d3d12/d3d12_constants.odin">d3d12_constants.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-13 09:03:18.723563400 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-13 09:24:13.250952900 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
