@@ -269,15 +269,46 @@ add_styling_to_builtin :: proc(txt: string) -> string {
 			append(b, `</span></a>`)
 			prev_offset^ = s.tok_end
 		}
+		append_anchored_span_other :: proc(b: ^[dynamic]byte, s: ^scanner.Scanner, anchor: string, class: string, text: string, prev_offset: ^int) {
+			append(b, s.src[prev_offset^:s.tok_pos])
+			append(b, `<a href="`)
+			append(b, anchor)
+			append(b, `">`)
+			append(b, `<span class="`)
+			append(b, class)
+			append(b, `">`)
+			append(b, text)
+			append(b, `</span></a>`)
+			prev_offset^ = s.tok_end
+		}
+
 
 		switch scanner.scan(s) {
 		case scanner.EOF:
 			break loop
+		case scanner.Int, scanner.Float:
+			number := scanner.token_text(s)
+			append_span(&b, s, "number", number, &prev_offset)
 		case scanner.Ident:
 			ident := scanner.token_text(s)
-			if strings.has_prefix(ident, "type_is_") {
-				append_anchored_span(&b, s, "/base/intrinsics", "code-procedure", ident, &prev_offset)
-			} else {
+			found := false
+			if !found do for iname in intrinsics_table {
+				if iname.name == ident {
+					append_anchored_span(&b, s, "/base/intrinsics", "code-procedure", ident, &prev_offset)
+					found = true
+					break
+				}
+			}
+
+			if !found do for bname in builtins {
+				if bname.name == ident {
+					append_anchored_span(&b, s, "/base/builtin", "code-procedure", ident, &prev_offset)
+					found = true
+					break
+				}
+			}
+
+			if !found {
 				switch ident {
 				case "runtime":
 					if scanner.peek(s) == '.' {
@@ -295,20 +326,28 @@ add_styling_to_builtin :: proc(txt: string) -> string {
 				case "proc", "enum", "struct", "union", "map", "typeid", "matrix", "dynamic":
 					append_span(&b, s, "keyword-type", ident, &prev_offset)
 
-				case "#soa", "#simd", "#const", "#optional_ok":
+				case "#soa":
+					append_anchored_span_other(&b, s, "//odin-lang.org/docs/overview/#soa-data-types", "directive", ident, &prev_offset)
+				case "#optional_ok":
+					append_anchored_span_other(&b, s, "//odin-lang.org/docs/overview/#optional_ok", "directive", ident, &prev_offset)
+
+				case "#simd", "#const":
 					append_span(&b, s, "directive", ident, &prev_offset)
 
 				case "Atomic_Memory_Order",
 				     "objc_object", "objc_selector", "objc_class",
 				     "objc_id", "objc_SEL", "objc_Class":
 					append_anchored_span(&b, s, "/base/intrinsics", "code-typename", ident, &prev_offset)
+
 				case "uintptr", "uint", "int",
-				     "u64", "i64",
-				     "u32", "i32",
-				     "u16", "i16",
+				     "u128", "i128",
+				     "u64",  "i64",
+				     "u32",  "i32",
+				     "u16",  "i16",
 				     "u8",
 				     "bool",
 				     "string", "cstring",
+				     "string16", "cstring16",
 				     "rawptr":
 					append_anchored_span(&b, s, "/base/builtin", "doc-builtin", ident, &prev_offset)
 				}

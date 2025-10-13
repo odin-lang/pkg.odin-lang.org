@@ -1194,9 +1194,9 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		write_type(writer, cfg.types[type_types[0]], flags)
 	case .Array:
 		assert(type.elem_count_len == 1)
-		io.write_byte(w, '[')
+		io.write_string(w, `[<span class="number">`)
 		io.write_uint(w, uint(type.elem_counts[0]))
-		io.write_byte(w, ']')
+		io.write_string(w, `</span>]`)
 		write_type(writer, cfg.types[type_types[0]], flags)
 	case .Enumerated_Array:
 		io.write_byte(w, '[')
@@ -1519,12 +1519,13 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		}
 		io.write_string(w, "]")
 	case .Simd_Vector:
-		io.write_string(w, "<span class=\"directive\">#simd</span>[")
+		io.write_string(w, "<span class=\"directive\">#simd</span>")
+		io.write_string(w, `[<span class="number">`)
 		io.write_uint(w, uint(type.elem_counts[0]))
-		io.write_byte(w, ']')
+		io.write_string(w, `</span>]`)
 		write_type(writer, cfg.types[type_types[0]], flags)
 	case .SOA_Struct_Fixed:
-		io.write_string(w, "<span class=\"directive\">#soa</span>[")
+		io.write_string(w, "<span class=\"directive\"><a href=\"https://odin-lang.org/docs/overview/#soa-data-types\">#soa</a></span>[")
 		io.write_uint(w, uint(type.elem_counts[0]))
 		io.write_byte(w, ']')
 		write_type(writer, cfg.types[type_types[0]], flags)
@@ -2868,7 +2869,11 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 					io.write_string(w, init_string)
 					io.write_string(w, "</span>")
 				case:
-					io.write_string(w, init_string)
+					if strings.has_prefix(init_string, "runtime.") {
+						io.write_string(w, add_styling_to_builtin(init_string))
+					} else {
+						io.write_string(w, init_string)
+					}
 				}
 			} else {
 				io.write_string(w, init_string)
