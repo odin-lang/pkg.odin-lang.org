@@ -77,10 +77,10 @@ intrinsics_table := []Builtin{
 		comment = "Counts the number of leading unset bits (`0`s) until a set bit (`1`) is seen or all bits have been counted.",
 	},
 	{name = "reverse_bits",         kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)",
-		comment = "Reverses the bits from ascending order to descending order e.g. 0b01110101 -> 0b10101110",
+		comment = "Reverses the bits from ascending order to descending order e.g. `0b01110101` -> `0b10101110`",
 	},
 	{name = "byte_swap",            kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_float(T)",
-		comment = "Reverses the bytes from ascending order to descending order e.g. 0xfe_ed_01_12 -> `0x12_01_ed_fe",
+		comment = "Reverses the bytes from ascending order to descending order e.g. `0xfe_ed_01_12` -> `0x12_01_ed_fe`",
 	},
 
 	{name = "overflow_add", kind = "b", type = "proc(lhs, rhs: $T) -> (T, bool) where type_is_integer(T) #optional_ok",

@@ -2828,11 +2828,33 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	fmt.wprintf(w, "</h3>\n")
 	fmt.wprintln(w, `<div>`)
 
+	the_docs := strings.trim_space(str(e.docs))
+
 	if name != entity_name || entity_pkg != pkg {
 		fmt.wprint(w, `<pre class="doc-code">`)
 		fmt.wprintf(w, "%s :: ", name)
 		write_entity_reference(w, pkg, e, name)
 		fmt.wprintln(w, "</pre>")
+
+		// If `e` doesn't have a comment and it's a reference to a built-in or intrinsic with a comment, copy its comment.
+		// Saves work and prevents those comments going out of sync.
+		if the_docs == "" {
+			if .Builtin_Pkg_Builtin in e.flags {
+				for bname in builtins {
+					if bname.name == entity_name && bname.type != "" {
+						the_docs = bname.comment
+						break
+					}
+				}
+			} else if .Builtin_Pkg_Intrinsics in e.flags {
+				for iname in intrinsics_table {
+					if iname.name == entity_name && iname.type != "" {
+						the_docs = iname.comment
+						break
+					}
+				}
+			}
+		}
 	} else {
 		switch e.kind {
 		case .Invalid, .Import_Name, .Library_Name:
@@ -2954,7 +2976,6 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	}
 	fmt.wprintln(w, `</div>`)
 
-	the_docs := strings.trim_space(str(e.docs))
 	if the_docs == "" {
 		the_docs = strings.trim_space(str(e.comment))
 	}
