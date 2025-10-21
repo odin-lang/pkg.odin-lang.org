@@ -26,7 +26,7 @@ builtins := []Builtin{
 
 	{name = "ODIN_OS",      kind = "c", type = "runtime.Odin_OS_Type",     comment = "An enum value specifying the target platform's operating system."},
 	{name = "ODIN_ARCH",    kind = "c", type = "runtime.Odin_Arch_Type",   comment = "An enum value specifying the target platform's architecture."},
-	{name = "ODIN_ENDIAN",  kind = "c", type = "runtime.Odin_Endian_Type", comment = "An enum value specifying the target platform's endiannes."},
+	{name = "ODIN_ENDIAN",  kind = "c", type = "runtime.Odin_Endian_Type", comment = "An enum value specifying the target platform's endianness."},
 	{name = "ODIN_BUILD_MODE",  kind = "c", type = "runtime.Odin_Build_Mode_Type", comment = "An enum value specifying the \"build-mode\"."},
 	{name = "ODIN_ERROR_POS_STYLE",  kind = "c", type = "runtime.Odin_Error_Pos_Style_Type",
 		comment = "An enum value specifying whether errors should be stylized in the default (MSVC-like) style or a UNIX (GCC-like) style.\n\n"+
@@ -53,8 +53,8 @@ builtins := []Builtin{
 
 	{name = "byte", kind = "t", value = "u8", comment = "`byte` is an alias for `u8` and is equivalent to `u8` in all ways. It is used as a convention to distinguish values from 8-bit unsigned integer values."},
 
-	{name = "bool", kind = "t", comment = "`bool` is the set of boolean values, `false` and `true`. This is distinct to `b8`. `bool` has a size of 1 byte (8 bits)."},
-	{name = "b8",   kind = "t", comment = "`b8` is the set of boolean values, `false` and `true`. This is distinct to `bool`. `b8` has a size of 1 byte (8 bits)."},
+	{name = "bool", kind = "t", comment = "`bool` is the set of boolean values, `false` and `true`. This is distinct from `b8`. `bool` has a size of 1 byte (8 bits)."},
+	{name = "b8",   kind = "t", comment = "`b8` is the set of boolean values, `false` and `true`. This is distinct from `bool`. `b8` has a size of 1 byte (8 bits)."},
 	{name = "b16",  kind = "t", comment = "`b16` is the set of boolean values, `false` and `true`. `b16` has a size of 2 bytes (16 bits)."},
 	{name = "b32",  kind = "t", comment = "`b32` is the set of boolean values, `false` and `true`. `b32` has a size of 4 bytes (32 bits)."},
 	{name = "b64",  kind = "t", comment = "`b64` is the set of boolean values, `false` and `true`. `b64` has a size of 8 bytes (64 bits)."},
@@ -77,13 +77,13 @@ builtins := []Builtin{
 	{name = "f32", kind = "t", comment = "`f32` is the set of all IEEE-754 32-bit floating-point numbers with native endianness."},
 	{name = "f64", kind = "t", comment = "`f64` is the set of all IEEE-754 64-bit floating-point numbers with native endianness."},
 
-	{name = "complex32",  kind = "t", comment = "`complex32` is the set of all complex numbers with `f16` real and imaginary parts"},
-	{name = "complex64",  kind = "t", comment = "`complex64` is the set of all complex numbers with `f32` real and imaginary parts"},
-	{name = "complex128", kind = "t", comment = "`complex128` is the set of all complex numbers with `f64` real and imaginary parts"},
+	{name = "complex32",  kind = "t", comment = "`complex32` is the set of all complex numbers with `f16` real and imaginary parts."},
+	{name = "complex64",  kind = "t", comment = "`complex64` is the set of all complex numbers with `f32` real and imaginary parts."},
+	{name = "complex128", kind = "t", comment = "`complex128` is the set of all complex numbers with `f64` real and imaginary parts."},
 
-	{name = "quaternion64",  kind = "t", comment = "`quaternion64` is the set of all complex numbers with `f16` real and imaginary (i, j, & k) parts"},
-	{name = "quaternion128", kind = "t", comment = "`quaternion128` is the set of all complex numbers with `f32` real and imaginary (i, j, & k) parts"},
-	{name = "quaternion256", kind = "t", comment = "`quaternion256` is the set of all complex numbers with `f64` real and imaginary (i, j, & k) parts"},
+	{name = "quaternion64",  kind = "t", comment = "`quaternion64` is the set of all complex numbers with `f16` real and imaginary (i, j, & k) parts."},
+	{name = "quaternion128", kind = "t", comment = "`quaternion128` is the set of all complex numbers with `f32` real and imaginary (i, j, & k) parts."},
+	{name = "quaternion256", kind = "t", comment = "`quaternion256` is the set of all complex numbers with `f64` real and imaginary (i, j, & k) parts."},
 
 	{name = "int",     kind = "t", comment = "`int` is a signed integer type that is at least 32 bits in size. It is a distinct type, however, and not an alias for say, `i32`."},
 	{name = "uint",    kind = "t", comment = "`uint` is an unsigned integer type that is at least 32 bits in size. It is a distinct type, however, and not an alias for say, `u32`."},
@@ -100,9 +100,9 @@ builtins := []Builtin{
 
 	{name = "typeid", kind = "t", comment = "`typeid` is a unique identifier for an Odin type at runtime. It can be mapped to relevant type information through `type_info_of`."},
 	{name = "any",    kind = "t",
-		comment = "`any` can reference any data type at runtime. Internally it contains a pointer to the underlying data and its relevant `typeid`. This is a very useful construct in order to have a runtime type safe printing procedure.\n\n" +
+		comment = "`any` can reference any data type at runtime. Internally it contains a pointer to the underlying data and its relevant `typeid`. This is a very useful construct in order to have a runtime type-safe printing procedure.\n\n" +
 		          "**Note:** The `any` value is only valid for as long as the underlying data is still valid. Passing a literal to an `any` will allocate the literal in the current stack frame.\n\n" +
-		          "**Note:** It is highly recommend that you **do not** use this unless you know what you are doing. Its primary use is for printing procedures.",
+		          "**Note:** It is highly recommended that you **do not** use this unless you know what you are doing. Its primary use is for printing procedures.",
 	},
 
 	// Endian Specific Types
@@ -141,7 +141,7 @@ builtins := []Builtin{
 		          "\tPointer to (any) array: the number of elements in `v^` (even if `v` is `nil`).\n" +
 		          "\tSlice, dynamic array, or map: the number of elements in `v`; if `v` is `nil`, `len(v)` is zero.\n" +
 		          "\tString: the number of bytes in `v`\n" +
-		          "\tEnumerated array: the number elements in v.`\n" +
+		          "\tEnumerated array: the number of elements in v.`\n" +
 		          "\tEnum type: the number of enumeration fields.\n"+
 		          "\t#soa array: the number of elements in `v`; if `v` is `nil`, `len(v)` is zero.\n"+
 		          "\t#simd vector: the number of elements in `v`.\n"+
@@ -162,7 +162,7 @@ builtins := []Builtin{
 
 	{name = "size_of", kind = "b", type = "proc($T: typeid) -> int",
 		comment = "`size_of` takes an expression or type, and returns the size in bytes of the type of the expression if it was hypothetically instantiated as a variable. " +
-		"The size does not include any memory possibly referenced by a value. For instance, if a slice was given, `size_of` returns the size of the internal slice data structure and not the size of the memory referenced by the slice. " +
+		"The size does not include any memory possibly referenced by a value. For instance, if a slice is given, `size_of` returns the size of the internal slice data structure and not the size of the memory referenced by the slice. " +
 		"For a struct, the size includes any padding introduced by field alignment (if not specified with `#packed`. " +
 		"Other types follow similar rules. " +
 		"The return value of `size_of` is a compile time known integer constant.",
@@ -172,7 +172,7 @@ builtins := []Builtin{
 		          "It is the largest value `m` such that the address of `v` is always `0 mod m`.",
 	},
 
-	{name = "offset_of",           kind = "b", type = "proc{offset_of_selector, offset_of_member}",  comment = "`offset_of` returns the offset in bytes with the struct of the field."},
+	{name = "offset_of",           kind = "b", type = "proc{offset_of_selector, offset_of_member}",  comment = "`offset_of` returns the byte offset of the field within the struct."},
 	{name = "offset_of_selector",  kind = "b", type = "proc(selector: $T) -> uintptr",               comment = `e.g. offset_of(t.f), where t is an instance of the type T`},
 	{name = "offset_of_member"  ,  kind = "b", type = "proc($T: typeid, member: $M) -> uintptr",     comment = `e.g. offset_of(T, f), where T can be the type instead of a variable`},
 	{name = "offset_of_by_string", kind = "b", type = "proc($T: typeid, member: string) -> uintptr", comment = `e.g. offset_of(T, "f"), where T can be the type instead of a variable`},
@@ -191,8 +191,8 @@ builtins := []Builtin{
 	{name = "kmag",       kind = "b", type = "proc(v: Quaternion) -> Float",            comment = "`kmag` returns the k-imaginary part of a quaternion number `v`. The return value will be the floating-point type corresponding to the type of `v`."},
 	{name = "conj",       kind = "b", type = "proc(v: Complex_Or_Quaternion) -> Complex_Or_Quaternion", comment = "`conj` returns the complex conjugate of a complex or quaternion number `v`. This negates the imaginary component(s) whilst keeping the real component untouched."},
 
-	{name = "expand_values", kind = "b", type = "proc(value: Struct_Or_Array) -> (A, B, C, ...)", comment = "`expand_values` will return multiple values corresponding to the multiple fields of the passed struct or the multiple elements of a passed fixed length array."},
-	{name = "compress_values", kind = "b", type = "proc(values: ...) -> Struct_Or_Array_Like_Type", comment = "`compress_values` will return an unnamed fixed-length array if all arguments are of the same type. It will return an unnamed struct if the argument types differ. If there is only a single argument, it will return that argument. At least one argument is required."},
+	{name = "expand_values", kind = "b", type = "proc(value: Struct_Or_Array) -> (A, B, C, ...)", comment = "`expand_values` returns multiple values corresponding to the multiple fields of the passed struct or the multiple elements of a passed fixed length array."},
+	{name = "compress_values", kind = "b", type = "proc(values: ...) -> Struct_Or_Array_Like_Type", comment = "`compress_values` returns an unnamed fixed-length array if all arguments are of the same type. It returns an unnamed struct if the argument types differ. If there is only a single argument, it returns that argument. At least one argument is required."},
 
 	{name = "min",       kind = "b", type = "proc(values: ..T) -> T",
 		comment = "`min` returns the minimum value of passed arguments of all the same type.\n" +
@@ -208,7 +208,7 @@ builtins := []Builtin{
 	},
 	{name = "clamp",     kind = "b", type = "proc(v, minimum, maximum: T) -> T",
 		comment = "`clamp` returns a value `v` clamped between `minimum` and `maximum`.\n" +
-		          "This is calculated as the following: `minimum if v < minimum else maximum if v > maximum else v`.",
+		          "This is calculated as follows: `minimum if v < minimum else maximum if v > maximum else v`.",
 	},
 
 	{name = "soa_zip",   kind = "b", type = "proc(slices: ...) -> #soa[]Struct", comment = "See: [[https://odin-lang.org/docs/overview/#soa_zip-and-soa_unzip]]"},
@@ -641,7 +641,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 
 	write_entries :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, title: string, kind: string, entries: []doc.Scope_Entry, entry_table: []Builtin) {
 		fmt.wprintf(w, "<h2 id=\"pkg-{0:s}\" class=\"pkg-header\">{0:s}</h2>\n", title)
-		
+
 		collection := cfg.pkg_to_collection[runtime_pkg]
 		runtime_url := fmt.aprintf("%s/%s", collection.base_url, collection.pkg_to_path[runtime_pkg])
 		defer delete(runtime_url)
