@@ -376,9 +376,10 @@ Variables (0)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (23)</summary>
+Procedures (24)</summary>
 <ul>
 <li><a href="#adler32">adler32</a></li>
+<li><a href="#crc16_ccitt_0x1021">crc16_ccitt_0x1021</a></li>
 <li><a href="#crc32">crc32</a></li>
 <li><a href="#crc64_ecma_182">crc64_ecma_182</a></li>
 <li><a href="#crc64_iso_3306">crc64_iso_3306</a></li>
@@ -428,19 +429,35 @@ Procedure Groups (0)</summary>
 </div>
 </div>
 <div class="pkg-entity">
+<h3 id="crc16_ccitt_0x1021"><span><a class="doc-id-link" href="#crc16_ccitt_0x1021">crc16_ccitt_0x1021<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/hash/crc.odin#L12"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">crc16_ccitt_0x1021 :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, seed: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a> = u16(0)) -> (result: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Compute CRC-16 in the manner of CCITT (ITU-T V.41), using the 0x1021 polynomial.</p>
+<pre>Generator polynomial: x^16 + x^12 + x^5 + 1
+
+Used in the UDF (DVD *.iso) disk format's Volume Descriptor Tag,
+and was more historically the ITU-T V.41 CRC-16 used in the XModem protocol,
+which uses 0xffff as the initial value.
+</pre>
+</details>
+</div>
+<div class="pkg-entity">
 <h3 id="crc32"><span><a class="doc-id-link" href="#crc32">crc32<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/hash/crc32.odin#L6"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">crc32 :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, seed: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> = u32(0)) -> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="crc64_ecma_182"><span><a class="doc-id-link" href="#crc64_ecma_182">crc64_ecma_182<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/hash/crc.odin#L4"><em>Source</em></a></div></h3>
+<h3 id="crc64_ecma_182"><span><a class="doc-id-link" href="#crc64_ecma_182">crc64_ecma_182<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/hash/crc.odin#L21"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">crc64_ecma_182 :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, seed: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> = u64(0)) -> (result: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="crc64_iso_3306"><span><a class="doc-id-link" href="#crc64_iso_3306">crc64_iso_3306<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/hash/crc.odin#L56"><em>Source</em></a></div></h3>
+<h3 id="crc64_iso_3306"><span><a class="doc-id-link" href="#crc64_iso_3306">crc64_iso_3306<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/hash/crc.odin#L71"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">crc64_iso_3306 :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, seed: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> = u64(0)) -> <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> {…}</pre>
 </div>
@@ -450,13 +467,13 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="crc64_iso_3306_inverse"><span><a class="doc-id-link" href="#crc64_iso_3306_inverse">crc64_iso_3306_inverse<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/hash/crc.odin#L73"><em>Source</em></a></div></h3>
+<h3 id="crc64_iso_3306_inverse"><span><a class="doc-id-link" href="#crc64_iso_3306_inverse">crc64_iso_3306_inverse<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/hash/crc.odin#L88"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">crc64_iso_3306_inverse :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, seed: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> = u64(0)) -> <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="crc64_xz"><span><a class="doc-id-link" href="#crc64_xz">crc64_xz<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/hash/crc.odin#L18"><em>Source</em></a></div></h3>
+<h3 id="crc64_xz"><span><a class="doc-id-link" href="#crc64_xz">crc64_xz<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/hash/crc.odin#L35"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">crc64_xz :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, seed: <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> = u64(0)) -> <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a> {…}</pre>
 </div>
@@ -606,13 +623,14 @@ Based on Mark Adler's v1.4 implementation in C under the ZLIB license.
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/hash/mini.odin">mini.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-21 11:42:15.412010700 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-21 21:13:14.516406500 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
 <ul>
 <li><a href="#pkg-overview">Overview</a><li><a href="#pkg-Procedures">Procedures</a><ul>
 <li><a href="#adler32">adler32</a></li>
+<li><a href="#crc16_ccitt_0x1021">crc16_ccitt_0x1021</a></li>
 <li><a href="#crc32">crc32</a></li>
 <li><a href="#crc64_ecma_182">crc64_ecma_182</a></li>
 <li><a href="#crc64_iso_3306">crc64_iso_3306</a></li>
