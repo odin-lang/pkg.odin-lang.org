@@ -237,13 +237,14 @@ Types (60)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (107)</summary>
+Procedures (108)</summary>
 <ul>
 <li><a href="#abs">abs</a></li>
 <li><a href="#align_of">align_of</a></li>
 <li><a href="#cap">cap</a></li>
 <li><a href="#clamp">clamp</a></li>
 <li><a href="#complex">complex</a></li>
+<li><a href="#compress_values">compress_values</a></li>
 <li><a href="#conj">conj</a></li>
 <li><a href="#expand_values">expand_values</a></li>
 <li><a href="#imag">imag</a></li>
@@ -485,7 +486,7 @@ Odin_Build_Mode_Type :: enum int {
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>An enum value specifying the target platform's endiannes.</p>
+<p>An enum value specifying the target platform's endianness.</p>
 <details open class="code-example">
 <summary><b>Example:</b></summary>
 <pre><code class="hljs language-odin" data-lang="odin">// Defined internally by the compiler
@@ -673,9 +674,9 @@ Odin_Platform_Subtarget_Type :: enum int {
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>any</code> can reference any data type at runtime. Internally it contains a pointer to the underlying data and its relevant <code>typeid</code>. This is a very useful construct in order to have a runtime type safe printing procedure.</p>
+<p><code>any</code> can reference any data type at runtime. Internally it contains a pointer to the underlying data and its relevant <code>typeid</code>. This is a very useful construct in order to have a runtime type-safe printing procedure.</p>
 <p><b>Note:</b> The <code>any</code> value is only valid for as long as the underlying data is still valid. Passing a literal to an <code>any</code> will allocate the literal in the current stack frame.</p>
-<p><b>Note:</b> It is highly recommend that you <b>do not</b> use this unless you know what you are doing. Its primary use is for printing procedures.</p>
+<p><b>Note:</b> It is highly recommended that you <b>do not</b> use this unless you know what you are doing. Its primary use is for printing procedures.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -715,7 +716,7 @@ Odin_Platform_Subtarget_Type :: enum int {
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>b8</code> is the set of boolean values, <code>false</code> and <code>true</code>. This is distinct to <code>bool</code>. <code>b8</code> has a size of 1 byte (8 bits).</p>
+<p><code>b8</code> is the set of boolean values, <code>false</code> and <code>true</code>. This is distinct from <code>bool</code>. <code>b8</code> has a size of 1 byte (8 bits).</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -725,7 +726,7 @@ Odin_Platform_Subtarget_Type :: enum int {
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>bool</code> is the set of boolean values, <code>false</code> and <code>true</code>. This is distinct to <code>b8</code>. <code>bool</code> has a size of 1 byte (8 bits).</p>
+<p><code>bool</code> is the set of boolean values, <code>false</code> and <code>true</code>. This is distinct from <code>b8</code>. <code>bool</code> has a size of 1 byte (8 bits).</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -745,7 +746,7 @@ Odin_Platform_Subtarget_Type :: enum int {
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>complex128</code> is the set of all complex numbers with <code>f64</code> real and imaginary parts</p>
+<p><code>complex128</code> is the set of all complex numbers with <code>f64</code> real and imaginary parts.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -755,7 +756,7 @@ Odin_Platform_Subtarget_Type :: enum int {
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>complex32</code> is the set of all complex numbers with <code>f16</code> real and imaginary parts</p>
+<p><code>complex32</code> is the set of all complex numbers with <code>f16</code> real and imaginary parts.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -765,7 +766,7 @@ Odin_Platform_Subtarget_Type :: enum int {
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>complex64</code> is the set of all complex numbers with <code>f32</code> real and imaginary parts</p>
+<p><code>complex64</code> is the set of all complex numbers with <code>f32</code> real and imaginary parts.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1025,7 +1026,7 @@ Odin_Platform_Subtarget_Type :: enum int {
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>quaternion128</code> is the set of all complex numbers with <code>f32</code> real and imaginary (i, j, & k) parts</p>
+<p><code>quaternion128</code> is the set of all complex numbers with <code>f32</code> real and imaginary (i, j, & k) parts.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1035,7 +1036,7 @@ Odin_Platform_Subtarget_Type :: enum int {
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>quaternion256</code> is the set of all complex numbers with <code>f64</code> real and imaginary (i, j, & k) parts</p>
+<p><code>quaternion256</code> is the set of all complex numbers with <code>f64</code> real and imaginary (i, j, & k) parts.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1045,7 +1046,7 @@ Odin_Platform_Subtarget_Type :: enum int {
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>quaternion64</code> is the set of all complex numbers with <code>f16</code> real and imaginary (i, j, & k) parts</p>
+<p><code>quaternion64</code> is the set of all complex numbers with <code>f16</code> real and imaginary (i, j, & k) parts.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1316,7 +1317,7 @@ Enum type: equal to `max(Enum)-min(Enum)+1`.
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p><code>clamp</code> returns a value <code>v</code> clamped between <code>minimum</code> and <code>maximum</code>.
-This is calculated as the following: <code>minimum if v &lt; minimum else maximum if v &gt; maximum else v</code>.</p>
+This is calculated as follows: <code>minimum if v &lt; minimum else maximum if v &gt; maximum else v</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1326,6 +1327,16 @@ This is calculated as the following: <code>minimum if v &lt; minimum else maximu
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="compress_values"><span><a class="doc-id-link" href="#compress_values">compress_values<span class="a-hidden">&nbsp;¶</span></a></span></h3>
+<div>
+<pre class="doc-code">compress_values :: <span class="keyword-type">proc</span>(values: ...) -> Struct_Or_Array_Like_Type {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>compress_values</code> returns an unnamed fixed-length array if all arguments are of the same type. It returns an unnamed struct if the argument types differ. If there is only a single argument, it returns that argument. At least one argument is required.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1345,7 +1356,7 @@ This is calculated as the following: <code>minimum if v &lt; minimum else maximu
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>expand_values</code> will return multiple values corresponding to the multiple fields of the passed struct or the multiple elements of a passed fixed length array.</p>
+<p><code>expand_values</code> returns multiple values corresponding to the multiple fields of the passed struct or the multiple elements of a passed fixed length array.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1390,7 +1401,7 @@ This is calculated as the following: <code>minimum if v &lt; minimum else maximu
 Pointer to (any) array: the number of elements in `v^` (even if `v` is `nil`).
 Slice, dynamic array, or map: the number of elements in `v`; if `v` is `nil`, `len(v)` is zero.
 String: the number of bytes in `v`
-Enumerated array: the number elements in v.`
+Enumerated array: the number of elements in v.`
 Enum type: the number of enumeration fields.
 #soa array: the number of elements in `v`; if `v` is `nil`, `len(v)` is zero.
 #simd vector: the number of elements in `v`.
@@ -1428,7 +1439,7 @@ If one argument is passed and it is an enum or numeric type, then <code>min</cod
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>offset_of</code> returns the offset in bytes with the struct of the field.</p>
+<p><code>offset_of</code> returns the byte offset of the field within the struct.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1503,7 +1514,7 @@ raw_data(string)       -&gt; [^]byte // string
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p><code>size_of</code> takes an expression or type, and returns the size in bytes of the type of the expression if it was hypothetically instantiated as a variable. The size does not include any memory possibly referenced by a value. For instance, if a slice was given, <code>size_of</code> returns the size of the internal slice data structure and not the size of the memory referenced by the slice. For a struct, the size includes any padding introduced by field alignment (if not specified with <code>#packed</code>. Other types follow similar rules. The return value of <code>size_of</code> is a compile time known integer constant.</p>
+<p><code>size_of</code> takes an expression or type, and returns the size in bytes of the type of the expression if it was hypothetically instantiated as a variable. The size does not include any memory possibly referenced by a value. For instance, if a slice is given, <code>size_of</code> returns the size of the internal slice data structure and not the size of the memory referenced by the slice. For a struct, the size includes any padding introduced by field alignment (if not specified with <code>#packed</code>. Other types follow similar rules. The return value of <code>size_of</code> is a compile time known integer constant.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -3202,6 +3213,7 @@ Make uses the specified allocator, default is context.allocator.</p>
 <li><a href="#cap">cap</a></li>
 <li><a href="#clamp">clamp</a></li>
 <li><a href="#complex">complex</a></li>
+<li><a href="#compress_values">compress_values</a></li>
 <li><a href="#conj">conj</a></li>
 <li><a href="#expand_values">expand_values</a></li>
 <li><a href="#imag">imag</a></li>
