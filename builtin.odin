@@ -192,6 +192,7 @@ builtins := []Builtin{
 	{name = "conj",       kind = "b", type = "proc(v: Complex_Or_Quaternion) -> Complex_Or_Quaternion", comment = "`conj` returns the complex conjugate of a complex or quaternion number `v`. This negates the imaginary component(s) whilst keeping the real component untouched."},
 
 	{name = "expand_values", kind = "b", type = "proc(value: Struct_Or_Array) -> (A, B, C, ...)", comment = "`expand_values` will return multiple values corresponding to the multiple fields of the passed struct or the multiple elements of a passed fixed length array."},
+	{name = "compress_values", kind = "b", type = "proc(values: ...) -> Struct_Or_Array_Like_Type", comment = "`compress_values` will return an unnamed fixed-length array if all arguments are of the same type. It will return an unnamed struct if the argument types differ. If there is only a single argument, it will return that argument. At least one argument is required."},
 
 	{name = "min",       kind = "b", type = "proc(values: ..T) -> T",
 		comment = "`min` returns the minimum value of passed arguments of all the same type.\n" +
