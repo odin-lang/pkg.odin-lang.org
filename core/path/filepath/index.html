@@ -532,13 +532,11 @@ when 'skip_dir' is invoked on a non-directory. 'walk' skips the remaining files 
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Gets the file name and extension from a path.</p>
-<pre>e.g.
+<p>e.g.
   'path/to/name.tar.gz' -&gt; 'name.tar.gz'
   'path/to/name.txt'    -&gt; 'name.txt'
-  'path/to/name'        -&gt; 'name'
-
-Returns "." if the path is an empty string.
-</pre>
+  'path/to/name'        -&gt; 'name'</p>
+<p>Returns "." if the path is an empty string.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -548,19 +546,15 @@ Returns "." if the path is an empty string.
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Returns the shortest path name equivalent to <code>path</code> through solely lexical processing.</p>
-<pre>It applies the folliwng rules until none of them can be applied:
-
-* Replace multiple separators with a single one
-* Remove each current directory (`.`) path name element
-* Remove each inner parent directory (`..`) path and the preceding paths
-* Remove `..` that begin at the root of a path
-* All possible separators are replaced with the OS specific separator
-
-The return path ends in a slash only if it represents the root of a directory (`C:\` on Windows and  `/` on *nix systems).
-
-If the result of the path is an empty string, the returned path with be `"."`.
-</pre>
+<p>Returns the shortest path name equivalent to <code>path</code> through solely lexical processing.
+It applies the folliwng rules until none of them can be applied:</p>
+<p>* Replace multiple separators with a single one
+* Remove each current directory (<code>.</code>) path name element
+* Remove each inner parent directory (<code>..</code>) path and the preceding paths
+* Remove <code>..</code> that begin at the root of a path
+* All possible separators are replaced with the OS specific separator</p>
+<p>The return path ends in a slash only if it represents the root of a directory (<code>C:\</code> on Windows and  <code>/</code> on *nix systems).</p>
+<p>If the result of the path is an empty string, the returned path with be <code>"."</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -570,10 +564,9 @@ If the result of the path is an empty string, the returned path with be `"."`.
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Returns all but the last element path, usually the path's directory. Once the final element has been removed,</p>
-<pre>`dir` calls `clean` on the path and trailing separators are removed. If the path consists purely of separators,
-then `"."` is returned.
-</pre>
+<p>Returns all but the last element path, usually the path's directory. Once the final element has been removed,
+<code>dir</code> calls <code>clean</code> on the path and trailing separators are removed. If the path consists purely of separators,
+then <code>"."</code> is returned.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -584,18 +577,14 @@ then `"."` is returned.
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Gets the file extension from a path, including the dot.</p>
-<pre>The file extension is such that stem(path) + ext(path) = base(path).
-
-Only the last dot is considered when splitting the file extension.
-See `long_ext`.
-
-e.g.
+<p>The file extension is such that stem(path) + ext(path) = base(path).</p>
+<p>Only the last dot is considered when splitting the file extension.
+See <code>long_ext</code>.</p>
+<p>e.g.
   'name.tar.gz' -&gt; '.gz'
-  'name.txt'    -&gt; '.txt'
-
-Returns an empty string if there is no dot.
-Returns an empty string if there is a trailing path separator.
-</pre>
+  'name.txt'    -&gt; '.txt'</p>
+<p>Returns an empty string if there is no dot.
+Returns an empty string if there is a trailing path separator.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -669,17 +658,13 @@ The pattern may describe hierarchical names such as /usr/*/bin (assuming '/' is 
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Gets the file extension from a path, including the dot.</p>
-<pre>The long file extension is such that short_stem(path) + long_ext(path) = base(path).
-
-The first dot is used to split off the file extension, unlike `ext` which uses the last dot.
-
-e.g.
+<p>The long file extension is such that short_stem(path) + long_ext(path) = base(path).</p>
+<p>The first dot is used to split off the file extension, unlike <code>ext</code> which uses the last dot.</p>
+<p>e.g.
   'name.tar.gz' -&gt; '.tar.gz'
-  'name.txt'    -&gt; '.txt'
-
-Returns an empty string if there is no dot.
-Returns an empty string if there is a trailing path separator.
-</pre>
+  'name.txt'    -&gt; '.txt'</p>
+<p>Returns an empty string if there is no dot.
+Returns an empty string if there is a trailing path separator.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -720,10 +705,8 @@ The only possible error returned is .Syntax_Error</p>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Returns a relative path that is lexically equivalent to the <code>target_path</code> when joined with the <code>base_path</code> with an OS specific separator.</p>
-<pre>e.g. `join(base_path, rel(base_path, target_path))` is equivalent to `target_path`
-
-On failure, the `Relative_Error` will be state it cannot compute the necessary relative path.
-</pre>
+<p>e.g. <code>join(base_path, rel(base_path, target_path))</code> is equivalent to <code>target_path</code></p>
+<p>On failure, the <code>Relative_Error</code> will be state it cannot compute the necessary relative path.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -734,17 +717,13 @@ On failure, the `Relative_Error` will be state it cannot compute the necessary r
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Gets the name of a file from a path.</p>
-<pre>The short stem is such that short_stem(path) + long_ext(path) = base(path).
-
-The first dot is used to split off the file extension, unlike `stem` which uses the last dot.
-
-e.g.
+<p>The short stem is such that short_stem(path) + long_ext(path) = base(path).</p>
+<p>The first dot is used to split off the file extension, unlike <code>stem</code> which uses the last dot.</p>
+<p>e.g.
   'name.tar.gz' -&gt; 'name'
-  'name.txt'    -&gt; 'name'
-
-Returns an empty string if there is no stem. e.g: '.gitignore'.
-Returns an empty string if there's a trailing path separator.
-</pre>
+  'name.txt'    -&gt; 'name'</p>
+<p>Returns an empty string if there is no stem. e.g: '.gitignore'.
+Returns an empty string if there's a trailing path separator.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -780,18 +759,14 @@ Separators within pairs of double-quotes will be ignored and stripped, e.g. <cod
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Gets the name of a file from a path.</p>
-<pre>The stem of a file is such that stem(path) + ext(path) = base(path).
-
-Only the last dot is considered when splitting the file extension.
-See `short_stem`.
-
-e.g.
+<p>The stem of a file is such that stem(path) + ext(path) = base(path).</p>
+<p>Only the last dot is considered when splitting the file extension.
+See <code>short_stem</code>.</p>
+<p>e.g.
   'name.tar.gz' -&gt; 'name.tar'
-  'name.txt'    -&gt; 'name'
-
-Returns an empty string if there is no stem. e.g: '.gitignore'.
-Returns an empty string if there's a trailing path separator.
-</pre>
+  'name.txt'    -&gt; 'name'</p>
+<p>Returns an empty string if there is no stem. e.g: '.gitignore'.
+Returns an empty string if there's a trailing path separator.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -812,10 +787,9 @@ Returns an empty string if there's a trailing path separator.
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Returns leading volume name.</p>
-<pre>e.g.
+<p>e.g.
   "C:\foo\bar\baz" will return "C:" on Windows.
-  Everything else will be "".
-</pre>
+  Everything else will be "".</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -854,7 +828,7 @@ NOTE: os.File_Info uses the 'context.temp_allocator' to allocate, and will delet
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-24 21:15:15.370593500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-25 10:54:34.014854000 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

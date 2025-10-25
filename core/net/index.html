@@ -910,10 +910,9 @@ Procedure Groups (4)</summary>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Another domain name that the domain name maps to.</p>
-<pre>Domains can be pointed to another domain instead of directly to an IP address.
-`get_dns_records` will recursively follow these if you request this type of record.
-</pre>
+<p>Another domain name that the domain name maps to.
+Domains can be pointed to another domain instead of directly to an IP address.
+<code>get_dns_records</code> will recursively follow these if you request this type of record.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -978,9 +977,8 @@ These records also have values which ranks them in the order they should be pref
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Domain names of other DNS servers that are associated with the domain name.</p>
-<pre>TODO(tetra): Expand on what these records are used for, and when you should use pay attention to these.
-</pre>
+<p>Domain names of other DNS servers that are associated with the domain name.
+TODO(tetra): Expand on what these records are used for, and when you should use pay attention to these.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1006,16 +1004,13 @@ These records also have values which ranks them in the order they should be pref
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>An endpoint for a service that is available through the domain name.</p>
-<pre>This is the way to discover the services that a domain name provides.
-
-Clients MUST attempt to contact the host with the lowest priority that they can reach.
+<p>An endpoint for a service that is available through the domain name.
+This is the way to discover the services that a domain name provides.</p>
+<p>Clients MUST attempt to contact the host with the lowest priority that they can reach.
 If two hosts have the same priority, they should be contacted in the order according to their weight.
 Hosts with larger weights should have a proportionally higher chance of being contacted by clients.
-A weight of zero indicates a very low weight, or, when there is no choice (to reduce visual noise).
-
-The host may be "." to indicate that it is "decidedly not available" on this domain.
-</pre>
+A weight of zero indicates a very low weight, or, when there is no choice (to reduce visual noise).</p>
+<p>The host may be "." to indicate that it is "decidedly not available" on this domain.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1028,10 +1023,9 @@ The host may be "." to indicate that it is "decidedly not available" on this dom
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Arbitrary string data that is associated with the domain name.</p>
-<pre>Commonly of the form `key=value` to be parsed, though there is no specific format for them.
-These can be used for any purpose.
-</pre>
+<p>Arbitrary string data that is associated with the domain name.
+Commonly of the form <code>key=value</code> to be parsed, though there is no specific format for them.
+These can be used for any purpose.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -1579,11 +1573,9 @@ These can be used for any purpose.
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>To allow freely using <code>Socket</code> in your own data structures in a cross-platform manner,</p>
-<pre>we treat it as a handle large enough to accomodate OS-specific notions of socket handles.
-
-The platform code will perform the cast so you don't have to.
-</pre>
+<p>To allow freely using <code>Socket</code> in your own data structures in a cross-platform manner,
+we treat it as a handle large enough to accomodate OS-specific notions of socket handles.</p>
+<p>The platform code will perform the cast so you don't have to.</p>
 </details>
 <details class="odin-doc-toggle" open>
 <summary class="hideme">
@@ -2020,12 +2012,10 @@ The platform code will perform the cast so you don't have to.
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>The minimum length of a valid IPv6 address string is 2, e.g. <code>::</code></p>
-<pre>The maximum length of a valid IPv6 address string is 45, when it embeds an IPv4,
-e.g. `0000:0000:0000:0000:0000:ffff:255.255.255.255`
-
-An IPv6 address must contain at least 3 pieces, e.g. `::`,
-and at most 9 (using `::` for a trailing or leading 0)
-</pre>
+<p>The maximum length of a valid IPv6 address string is 45, when it embeds an IPv4,
+e.g. <code>0000:0000:0000:0000:0000:ffff:255.255.255.255</code></p>
+<p>An IPv6 address must contain at least 3 pieces, e.g. <code>::</code>,
+and at most 9 (using <code>::</code> for a trailing or leading 0)</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2110,8 +2100,7 @@ and at most 9 (using `::` for a trailing or leading 0)
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Returns a temporarily-allocated string representation of the address.</p>
-<pre>See RFC 5952 section 4 for IPv6 representation recommendations.
-</pre>
+<p>See RFC 5952 section 4 for IPv6 representation recommendations.</p>
 </details>
 <details class="odin-doc-toggle" open>
 <summary class="hideme">
@@ -2136,20 +2125,21 @@ and at most 9 (using `::` for a trailing or leading 0)
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Parses an IP address in "non-decimal" <code>inet_aton</code> form.</p>
-<pre>e.g."00377.0x0ff.65534" = 255.255.255.254
-	00377 = 255 in octal
-	0x0ff = 255 in hexadecimal
-	This leaves 16 bits worth of address
-	.65534 then accounts for the last two digits
+<p>e.g."00377.0x0ff.65534" = 255.255.255.254</p>
+<pre>00377 = 255 in octal
+0x0ff = 255 in hexadecimal
+This leaves 16 bits worth of address
+.65534 then accounts for the last two digits
 
-For the address part the allowed forms are:
-	a.b.c.d - where each part represents a byte
-	a.b.c   - where `a` & `b` represent a byte and `c` a u16
-	a.b     - where `a` represents a byte and `b` supplies the trailing 24 bits
-	a       - where `a` gives the entire 32-bit value
-
-The port, if present, is required to be a base 10 number in the range 0-65535, inclusive.
 </pre>
+<p>For the address part the allowed forms are:</p>
+<pre>a.b.c.d - where each part represents a byte
+a.b.c   - where `a` & `b` represent a byte and `c` a u16
+a.b     - where `a` represents a byte and `b` supplies the trailing 24 bits
+a       - where `a` gives the entire 32-bit value
+
+</pre>
+<p>The port, if present, is required to be a base 10 number in the range 0-65535, inclusive.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2214,8 +2204,7 @@ The port, if present, is required to be a base 10 number in the range 0-65535, i
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Dial from an Address.</p>
-<pre>Errors that can be returned: `Create_Socket_Error`, or `Dial_Error`
-</pre>
+<p>Errors that can be returned: <code>Create_Socket_Error</code>, or <code>Dial_Error</code></p>
 </details>
 <details class="odin-doc-toggle" open>
 <summary class="hideme">
@@ -2234,8 +2223,7 @@ The port, if present, is required to be a base 10 number in the range 0-65535, i
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Dial from an Endpoint.</p>
-<pre>Errors that can be returned: `Create_Socket_Error`, or `Dial_Error`
-</pre>
+<p>Errors that can be returned: <code>Create_Socket_Error</code>, or <code>Dial_Error</code></p>
 </details>
 <details class="odin-doc-toggle" open>
 <summary class="hideme">
@@ -2389,16 +2377,13 @@ If there's a port, uses the <code>ip4address:port</code> or <code>[ip6address]:p
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>A generic DNS client usable on any platform.</p>
-<pre>Performs a recursive DNS query for records of a particular type for the hostname.
-
-NOTE: This procedure instructs the DNS resolver to recursively perform CNAME requests on our behalf,
+<p>A generic DNS client usable on any platform.
+Performs a recursive DNS query for records of a particular type for the hostname.</p>
+<p>NOTE: This procedure instructs the DNS resolver to recursively perform CNAME requests on our behalf,
 meaning that DNS queries for a hostname will resolve through CNAME records until an
-IP address is reached.
-
-IMPORTANT: This procedure allocates memory for each record returned; deleting just the returned slice is not enough!
-See `destroy_records`.
-</pre>
+IP address is reached.</p>
+<p>IMPORTANT: This procedure allocates memory for each record returned; deleting just the returned slice is not enough!
+See <code>destroy_records</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2409,13 +2394,11 @@ See `destroy_records`.
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Performs a recursive DNS query for records of a particular type for the hostname using the OS.</p>
-<pre>NOTE: This procedure instructs the DNS resolver to recursively perform CNAME requests on our behalf,
+<p>NOTE: This procedure instructs the DNS resolver to recursively perform CNAME requests on our behalf,
 meaning that DNS queries for a hostname will resolve through CNAME records until an
-IP address is reached.
-
-IMPORTANT: This procedure allocates memory for each record returned; deleting just the returned slice is not enough!
-See `destroy_records`.
-</pre>
+IP address is reached.</p>
+<p>IMPORTANT: This procedure allocates memory for each record returned; deleting just the returned slice is not enough!
+See <code>destroy_records</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2482,8 +2465,7 @@ See `destroy_records`.
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Creates a TCP socket and starts listening on the given endpoint.</p>
-<pre>Errors that can be returned: `Create_Socket_Error`, `Bind_Error`, or `Listen_Error`
-</pre>
+<p>Errors that can be returned: <code>Create_Socket_Error</code>, <code>Bind_Error</code>, or <code>Listen_Error</code></p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2505,14 +2487,11 @@ See `destroy_records`.
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This type of socket is bound immediately, which enables it to receive data on the port.</p>
-<pre>Since it's UDP, it's also able to send data without receiving any first.
-
-This is like a listening TCP socket, except that data packets can be sent and received without needing to establish a connection first.
-The `bound_address` is the address of the network interface that you want to use, or a loopback address if you don't care which to use.
-
-Errors that can be returned: `Parse_Endpoint_Error`, `Create_Socket_Error`, or `Bind_Error`
-</pre>
+<p>This type of socket is bound immediately, which enables it to receive data on the port.
+Since it's UDP, it's also able to send data without receiving any first.</p>
+<p>This is like a listening TCP socket, except that data packets can be sent and received without needing to establish a connection first.
+The <code>bound_address</code> is the address of the network interface that you want to use, or a loopback address if you don't care which to use.</p>
+<p>Errors that can be returned: <code>Parse_Endpoint_Error</code>, <code>Create_Socket_Error</code>, or <code>Bind_Error</code></p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2522,11 +2501,9 @@ Errors that can be returned: `Parse_Endpoint_Error`, `Create_Socket_Error`, or `
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>This type of socket becomes bound when you try to send data.</p>
-<pre>It is likely what you want if you want to send data unsolicited.
-
-This is like a client TCP socket, except that it can send data to any remote endpoint without needing to establish a connection first.
-</pre>
+<p>This type of socket becomes bound when you try to send data.
+It is likely what you want if you want to send data unsolicited.</p>
+<p>This is like a client TCP socket, except that it can send data to any remote endpoint without needing to establish a connection first.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2552,9 +2529,8 @@ This is like a client TCP socket, except that it can send data to any remote end
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Try parsing as an IPv6 address.</p>
-<pre>If it's determined not to be, try as an IPv4 address, optionally in non-decimal format.
-</pre>
+<p>Try parsing as an IPv6 address.
+If it's determined not to be, try as an IPv4 address, optionally in non-decimal format.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2581,18 +2557,14 @@ and return the component parts in a useful form.</p>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Expects an IPv4 address with no leading or trailing whitespace:</p>
-<pre>- a.b.c.d
-- a.b.c.d:port
-- [a.b.c.d]:port
-
-If the IP address is bracketed, the port must be present and valid (though it will be ignored):
-- [a.b.c.d] will be treated as a parsing failure.
-
-The port, if present, is required to be a base 10 number in the range 0-65535, inclusive.
-
-If `allow_non_decimal` is false, `aton` is told each component must be decimal and max 255.
-</pre>
+<p>Expects an IPv4 address with no leading or trailing whitespace:
+<span class="doc-list">a.b.c.d</span>
+<span class="doc-list">a.b.c.d:port</span>
+<span class="doc-list">[a.b.c.d]:port</span></p>
+<p>If the IP address is bracketed, the port must be present and valid (though it will be ignored):
+<span class="doc-list">[a.b.c.d] will be treated as a parsing failure.</span></p>
+<p>The port, if present, is required to be a base 10 number in the range 0-65535, inclusive.</p>
+<p>If <code>allow_non_decimal</code> is false, <code>aton</code> is told each component must be decimal and max 255.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2608,23 +2580,17 @@ If `allow_non_decimal` is false, `aton` is told each component must be decimal a
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Parses a single unsigned number in requested <code>bases</code> from <code>input</code>.</p>
-<pre>`max_value` represents the maximum allowed value for this number.
-
-Returns the `value`, the `bytes_consumed` so far, and `ok` to signal success or failure.
-
-An out-of-range or invalid number will return the accumulated value so far (which can be out of range),
-the number of bytes consumed leading up the error, and `ok = false`.
-
-When `.` or `:` are encountered, they'll be considered valid separators and will stop parsing,
-returning the valid number leading up to it.
-
-Other non-digit characters are treated as an error.
-
-Octal numbers are expected to have a leading zero, with no 'o' format specifier.
+<p>Parses a single unsigned number in requested <code>bases</code> from <code>input</code>.
+<code>max_value</code> represents the maximum allowed value for this number.</p>
+<p>Returns the <code>value</code>, the <code>bytes_consumed</code> so far, and <code>ok</code> to signal success or failure.</p>
+<p>An out-of-range or invalid number will return the accumulated value so far (which can be out of range),
+the number of bytes consumed leading up the error, and <code>ok = false</code>.</p>
+<p>When <code>.</code> or <code>:</code> are encountered, they'll be considered valid separators and will stop parsing,
+returning the valid number leading up to it.</p>
+<p>Other non-digit characters are treated as an error.</p>
+<p>Octal numbers are expected to have a leading zero, with no 'o' format specifier.
 Hexadecimal numbers are expected to be preceded by '0x' or '0X'.
-Numbers will otherwise be considered to be in base 10.
-</pre>
+Numbers will otherwise be considered to be in base 10.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2689,11 +2655,9 @@ Numbers will otherwise be considered to be in base 10.
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Receive data from into a buffer from any socket.</p>
-<pre>Note: `remote_endpoint` parameter is non-nil only if the socket type is UDP. On TCP sockets it
-will always return `nil`.
-
-Errors that can be returned: `TCP_Recv_Error`, or `UDP_Recv_Error`
-</pre>
+<p>Note: <code>remote_endpoint</code> parameter is non-nil only if the socket type is UDP. On TCP sockets it
+will always return <code>nil</code>.</p>
+<p>Errors that can be returned: <code>TCP_Recv_Error</code>, or <code>UDP_Recv_Error</code></p>
 </details>
 <details class="odin-doc-toggle" open>
 <summary class="hideme">
@@ -2739,19 +2703,15 @@ Errors that can be returned: `TCP_Recv_Error`, or `UDP_Recv_Error`
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Resolves a hostname to exactly one IP4 and IP6 endpoint.</p>
-<pre>It's then up to you which one you use.
-Note that which address you use to open a socket, determines the type of the socket you get.
-
-Returns `ok=false` if the host name could not be resolved to any endpoints.
-
-Returned endpoints have the same port as provided in the string, or 0 if absent.
-If you want to use a specific port, just modify the field after the call to this procedure.
-
-If the hostname part of the endpoint is actually a string representation of an IP address, DNS resolution will be skipped.
+<p>Resolves a hostname to exactly one IP4 and IP6 endpoint.
+It's then up to you which one you use.
+Note that which address you use to open a socket, determines the type of the socket you get.</p>
+<p>Returns <code>ok=false</code> if the host name could not be resolved to any endpoints.</p>
+<p>Returned endpoints have the same port as provided in the string, or 0 if absent.
+If you want to use a specific port, just modify the field after the call to this procedure.</p>
+<p>If the hostname part of the endpoint is actually a string representation of an IP address, DNS resolution will be skipped.
 This allows you to pass both strings like "example.com:9000" and "1.2.3.4:9000" to this function end reliably get
-back an endpoint in both cases.
-</pre>
+back an endpoint in both cases.</p>
 </details>
 </div>
 <div class="pkg-entity">
@@ -2774,8 +2734,7 @@ back an endpoint in both cases.
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Sends data over the socket.</p>
-<pre>Errors that can be returned: `TCP_Send_Error`, or `UDP_Send_Error`
-</pre>
+<p>Errors that can be returned: <code>TCP_Send_Error</code>, or <code>UDP_Send_Error</code></p>
 </details>
 <details class="odin-doc-toggle" open>
 <summary class="hideme">
@@ -2793,9 +2752,8 @@ back an endpoint in both cases.
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
-<p>Repeatedly sends data until the entire buffer is sent.</p>
-<pre>If a send fails before all data is sent, returns the amount sent up to that point.
-</pre>
+<p>Repeatedly sends data until the entire buffer is sent.
+If a send fails before all data is sent, returns the amount sent up to that point.</p>
 </details>
 <details class="odin-doc-toggle" open>
 <summary class="hideme">
@@ -2814,9 +2772,8 @@ back an endpoint in both cases.
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
 <p>Sends a single UDP datagram packet.</p>
-<pre>Datagrams are limited in size; attempting to send more than this limit at once will result in a Message_Too_Long error.
-UDP packets are not guarenteed to be received in order.
-</pre>
+<p>Datagrams are limited in size; attempting to send more than this limit at once will result in a Message_Too_Long error.
+UDP packets are not guarenteed to be received in order.</p>
 </details>
 <details class="odin-doc-toggle" open>
 <summary class="hideme">
@@ -2951,7 +2908,7 @@ Returns ok=false if port is not a number.</p>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-24 21:15:15.319925100 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-25 10:54:33.964203000 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
