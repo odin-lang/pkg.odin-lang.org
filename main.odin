@@ -2828,7 +2828,9 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	fmt.wprintf(w, "</h3>\n")
 	fmt.wprintln(w, `<div>`)
 
-	the_docs := strings.trim_space(str(e.docs))
+	// Important: Don't trim `the_docs`.
+	// See comment block below where we optionally replace it with `e.comment`.
+	the_docs := str(e.docs)
 
 	if name != entity_name || entity_pkg != pkg {
 		fmt.wprint(w, `<pre class="doc-code">`)
@@ -2976,8 +2978,16 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	}
 	fmt.wprintln(w, `</div>`)
 
-	if the_docs == "" {
-		the_docs = strings.trim_space(str(e.comment))
+	// NOTE(Jeroen):
+	//
+	// If we trim `the_docs` before passing it to `write_docs`, all but the first line
+	// turn into `<pre>`, and `[[ title ; link ]]` tags are no longer resolved either.
+	// Laytan discovered this on the docs for `readlink` in `core:sys/posix`.
+	// Instead check if `the_docs` would be empty if trimmed in order to substitute it with
+	// the comments, but don't actually mess with the input. It seems to upset CommonMark,
+	// and `write_docs` does its own trimming as it is.
+	if strings.trim_space(the_docs) == "" {
+		the_docs = str(e.comment)
 	}
 
 	if the_docs != "" {
