@@ -2482,7 +2482,7 @@ Procedure Groups (0)</summary>
 <div>
 <pre class="doc-code">DRED_ALLOCATION_NODE :: <span class="keyword-type">struct</span> {
 	ObjectNameA:    <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
-	ObjectNameW:    ^<a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>,
+	ObjectNameW:    <a href="/base/builtin#cstring16"><span class="doc-builtin">cstring16</span></a>,
 	AllocationType: <a class="code-typename" href="/vendor/directx/d3d12/#DRED_ALLOCATION_TYPE">DRED_ALLOCATION_TYPE</a>,
 	pNext:          ^<a class="code-typename" href="/vendor/directx/d3d12/#DRED_ALLOCATION_NODE">DRED_ALLOCATION_NODE</a>,
 }</pre>
@@ -2493,7 +2493,7 @@ Procedure Groups (0)</summary>
 <div>
 <pre class="doc-code">DRED_ALLOCATION_NODE1 :: <span class="keyword-type">struct</span> {
 	ObjectNameA:    <a href="/base/builtin#cstring"><span class="doc-builtin">cstring</span></a>,
-	ObjectNameW:    ^<a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>,
+	ObjectNameW:    <a href="/base/builtin#cstring16"><span class="doc-builtin">cstring16</span></a>,
 	AllocationType: <a class="code-typename" href="/vendor/directx/d3d12/#DRED_ALLOCATION_TYPE">DRED_ALLOCATION_TYPE</a>,
 	pNext:          ^<a class="code-typename" href="/vendor/directx/d3d12/#DRED_ALLOCATION_NODE1">DRED_ALLOCATION_NODE1</a>,
 	pObject:        ^sys_windows.<a class="code-typename" href="/core/sys/windows/#IUnknown">IUnknown</a>,
@@ -2607,7 +2607,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="DRED_PAGE_FAULT_FLAGS"><span><a class="doc-id-link" href="#DRED_PAGE_FAULT_FLAGS">DRED_PAGE_FAULT_FLAGS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/directx/d3d12/d3d12.odin#L3542"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">DRED_PAGE_FAULT_FLAGS :: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/directx/d3d12/#DRED_PAGE_FAULT_FLAG">DRED_PAGE_FAULT_FLAG</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
+<pre class="doc-code">DRED_PAGE_FAULT_FLAGS :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/directx/d3d12/#DRED_PAGE_FAULT_FLAG">DRED_PAGE_FAULT_FLAG</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -2637,7 +2637,7 @@ Procedure Groups (0)</summary>
 	PageFaultVA:                    <a href="/base/builtin#u64"><span class="doc-builtin">u64</span></a>,
 	pHeadExistingAllocationNode:    ^<a class="code-typename" href="/vendor/directx/d3d12/#DRED_ALLOCATION_NODE1">DRED_ALLOCATION_NODE1</a>,
 	pHeadRecentFreedAllocationNode: ^<a class="code-typename" href="/vendor/directx/d3d12/#DRED_ALLOCATION_NODE1">DRED_ALLOCATION_NODE1</a>,
-	PageFaultFlags:                 <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/directx/d3d12/#DRED_PAGE_FAULT_FLAG">DRED_PAGE_FAULT_FLAG</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>],
+	PageFaultFlags:                 <a class="code-typename" href="/vendor/directx/d3d12/#DRED_PAGE_FAULT_FLAGS">DRED_PAGE_FAULT_FLAGS</a>,
 }</pre>
 </div>
 </div>
@@ -2720,9 +2720,9 @@ Procedure Groups (0)</summary>
 <h3 id="DXIL_SUBOBJECT_TO_EXPORTS_ASSOCIATION"><span><a class="doc-id-link" href="#DXIL_SUBOBJECT_TO_EXPORTS_ASSOCIATION">DXIL_SUBOBJECT_TO_EXPORTS_ASSOCIATION<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/directx/d3d12/d3d12.odin#L3096"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">DXIL_SUBOBJECT_TO_EXPORTS_ASSOCIATION :: <span class="keyword-type">struct</span> {
-	SubobjectToAssociate: ^<a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>,
+	SubobjectToAssociate: <a href="/base/builtin#cstring16"><span class="doc-builtin">cstring16</span></a>,
 	NumExports:           <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
-	pExports:             [^]^<a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>,
+	pExports:             [^]<a href="/base/builtin#cstring16"><span class="doc-builtin">cstring16</span></a> <span class="string">`fmt:"v,NumExports"`</span>,
 }</pre>
 </div>
 </div>
@@ -3695,11 +3695,11 @@ Procedure Groups (0)</summary>
 <h3 id="HIT_GROUP_DESC"><span><a class="doc-id-link" href="#HIT_GROUP_DESC">HIT_GROUP_DESC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/directx/d3d12/d3d12.odin#L3107"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">HIT_GROUP_DESC :: <span class="keyword-type">struct</span> {
-	HitGroupExport:           ^<a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>,
+	HitGroupExport:           <a href="/base/builtin#cstring16"><span class="doc-builtin">cstring16</span></a>,
 	Type:                     <a class="code-typename" href="/vendor/directx/d3d12/#HIT_GROUP_TYPE">HIT_GROUP_TYPE</a>,
-	AnyHitShaderImport:       ^<a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>,
-	ClosestHitShaderImport:   ^<a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>,
-	IntersectionShaderImport: ^<a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>,
+	AnyHitShaderImport:       <a href="/base/builtin#cstring16"><span class="doc-builtin">cstring16</span></a>,
+	ClosestHitShaderImport:   <a href="/base/builtin#cstring16"><span class="doc-builtin">cstring16</span></a>,
+	IntersectionShaderImport: <a href="/base/builtin#cstring16"><span class="doc-builtin">cstring16</span></a>,
 }</pre>
 </div>
 </div>
@@ -4307,7 +4307,7 @@ Procedure Groups (0)</summary>
 <pre class="doc-code">IDevice9_VTable :: <span class="keyword-type">struct</span> {
 	<span class="keyword-type">using</span> id3d12device8_vtable: <a class="code-typename" href="/vendor/directx/d3d12/#IDevice8_VTable">IDevice8_VTable</a>,
 	CreateShaderCacheSession: <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IDevice9">IDevice9</a>, pDesc: ^<a class="code-typename" href="/vendor/directx/d3d12/#SHADER_CACHE_SESSION_DESC">SHADER_CACHE_SESSION_DESC</a>, riid: ^sys_windows.<a class="code-typename" href="/core/sys/windows/#GUID">GUID</a>, ppvSession: ^<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
-	ShaderCacheControl:       <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IDevice9">IDevice9</a>, Kinds: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/directx/d3d12/#SHADER_CACHE_KIND_FLAG">SHADER_CACHE_KIND_FLAG</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>], Control: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/directx/d3d12/#SHADER_CACHE_CONTROL_FLAG">SHADER_CACHE_CONTROL_FLAG</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
+	ShaderCacheControl:       <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IDevice9">IDevice9</a>, Kinds: <a class="code-typename" href="/vendor/directx/d3d12/#SHADER_CACHE_KIND_FLAGS">SHADER_CACHE_KIND_FLAGS</a>, Control: <a class="code-typename" href="/vendor/directx/d3d12/#SHADER_CACHE_CONTROL_FLAGS">SHADER_CACHE_CONTROL_FLAGS</a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
 	CreateCommandQueue1:      <span class="keyword-type">proc</span> <span class="string">"stdcall"</span> (this: ^<a class="code-typename" href="/vendor/directx/d3d12/#IDevice9">IDevice9</a>, pDesc: ^<a class="code-typename" href="/vendor/directx/d3d12/#COMMAND_QUEUE_DESC">COMMAND_QUEUE_DESC</a>, CreatorID: ^sys_windows.<a class="code-typename" href="/core/sys/windows/#GUID">GUID</a>, riid: ^sys_windows.<a class="code-typename" href="/core/sys/windows/#GUID">GUID</a>, ppCommandQueue: ^<a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>) -> sys_windows.<a class="code-typename" href="/core/sys/windows/#HRESULT">HRESULT</a>,
 }</pre>
 </div>
@@ -5060,7 +5060,7 @@ Procedure Groups (0)</summary>
 <h3 id="INPUT_LAYOUT_DESC"><span><a class="doc-id-link" href="#INPUT_LAYOUT_DESC">INPUT_LAYOUT_DESC<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/directx/d3d12/d3d12.odin#L721"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">INPUT_LAYOUT_DESC :: <span class="keyword-type">struct</span> {
-	pInputElementDescs: [^]<a class="code-typename" href="/vendor/directx/d3d12/#INPUT_ELEMENT_DESC">INPUT_ELEMENT_DESC</a>,
+	pInputElementDescs: [^]<a class="code-typename" href="/vendor/directx/d3d12/#INPUT_ELEMENT_DESC">INPUT_ELEMENT_DESC</a> <span class="string">`fmt:"v,NumElements"`</span>,
 	NumElements:        <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
 }</pre>
 </div>
@@ -7579,7 +7579,7 @@ Procedure Groups (0)</summary>
 	pSrcResource:           ^<a class="code-typename" href="/vendor/directx/d3d12/#IResource">IResource</a>,
 	pDstResource:           ^<a class="code-typename" href="/vendor/directx/d3d12/#IResource">IResource</a>,
 	SubresourceCount:       <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
-	pSubresourceParameters: [^]<a class="code-typename" href="/vendor/directx/d3d12/#RENDER_PASS_ENDING_ACCESS_RESOLVE_SUBRESOURCE_PARAMETERS">RENDER_PASS_ENDING_ACCESS_RESOLVE_SUBRESOURCE_PARAMETERS</a>,
+	pSubresourceParameters: [^]<a class="code-typename" href="/vendor/directx/d3d12/#RENDER_PASS_ENDING_ACCESS_RESOLVE_SUBRESOURCE_PARAMETERS">RENDER_PASS_ENDING_ACCESS_RESOLVE_SUBRESOURCE_PARAMETERS</a> <span class="string">`fmt:"v,SubresourceCount"`</span>,
 	Format:                 directx_dxgi.<a class="code-typename" href="/vendor/directx/dxgi/#FORMAT">FORMAT</a>,
 	ResolveMode:            <a class="code-typename" href="/vendor/directx/d3d12/#RESOLVE_MODE">RESOLVE_MODE</a>,
 	PreserveResolveSource:  sys_windows.<a class="code-typename" href="/core/sys/windows/#BOOL">BOOL</a>,
@@ -8268,7 +8268,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="SHADER_CACHE_CONTROL_FLAGS"><span><a class="doc-id-link" href="#SHADER_CACHE_CONTROL_FLAGS">SHADER_CACHE_CONTROL_FLAGS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/directx/d3d12/d3d12.odin#L3943"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">SHADER_CACHE_CONTROL_FLAGS :: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/directx/d3d12/#SHADER_CACHE_CONTROL_FLAG">SHADER_CACHE_CONTROL_FLAG</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
+<pre class="doc-code">SHADER_CACHE_CONTROL_FLAGS :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/directx/d3d12/#SHADER_CACHE_CONTROL_FLAG">SHADER_CACHE_CONTROL_FLAG</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -8283,7 +8283,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="SHADER_CACHE_FLAGS"><span><a class="doc-id-link" href="#SHADER_CACHE_FLAGS">SHADER_CACHE_FLAGS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/directx/d3d12/d3d12.odin#L3904"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">SHADER_CACHE_FLAGS :: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/directx/d3d12/#SHADER_CACHE_FLAG">SHADER_CACHE_FLAG</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
+<pre class="doc-code">SHADER_CACHE_FLAGS :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/directx/d3d12/#SHADER_CACHE_FLAG">SHADER_CACHE_FLAG</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -8300,7 +8300,7 @@ Procedure Groups (0)</summary>
 <div class="pkg-entity">
 <h3 id="SHADER_CACHE_KIND_FLAGS"><span><a class="doc-id-link" href="#SHADER_CACHE_KIND_FLAGS">SHADER_CACHE_KIND_FLAGS<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/vendor/directx/d3d12/d3d12.odin#L3935"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">SHADER_CACHE_KIND_FLAGS :: <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/directx/d3d12/#SHADER_CACHE_KIND_FLAG">SHADER_CACHE_KIND_FLAG</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
+<pre class="doc-code">SHADER_CACHE_KIND_FLAGS :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/directx/d3d12/#SHADER_CACHE_KIND_FLAG">SHADER_CACHE_KIND_FLAG</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>]</pre>
 </div>
 </div>
 <div class="pkg-entity">
@@ -8318,7 +8318,7 @@ Procedure Groups (0)</summary>
 <pre class="doc-code">SHADER_CACHE_SESSION_DESC :: <span class="keyword-type">struct</span> {
 	Identifier:                    sys_windows.<a class="code-typename" href="/core/sys/windows/#GUID">GUID</a>,
 	Mode:                          <a class="code-typename" href="/vendor/directx/d3d12/#SHADER_CACHE_MODE">SHADER_CACHE_MODE</a>,
-	Flags:                         <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/vendor/directx/d3d12/#SHADER_CACHE_FLAG">SHADER_CACHE_FLAG</a>; <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>],
+	Flags:                         <a class="code-typename" href="/vendor/directx/d3d12/#SHADER_CACHE_FLAGS">SHADER_CACHE_FLAGS</a>,
 	MaximumInMemoryCacheSizeBytes: <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
 	MaximumInMemoryCacheEntries:   <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
 	MaximumValueFileSizeBytes:     <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
@@ -8987,7 +8987,7 @@ Procedure Groups (0)</summary>
 <pre class="doc-code">SUBOBJECT_TO_EXPORTS_ASSOCIATION :: <span class="keyword-type">struct</span> {
 	pSubobjectToAssociate: ^<a class="code-typename" href="/vendor/directx/d3d12/#STATE_SUBOBJECT">STATE_SUBOBJECT</a>,
 	NumExports:            <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
-	pExports:              [^]^<a href="/base/builtin#i16"><span class="doc-builtin">i16</span></a>,
+	pExports:              [^]<a href="/base/builtin#cstring16"><span class="doc-builtin">cstring16</span></a> <span class="string">`fmt:"v,NumExports"`</span>,
 }</pre>
 </div>
 </div>
@@ -9615,7 +9615,7 @@ Procedure Groups (0)</summary>
 <div>
 <pre class="doc-code">VIEW_INSTANCING_DESC :: <span class="keyword-type">struct</span> {
 	ViewInstanceCount:      <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a>,
-	pViewInstanceLocations: [^]<a class="code-typename" href="/vendor/directx/d3d12/#VIEW_INSTANCE_LOCATION">VIEW_INSTANCE_LOCATION</a>,
+	pViewInstanceLocations: [^]<a class="code-typename" href="/vendor/directx/d3d12/#VIEW_INSTANCE_LOCATION">VIEW_INSTANCE_LOCATION</a> <span class="string">`fmt:"v,ViewInstanceCount"`</span>,
 	Flags:                  <a class="code-typename" href="/vendor/directx/d3d12/#VIEW_INSTANCING_FLAGS">VIEW_INSTANCING_FLAGS</a>,
 }</pre>
 </div>
@@ -13725,7 +13725,7 @@ Procedure Groups (0)</summary>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/vendor/directx/d3d12/d3d12_constants.odin">d3d12_constants.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-27 21:13:19.903279600 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-28 21:13:09.098156100 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
