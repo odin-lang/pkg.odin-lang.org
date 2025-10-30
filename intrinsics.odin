@@ -526,6 +526,10 @@ intrinsics_table := []Builtin{
 	{name = "constant_log2", kind = "b", type = "proc($v: $T) -> T where type_is_integer(T)",
 		comment = "Returns the log2 value of the given constant integer.",
 	},
+	{name = "constant_floor", kind = "b", type = "proc($v: $T) -> T where type_is_integer(T) || type_is_float(T)", comment = "Returns the floored value of the given constant integer or float."},
+	{name = "constant_trunc", kind = "b", type = "proc($v: $T) -> T where type_is_integer(T) || type_is_float(T)", comment = "Returns the truncated value of the given constant integer or float."},
+	{name = "constant_ceil",  kind = "b", type = "proc($v: $T) -> T where type_is_integer(T) || type_is_float(T)", comment = "Returns the ceiling of the given constant integer or float."},
+	{name = "constant_round", kind = "b", type = "proc($v: $T) -> T where type_is_integer(T) || type_is_float(T)", comment = "Returns the rounded value of the given constant integer or float."},
 
 	// SIMD related
 	// IMPORTANT NOTE(bill): All of these docs are generated from the `core:simd` package (if available)
