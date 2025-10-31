@@ -1659,7 +1659,7 @@ write_markup_text :: proc(w: io.Writer, s_: string, code_inline := false) {
 					scheme, host, path, queries, fragment := net.split_url(url, context.temp_allocator)
 					scheme = strings.to_lower(scheme, context.temp_allocator)
 					host  = strings.to_lower(host, context.temp_allocator)
-					url = net.join_url(scheme, host, path, queries, fragment)
+					url = net.join_url(scheme, host, path, queries, fragment, context.temp_allocator)
 
 					if strings.has_suffix(host, cfg.domain) {
 						// Same domain as cfg.domain
