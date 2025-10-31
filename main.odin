@@ -812,6 +812,10 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 				assert(child.pkg != nil)
 				init_cfg_from_pkg(child.pkg)
 
+				if str(child.pkg.name) == "os2" {
+					continue
+				}
+
 				fmt.wprintf(w, `<tr id="pkg-%s" class="directory-pkg directory-child visible"><td class="pkg-line pkg-name">`, child.name)
 				fmt.wprintf(w, `<a href="%s/%s/">%s</a>`, collection.base_url, child.path, child.name)
 				io.write_string(w, `</td>`)
