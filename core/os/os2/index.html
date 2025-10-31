@@ -439,7 +439,7 @@ Variables (4)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedures" aria-labelledby="#doc-index-Procedures-header">
 <summary id="#doc-index-Procedures-header">
-Procedures (166)</summary>
+Procedures (167)</summary>
 <ul>
 <li><a href="#are_paths_identical">are_paths_identical</a></li>
 <li><a href="#change_directory">change_directory</a></li>
@@ -602,7 +602,8 @@ Procedures (166)</summary>
 <li><a href="#write_at">write_at</a></li>
 <li><a href="#write_byte">write_byte</a></li>
 <li><a href="#write_encoded_rune">write_encoded_rune</a></li>
-<li><a href="#write_entire_file">write_entire_file</a></li>
+<li><a href="#write_entire_file_from_bytes">write_entire_file_from_bytes</a></li>
+<li><a href="#write_entire_file_from_string">write_entire_file_from_string</a></li>
 <li><a href="#write_ptr">write_ptr</a></li>
 <li><a href="#write_rune">write_rune</a></li>
 <li><a href="#write_string">write_string</a></li>
@@ -613,7 +614,7 @@ Procedures (166)</summary>
 <div>
 <details class="doc-index" id="doc-index-Procedure Groups" aria-labelledby="#doc-index-Procedure Groups-header">
 <summary id="#doc-index-Procedure Groups-header">
-Procedure Groups (7)</summary>
+Procedure Groups (8)</summary>
 <ul>
 <li><a href="#get_env">get_env</a></li>
 <li><a href="#lookup_env">lookup_env</a></li>
@@ -622,6 +623,7 @@ Procedure Groups (7)</summary>
 <li><a href="#read_entire_file">read_entire_file</a></li>
 <li><a href="#walker_create">walker_create</a></li>
 <li><a href="#walker_init">walker_init</a></li>
+<li><a href="#write_entire_file">write_entire_file</a></li>
 </ul>
 </details>
 </div>
@@ -630,7 +632,7 @@ Procedure Groups (7)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Error"><span><a class="doc-id-link" href="#Error">Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L38"><em>Source</em></a></div></h3>
+<h3 id="Error"><span><a class="doc-id-link" href="#Error">Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L46"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Error :: <span class="keyword-type">union</span> {
 	<a class="code-typename" href="/core/os/os2/#General_Error">General_Error</a>, 
@@ -639,6 +641,10 @@ Procedure Groups (7)</summary>
 	sys_windows.<a class="code-typename" href="/core/sys/windows/#System_Error">System_Error</a>, 
 }</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>Error</code> is a union of different classes of errors that could be returned from procedures in this package.</p>
+</details>
 <details class="odin-doc-toggle" open>
 <summary class="hideme">
 <h5 style="display:inline-block">Related Procedures With Parameters</h5>
@@ -745,7 +751,8 @@ Procedure Groups (7)</summary>
 <li><a href="/core/os/os2/#write_at">write_at</a></li>
 <li><a href="/core/os/os2/#write_byte">write_byte</a></li>
 <li><a href="/core/os/os2/#write_encoded_rune">write_encoded_rune</a></li>
-<li><a href="/core/os/os2/#write_entire_file">write_entire_file</a></li>
+<li><a href="/core/os/os2/#write_entire_file_from_bytes">write_entire_file_from_bytes</a></li>
+<li><a href="/core/os/os2/#write_entire_file_from_string">write_entire_file_from_string</a></li>
 <li><a href="/core/os/os2/#write_ptr">write_ptr</a></li>
 <li><a href="/core/os/os2/#write_rune">write_rune</a></li>
 <li><a href="/core/os/os2/#write_string">write_string</a></li>
@@ -753,6 +760,7 @@ Procedure Groups (7)</summary>
 <li><a href="/core/os/os2/#lookup_env">lookup_env</a>&nbsp;<em>(procedure groups)</em></li>
 <li><a href="/core/os/os2/#process_info">process_info</a>&nbsp;<em>(procedure groups)</em></li>
 <li><a href="/core/os/os2/#read_entire_file">read_entire_file</a>&nbsp;<em>(procedure groups)</em></li>
+<li><a href="/core/os/os2/#write_entire_file">write_entire_file</a>&nbsp;<em>(procedure groups)</em></li>
 </ul>
 </details>
 <h5>Related Constants</h5>
@@ -894,21 +902,29 @@ the following:
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="File_Info"><span><a class="doc-id-link" href="#File_Info">File_Info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L9"><em>Source</em></a></div></h3>
+<h3 id="File_Info"><span><a class="doc-id-link" href="#File_Info">File_Info<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L12"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">File_Info :: <span class="keyword-type">struct</span> {
 	fullpath:          <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
+	<span class="comment">// fullpath of the file</span>
 	name:              <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>,
+	<span class="comment">// base name of the file</span>
 	inode:             <a href="/base/builtin#u128"><span class="doc-builtin">u128</span></a>,
 	<span class="comment">// might be zero if cannot be determined</span>
 	size:              <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a> <span class="string">`fmt:"M"`</span>,
+	<span class="comment">// length in bytes for regular files; system-dependent for other file types</span>
 	mode:              <a class="code-typename" href="/core/os/os2/#Permissions">Permissions</a>,
+	<span class="comment">// file permission flags</span>
 	type:              <a class="code-typename" href="/core/os/os2/#File_Type">File_Type</a>,
 	creation_time:     time.<a class="code-typename" href="/core/time/#Time">Time</a>,
 	modification_time: time.<a class="code-typename" href="/core/time/#Time">Time</a>,
 	access_time:       time.<a class="code-typename" href="/core/time/#Time">Time</a>,
 }</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>File_Info</code> describes a file and is returned from <code>stat</code>, <code>fstat</code>, and <code>lstat</code>.</p>
+</details>
 <details class="odin-doc-toggle" open>
 <summary class="hideme">
 <h5 style="display:inline-block">Related Procedures With Parameters</h5>
@@ -973,7 +989,7 @@ character devices.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="General_Error"><span><a class="doc-id-link" href="#General_Error">General_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L6"><em>Source</em></a></div></h3>
+<h3 id="General_Error"><span><a class="doc-id-link" href="#General_Error">General_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L10"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">General_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	None, 
@@ -997,6 +1013,11 @@ character devices.</p>
 	Unsupported, 
 }</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>General errors that are common within this package which cannot
+be categorized by <code>io.Error</code> nor <code>runtime.Allocator_Error</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="Permission_Flag"><span><a class="doc-id-link" href="#Permission_Flag">Permission_Flag<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L95"><em>Source</em></a></div></h3>
@@ -1027,7 +1048,9 @@ character devices.</p>
 <li><a href="/core/os/os2/#change_mode">change_mode</a></li>
 <li><a href="/core/os/os2/#fchange_mode">fchange_mode</a></li>
 <li><a href="/core/os/os2/#open">open</a></li>
-<li><a href="/core/os/os2/#write_entire_file">write_entire_file</a></li>
+<li><a href="/core/os/os2/#write_entire_file_from_bytes">write_entire_file_from_bytes</a></li>
+<li><a href="/core/os/os2/#write_entire_file_from_string">write_entire_file_from_string</a></li>
+<li><a href="/core/os/os2/#write_entire_file">write_entire_file</a>&nbsp;<em>(procedure groups)</em></li>
 </ul>
 </details>
 <details class="odin-doc-toggle" open>
@@ -1052,10 +1075,14 @@ character devices.</p>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Platform_Error"><span><a class="doc-id-link" href="#Platform_Error">Platform_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L36"><em>Source</em></a></div></h3>
+<h3 id="Platform_Error"><span><a class="doc-id-link" href="#Platform_Error">Platform_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L41"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Platform_Error :: sys_windows.<a class="code-typename" href="/core/sys/windows/#System_Error">System_Error</a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>A platform specific error</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="Process"><span><a class="doc-id-link" href="#Process">Process<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/process.odin#L273"><em>Source</em></a></div></h3>
@@ -1296,7 +1323,7 @@ field in the <code>Process_Info</code> struct.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Read_Directory_Iterator"><span><a class="doc-id-link" href="#Read_Directory_Iterator">Read_Directory_Iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L69"><em>Source</em></a></div></h3>
+<h3 id="Read_Directory_Iterator"><span><a class="doc-id-link" href="#Read_Directory_Iterator">Read_Directory_Iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L83"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Read_Directory_Iterator :: <span class="keyword-type">struct</span> {
 	f:     ^<a class="code-typename" href="/core/os/os2/#File">File</a>,
@@ -1379,7 +1406,7 @@ field in the <code>Process_Info</code> struct.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ERROR_NONE"><span><a class="doc-id-link" href="#ERROR_NONE">ERROR_NONE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L46"><em>Source</em></a></div></h3>
+<h3 id="ERROR_NONE"><span><a class="doc-id-link" href="#ERROR_NONE">ERROR_NONE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L54"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ERROR_NONE :: Error{}</pre>
 </div>
@@ -1630,7 +1657,7 @@ it changes the <code>uid</code> and <code>gid</code> of the link's target.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="change_owner_do_not_follow_links"><span><a class="doc-id-link" href="#change_owner_do_not_follow_links">change_owner_do_not_follow_links<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L433"><em>Source</em></a></div></h3>
+<h3 id="change_owner_do_not_follow_links"><span><a class="doc-id-link" href="#change_owner_do_not_follow_links">change_owner_do_not_follow_links<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L439"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">change_owner_do_not_follow_links :: <span class="keyword-type">proc</span>(name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, uid, gid: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a class="code-typename" href="/core/os/os2/#Error">Error</a> {…}</pre>
 </div>
@@ -1642,7 +1669,7 @@ it changes the <code>uid</code> and <code>gid</code> of the lin itself.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="change_times"><span><a class="doc-id-link" href="#change_times">change_times<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L442"><em>Source</em></a></div></h3>
+<h3 id="change_times"><span><a class="doc-id-link" href="#change_times">change_times<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L448"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">change_times :: <span class="keyword-type">proc</span>(name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, atime, mtime: time.<a class="code-typename" href="/core/time/#Time">Time</a>) -> <a class="code-typename" href="/core/os/os2/#Error">Error</a> {…}</pre>
 </div>
@@ -1688,7 +1715,7 @@ it changes the <code>uid</code> and <code>gid</code> of the link's target.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="chtimes"><span><a class="doc-id-link" href="#chtimes">chtimes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L442"><em>Source</em></a></div></h3>
+<h3 id="chtimes"><span><a class="doc-id-link" href="#chtimes">chtimes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L448"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">chtimes :: <a class="code-procedure" href="/core/os/os2/#change_times">change_times</a></pre>
 </div>
@@ -1739,7 +1766,7 @@ same class of bugs as a use-after-free.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="copy_directory_all"><span><a class="doc-id-link" href="#copy_directory_all">copy_directory_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L198"><em>Source</em></a></div></h3>
+<h3 id="copy_directory_all"><span><a class="doc-id-link" href="#copy_directory_all">copy_directory_all<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L212"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">copy_directory_all :: <span class="keyword-type">proc</span>(dst, src: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, dst_perm: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = 0o755) -> <a class="code-typename" href="/core/os/os2/#Error">Error</a> {…}</pre>
 </div>
@@ -1749,7 +1776,7 @@ same class of bugs as a use-after-free.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="copy_file"><span><a class="doc-id-link" href="#copy_file">copy_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L494"><em>Source</em></a></div></h3>
+<h3 id="copy_file"><span><a class="doc-id-link" href="#copy_file">copy_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L500"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">copy_file :: <span class="keyword-type">proc</span>(dst_path, src_path: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> <a class="code-typename" href="/core/os/os2/#Error">Error</a> {…}</pre>
 </div>
@@ -1826,13 +1853,17 @@ NOTE: the slice of strings and the strings with be allocated using the supplied 
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="error_string"><span><a class="doc-id-link" href="#error_string">error_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L57"><em>Source</em></a></div></h3>
+<h3 id="error_string"><span><a class="doc-id-link" href="#error_string">error_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L67"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">error_string :: <span class="keyword-type">proc</span>(ferr: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Attempts to return the error <code>ferr</code> as a string without any allocation</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="exists"><span><a class="doc-id-link" href="#exists">exists<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L459"><em>Source</em></a></div></h3>
+<h3 id="exists"><span><a class="doc-id-link" href="#exists">exists<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L465"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">exists :: <span class="keyword-type">proc</span>(path: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -1852,19 +1883,27 @@ NOTE: the slice of strings and the strings with be allocated using the supplied 
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="fchange_directory"><span><a class="doc-id-link" href="#fchange_directory">fchange_directory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L402"><em>Source</em></a></div></h3>
+<h3 id="fchange_directory"><span><a class="doc-id-link" href="#fchange_directory">fchange_directory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L405"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">fchange_directory :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>) -> <a class="code-typename" href="/core/os/os2/#Error">Error</a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Changes the current working directory to the file, which must be a directory.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="fchange_mode"><span><a class="doc-id-link" href="#fchange_mode">fchange_mode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L408"><em>Source</em></a></div></h3>
+<h3 id="fchange_mode"><span><a class="doc-id-link" href="#fchange_mode">fchange_mode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L414"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">fchange_mode :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, mode: <a class="code-typename" href="/core/os/os2/#Permissions">Permissions</a>) -> <a class="code-typename" href="/core/os/os2/#Error">Error</a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Changes the current <code>mode</code> permissions of the file <code>f</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="fchange_owner"><span><a class="doc-id-link" href="#fchange_owner">fchange_owner<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L420"><em>Source</em></a></div></h3>
+<h3 id="fchange_owner"><span><a class="doc-id-link" href="#fchange_owner">fchange_owner<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L426"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">fchange_owner :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, uid, gid: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> <a class="code-typename" href="/core/os/os2/#Error">Error</a> {…}</pre>
 </div>
@@ -1876,7 +1915,7 @@ it changes the <code>uid</code> and <code>gid</code> of the link's target.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="fchange_times"><span><a class="doc-id-link" href="#fchange_times">fchange_times<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L451"><em>Source</em></a></div></h3>
+<h3 id="fchange_times"><span><a class="doc-id-link" href="#fchange_times">fchange_times<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L457"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">fchange_times :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, atime, mtime: time.<a class="code-typename" href="/core/time/#Time">Time</a>) -> <a class="code-typename" href="/core/os/os2/#Error">Error</a> {…}</pre>
 </div>
@@ -1886,19 +1925,27 @@ it changes the <code>uid</code> and <code>gid</code> of the link's target.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="fchdir"><span><a class="doc-id-link" href="#fchdir">fchdir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L402"><em>Source</em></a></div></h3>
+<h3 id="fchdir"><span><a class="doc-id-link" href="#fchdir">fchdir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L405"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">fchdir :: <a class="code-procedure" href="/core/os/os2/#fchange_directory">fchange_directory</a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Changes the current working directory to the file, which must be a directory.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="fchmod"><span><a class="doc-id-link" href="#fchmod">fchmod<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L408"><em>Source</em></a></div></h3>
+<h3 id="fchmod"><span><a class="doc-id-link" href="#fchmod">fchmod<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L414"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">fchmod :: <a class="code-procedure" href="/core/os/os2/#fchange_mode">fchange_mode</a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Changes the current <code>mode</code> permissions of the file <code>f</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="fchown"><span><a class="doc-id-link" href="#fchown">fchown<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L420"><em>Source</em></a></div></h3>
+<h3 id="fchown"><span><a class="doc-id-link" href="#fchown">fchown<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L426"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">fchown :: <a class="code-procedure" href="/core/os/os2/#fchange_owner">fchange_owner</a></pre>
 </div>
@@ -1910,7 +1957,7 @@ it changes the <code>uid</code> and <code>gid</code> of the link's target.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="fchtimes"><span><a class="doc-id-link" href="#fchtimes">fchtimes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L451"><em>Source</em></a></div></h3>
+<h3 id="fchtimes"><span><a class="doc-id-link" href="#fchtimes">fchtimes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L457"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">fchtimes :: <a class="code-procedure" href="/core/os/os2/#fchange_times">fchange_times</a></pre>
 </div>
@@ -1930,19 +1977,19 @@ it changes the <code>uid</code> and <code>gid</code> of the link's target.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="file_info_clone"><span><a class="doc-id-link" href="#file_info_clone">file_info_clone<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L24"><em>Source</em></a></div></h3>
+<h3 id="file_info_clone"><span><a class="doc-id-link" href="#file_info_clone">file_info_clone<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L27"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">file_info_clone :: <span class="keyword-type">proc</span>(fi: <a class="code-typename" href="/core/os/os2/#File_Info">File_Info</a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (cloned: <a class="code-typename" href="/core/os/os2/#File_Info">File_Info</a>, err: runtime.<a class="code-typename" href="/base/runtime/#Allocator_Error">Allocator_Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="file_info_delete"><span><a class="doc-id-link" href="#file_info_delete">file_info_delete<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L38"><em>Source</em></a></div></h3>
+<h3 id="file_info_delete"><span><a class="doc-id-link" href="#file_info_delete">file_info_delete<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L41"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">file_info_delete :: <span class="keyword-type">proc</span>(fi: <a class="code-typename" href="/core/os/os2/#File_Info">File_Info</a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="file_info_slice_delete"><span><a class="doc-id-link" href="#file_info_slice_delete">file_info_slice_delete<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L31"><em>Source</em></a></div></h3>
+<h3 id="file_info_slice_delete"><span><a class="doc-id-link" href="#file_info_slice_delete">file_info_slice_delete<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L34"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">file_info_slice_delete :: <span class="keyword-type">proc</span>(infos: []<a class="code-typename" href="/core/os/os2/#File_Info">File_Info</a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) {…}</pre>
 </div>
@@ -1981,7 +2028,7 @@ to the <code>process_info</code> function.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="fstat"><span><a class="doc-id-link" href="#fstat">fstat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L43"><em>Source</em></a></div></h3>
+<h3 id="fstat"><span><a class="doc-id-link" href="#fstat">fstat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L46"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">fstat :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (<a class="code-typename" href="/core/os/os2/#File_Info">File_Info</a>, <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
@@ -2182,13 +2229,17 @@ the function simply returns -1.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="heap_allocator"><span><a class="doc-id-link" href="#heap_allocator">heap_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/heap.odin#L6"><em>Source</em></a></div></h3>
+<h3 id="heap_allocator"><span><a class="doc-id-link" href="#heap_allocator">heap_allocator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/heap.odin#L9"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">heap_allocator :: <span class="keyword-type">proc</span>() -> runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the default <code>heap_allocator</code> for this specific platform.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="heap_allocator_proc"><span><a class="doc-id-link" href="#heap_allocator_proc">heap_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/heap.odin#L15"><em>Source</em></a></div></h3>
+<h3 id="heap_allocator_proc"><span><a class="doc-id-link" href="#heap_allocator_proc">heap_allocator_proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/heap.odin#L18"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">heap_allocator_proc :: <span class="keyword-type">proc</span>(
 	allocator_data:  <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, 
@@ -2211,7 +2262,7 @@ the function simply returns -1.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="is_dir"><span><a class="doc-id-link" href="#is_dir">is_dir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L482"><em>Source</em></a></div></h3>
+<h3 id="is_dir"><span><a class="doc-id-link" href="#is_dir">is_dir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L488"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_dir :: <a class="code-procedure" href="/core/os/os2/#is_directory">is_directory</a></pre>
 </div>
@@ -2221,7 +2272,7 @@ the function simply returns -1.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="is_directory"><span><a class="doc-id-link" href="#is_directory">is_directory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L482"><em>Source</em></a></div></h3>
+<h3 id="is_directory"><span><a class="doc-id-link" href="#is_directory">is_directory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L488"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_directory :: <span class="keyword-type">proc</span>(path: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -2231,7 +2282,7 @@ the function simply returns -1.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="is_file"><span><a class="doc-id-link" href="#is_file">is_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L467"><em>Source</em></a></div></h3>
+<h3 id="is_file"><span><a class="doc-id-link" href="#is_file">is_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L473"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_file :: <span class="keyword-type">proc</span>(path: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
@@ -2252,10 +2303,14 @@ file hierarchies on the current system.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="is_platform_error"><span><a class="doc-id-link" href="#is_platform_error">is_platform_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L50"><em>Source</em></a></div></h3>
+<h3 id="is_platform_error"><span><a class="doc-id-link" href="#is_platform_error">is_platform_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L59"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_platform_error :: <span class="keyword-type">proc</span>(ferr: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) -> (err: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Attempts to convert an <code>Error</code> into a platform specific error as an integer. <code>ok</code> is false if not possible</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="join_filename"><span><a class="doc-id-link" href="#join_filename">join_filename<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/path.odin#L390"><em>Source</em></a></div></h3>
@@ -2282,19 +2337,29 @@ file hierarchies on the current system.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="last_write_time"><span><a class="doc-id-link" href="#last_write_time">last_write_time<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L75"><em>Source</em></a></div></h3>
+<h3 id="last_write_time"><span><a class="doc-id-link" href="#last_write_time">last_write_time<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L95"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">last_write_time :: <a class="code-procedure" href="/core/os/os2/#modification_time">modification_time</a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the modification time of the file <code>f</code>.
+The resolution of the timestamp is system-dependent.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="last_write_time_by_name"><span><a class="doc-id-link" href="#last_write_time_by_name">last_write_time_by_name<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L82"><em>Source</em></a></div></h3>
+<h3 id="last_write_time_by_name"><span><a class="doc-id-link" href="#last_write_time_by_name">last_write_time_by_name<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L106"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">last_write_time_by_name :: <a class="code-procedure" href="/core/os/os2/#modification_time_by_path">modification_time_by_path</a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the modification time of the named file <code>path</code>.
+The resolution of the timestamp is system-dependent.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="lchown"><span><a class="doc-id-link" href="#lchown">lchown<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L433"><em>Source</em></a></div></h3>
+<h3 id="lchown"><span><a class="doc-id-link" href="#lchown">lchown<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L439"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">lchown :: <a class="code-procedure" href="/core/os/os2/#change_owner_do_not_follow_links">change_owner_do_not_follow_links</a></pre>
 </div>
@@ -2357,10 +2422,17 @@ due to the necessary utf-8 &lt;&gt; utf-16 conversion.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="lstat"><span><a class="doc-id-link" href="#lstat">lstat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L60"><em>Source</em></a></div></h3>
+<h3 id="lstat"><span><a class="doc-id-link" href="#lstat">lstat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L73"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">lstat :: <a class="code-procedure" href="/core/os/os2/#stat_do_not_follow_links">stat_do_not_follow_links</a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns a <code>File_Info</code> describing the named file from the file system.
+If the file is a symbolic link, the <code>File_Info</code> returns describes the symbolic link,
+rather than following the link.
+The resulting <code>File_Info</code> must be deleted with <code>file_info_delete</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="make_directory"><span><a class="doc-id-link" href="#make_directory">make_directory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/path.odin#L29"><em>Source</em></a></div></h3>
@@ -2433,16 +2505,26 @@ If <code>dir</code> is an empty tring, <code>temp_directory()</code> will be use
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="modification_time"><span><a class="doc-id-link" href="#modification_time">modification_time<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L75"><em>Source</em></a></div></h3>
+<h3 id="modification_time"><span><a class="doc-id-link" href="#modification_time">modification_time<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L95"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">modification_time :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>) -> (time.<a class="code-typename" href="/core/time/#Time">Time</a>, <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the modification time of the file <code>f</code>.
+The resolution of the timestamp is system-dependent.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="modification_time_by_path"><span><a class="doc-id-link" href="#modification_time_by_path">modification_time_by_path<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L82"><em>Source</em></a></div></h3>
+<h3 id="modification_time_by_path"><span><a class="doc-id-link" href="#modification_time_by_path">modification_time_by_path<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L106"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">modification_time_by_path :: <span class="keyword-type">proc</span>(path: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> (time.<a class="code-typename" href="/core/time/#Time">Time</a>, <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the modification time of the named file <code>path</code>.
+The resolution of the timestamp is system-dependent.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="name"><span><a class="doc-id-link" href="#name">name<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L209"><em>Source</em></a></div></h3>
@@ -2539,10 +2621,14 @@ can be returned by this procedure. Handle these errors accordingly.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="print_error"><span><a class="doc-id-link" href="#print_error">print_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L115"><em>Source</em></a></div></h3>
+<h3 id="print_error"><span><a class="doc-id-link" href="#print_error">print_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L128"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">print_error :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, ferr: <a class="code-typename" href="/core/os/os2/#Error">Error</a>, msg: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>print_error</code> is a utility procedure which will print an error <code>ferr</code> to a specified file <code>f</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="process_close"><span><a class="doc-id-link" href="#process_close">process_close<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/process.odin#L515"><em>Source</em></a></div></h3>
@@ -2722,16 +2808,24 @@ At the end of a file, it returns <code>0, io.EOF</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_all_directory"><span><a class="doc-id-link" href="#read_all_directory">read_all_directory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L51"><em>Source</em></a></div></h3>
+<h3 id="read_all_directory"><span><a class="doc-id-link" href="#read_all_directory">read_all_directory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L58"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_all_directory :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (fi: []<a class="code-typename" href="/core/os/os2/#File_Info">File_Info</a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reads the file <code>f</code> (assuming it is a directory) and returns all of the unsorted directory entries.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_all_directory_by_path"><span><a class="doc-id-link" href="#read_all_directory_by_path">read_all_directory_by_path<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L63"><em>Source</em></a></div></h3>
+<h3 id="read_all_directory_by_path"><span><a class="doc-id-link" href="#read_all_directory_by_path">read_all_directory_by_path<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L77"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_all_directory_by_path :: <span class="keyword-type">proc</span>(path: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (fi: []<a class="code-typename" href="/core/os/os2/#File_Info">File_Info</a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reads the named directory by path (assuming it is a directory) and returns all of the unsorted directory entries.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="read_at"><span><a class="doc-id-link" href="#read_at">read_at<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L261"><em>Source</em></a></div></h3>
@@ -2747,31 +2841,52 @@ At the end of a file, the error is <code>io.EOF</code>.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_at_least"><span><a class="doc-id-link" href="#read_at_least">read_at_least<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L76"><em>Source</em></a></div></h3>
+<h3 id="read_at_least"><span><a class="doc-id-link" href="#read_at_least">read_at_least<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L120"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_at_least :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, min: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>read_at_least</code> reads from <code>f</code> into <code>buf</code> until it has read at least <code>min</code> bytes.
+It returns the number of bytes copied and an error if fewer bytes were read.
+The error is only an <code>io.EOF</code> if no bytes were read.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_dir"><span><a class="doc-id-link" href="#read_dir">read_dir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L10"><em>Source</em></a></div></h3>
+<h3 id="read_dir"><span><a class="doc-id-link" href="#read_dir">read_dir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L14"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_dir :: <a class="code-procedure" href="/core/os/os2/#read_directory">read_directory</a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reads the file <code>f</code> (assuming it is a directory) and returns the unsorted directory entries.
+This returns up to <code>n</code> entries OR all of them if <code>n &lt;= 0</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_directory"><span><a class="doc-id-link" href="#read_directory">read_directory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L10"><em>Source</em></a></div></h3>
+<h3 id="read_directory"><span><a class="doc-id-link" href="#read_directory">read_directory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L14"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_directory :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (files: []<a class="code-typename" href="/core/os/os2/#File_Info">File_Info</a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reads the file <code>f</code> (assuming it is a directory) and returns the unsorted directory entries.
+This returns up to <code>n</code> entries OR all of them if <code>n &lt;= 0</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_directory_by_path"><span><a class="doc-id-link" href="#read_directory_by_path">read_directory_by_path<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L56"><em>Source</em></a></div></h3>
+<h3 id="read_directory_by_path"><span><a class="doc-id-link" href="#read_directory_by_path">read_directory_by_path<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L67"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_directory_by_path :: <span class="keyword-type">proc</span>(path: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (fi: []<a class="code-typename" href="/core/os/os2/#File_Info">File_Info</a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Reads the named directory by path (assuming it is a directory) and returns the unsorted directory entries.
+This returns up to <code>n</code> entries OR all of them if <code>n &lt;= 0</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_directory_iterator"><span><a class="doc-id-link" href="#read_directory_iterator">read_directory_iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L185"><em>Source</em></a></div></h3>
+<h3 id="read_directory_iterator"><span><a class="doc-id-link" href="#read_directory_iterator">read_directory_iterator<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L199"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_directory_iterator :: <span class="keyword-type">proc</span>(it: ^<a class="code-typename" href="/core/os/os2/#Read_Directory_Iterator">Read_Directory_Iterator</a>) -> (fi: <a class="code-typename" href="/core/os/os2/#File_Info">File_Info</a>, index: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -2823,7 +2938,7 @@ main :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_directory_iterator_create"><span><a class="doc-id-link" href="#read_directory_iterator_create">read_directory_iterator_create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L84"><em>Source</em></a></div></h3>
+<h3 id="read_directory_iterator_create"><span><a class="doc-id-link" href="#read_directory_iterator_create">read_directory_iterator_create<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L98"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_directory_iterator_create :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>) -> (it: <a class="code-typename" href="/core/os/os2/#Read_Directory_Iterator">Read_Directory_Iterator</a>) {…}</pre>
 </div>
@@ -2834,7 +2949,7 @@ main :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_directory_iterator_destroy"><span><a class="doc-id-link" href="#read_directory_iterator_destroy">read_directory_iterator_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L110"><em>Source</em></a></div></h3>
+<h3 id="read_directory_iterator_destroy"><span><a class="doc-id-link" href="#read_directory_iterator_destroy">read_directory_iterator_destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L124"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_directory_iterator_destroy :: <span class="keyword-type">proc</span>(it: ^<a class="code-typename" href="/core/os/os2/#Read_Directory_Iterator">Read_Directory_Iterator</a>) {…}</pre>
 </div>
@@ -2844,7 +2959,7 @@ main :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_directory_iterator_error"><span><a class="doc-id-link" href="#read_directory_iterator_error">read_directory_iterator_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L124"><em>Source</em></a></div></h3>
+<h3 id="read_directory_iterator_error"><span><a class="doc-id-link" href="#read_directory_iterator_error">read_directory_iterator_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L138"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_directory_iterator_error :: <span class="keyword-type">proc</span>(it: ^<a class="code-typename" href="/core/os/os2/#Read_Directory_Iterator">Read_Directory_Iterator</a>) -> (path: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
@@ -2854,7 +2969,7 @@ main :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_directory_iterator_init"><span><a class="doc-id-link" href="#read_directory_iterator_init">read_directory_iterator_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L96"><em>Source</em></a></div></h3>
+<h3 id="read_directory_iterator_init"><span><a class="doc-id-link" href="#read_directory_iterator_init">read_directory_iterator_init<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/dir.odin#L110"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_directory_iterator_init :: <span class="keyword-type">proc</span>(it: ^<a class="code-typename" href="/core/os/os2/#Read_Directory_Iterator">Read_Directory_Iterator</a>, f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>) {…}</pre>
 </div>
@@ -2866,24 +2981,15 @@ main :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_entire_file_from_file"><span><a class="doc-id-link" href="#read_entire_file_from_file">read_entire_file_from_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L117"><em>Source</em></a></div></h3>
+<h3 id="read_entire_file_from_file"><span><a class="doc-id-link" href="#read_entire_file_from_file">read_entire_file_from_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L169"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_entire_file_from_file :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
 <details class="odin-doc-toggle" open>
-<summary class="hideme">
-<h5 style="display:inline-block">Related Procedure Groups</h5>
-</summary>
-<ul>
-<li><a href="/core/os/os2/#read_entire_file">read_entire_file</a></li>
-</ul>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>read_entire_file_from_file</code> reads the entire file <code>f</code> into memory allocated with <code>allocator</code>.
+A slice of bytes and an error is returned, if any error is encountered.</p>
 </details>
-</div>
-<div class="pkg-entity">
-<h3 id="read_entire_file_from_path"><span><a class="doc-id-link" href="#read_entire_file_from_path">read_entire_file_from_path<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L110"><em>Source</em></a></div></h3>
-<div>
-<pre class="doc-code">read_entire_file_from_path :: <span class="keyword-type">proc</span>(name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
-</div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme">
 <h5 style="display:inline-block">Related Procedure Groups</h5>
@@ -2894,10 +3000,36 @@ main :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_full"><span><a class="doc-id-link" href="#read_full">read_full<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L91"><em>Source</em></a></div></h3>
+<h3 id="read_entire_file_from_path"><span><a class="doc-id-link" href="#read_entire_file_from_path">read_entire_file_from_path<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L158"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">read_entire_file_from_path :: <span class="keyword-type">proc</span>(name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>, loc := <a href="/base/runtime/#Source_Code_Location">#caller_location</a>) -> (data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>read_entire_file_from_path</code> reads the entire named file <code>name</code> into memory allocated with <code>allocator</code>.
+A slice of bytes and an error is returned, if any error is encountered.</p>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedure Groups</h5>
+</summary>
+<ul>
+<li><a href="/core/os/os2/#read_entire_file">read_entire_file</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="read_full"><span><a class="doc-id-link" href="#read_full">read_full<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L142"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_full :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>read_full</code> reads exactly <code>len(buf)</code> bytes from <code>f</code> into <code>buf</code>.
+It returns the number of bytes copied and an error if fewer bytes were read.
+The error is only an <code>io.EOF</code> if no bytes were read.</p>
+<p>It is equivalent to <code>read_at_least(f, buf, len(buf))</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="read_link"><span><a class="doc-id-link" href="#read_link">read_link<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L360"><em>Source</em></a></div></h3>
@@ -2910,10 +3042,15 @@ main :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_ptr"><span><a class="doc-id-link" href="#read_ptr">read_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L99"><em>Source</em></a></div></h3>
+<h3 id="read_ptr"><span><a class="doc-id-link" href="#read_ptr">read_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L109"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_ptr :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>read_ptr</code> is a utility procedure that reads the bytes points at <code>data</code> with length <code>len</code>.</p>
+<p>It is equivalent to: <code>read(f, ([^]byte)(data)[:len])</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="remove"><span><a class="doc-id-link" href="#remove">remove<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L332"><em>Source</em></a></div></h3>
@@ -2957,10 +3094,14 @@ main :: proc() {
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="same_file"><span><a class="doc-id-link" href="#same_file">same_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L66"><em>Source</em></a></div></h3>
+<h3 id="same_file"><span><a class="doc-id-link" href="#same_file">same_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L82"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">same_file :: <span class="keyword-type">proc</span>(fi1, fi2: <a class="code-typename" href="/core/os/os2/#File_Info">File_Info</a>) -> <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns true if two <code>File_Info</code>s are equivalent.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="seek"><span><a class="doc-id-link" href="#seek">seek<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L236"><em>Source</em></a></div></h3>
@@ -3065,16 +3206,28 @@ this procedure can split into separate entries.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="stat"><span><a class="doc-id-link" href="#stat">stat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L53"><em>Source</em></a></div></h3>
+<h3 id="stat"><span><a class="doc-id-link" href="#stat">stat<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L60"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stat :: <span class="keyword-type">proc</span>(name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (<a class="code-typename" href="/core/os/os2/#File_Info">File_Info</a>, <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>stat</code> returns a <code>File_Info</code> describing the named file from the file system.
+The resulting <code>File_Info</code> must be deleted with <code>file_info_delete</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="stat_do_not_follow_links"><span><a class="doc-id-link" href="#stat_do_not_follow_links">stat_do_not_follow_links<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L60"><em>Source</em></a></div></h3>
+<h3 id="stat_do_not_follow_links"><span><a class="doc-id-link" href="#stat_do_not_follow_links">stat_do_not_follow_links<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/stat.odin#L73"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">stat_do_not_follow_links :: <span class="keyword-type">proc</span>(name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (<a class="code-typename" href="/core/os/os2/#File_Info">File_Info</a>, <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns a <code>File_Info</code> describing the named file from the file system.
+If the file is a symbolic link, the <code>File_Info</code> returns describes the symbolic link,
+rather than following the link.
+The resulting <code>File_Info</code> must be deleted with <code>file_info_delete</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="symlink"><span><a class="doc-id-link" href="#symlink">symlink<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L353"><em>Source</em></a></div></h3>
@@ -3098,34 +3251,70 @@ This usually means flushing the file system's in-memory copy to disk.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="temp_dir"><span><a class="doc-id-link" href="#temp_dir">temp_dir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/temp_file.odin#L84"><em>Source</em></a></div></h3>
+<h3 id="temp_dir"><span><a class="doc-id-link" href="#temp_dir">temp_dir<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/temp_file.odin#L97"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">temp_dir :: <a class="code-procedure" href="/core/os/os2/#temp_directory">temp_directory</a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the default directory to use for temporary files.</p>
+<p>On Unix systems, it typically returns $TMPDIR if non-empty, otherwlse <code>/tmp</code>.
+On Windows, it uses <code>GetTempPathW</code>, returning the first non-empty value from one of the following:
+    * <code>%TMP%</code>
+    * <code>%TEMP%</code>
+    * <code>%USERPROFILE %</code>
+    * or the Windows directory
+  See https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-gettemppathw for more information.
+On wasi, it returns <code>/tmp</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="temp_directory"><span><a class="doc-id-link" href="#temp_directory">temp_directory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/temp_file.odin#L84"><em>Source</em></a></div></h3>
+<h3 id="temp_directory"><span><a class="doc-id-link" href="#temp_directory">temp_directory<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/temp_file.odin#L97"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">temp_directory :: <span class="keyword-type">proc</span>(allocator: runtime.<a class="code-typename" href="/base/runtime/#Allocator">Allocator</a>) -> (<a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Returns the default directory to use for temporary files.</p>
+<p>On Unix systems, it typically returns $TMPDIR if non-empty, otherwlse <code>/tmp</code>.
+On Windows, it uses <code>GetTempPathW</code>, returning the first non-empty value from one of the following:
+    * <code>%TMP%</code>
+    * <code>%TEMP%</code>
+    * <code>%USERPROFILE %</code>
+    * or the Windows directory
+  See https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-gettemppathw for more information.
+On wasi, it returns <code>/tmp</code>.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="to_reader"><span><a class="doc-id-link" href="#to_reader">to_reader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_stream.odin#L5"><em>Source</em></a></div></h3>
+<h3 id="to_reader"><span><a class="doc-id-link" href="#to_reader">to_reader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_stream.odin#L6"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">to_reader :: <a class="code-procedure" href="/core/os/os2/#to_stream">to_stream</a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Converts a file <code>f</code> into an <code>io.Stream</code></p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="to_stream"><span><a class="doc-id-link" href="#to_stream">to_stream<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_stream.odin#L5"><em>Source</em></a></div></h3>
+<h3 id="to_stream"><span><a class="doc-id-link" href="#to_stream">to_stream<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_stream.odin#L6"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">to_stream :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>) -> (s: io.<a class="code-typename" href="/core/io/#Stream">Stream</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Converts a file <code>f</code> into an <code>io.Stream</code></p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="to_writer"><span><a class="doc-id-link" href="#to_writer">to_writer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_stream.odin#L5"><em>Source</em></a></div></h3>
+<h3 id="to_writer"><span><a class="doc-id-link" href="#to_writer">to_writer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_stream.odin#L6"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">to_writer :: <a class="code-procedure" href="/core/os/os2/#to_stream">to_stream</a></pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p>Converts a file <code>f</code> into an <code>io.Stream</code></p>
+</details>
 </div>
 <div class="pkg-entity">
 <h3 id="truncate"><span><a class="doc-id-link" href="#truncate">truncate<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file.odin#L325"><em>Source</em></a></div></h3>
@@ -3502,46 +3691,110 @@ It returns the number of bytes written to and an error, if any is encountered.
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="write_byte"><span><a class="doc-id-link" href="#write_byte">write_byte<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L23"><em>Source</em></a></div></h3>
+<h3 id="write_byte"><span><a class="doc-id-link" href="#write_byte">write_byte<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L34"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write_byte :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, b: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>write_byte</code> writes a byte <code>b</code> to file <code>f</code>.
+Returns the number of bytes written and an error, if any is encountered.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="write_encoded_rune"><span><a class="doc-id-link" href="#write_encoded_rune">write_encoded_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L37"><em>Source</em></a></div></h3>
+<h3 id="write_encoded_rune"><span><a class="doc-id-link" href="#write_encoded_rune">write_encoded_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L56"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write_encoded_rune :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, r: untyped rune) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>write_encoded_rune</code> writes a rune <code>r</code> as an UTF-8 encoded string which with escaped control codes to file <code>f</code>.
+Returns the number of bytes written and an error, if any is encountered.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="write_entire_file"><span><a class="doc-id-link" href="#write_entire_file">write_entire_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L164"><em>Source</em></a></div></h3>
+<h3 id="write_entire_file_from_bytes"><span><a class="doc-id-link" href="#write_entire_file_from_bytes">write_entire_file_from_bytes<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L231"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">write_entire_file :: <span class="keyword-type">proc</span>(name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, perm: <a class="code-typename" href="/core/os/os2/#Permissions">Permissions</a> = Permissions_Read_All + {.Write_User}, truncate: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> <a class="code-typename" href="/core/os/os2/#Error">Error</a> {…}</pre>
+<pre class="doc-code">write_entire_file_from_bytes :: <span class="keyword-type">proc</span>(name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, data: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, perm: <a class="code-typename" href="/core/os/os2/#Permissions">Permissions</a> = Permissions_Read_All + {.Write_User}, truncate: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> <a class="code-typename" href="/core/os/os2/#Error">Error</a> {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>write_entire_file_from_bytes</code> writes the contents of <code>data</code> into named file <code>name</code>.
+It defaults with the permssions <code>perm := Permissions_Read_All + {.Write_User}</code>, and <code>truncate</code>s by default.
+An error is returned if any is encountered.</p>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedure Groups</h5>
+</summary>
+<ul>
+<li><a href="/core/os/os2/#write_entire_file">write_entire_file</a></li>
+</ul>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="write_ptr"><span><a class="doc-id-link" href="#write_ptr">write_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L95"><em>Source</em></a></div></h3>
+<h3 id="write_entire_file_from_string"><span><a class="doc-id-link" href="#write_entire_file_from_string">write_entire_file_from_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L252"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">write_entire_file_from_string :: <span class="keyword-type">proc</span>(name: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, data: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, perm: <a class="code-typename" href="/core/os/os2/#Permissions">Permissions</a> = Permissions_Read_All + {.Write_User}, truncate: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a> = true) -> <a class="code-typename" href="/core/os/os2/#Error">Error</a> {…}</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>write_entire_file_from_string</code> writes the contents of <code>data</code> into named file <code>name</code>.
+It defaults with the permssions <code>perm := Permissions_Read_All + {.Write_User}</code>, and <code>truncate</code>s by default.
+An error is returned if any is encountered.</p>
+</details>
+<details class="odin-doc-toggle" open>
+<summary class="hideme">
+<h5 style="display:inline-block">Related Procedure Groups</h5>
+</summary>
+<ul>
+<li><a href="/core/os/os2/#write_entire_file">write_entire_file</a></li>
+</ul>
+</details>
+</div>
+<div class="pkg-entity">
+<h3 id="write_ptr"><span><a class="doc-id-link" href="#write_ptr">write_ptr<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L100"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write_ptr :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, len: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>write_ptr</code> is a utility procedure that writes the bytes points at <code>data</code> with length <code>len</code>.</p>
+<p>It is equivalent to: <code>write(f, ([^]byte)(data)[:len])</code></p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="write_rune"><span><a class="doc-id-link" href="#write_rune">write_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L27"><em>Source</em></a></div></h3>
+<h3 id="write_rune"><span><a class="doc-id-link" href="#write_rune">write_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L42"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write_rune :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, r: untyped rune) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>write_rune</code> writes a rune <code>r</code> as an UTF-8 encoded string to file <code>f</code>.
+Returns the number of bytes written and an error, if any is encountered.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="write_string"><span><a class="doc-id-link" href="#write_string">write_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L7"><em>Source</em></a></div></h3>
+<h3 id="write_string"><span><a class="doc-id-link" href="#write_string">write_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L11"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write_string :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, s: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>write_string</code> writes a string <code>s</code> to file <code>f</code>.
+Returns the number of bytes written and an error, if any is encountered.</p>
+</details>
 </div>
 <div class="pkg-entity">
-<h3 id="write_strings"><span><a class="doc-id-link" href="#write_strings">write_strings<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L11"><em>Source</em></a></div></h3>
+<h3 id="write_strings"><span><a class="doc-id-link" href="#write_strings">write_strings<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L19"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write_strings :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, <span class="keyword-type">..</span> strings: ..<a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) {…}</pre>
 </div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>write_strings</code> writes a variadic list of strings <code>strings</code> to file <code>f</code>.
+Returns the number of bytes written and an error, if any is encountered.</p>
+</details>
 </div>
 <h2 id="pkg-Procedure Groups" class="pkg-header">Procedure Groups</h2>
 <div class="pkg-entity">
@@ -3589,7 +3842,7 @@ It returns the number of bytes written to and an error, if any is encountered.
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_entire_file"><span><a class="doc-id-link" href="#read_entire_file">read_entire_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L104"><em>Source</em></a></div></h3>
+<h3 id="read_entire_file"><span><a class="doc-id-link" href="#read_entire_file">read_entire_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L148"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_entire_file :: <span class="keyword-type">proc</span>{
 	<a class="code-procedure" href="/core/os/os2/#read_entire_file_from_path">read_entire_file_from_path</a>,
@@ -3629,6 +3882,22 @@ It returns the number of bytes written to and an error, if any is encountered.
 <p>For an example on how to use the walker, see <code>walker_walk</code>.</p>
 </details>
 </div>
+<div class="pkg-entity">
+<h3 id="write_entire_file"><span><a class="doc-id-link" href="#write_entire_file">write_entire_file<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/file_util.odin#L220"><em>Source</em></a></div></h3>
+<div>
+<pre class="doc-code">write_entire_file :: <span class="keyword-type">proc</span>{
+	<a class="code-procedure" href="/core/os/os2/#write_entire_file_from_bytes">write_entire_file_from_bytes</a>,
+	<a class="code-procedure" href="/core/os/os2/#write_entire_file_from_string">write_entire_file_from_string</a>,
+}
+</pre>
+</div>
+<details class="odin-doc-toggle" open>
+<summary class="hideme"><span>&nbsp;</span></summary>
+<p><code>write_entire_file</code> writes the contents of <code>data</code> into named file <code>name</code>.
+It defaults with the permssions <code>perm := Permissions_Read_All + {.Write_User}</code>, and <code>truncate</code>s by default.
+An error is returned if any is encountered.</p>
+</details>
+</div>
 </section>
 <h2 id="pkg-source-files">Source Files</h2>
 <ul>
@@ -3652,7 +3921,7 @@ It returns the number of bytes written to and an error, if any is encountered.
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-31 15:24:55.740943400 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-10 (vendor "odin") Windows_amd64 @ 2025-10-31 16:04:46.824873000 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
@@ -3877,7 +4146,8 @@ It returns the number of bytes written to and an error, if any is encountered.
 <li><a href="#write_at">write_at</a></li>
 <li><a href="#write_byte">write_byte</a></li>
 <li><a href="#write_encoded_rune">write_encoded_rune</a></li>
-<li><a href="#write_entire_file">write_entire_file</a></li>
+<li><a href="#write_entire_file_from_bytes">write_entire_file_from_bytes</a></li>
+<li><a href="#write_entire_file_from_string">write_entire_file_from_string</a></li>
 <li><a href="#write_ptr">write_ptr</a></li>
 <li><a href="#write_rune">write_rune</a></li>
 <li><a href="#write_string">write_string</a></li>
@@ -3892,6 +4162,7 @@ It returns the number of bytes written to and an error, if any is encountered.
 <li><a href="#read_entire_file">read_entire_file</a></li>
 <li><a href="#walker_create">walker_create</a></li>
 <li><a href="#walker_init">walker_init</a></li>
+<li><a href="#write_entire_file">write_entire_file</a></li>
 </ul>
 </li>
 <li><a href="#pkg-source-files">Source Files</a></ul>
