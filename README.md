@@ -101,7 +101,7 @@ Here is an example config file with comments, you should remove any comments so 
 			// You can also use $ODIN_ROOT which is replaced by the directory that contains the Odin core and vendor collections.
 			"root_path": "$ODIN_ROOTfoo",
 			"license": {
-				"text": "BSD-3-Clause",
+				"text": "zlib",
 				"url": "https://github.com/odin-lang/Odin/tree/master/LICENSE"
 			},
 			// Configuration for the home page.

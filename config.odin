@@ -82,7 +82,7 @@ collection_validate :: proc(c: ^Collection) -> Maybe(Collection_Error) {
 		return "collection requires the key \"base_url\" to be set to the relative URL to your collection, example: \"/core\""
 	}
 	if c.license.text == "" {
-		return "collection requires the key \"license.text\" to be set to the name of the license of your collection, example: \"BSD-3-Clause\""
+		return "collection requires the key \"license.text\" to be set to the name of the license of your collection, example: \"zlib\""
 	}
 	if c.license.url == "" {
 		return "collection requires the key \"license.url\" to be set to a URL that points to the license of your collection, example: \"https://github.com/odin-lang/Odin/tree/master/LICENSE\""
