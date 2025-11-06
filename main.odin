@@ -1659,22 +1659,23 @@ write_markup_text :: proc(w: io.Writer, s_: string, code_inline := false) {
 
 					io.write_string(w, s[latest_index:index])
 
-					_, host, _, _, _ := net.split_url(url, context.temp_allocator)
+					// Case-normalize URI per RFC 3986 §6.2.2.1
+					scheme, host, path, queries, fragment := net.split_url(url, context.temp_allocator)
+					scheme = strings.to_lower(scheme, context.temp_allocator)
 					host  = strings.to_lower(host, context.temp_allocator)
-					url_ := strings.to_lower(url,  context.temp_allocator)
+					url = net.join_url(scheme, host, path, queries, fragment, context.temp_allocator)
 
 					if strings.has_suffix(host, cfg.domain) {
 						// Same domain as cfg.domain
-						fmt.wprintf(w, `<a href="%s">`, url_)
+						fmt.wprintf(w, `<a href="%s">`, url)
 					} else {
 						// External domain, open in new tab.
-						fmt.wprintf(w, `<a href="%s" target="_blank">`, url_)
+						fmt.wprintf(w, `<a href="%s" target="_blank">`, url)
 					}
 					io.write_string(w, text)
 					io.write_string(w, "</a>")
 					latest_index = end_bracket + 1
 					index = latest_index
-
 				}
 			}
 		case '*':
