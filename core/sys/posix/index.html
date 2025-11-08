@@ -3495,6 +3495,9 @@ Procedure Groups (1)</summary>
 <h3 id="Sem_Cmd"><span><a class="doc-id-link" href="#Sem_Cmd">Sem_Cmd<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L41"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Sem_Cmd :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
+	RMID    = 0, 
+	SET     = 1, 
+	STAT    = 2, 
 	<span class="comment">// Returns the value of semncnt.</span>
 	GETNCNT = 3, 
 	<span class="comment">// Returns the value of sempid.</span>
@@ -5475,7 +5478,7 @@ Procedure Groups (1)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="sembuf"><span><a class="doc-id-link" href="#sembuf">sembuf<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L121"><em>Source</em></a></div></h3>
+<h3 id="sembuf"><span><a class="doc-id-link" href="#sembuf">sembuf<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L124"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">sembuf :: <span class="keyword-type">struct</span> {
 	sem_num: <a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
@@ -5495,7 +5498,7 @@ Procedure Groups (1)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="semid_ds"><span><a class="doc-id-link" href="#semid_ds">semid_ds<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L83"><em>Source</em></a></div></h3>
+<h3 id="semid_ds"><span><a class="doc-id-link" href="#semid_ds">semid_ds<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L86"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">semid_ds :: <span class="keyword-type">struct</span> {
 	sem_perm:  <a class="code-typename" href="/core/sys/posix/#ipc_perm">ipc_perm</a>,
@@ -5515,7 +5518,7 @@ Procedure Groups (1)</summary>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="semun"><span><a class="doc-id-link" href="#semun">semun<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L58"><em>Source</em></a></div></h3>
+<h3 id="semun"><span><a class="doc-id-link" href="#semun">semun<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L61"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">semun :: <span class="keyword-type">struct</span> <span class="directive">#raw_union</span> {
 	val:   <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>,
@@ -5523,14 +5526,6 @@ Procedure Groups (1)</summary>
 	array: [^]<a href="/base/builtin#u16"><span class="doc-builtin">u16</span></a>,
 }</pre>
 </div>
-<details class="odin-doc-toggle" open>
-<summary class="hideme">
-<h5 style="display:inline-block">Related Procedures With Parameters</h5>
-</summary>
-<ul>
-<li><a href="/core/sys/posix/#semctl">semctl</a></li>
-</ul>
-</details>
 </div>
 <div class="pkg-entity">
 <h3 id="servent"><span><a class="doc-id-link" href="#servent">servent<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/netdb.odin#L345"><em>Source</em></a></div></h3>
@@ -7713,31 +7708,31 @@ AIO_PRIO_DELTA_MAX         :: sysconf(._AIO_PRIO_DELTA_MAX)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GETALL"><span><a class="doc-id-link" href="#GETALL">GETALL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L77"><em>Source</em></a></div></h3>
+<h3 id="GETALL"><span><a class="doc-id-link" href="#GETALL">GETALL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L80"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GETALL: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 6</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GETNCNT"><span><a class="doc-id-link" href="#GETNCNT">GETNCNT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L74"><em>Source</em></a></div></h3>
+<h3 id="GETNCNT"><span><a class="doc-id-link" href="#GETNCNT">GETNCNT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L77"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GETNCNT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 3</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GETPID"><span><a class="doc-id-link" href="#GETPID">GETPID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L75"><em>Source</em></a></div></h3>
+<h3 id="GETPID"><span><a class="doc-id-link" href="#GETPID">GETPID<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L78"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GETPID: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 4</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GETVAL"><span><a class="doc-id-link" href="#GETVAL">GETVAL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L76"><em>Source</em></a></div></h3>
+<h3 id="GETVAL"><span><a class="doc-id-link" href="#GETVAL">GETVAL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L79"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GETVAL: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 5</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="GETZCNT"><span><a class="doc-id-link" href="#GETZCNT">GETZCNT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L78"><em>Source</em></a></div></h3>
+<h3 id="GETZCNT"><span><a class="doc-id-link" href="#GETZCNT">GETZCNT<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L81"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">GETZCNT: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 7</pre>
 </div>
@@ -9216,19 +9211,19 @@ MQ_PRIO_MAX                :: sysconf(._MQ_PRIO_MAX)</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SEM_UNDO"><span><a class="doc-id-link" href="#SEM_UNDO">SEM_UNDO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L72"><em>Source</em></a></div></h3>
+<h3 id="SEM_UNDO"><span><a class="doc-id-link" href="#SEM_UNDO">SEM_UNDO<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L75"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SEM_UNDO: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 0o10000</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SETALL"><span><a class="doc-id-link" href="#SETALL">SETALL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L80"><em>Source</em></a></div></h3>
+<h3 id="SETALL"><span><a class="doc-id-link" href="#SETALL">SETALL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L83"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SETALL: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 9</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="SETVAL"><span><a class="doc-id-link" href="#SETVAL">SETVAL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L79"><em>Source</em></a></div></h3>
+<h3 id="SETVAL"><span><a class="doc-id-link" href="#SETVAL">SETVAL<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L82"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">SETVAL: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> : 8</pre>
 </div>
@@ -14637,7 +14632,7 @@ does not have a signal mask, and may modify the timeout.</p>
 <div class="pkg-entity">
 <h3 id="semctl"><span><a class="doc-id-link" href="#semctl">semctl<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/sys_sem.odin#L21"><em>Source</em></a></div></h3>
 <div>
-<pre class="doc-code">semctl :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (semid: <a class="code-typename" href="/core/sys/posix/#FD">FD</a>, semnum: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, cmd: <a class="code-typename" href="/core/sys/posix/#Sem_Cmd">Sem_Cmd</a>, arg: ^<a class="code-typename" href="/core/sys/posix/#semun">semun</a> = nil) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
+<pre class="doc-code">semctl :: <span class="keyword-type">proc</span> <span class="string">"c"</span> (semid: <a class="code-typename" href="/core/sys/posix/#FD">FD</a>, semnum: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, cmd: <a class="code-typename" href="/core/sys/posix/#Sem_Cmd">Sem_Cmd</a>, <span class="keyword-type">..</span> args: ..<a class="code-typename" href="/core/sys/posix/#semun">semun</a>) -> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> ---</pre>
 </div>
 <details class="odin-doc-toggle" open>
 <summary class="hideme"><span>&nbsp;</span></summary>
@@ -16059,7 +16054,7 @@ case:
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/sys/posix/wordexp.odin">wordexp.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-11 (vendor "odin") Windows_amd64 @ 2025-11-07 21:12:57.239010500 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-11 (vendor "odin") Windows_amd64 @ 2025-11-08 21:11:05.066446800 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
