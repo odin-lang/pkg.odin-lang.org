@@ -632,7 +632,7 @@ Procedure Groups (8)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Error"><span><a class="doc-id-link" href="#Error">Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L46"><em>Source</em></a></div></h3>
+<h3 id="Error"><span><a class="doc-id-link" href="#Error">Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L38"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Error :: <span class="keyword-type">union</span> {
 	<a class="code-typename" href="/core/os/os2/#General_Error">General_Error</a>, 
@@ -993,15 +993,10 @@ character devices.</p>
 <div>
 <pre class="doc-code">General_Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#u32"><span class="doc-builtin">u32</span></a> {
 	None, 
-	Permission_Denied, 
 	Exist, 
 	Not_Exist, 
-	Closed, 
 	Timeout, 
 	Broken_Pipe, 
-	<span class="comment">// Indicates that an attempt to retrieve a file's size was made, but the</span>
-	<span class="comment">// file doesn't have a size.</span>
-	No_Size, 
 	Invalid_File, 
 	Invalid_Dir, 
 	Invalid_Path, 
@@ -1010,7 +1005,6 @@ character devices.</p>
 	Pattern_Has_Separator, 
 	No_HOME_Variable, 
 	Env_Var_Not_Found, 
-	Unsupported, 
 }</pre>
 </div>
 <details class="odin-doc-toggle" open>
@@ -1075,7 +1069,7 @@ be categorized by <code>io.Error</code> nor <code>runtime.Allocator_Error</code>
 </ul>
 </div>
 <div class="pkg-entity">
-<h3 id="Platform_Error"><span><a class="doc-id-link" href="#Platform_Error">Platform_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L41"><em>Source</em></a></div></h3>
+<h3 id="Platform_Error"><span><a class="doc-id-link" href="#Platform_Error">Platform_Error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L33"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Platform_Error :: sys_windows.<a class="code-typename" href="/core/sys/windows/#System_Error">System_Error</a></pre>
 </div>
@@ -1406,7 +1400,7 @@ field in the <code>Process_Info</code> struct.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="ERROR_NONE"><span><a class="doc-id-link" href="#ERROR_NONE">ERROR_NONE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L54"><em>Source</em></a></div></h3>
+<h3 id="ERROR_NONE"><span><a class="doc-id-link" href="#ERROR_NONE">ERROR_NONE<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L46"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">ERROR_NONE :: Error{}</pre>
 </div>
@@ -1853,7 +1847,7 @@ NOTE: the slice of strings and the strings with be allocated using the supplied 
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="error_string"><span><a class="doc-id-link" href="#error_string">error_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L67"><em>Source</em></a></div></h3>
+<h3 id="error_string"><span><a class="doc-id-link" href="#error_string">error_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L59"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">error_string :: <span class="keyword-type">proc</span>(ferr: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) -> <a href="/base/builtin#string"><span class="doc-builtin">string</span></a> {…}</pre>
 </div>
@@ -2303,7 +2297,7 @@ file hierarchies on the current system.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="is_platform_error"><span><a class="doc-id-link" href="#is_platform_error">is_platform_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L59"><em>Source</em></a></div></h3>
+<h3 id="is_platform_error"><span><a class="doc-id-link" href="#is_platform_error">is_platform_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L51"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">is_platform_error :: <span class="keyword-type">proc</span>(ferr: <a class="code-typename" href="/core/os/os2/#Error">Error</a>) -> (err: <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a>, ok: <a href="/base/builtin#bool"><span class="doc-builtin">bool</span></a>) {…}</pre>
 </div>
@@ -2621,7 +2615,7 @@ can be returned by this procedure. Handle these errors accordingly.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="print_error"><span><a class="doc-id-link" href="#print_error">print_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L128"><em>Source</em></a></div></h3>
+<h3 id="print_error"><span><a class="doc-id-link" href="#print_error">print_error<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/os/os2/errors.odin#L120"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">print_error :: <span class="keyword-type">proc</span>(f: ^<a class="code-typename" href="/core/os/os2/#File">File</a>, ferr: <a class="code-typename" href="/core/os/os2/#Error">Error</a>, msg: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>) {…}</pre>
 </div>
@@ -3921,7 +3915,7 @@ An error is returned if any is encountered.</p>
 <li><em>(hidden platform specific files)</em></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-11 (vendor "odin") Windows_amd64 @ 2025-11-13 21:13:32.220227000 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-11 (vendor "odin") Windows_amd64 @ 2025-11-14 21:13:00.048659000 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">

@@ -494,7 +494,7 @@ Procedure Groups (0)</summary>
 <section class="documentation">
 <h2 id="pkg-Types" class="pkg-header">Types</h2>
 <div class="pkg-entity">
-<h3 id="Closer"><span><a class="doc-id-link" href="#Closer">Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L81"><em>Source</em></a></div></h3>
+<h3 id="Closer"><span><a class="doc-id-link" href="#Closer">Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L95"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Closer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
@@ -582,7 +582,7 @@ Procedure Groups (0)</summary>
 <div>
 <pre class="doc-code">Error :: <span class="keyword-type">enum</span> <a href="/base/builtin#i32"><span class="doc-builtin">i32</span></a> {
 	<span class="comment">// No Error</span>
-	None           = 0, 
+	None              = 0, 
 	<span class="comment">// EOF is the error returned by `read` when no more input is available</span>
 	EOF, 
 	<span class="comment">// Unexpected_EOF means that EOF was encountered in the middle of reading a fixed-sized block of data</span>
@@ -597,8 +597,11 @@ Procedure Groups (0)</summary>
 	<span class="comment">// to `read` have failed to return any data or error.</span>
 	<span class="comment">// This is usually a sign of a broken `io.Reader` implementation</span>
 	No_Progress, 
+	<span class="comment">// Invalid whence argument</span>
 	Invalid_Whence, 
+	<span class="comment">// Invalid offset</span>
 	Invalid_Offset, 
+	<span class="comment">// Invalid "unread" operation</span>
 	Invalid_Unread, 
 	Negative_Read, 
 	Negative_Write, 
@@ -606,8 +609,15 @@ Procedure Groups (0)</summary>
 	Buffer_Full, 
 	<span class="comment">// Unknown means that an error has occurred but cannot be categorized</span>
 	Unknown, 
-	<span class="comment">// Empty is returned when a procedure has not been implemented for an io.Stream</span>
-	Empty          = -1, 
+	<span class="comment">// Indicates that an attempt to retrieve a Stream's size was made, but the</span>
+	<span class="comment">// stream doesn't have a size.</span>
+	No_Size, 
+	Permission_Denied, 
+	<span class="comment">// Stream cannot be used since it has been Closed</span>
+	Closed, 
+	<span class="comment">// Unsupported is returned when a procedure has not been implemented for an io.Stream</span>
+	Unsupported       = -1, 
+	Empty             = -1, 
 }</pre>
 </div>
 <details class="odin-doc-toggle" open>
@@ -667,7 +677,7 @@ Procedure Groups (0)</summary>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Flusher"><span><a class="doc-id-link" href="#Flusher">Flusher<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L82"><em>Source</em></a></div></h3>
+<h3 id="Flusher"><span><a class="doc-id-link" href="#Flusher">Flusher<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L96"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Flusher :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
@@ -810,7 +820,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Read_Closer"><span><a class="doc-id-link" href="#Read_Closer">Read_Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L86"><em>Source</em></a></div></h3>
+<h3 id="Read_Closer"><span><a class="doc-id-link" href="#Read_Closer">Read_Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L100"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Read_Closer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
@@ -894,7 +904,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Read_Write_Closer"><span><a class="doc-id-link" href="#Read_Write_Closer">Read_Write_Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L87"><em>Source</em></a></div></h3>
+<h3 id="Read_Write_Closer"><span><a class="doc-id-link" href="#Read_Write_Closer">Read_Write_Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L101"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Read_Write_Closer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
@@ -978,7 +988,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Read_Write_Seeker"><span><a class="doc-id-link" href="#Read_Write_Seeker">Read_Write_Seeker<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L88"><em>Source</em></a></div></h3>
+<h3 id="Read_Write_Seeker"><span><a class="doc-id-link" href="#Read_Write_Seeker">Read_Write_Seeker<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L102"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Read_Write_Seeker :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
@@ -1062,7 +1072,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Read_Writer"><span><a class="doc-id-link" href="#Read_Writer">Read_Writer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L85"><em>Source</em></a></div></h3>
+<h3 id="Read_Writer"><span><a class="doc-id-link" href="#Read_Writer">Read_Writer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L99"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Read_Writer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
@@ -1146,7 +1156,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Reader"><span><a class="doc-id-link" href="#Reader">Reader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L79"><em>Source</em></a></div></h3>
+<h3 id="Reader"><span><a class="doc-id-link" href="#Reader">Reader<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L93"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Reader :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
@@ -1230,7 +1240,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Reader_At"><span><a class="doc-id-link" href="#Reader_At">Reader_At<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L95"><em>Source</em></a></div></h3>
+<h3 id="Reader_At"><span><a class="doc-id-link" href="#Reader_At">Reader_At<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L109"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Reader_At :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
@@ -1360,7 +1370,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Seeker"><span><a class="doc-id-link" href="#Seeker">Seeker<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L83"><em>Source</em></a></div></h3>
+<h3 id="Seeker"><span><a class="doc-id-link" href="#Seeker">Seeker<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L97"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Seeker :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
@@ -1444,7 +1454,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Stream"><span><a class="doc-id-link" href="#Stream">Stream<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L74"><em>Source</em></a></div></h3>
+<h3 id="Stream"><span><a class="doc-id-link" href="#Stream">Stream<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L88"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Stream :: <span class="keyword-type">struct</span> {
 	procedure: <a class="code-typename" href="/core/io/#Stream_Proc">Stream_Proc</a>,
@@ -1531,7 +1541,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Stream_Mode"><span><a class="doc-id-link" href="#Stream_Mode">Stream_Mode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L57"><em>Source</em></a></div></h3>
+<h3 id="Stream_Mode"><span><a class="doc-id-link" href="#Stream_Mode">Stream_Mode<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L71"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Stream_Mode :: <span class="keyword-type">enum</span> <a href="/base/builtin#int"><span class="doc-builtin">int</span></a> {
 	Close, 
@@ -1548,7 +1558,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="Stream_Mode_Set"><span><a class="doc-id-link" href="#Stream_Mode_Set">Stream_Mode_Set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L70"><em>Source</em></a></div></h3>
+<h3 id="Stream_Mode_Set"><span><a class="doc-id-link" href="#Stream_Mode_Set">Stream_Mode_Set<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L84"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Stream_Mode_Set :: <span class="keyword-type">distinct</span> <span class="keyword-type">bit_set</span>[<a class="code-typename" href="/core/io/#Stream_Mode">Stream_Mode</a>; <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>]</pre>
 </div>
@@ -1570,7 +1580,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Stream_Proc"><span><a class="doc-id-link" href="#Stream_Proc">Stream_Proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L72"><em>Source</em></a></div></h3>
+<h3 id="Stream_Proc"><span><a class="doc-id-link" href="#Stream_Proc">Stream_Proc<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L86"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Stream_Proc :: <span class="keyword-type">proc</span>(stream_data: <a href="/base/builtin#rawptr"><span class="doc-builtin">rawptr</span></a>, mode: <a class="code-typename" href="/core/io/#Stream_Mode">Stream_Mode</a>, p: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, offset: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, whence: <a class="code-typename" href="/core/io/#Seek_From">Seek_From</a>) -> (n: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>)</pre>
 </div>
@@ -1594,7 +1604,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Write_Closer"><span><a class="doc-id-link" href="#Write_Closer">Write_Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L90"><em>Source</em></a></div></h3>
+<h3 id="Write_Closer"><span><a class="doc-id-link" href="#Write_Closer">Write_Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L104"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Write_Closer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
@@ -1678,7 +1688,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Write_Flush_Closer"><span><a class="doc-id-link" href="#Write_Flush_Closer">Write_Flush_Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L93"><em>Source</em></a></div></h3>
+<h3 id="Write_Flush_Closer"><span><a class="doc-id-link" href="#Write_Flush_Closer">Write_Flush_Closer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L107"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Write_Flush_Closer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
@@ -1762,7 +1772,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Write_Flusher"><span><a class="doc-id-link" href="#Write_Flusher">Write_Flusher<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L92"><em>Source</em></a></div></h3>
+<h3 id="Write_Flusher"><span><a class="doc-id-link" href="#Write_Flusher">Write_Flusher<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L106"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Write_Flusher :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
@@ -1846,7 +1856,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Write_Seeker"><span><a class="doc-id-link" href="#Write_Seeker">Write_Seeker<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L91"><em>Source</em></a></div></h3>
+<h3 id="Write_Seeker"><span><a class="doc-id-link" href="#Write_Seeker">Write_Seeker<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L105"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Write_Seeker :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
@@ -1930,7 +1940,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Writer"><span><a class="doc-id-link" href="#Writer">Writer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L80"><em>Source</em></a></div></h3>
+<h3 id="Writer"><span><a class="doc-id-link" href="#Writer">Writer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L94"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Writer :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
@@ -2014,7 +2024,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="Writer_At"><span><a class="doc-id-link" href="#Writer_At">Writer_At<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L96"><em>Source</em></a></div></h3>
+<h3 id="Writer_At"><span><a class="doc-id-link" href="#Writer_At">Writer_At<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L110"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">Writer_At :: <a class="code-typename" href="/core/io/#Stream">Stream</a></pre>
 </div>
@@ -2103,7 +2113,7 @@ read returns EOF when n &lt;= 0 or when the underlying r returns EOF.</p>
 <p class="pkg-empty-section">This section is empty.</p>
 <h2 id="pkg-Procedures" class="pkg-header">Procedures</h2>
 <div class="pkg-entity">
-<h3 id="close"><span><a class="doc-id-link" href="#close">close<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L177"><em>Source</em></a></div></h3>
+<h3 id="close"><span><a class="doc-id-link" href="#close">close<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L191"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">close :: <span class="keyword-type">proc</span>(s: <a class="code-typename" href="/core/io/#Stream">Stream</a>) -> (err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2114,7 +2124,7 @@ Different streams may document their own behaviour.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="copy"><span><a class="doc-id-link" href="#copy">copy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L407"><em>Source</em></a></div></h3>
+<h3 id="copy"><span><a class="doc-id-link" href="#copy">copy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L421"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">copy :: <span class="keyword-type">proc</span>(dst: <a class="code-typename" href="/core/io/#Stream">Stream</a>, src: <a class="code-typename" href="/core/io/#Stream">Stream</a>) -> (written: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2125,7 +2135,7 @@ It returns the number of bytes copied and the first error that occurred whilst c
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="copy_buffer"><span><a class="doc-id-link" href="#copy_buffer">copy_buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L414"><em>Source</em></a></div></h3>
+<h3 id="copy_buffer"><span><a class="doc-id-link" href="#copy_buffer">copy_buffer<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L428"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">copy_buffer :: <span class="keyword-type">proc</span>(dst: <a class="code-typename" href="/core/io/#Stream">Stream</a>, src: <a class="code-typename" href="/core/io/#Stream">Stream</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (written: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2137,7 +2147,7 @@ If buf is <code>nil</code>, it is allocate through <code>intrinsics.alloca</code
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="copy_n"><span><a class="doc-id-link" href="#copy_n">copy_n<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L426"><em>Source</em></a></div></h3>
+<h3 id="copy_n"><span><a class="doc-id-link" href="#copy_n">copy_n<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L440"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">copy_n :: <span class="keyword-type">proc</span>(dst: <a class="code-typename" href="/core/io/#Stream">Stream</a>, src: <a class="code-typename" href="/core/io/#Stream">Stream</a>, n: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>) -> (written: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2149,13 +2159,13 @@ On return, written == n IFF err == nil</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L99"><em>Source</em></a></div></h3>
+<h3 id="destroy"><span><a class="doc-id-link" href="#destroy">destroy<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L113"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">destroy :: <span class="keyword-type">proc</span>(s: <a class="code-typename" href="/core/io/#Stream">Stream</a>) -> (err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="flush"><span><a class="doc-id-link" href="#flush">flush<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L184"><em>Source</em></a></div></h3>
+<h3 id="flush"><span><a class="doc-id-link" href="#flush">flush<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L198"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">flush :: <span class="keyword-type">proc</span>(s: <a class="code-typename" href="/core/io/#Stream">Stream</a>) -> (err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2203,19 +2213,19 @@ On return, written == n IFF err == nil</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="query"><span><a class="doc-id-link" href="#query">query<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L110"><em>Source</em></a></div></h3>
+<h3 id="query"><span><a class="doc-id-link" href="#query">query<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L124"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">query :: <span class="keyword-type">proc</span>(s: <a class="code-typename" href="/core/io/#Stream">Stream</a>) -> (set: <a class="code-typename" href="/core/io/#Stream_Mode_Set">Stream_Mode_Set</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="query_utility"><span><a class="doc-id-link" href="#query_utility">query_utility<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L121"><em>Source</em></a></div></h3>
+<h3 id="query_utility"><span><a class="doc-id-link" href="#query_utility">query_utility<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L135"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">query_utility :: <span class="keyword-type">proc</span> <span class="string">"contextless"</span> (set: <a class="code-typename" href="/core/io/#Stream_Mode_Set">Stream_Mode_Set</a>) -> (n: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="read"><span><a class="doc-id-link" href="#read">read<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L134"><em>Source</em></a></div></h3>
+<h3 id="read"><span><a class="doc-id-link" href="#read">read<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L148"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read :: <span class="keyword-type">proc</span>(s: <a class="code-typename" href="/core/io/#Stream">Stream</a>, p: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, n_read: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2227,7 +2237,7 @@ bytes read along with the error.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_at"><span><a class="doc-id-link" href="#read_at">read_at<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L216"><em>Source</em></a></div></h3>
+<h3 id="read_at"><span><a class="doc-id-link" href="#read_at">read_at<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L230"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_at :: <span class="keyword-type">proc</span>(r: <a class="code-typename" href="/core/io/#Stream">Stream</a>, p: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, offset: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, n_read: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2240,7 +2250,7 @@ It returns the number of bytes read and any error if occurred.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_at_least"><span><a class="doc-id-link" href="#read_at_least">read_at_least<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L368"><em>Source</em></a></div></h3>
+<h3 id="read_at_least"><span><a class="doc-id-link" href="#read_at_least">read_at_least<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L382"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_at_least :: <span class="keyword-type">proc</span>(r: <a class="code-typename" href="/core/io/#Stream">Stream</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, min: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2253,7 +2263,7 @@ fewer than min bytes. If len(buf) is less than min, <code>.Short_Buffer</code> i
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_byte"><span><a class="doc-id-link" href="#read_byte">read_byte<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L264"><em>Source</em></a></div></h3>
+<h3 id="read_byte"><span><a class="doc-id-link" href="#read_byte">read_byte<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L278"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_byte :: <span class="keyword-type">proc</span>(r: <a class="code-typename" href="/core/io/#Stream">Stream</a>, n_read: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> (b: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2263,7 +2273,7 @@ fewer than min bytes. If len(buf) is less than min, <code>.Short_Buffer</code> i
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="read_full"><span><a class="doc-id-link" href="#read_full">read_full<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L359"><em>Source</em></a></div></h3>
+<h3 id="read_full"><span><a class="doc-id-link" href="#read_full">read_full<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L373"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_full :: <span class="keyword-type">proc</span>(r: <a class="code-typename" href="/core/io/#Stream">Stream</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2285,7 +2295,7 @@ fewer than min bytes. If len(buf) is less than min, <code>.Short_Buffer</code> i
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="read_rune"><span><a class="doc-id-link" href="#read_rune">read_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L279"><em>Source</em></a></div></h3>
+<h3 id="read_rune"><span><a class="doc-id-link" href="#read_rune">read_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L293"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">read_rune :: <span class="keyword-type">proc</span>(br: <a class="code-typename" href="/core/io/#Stream">Stream</a>, n_read: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> (ch: untyped rune, size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2307,7 +2317,7 @@ fewer than min bytes. If len(buf) is less than min, <code>.Short_Buffer</code> i
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="seek"><span><a class="doc-id-link" href="#seek">seek<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L166"><em>Source</em></a></div></h3>
+<h3 id="seek"><span><a class="doc-id-link" href="#seek">seek<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L180"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">seek :: <span class="keyword-type">proc</span>(s: <a class="code-typename" href="/core/io/#Stream">Stream</a>, offset: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, whence: <a class="code-typename" href="/core/io/#Seek_From">Seek_From</a>) -> (n: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2321,7 +2331,7 @@ fewer than min bytes. If len(buf) is less than min, <code>.Short_Buffer</code> i
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="size"><span><a class="doc-id-link" href="#size">size<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L192"><em>Source</em></a></div></h3>
+<h3 id="size"><span><a class="doc-id-link" href="#size">size<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L206"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">size :: <span class="keyword-type">proc</span>(s: <a class="code-typename" href="/core/io/#Stream">Stream</a>) -> (n: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2442,7 +2452,7 @@ tee_reader_init must call io.destroy when done with</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="write"><span><a class="doc-id-link" href="#write">write<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L147"><em>Source</em></a></div></h3>
+<h3 id="write"><span><a class="doc-id-link" href="#write">write<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L161"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write :: <span class="keyword-type">proc</span>(s: <a class="code-typename" href="/core/io/#Stream">Stream</a>, p: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, n_written: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2452,7 +2462,7 @@ tee_reader_init must call io.destroy when done with</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="write_at"><span><a class="doc-id-link" href="#write_at">write_at<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L242"><em>Source</em></a></div></h3>
+<h3 id="write_at"><span><a class="doc-id-link" href="#write_at">write_at<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L256"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write_at :: <span class="keyword-type">proc</span>(w: <a class="code-typename" href="/core/io/#Stream">Stream</a>, p: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, offset: <a href="/base/builtin#i64"><span class="doc-builtin">i64</span></a>, n_written: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2465,7 +2475,7 @@ seek offset.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="write_at_least"><span><a class="doc-id-link" href="#write_at_least">write_at_least<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L393"><em>Source</em></a></div></h3>
+<h3 id="write_at_least"><span><a class="doc-id-link" href="#write_at_least">write_at_least<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L407"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write_at_least :: <span class="keyword-type">proc</span>(w: <a class="code-typename" href="/core/io/#Stream">Stream</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, min: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2476,7 +2486,7 @@ If an error occurs before writing everything it is returned.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="write_byte"><span><a class="doc-id-link" href="#write_byte">write_byte<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L271"><em>Source</em></a></div></h3>
+<h3 id="write_byte"><span><a class="doc-id-link" href="#write_byte">write_byte<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L285"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write_byte :: <span class="keyword-type">proc</span>(w: <a class="code-typename" href="/core/io/#Stream">Stream</a>, c: <a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>, n_written: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> <a class="code-typename" href="/core/io/#Error">Error</a> {…}</pre>
 </div>
@@ -2519,7 +2529,7 @@ If an error occurs before writing everything it is returned.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="write_full"><span><a class="doc-id-link" href="#write_full">write_full<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L387"><em>Source</em></a></div></h3>
+<h3 id="write_full"><span><a class="doc-id-link" href="#write_full">write_full<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L401"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write_full :: <span class="keyword-type">proc</span>(w: <a class="code-typename" href="/core/io/#Stream">Stream</a>, buf: []<a href="/base/builtin#u8"><span class="doc-builtin">u8</span></a>) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2581,7 +2591,7 @@ If an error occurs before writing everything it is returned.</p>
 </div>
 </div>
 <div class="pkg-entity">
-<h3 id="write_rune"><span><a class="doc-id-link" href="#write_rune">write_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L342"><em>Source</em></a></div></h3>
+<h3 id="write_rune"><span><a class="doc-id-link" href="#write_rune">write_rune<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L356"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write_rune :: <span class="keyword-type">proc</span>(s: <a class="code-typename" href="/core/io/#Stream">Stream</a>, r: untyped rune, n_written: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> (size: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2591,7 +2601,7 @@ If an error occurs before writing everything it is returned.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="write_string"><span><a class="doc-id-link" href="#write_string">write_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L314"><em>Source</em></a></div></h3>
+<h3 id="write_string"><span><a class="doc-id-link" href="#write_string">write_string<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L328"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write_string :: <span class="keyword-type">proc</span>(s: <a class="code-typename" href="/core/io/#Stream">Stream</a>, str: <a href="/base/builtin#string"><span class="doc-builtin">string</span></a>, n_written: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2601,7 +2611,7 @@ If an error occurs before writing everything it is returned.</p>
 </details>
 </div>
 <div class="pkg-entity">
-<h3 id="write_string16"><span><a class="doc-id-link" href="#write_string16">write_string16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L319"><em>Source</em></a></div></h3>
+<h3 id="write_string16"><span><a class="doc-id-link" href="#write_string16">write_string16<span class="a-hidden">&nbsp;¶</span></a></span><div class="doc-source"><a href="https://github.com/odin-lang/Odin/tree/master/core/io/io.odin#L333"><em>Source</em></a></div></h3>
 <div>
 <pre class="doc-code">write_string16 :: <span class="keyword-type">proc</span>(s: <a class="code-typename" href="/core/io/#Stream">Stream</a>, str: <a href="/base/builtin#string16"><span class="doc-builtin">string16</span></a>, n_written: ^<a href="/base/builtin#int"><span class="doc-builtin">int</span></a> = nil) -> (n: <a href="/base/builtin#int"><span class="doc-builtin">int</span></a>, err: <a class="code-typename" href="/core/io/#Error">Error</a>) {…}</pre>
 </div>
@@ -2639,7 +2649,7 @@ If an error occurs before writing everything it is returned.</p>
 <li><a href="https://github.com/odin-lang/Odin/tree/master/core/io/util.odin">util.odin</a></li>
 </ul>
 <h2 id="pkg-generation-information">Generation Information</h2>
-<p>Generated with <code>odin version dev-2025-11 (vendor "odin") Windows_amd64 @ 2025-11-13 21:13:31.576844400 +0000 UTC</code></p>
+<p>Generated with <code>odin version dev-2025-11 (vendor "odin") Windows_amd64 @ 2025-11-14 21:12:59.386086800 +0000 UTC</code></p>
 </article>
 <div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">
 <nav id="TableOfContents">
