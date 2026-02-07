@@ -9,8 +9,14 @@ on:
 jobs:
   deploy:
     runs-on: windows-2025
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v5
       - name: Make initial directories
         shell: cmd
         run: |
@@ -19,7 +25,7 @@ jobs:
       - name: Clone Odin repo
         shell: cmd
         run: |
-          git clone https://github.com/odin-lang/Odin.git
+          git clone https://github.com/odin-lang/Odin.git --depth 1
       - name: build Odin
         shell: cmd
         run: |
@@ -61,10 +67,9 @@ jobs:
           pushd website\static
           ..\odin-html-docs.exe ..\all.odin-doc --merge ..\darwin.odin-doc ..\all_posix.odin-doc ..\freebsd.odin-doc ..\all_linux.odin-doc ..\unix.odin-doc ..\haiku.odin-doc ..\sdl3.odin-doc
           popd
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./website/static
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
+          path: ./website/static
+      - uses: actions/deploy-pages@v4
+        id: deployment
