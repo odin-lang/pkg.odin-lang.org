@@ -1,3 +1,4 @@
+#+feature using-stmt
 package odin_html_docs
 
 import "base:intrinsics"
