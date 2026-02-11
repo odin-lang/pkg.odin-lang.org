@@ -110,8 +110,8 @@ main :: proc() {
 		write_html_header(w, fmt.tprintf("%s library - pkg.odin-lang.org", dir))
 		write_collection_directory(w, collection)
 		write_html_footer(w, true)
-		os.make_directory(dir, DIRECTORY_MODE)
-		os.write_entire_file(fmt.tprintf("%s/index.html", dir), b.buf[:])
+		os.make_directory(dir)
+		_ = os.write_entire_file(fmt.tprintf("%s/index.html", dir), b.buf[:])
 
 		generate_packages_in_collection(&b, collection)
 	}
@@ -123,7 +123,7 @@ main :: proc() {
 		write_html_header(w, "Packages - pkg.odin-lang.org")
 		write_home_page(w)
 		write_html_footer(w, true)
-		os.write_entire_file("index.html", b.buf[:])
+		_ = os.write_entire_file("index.html", b.buf[:])
 	}
 
 
@@ -160,8 +160,8 @@ generate_from_path :: proc(path: string, all_packages: bool) {
 	log.debugf("reading %q", path)
 
 	{
-		data, ok := os.read_entire_file(path)
-		if !ok {
+		data, data_err := os.read_entire_file(path, context.allocator)
+		if data_err != nil {
 			errorf("unable to read Odin doc file at: %s", path)
 		}
 
@@ -317,15 +317,15 @@ print_usage :: proc() -> ! {
 }
 
 copy_assets :: proc() {
-	if !os.write_entire_file("search.js", #load("resources/search.js")) {
+	if nil != os.write_entire_file("search.js", #load("resources/search.js")) {
 		errorf("unable to write the search.js file")
 	}
 
-	if !os.write_entire_file("style.css", #load("resources/style.css")) {
+	if nil != os.write_entire_file("style.css", #load("resources/style.css")) {
 		errorf("unable to write the style.css file")
 	}
 
-	if !os.write_entire_file("favicon.svg", #load("resources/favicon.svg")) {
+	if nil != os.write_entire_file("favicon.svg", #load("resources/favicon.svg")) {
 		errorf("unable to write favicon.svg file")
 	}
 }
@@ -475,7 +475,7 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: []^Collection) 
 	}
 	fmt.wprintln(w, "}};")
 
-	os.write_entire_file("pkg-data.js", b.buf[:])
+	_ = os.write_entire_file("pkg-data.js", b.buf[:])
 }
 
 write_html_footer :: proc(w: io.Writer, include_directory_js: bool) {
@@ -523,7 +523,7 @@ generate_package_from_directory_tree :: proc(b: ^strings.Builder, node: ^Dir_Nod
 		write_pkg(w, dir, path, pkg, collection, collection.pkg_entries_map[pkg])
 		write_html_footer(w, false)
 		recursive_make_directory(path, dir)
-		os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
+		_ = os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
 	}
 	for child in node.children {
 		res := generate_package_from_directory_tree(b, child)
@@ -555,7 +555,7 @@ generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collec
 		write_builtin_pkg(w, dir, path, runtime_pkg, collection, "builtin", builtin_docs)
 		write_html_footer(w, false)
 		recursive_make_directory(path, dir)
-		os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
+		_ = os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
 
 
 		path = "intrinsics"
@@ -564,7 +564,7 @@ generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collec
 		write_builtin_pkg(w, dir, path, runtime_pkg, collection, "intrinsics", intrinsics_docs)
 		write_html_footer(w, false)
 		recursive_make_directory(path, dir)
-		os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
+		_ = os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
 	}
 }
 
@@ -635,8 +635,8 @@ write_home_page :: proc(w: io.Writer) {
 }
 
 write_readme :: proc(w: io.Writer, path: string) {
-	data, ok := os.read_entire_file_from_filename(path)
-	if !ok {
+	data, data_err := os.read_entire_file(path, context.allocator)
+	if data_err != nil {
 		log.errorf("Could not read the file %q to render the readme", path)
 		return
 	}

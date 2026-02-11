@@ -123,9 +123,8 @@ config_default :: proc() -> (c: Config) {
 }
 
 config_merge_from_file :: proc(c: ^Config, file: string) -> (file_ok: bool, err: json.Unmarshal_Error) {
-	data: []byte
-	data, file_ok = os.read_entire_file_from_filename(file)
-	if !file_ok do return
+	data, data_err := os.read_entire_file(file, context.allocator)
+	if data_err != nil { return }
 
 	err = json.unmarshal(data, c)
 
@@ -165,8 +164,8 @@ config_sort_collections :: proc(c: ^Config) {
 config_do_replacements :: proc(path: string) -> string {
 	res, allocated := strings.replace(path, "$ODIN_ROOT", ODIN_ROOT, 1)
 
-	abs, ok := filepath.abs(res)
-	if !ok {
+	abs, abs_err := os.get_absolute_path(res, context.allocator)
+	if abs_err != nil {
 		log.warnf("Could not resolve absolute path from %q", res)
 		return res
 	}

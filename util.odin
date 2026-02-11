@@ -169,10 +169,6 @@ errorf :: proc(format: string, args: ..any) -> ! {
 HTML_LESS_THAN :: "&lt;"
 HTML_GREATER_THAN :: "&gt;"
 
-// On Unix systems we need to set the directory mode so that we
-// can read/write from them
-DIRECTORY_MODE :: 0o775 when os.OS == .Darwin || os.OS == .Linux || os.OS == .FreeBSD else 0
-
 common_prefix :: proc(strs: []string) -> string {
 	if len(strs) == 0 {
 		return ""
@@ -202,7 +198,7 @@ recursive_make_directory :: proc(path: string, prefix := "") {
 	if prefix != "" {
 		path_to_make = fmt.tprintf("%s/%s", prefix, head)
 	}
-	os.make_directory(path_to_make, DIRECTORY_MODE)
+	os.make_directory(path_to_make)
 	if tail != "" {
 		recursive_make_directory(tail, path_to_make)
 	}
