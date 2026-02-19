@@ -2184,12 +2184,13 @@ pkg_entries_gather :: proc(pkg: ^doc.Pkg) -> (entries: Pkg_Entries) {
 		}
 	}
 
-	slice.sort_by_key(entries.procs[:],       entity_key)
-	slice.sort_by_key(entries.proc_groups[:], entity_key)
-	slice.sort_by_key(entries.types[:],       entity_key)
-	slice.sort_by_key(entries.vars[:],        entity_key)
-	slice.sort_by_key(entries.consts[:],      entity_key)
-	slice.sort_by_key(entries.all[:],         entity_key)
+	slice.sort_by_key(entries.procs[:],         entity_key)
+	slice.sort_by_key(entries.proc_groups[:],   entity_key)
+	slice.sort_by_key(entries.types[:],         entity_key)
+	slice.sort_by_key(entries.vars[:],          entity_key)
+	slice.sort_by_key(entries.consts[:],        entity_key)
+	slice.sort_by_key(entries.config_values[:], entity_key)
+	slice.sort_by_key(entries.all[:],           entity_key)
 
 	entries.ordering = {
 		{"Types",            entries.types[:], false},
