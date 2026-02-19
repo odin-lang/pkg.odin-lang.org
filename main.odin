@@ -2131,15 +2131,16 @@ find_entity_attribute :: proc(e: ^doc.Entity, key: string) -> (value: string, ok
 }
 
 Pkg_Entries :: struct {
-	procs:       [dynamic]doc.Scope_Entry,
-	proc_groups: [dynamic]doc.Scope_Entry,
-	types:       [dynamic]doc.Scope_Entry,
-	vars:        [dynamic]doc.Scope_Entry,
-	consts:      [dynamic]doc.Scope_Entry,
+	procs:         [dynamic]doc.Scope_Entry,
+	proc_groups:   [dynamic]doc.Scope_Entry,
+	types:         [dynamic]doc.Scope_Entry,
+	vars:          [dynamic]doc.Scope_Entry,
+	consts:        [dynamic]doc.Scope_Entry,
+	config_values: [dynamic]doc.Scope_Entry,
 
 	all:         [dynamic]doc.Scope_Entry,
 
-	ordering: [5]struct{name: string, entries: []doc.Scope_Entry},
+	ordering: [6]struct{name: string, entries: []doc.Scope_Entry, ignore: bool},
 }
 
 entity_key :: proc(entry: doc.Scope_Entry) -> string {
@@ -2174,6 +2175,13 @@ pkg_entries_gather :: proc(pkg: ^doc.Pkg) -> (entries: Pkg_Entries) {
 			append(&entries.proc_groups, entry)
 		}
 		append(&entries.all, entry)
+
+		#partial switch e.kind {
+		case .Constant, .Variable:
+			if strings.has_prefix(str(e.init_string), "#config") {
+				append(&entries.config_values, entry)
+			}
+		}
 	}
 
 	slice.sort_by_key(entries.procs[:],       entity_key)
@@ -2184,11 +2192,12 @@ pkg_entries_gather :: proc(pkg: ^doc.Pkg) -> (entries: Pkg_Entries) {
 	slice.sort_by_key(entries.all[:],         entity_key)
 
 	entries.ordering = {
-		{"Types",            entries.types[:]},
-		{"Constants",        entries.consts[:]},
-		{"Variables",        entries.vars[:]},
-		{"Procedures",       entries.procs[:]},
-		{"Procedure Groups", entries.proc_groups[:]},
+		{"Types",            entries.types[:], false},
+		{"Constants",        entries.consts[:], false},
+		{"Variables",        entries.vars[:], false},
+		{"Procedures",       entries.procs[:], false},
+		{"Procedure Groups", entries.proc_groups[:], false},
+		{"`#config` values", entries.config_values[:], len(entries.config_values) == 0},
 	}
 	return
 }
@@ -2199,6 +2208,7 @@ pkg_entries_destroy :: proc(entries: ^Pkg_Entries) {
 	delete(entries.types)
 	delete(entries.vars)
 	delete(entries.consts)
+	delete(entries.config_values)
 	entries^ = {}
 }
 
@@ -3108,6 +3118,9 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	}
 
 	for eo in pkg_entries.ordering {
+		if eo.ignore {
+			continue
+		}
 		write_index(w, eo.name, eo.entries)
 	}
 
@@ -3131,6 +3144,9 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 
 	fmt.wprintln(w, `<section class="documentation">`)
 	for eo in pkg_entries.ordering {
+		if eo.ignore {
+			continue
+		}
 		write_entries(w, pkg, eo.name, eo.entries)
 	}
 	fmt.wprintln(w, "</section>")
