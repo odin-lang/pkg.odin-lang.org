@@ -686,8 +686,14 @@ write_table_contents :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, consts: []doc.
 		{
 			fmt.wprintf(w, `<a href="#pkg-{0:s}">{0:s}</a>`, title)
 			fmt.wprintln(w, `<ul>`)
-			for e in entry_table do if e.kind == kind {
-				fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", e.name)
+			if kind == "g" {     
+				for e in entries {      
+					fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", str(e.name))
+				}   
+			} else {     
+				for e in entry_table do if e.kind == kind {      
+					fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", e.name)     
+				}   
 			}
 			fmt.wprintln(w, `</ul>`)
 		}
