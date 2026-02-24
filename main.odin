@@ -2222,7 +2222,7 @@ write_search :: proc(w: io.Writer, kind: enum { Package, Collection, All}) {
 	}
 	fmt.wprintf(w, `
 		<div class="odin-search-wrapper">
-			<input type="search" id="odin-search" class="%s" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">
+			<input type="search" id="odin-search" class="%s" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search..." autofocus>
 			<div class="odin-search-shortcut">
 				<div class="odin-search-key key-macos">⌘K</div>
 				<div class="odin-search-key key-windows">Ctrl+K</div>
