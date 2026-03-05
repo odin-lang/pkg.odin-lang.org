@@ -124,6 +124,7 @@ config_default :: proc() -> (c: Config) {
 config_merge_from_file :: proc(c: ^Config, file: string) -> (file_ok: bool, err: json.Unmarshal_Error) {
 	data, data_err := os.read_entire_file(file, context.allocator)
 	if data_err != nil { return }
+	file_ok = true
 
 	err = json.unmarshal(data, c)
 
