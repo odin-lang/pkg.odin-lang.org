@@ -687,6 +687,8 @@ target_from_pkg :: proc(pkg: ^doc.Pkg) -> (target: string, ok: bool) {
 			target = "haiku_arm64"
 		case "freebsd":
 			target = "freebsd_amd64"
+		case "wasm/js", "wasm/wasi":
+			target = "js_wasm32"
 		}
 	}
 	return

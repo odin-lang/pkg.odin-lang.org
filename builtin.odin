@@ -445,6 +445,7 @@ write_butilin_entry :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, runtime_url: st
 
 		core     := (&cfg._collections["core"]) or_break simd_docs
 		simd_pkg := core.pkgs["simd"]           or_break simd_docs
+		init_cfg_from_pkg(simd_pkg)
 		for e in array(simd_pkg.entries) {
 			if str(e.name) == simd_name {
 				simd_entity := &cfg.entities[e.entity]
@@ -461,6 +462,7 @@ write_butilin_entry :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, runtime_url: st
 
 		core     := (&cfg._collections["core"]) or_break atomic_docs
 		sync_pkg := core.pkgs["sync"]           or_break atomic_docs
+		init_cfg_from_pkg(sync_pkg)
 		for e in array(sync_pkg.entries) {
 			if str(e.name) == atomic_name {
 				atomic_entity := &cfg.entities[e.entity]
