@@ -2150,14 +2150,16 @@ entity_key :: proc(entry: doc.Scope_Entry) -> string {
 }
 
 pkg_entries_gather :: proc(pkg: ^doc.Pkg) -> (entries: Pkg_Entries) {
+	pkg_name := str(pkg.name)
+
 	for entry in array(pkg.entries) {
 		e := &cfg.entities[entry.entity]
 		name := str(e.name)
-		if name == "" || name[0] == '_' {
+		if name == "" || (name[0] == '_' && !strings.has_prefix(pkg_name, "simd")) {
 			continue
 		}
 		name = str(entry.name)
-		if name == "" || name[0] == '_' {
+		if name == "" || (name[0] == '_' && !strings.has_prefix(pkg_name, "simd")) {
 			continue
 		}
 		switch e.kind {
