@@ -1634,7 +1634,7 @@ write_markup_text :: proc(w: io.Writer, s_: string, code_inline := false) {
 	needles := []string{"If and only if (⟺)", "if and only if (⟺)"}
 	for needle in needles {
 		if strings.index(s, needle) != -1 {
-			s, _ = strings.replace_all(s, needle, "<abbr title=\"If and only if\">⟺</abbr>", context.temp_allocator)
+			s, _ = strings.replace_all(s, needle, "<abbr title=\"If and only if (⟺)\">iff</abbr>", context.temp_allocator)
 		}
 	}
 
