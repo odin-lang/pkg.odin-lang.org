@@ -1217,6 +1217,12 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			io.write_string(w, "[]")
 		}
 		write_type(writer, cfg.types[type_types[0]], flags - {.Variadic})
+	case .Fixed_Capacity_Dynamic_Array:
+		assert(type.elem_count_len == 1)
+		io.write_string(w, "[<span class=\"keyword\">dynamic</span>; ")
+		io.write_uint(w, uint(type.elem_counts[0]))
+		io.write_string(w, "]")
+		write_type(writer, cfg.types[type_types[0]], flags)
 	case .Dynamic_Array:
 		io.write_string(w, "[<span class=\"keyword\">dynamic</span>]")
 		write_type(writer, cfg.types[type_types[0]], flags)
