@@ -185,11 +185,9 @@ if (odin_search) {
 			}
 
 			// Match separator
-			if (str_char == '_' || str_char == ' ' || str_char == '.') {
-				prev_separator = true;
-				if (!prev_matched) {
-					pattern_idx += 1
-				}
+			prev_separator = str_char == '_' || str_char == ' ' || str_char == '.';
+			if (prev_separator && !prev_matched) {
+				pattern_idx += 1
 			}
 
 			str_idx += 1;
