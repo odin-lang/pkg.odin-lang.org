@@ -60,7 +60,7 @@ if (odin_search) {
 		return x;
 	}
 
-
+	// matches one string against a pattern
 	function fuzzy_match(str, pattern) {
 		// Score consts
 		const ADJACENCY_BONUS            =  5; // bonus for adjacent matches
@@ -101,7 +101,7 @@ if (odin_search) {
 
 		let matched_indices = [];
 
-		// Loop over strings
+		// Loop over string
 		while (str_idx != str_length) {
 			let pattern_char = pattern_idx != pattern_length ? pattern.charAt(pattern_idx) : null;
 			let str_char     = str.charAt(str_idx);
@@ -183,7 +183,12 @@ if (odin_search) {
 			if (str_char == '.') {
 				seen_dot = true;
 			}
+
+			// Match separator
 			prev_separator = str_char == '_' || str_char == ' ' || str_char == '.';
+			if (prev_separator && !prev_matched) {
+				pattern_idx += 1
+			}
 
 			str_idx += 1;
 		}
