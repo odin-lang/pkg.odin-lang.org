@@ -2604,7 +2604,7 @@ print_procs :: proc(w:               io.Writer,
 			if len(related_procs) < MAX_PROCS_BEFORE_HIDING {
 				fmt.wprintln(w, "<details class=\"odin-doc-toggle\" open>")
 			} else {
-				fmt.wprintln(w, "<details class=\"odin-doc-toggle\" close>")
+				fmt.wprintln(w, "<details class=\"odin-doc-toggle\">")
 			}
 			fmt.wprintln(w, `<summary class="hideme">`)
 			if is_inherited {
@@ -2838,15 +2838,27 @@ slugify :: proc(s: string, allocator := context.allocator) -> string {
 
 
 write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
-	write_attributes :: proc(w: io.Writer, e: ^doc.Entity) {
+	write_declaration_attributes :: proc(w: io.Writer, e: ^doc.Entity) {
+		skip :: proc(name: string) -> bool {
+			switch name {
+			case "objc_name", "objc_type", "objc_is_class_method", "objc_class":
+				return true
+			case "private":
+				return true
+			}
+			return false
+		}
+
 		for attr in array(e.attributes) {
-			io.write_string(w, "@(")
 			name := str(attr.name)
-			value := str(attr.value)
-			io.write_string(w, name)
-			if value != "" {
-				io.write_string(w, "=")
-				io.write_string(w, value)
+			if skip(name) {
+				continue
+			}
+			io.write_string(w, "@(")
+			io.write_string(w, escape_html_string(name))
+			if value := str(attr.value); value != "" {
+				io.write_byte(w, '=')
+				io.write_string(w, escape_html_string(value))
 			}
 			io.write_string(w, ")\n")
 		}
@@ -2946,6 +2958,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			// ignore
 		case .Constant:
 			fmt.wprint(w, `<pre class="doc-code">`)
+			write_declaration_attributes(w, e)
 			the_type := cfg.types[e.type]
 
 			init_string := escape_html_string(str(e.init_string))
@@ -2988,7 +3001,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			fmt.wprintln(w, "</pre>")
 		case .Variable:
 			fmt.wprint(w, `<pre class="doc-code">`)
-			write_attributes(w, e)
+			write_declaration_attributes(w, e)
 			fmt.wprintf(w, "%s: ", name)
 			write_type(writer, cfg.types[e.type], {.Allow_Indent})
 			init_string := str(e.init_string)
@@ -3001,8 +3014,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		case .Type_Name:
 			fmt.wprint(w, `<pre class="doc-code">`)
 			defer fmt.wprintln(w, "</pre>")
-
-			// write_attributes(w, e)
+			write_declaration_attributes(w, e)
 			fmt.wprintf(w, "%s :: ", name)
 			the_type := cfg.types[e.type]
 			type_to_print := the_type
@@ -3031,6 +3043,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			fmt.wprint(w, `</pre>`)
 		case .Procedure:
 			fmt.wprint(w, `<pre class="doc-code">`)
+			write_declaration_attributes(w, e)
 			fmt.wprintf(w, "%s :: ", name)
 			write_type(writer, cfg.types[e.type], {.Allow_Multiple_Lines})
 			write_where_clauses(w, array(e.where_clauses))
@@ -3045,6 +3058,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 
 		case .Proc_Group:
 			fmt.wprint(w, `<pre class="doc-code">`)
+			write_declaration_attributes(w, e)
 			fmt.wprintf(w, "%s :: <span class=\"keyword-type\">proc</span>{{\n", name)
 			for entity_index in array(e.grouped_entities) {
 				this_proc := &cfg.entities[entity_index]
