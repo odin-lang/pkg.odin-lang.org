@@ -70,16 +70,71 @@ if (odin_search) {
 		const LEADING_LETTER_PENALTY     = -3; // penalty applied for every letter in str before the first match
 		const MAX_LEADING_LETTER_PENALTY = -9; // maximum penalty for leading letters
 		const UNMATCHED_LETTER_PENALTY   = -1; // penalty for every letter that doesn't matter
-		const SUBSTRING_BOUNS            = 50;
 
-		if (str.includes(pattern)) {
-			let i = str.indexOf(pattern);
-			let formatted_str = str.substring(0, i) + '<b>' + str.substring(i, i+pattern.length) + '</b>' + str.substring(i+pattern.length, str.length);
-			let score = pattern.length * SUBSTRING_BOUNS;
-			if (str.length == pattern.length) {
-				score *= 2;
+		{ // NOTE(bill): fast path for when the pattern occurs verbatim somewhere in the string.
+			const lc_str = str.toLowerCase();
+			const lc_pat = pattern.toLowerCase();
+			let first = lc_str.indexOf(lc_pat);
+			if (first >= 0) {
+				const dot_idx    = str.indexOf('.');
+				const name_start = dot_idx < 0 ? 0 : dot_idx + 1;
+				const name_len   = str.length - name_start;
+				const pkg_len    = dot_idx < 0 ? 0 : dot_idx;
+
+				const BASE             = 100000;
+				const NAME_BONUS       =   4000;
+				const WORD_START_BONUS =   2000;
+				const NAME_PREFIX_BONUS=   2000;
+				const EXACT_NAME_BONUS =  10000;
+				const CAMEL_BONUS_S    =   1000;
+				const CASE_BONUS       =    250;
+				const COVERAGE_WEIGHT  =   3000;
+
+				const is_lower = c => c >= 'a' && c <= 'z';
+				const is_upper = c => c >= 'A' && c <= 'Z';
+
+				let best_score = -Infinity;
+				let best_idx   = first;
+
+				// The first occurrence is not always the most relevant one (a hit in
+				// the package name loses to a hit in the declaration name), so score
+				// every occurrence and keep the best.
+				for (let i = first; i >= 0; i = lc_str.indexOf(lc_pat, i + 1)) {
+					const end         = i + pattern.length;
+					const in_name     = i >= name_start;
+					const char_before = i > 0 ? str.charAt(i - 1) : '.';
+					const word_start  = i === name_start || char_before === '_' || char_before === '.' || char_before === ' ';
+					const camel       = i > 0 && is_lower(str.charAt(i - 1)) && is_upper(str.charAt(i));
+					const exact_name  = in_name && i === name_start && end === str.length;
+
+					let s = BASE;
+					if (in_name)                     s += NAME_BONUS;
+					if (word_start)                  s += WORD_START_BONUS;
+					if (in_name && i === name_start) s += NAME_PREFIX_BONUS;
+					if (camel)                       s += CAMEL_BONUS_S;
+					if (exact_name)                  s += EXACT_NAME_BONUS;
+					if (str.substring(i, end) === pattern) s += CASE_BONUS;
+
+					// Coverage: how much of the segment the match lands in it fills.
+					// A full-name match (coverage 1) beats a match that is a small
+					// fragment of a long identifier.
+					const segment_len = in_name ? name_len : (pkg_len || str.length);
+					s += Math.round((pattern.length / Math.max(segment_len, 1)) * COVERAGE_WEIGHT);
+
+					// Gently prefer shorter identifiers and earlier match positions.
+					s -= Math.min(str.length, 100);
+					s -= Math.min(Math.max(i - name_start, 0), 50);
+
+					if (s > best_score) {
+						best_score = s;
+						best_idx   = i;
+					}
+				}
+
+				let i = best_idx;
+				let formatted_str = str.substring(0, i) + '<b>' + str.substring(i, i+pattern.length) + '</b>' + str.substring(i+pattern.length, str.length);
+				return [true, best_score, formatted_str];
 			}
-			return [true, score, formatted_str];
 		}
 
 		// Loop variables
