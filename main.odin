@@ -130,10 +130,71 @@ main :: proc() {
 	log.infof("generate json pkg data")
 	generate_json_pkg_data(&b, not_hidden[:])
 
+	log.infof("generate sitemap")
+	generate_sitemap(&b, not_hidden[:])
+
 	log.infof("copy_assets")
 	copy_assets()
 
+
 	log.infof("[DONE]")
+}
+
+generate_sitemap :: proc(b: ^strings.Builder, collections: []^Collection) {
+	if cfg.domain == "" {
+		log.warn("no `domain` configured; skipping sitemap.xml and robots.txt")
+		return
+	}
+	runtime.DEFAULT_TEMP_ALLOCATOR_TEMP_GUARD()
+
+	origin := fmt.tprintf("https://%s", cfg.domain)
+	w := strings.to_writer(b)
+
+	write_url :: proc(w: io.Writer, loc: string) {
+		fmt.wprintf(w, "\t<url><loc>%s</loc></url>\n", loc)
+	}
+
+	strings.builder_reset(b)
+	io.write_string(w, `<?xml version="1.0" encoding="UTF-8"?>`+"\n")
+	io.write_string(w, `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`+"\n")
+
+	write_url(w, fmt.tprintf("%s/", origin))
+
+	for c in collections {
+		if c.hidden {
+			continue
+		}
+		write_url(w, fmt.tprintf("%s%s/", origin, c.base_url))
+		if c.name == "base" {
+			write_url(w, fmt.tprintf("%s%s/builtin/", origin, c.base_url))
+			write_url(w, fmt.tprintf("%s%s/intrinsics/", origin, c.base_url))
+		}
+
+		paths := make([dynamic]string, 0, len(c.pkgs), context.temp_allocator)
+		for path in c.pkgs {
+			if path == "" { // package sitting at the collection root; already emitted above
+				continue
+			}
+			append(&paths, path)
+		}
+		slice.sort(paths[:])
+		for path in paths {
+			write_url(w, fmt.tprintf("%s%s/%s/", origin, c.base_url, path))
+		}
+	}
+
+	io.write_string(w, "</urlset>\n")
+	if nil != os.write_entire_file("sitemap.xml", b.buf[:]) {
+		errorf("unable to write the sitemap.xml file")
+	}
+
+	strings.builder_reset(b)
+	fmt.wprintln(w, "User-agent: *")
+	fmt.wprintln(w, "Allow: /")
+	fmt.wprintf(w, "Sitemap: %s/sitemap.xml\n", origin)
+	if nil != os.write_entire_file("robots.txt", b.buf[:]) {
+		errorf("unable to write the robots.txt file")
+	}
 }
 
 
@@ -1714,7 +1775,7 @@ write_markup_text :: proc(w: io.Writer, s_: string, code_inline := false) {
 						fmt.wprintf(w, `<a href="%s">`, url)
 					} else {
 						// External domain, open in new tab.
-						fmt.wprintf(w, `<a href="%s" target="_blank">`, url)
+						fmt.wprintf(w, `<a href="%s" target="_blank" rel="noopener noreferrer">`, url)
 					}
 					io.write_string(w, text)
 					io.write_string(w, "</a>")
@@ -2267,7 +2328,7 @@ write_search :: proc(w: io.Writer, kind: enum { Package, Collection, All}) {
 	}
 	fmt.wprintf(w, `
 		<div class="odin-search-wrapper">
-			<input type="search" id="odin-search" class="%s" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search..." autofocus>
+			<input type="search" id="odin-search" class="%s" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search...">
 			<div class="odin-search-shortcut">
 				<div class="odin-search-key key-macos">⌘K</div>
 				<div class="odin-search-key key-windows">Ctrl+K</div>
@@ -3368,7 +3429,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	fmt.wprintln(w, `</article>`)
 	{
 		write_link :: proc(w: io.Writer, id, text: string) {
-			fmt.wprintf(w, `<li><a href="#%s">%s</a>`, id, text)
+			fmt.wprintf(w, `<li><a href="#%s">%s</a></li>`, id, text)
 		}
 
 		fmt.wprintln(w, `<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">`)
