@@ -353,12 +353,13 @@ intrinsics_table := []Builtin{
 		comment = "Returns true if the type passed is a matrix using `#column_major` ordering, this intrinsic only allows for matrices and will not compile otherwise. Note: The default matrix layout is `#column_major`."},
 
 	{name = "type_is_specialization_of",                kind = "b", type = "proc($T, $S: typeid) -> bool",
-		comment = "Returns true if the type passed is a specialization of a parametric polymorphic type.\n\n"+
+		comment = "Returns true if `T` is a strict specialization of `S`. Identical types are not considered specializations.\n\n"+
 		"Example:\n"+
 		"\tFoo :: struct($T: typeid) {x: T}\n"+
-		"\tassert(type_is_specialization_of(Foo(int)) == true)\n"+
-		"\tassert(type_is_specialization_of(Foo)      == false)\n"+
-		"\tassert(type_is_specialization_of(i32)      == false)\n"+
+		"\tassert(type_is_specialization_of(Foo(int), Foo)      == true)\n"+
+		"\tassert(type_is_specialization_of(Foo, Foo)           == false)\n"+
+		"\tassert(type_is_specialization_of(Foo(int), Foo(int)) == false)\n"+
+		"\tassert(type_is_specialization_of(i32, Foo)            == false)\n"+
 		"",
 	},
 
