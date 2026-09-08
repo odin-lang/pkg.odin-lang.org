@@ -3124,23 +3124,70 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	}
 }
 
+INDEX_MIN_GROUP_SIZE :: 3
+INDEX_MIN_ENTRIES_TO_GROUP :: 16
+
+Index_Group_Handlers :: struct {
+	group_start: proc(w: io.Writer, prefix: string, count: int),
+	group_end:   proc(w: io.Writer),
+	item:        proc(w: io.Writer, name: string),
+}
+
+index_group_prefix :: proc(name: string) -> string {
+	if i := strings.index_byte(name, '_'); i > 0 {
+		return name[:i]
+	}
+	return ""
+}
+
+write_index_item :: proc(w: io.Writer, name: string) {
+	fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", name)
+}
+
+
+walk_index_groups :: proc(w: io.Writer, entries: []doc.Scope_Entry, h: Index_Group_Handlers) {
+	i := 0
+	for i < len(entries) {
+		prefix := index_group_prefix(str(entries[i].name))
+		j := i + 1
+		if prefix != "" {
+			for j < len(entries) && index_group_prefix(str(entries[j].name)) == prefix {
+				j += 1
+			}
+		}
+		run := entries[i:j]
+		if prefix != "" && len(run) >= INDEX_MIN_GROUP_SIZE {
+			h.group_start(w, prefix, len(run))
+			for e in run {
+				h.item(w, str(e.name))
+			}
+			h.group_end(w)
+		} else {
+			for e in run {
+				h.item(w, str(e.name))
+			}
+		}
+		i = j
+	}
+}
+
+index_group_start :: proc(w: io.Writer, prefix: string, count: int) {
+	fmt.wprintf(w, `<li class="doc-index-group"><details open><summary>%s_… <span class="doc-index-group-count">(%d)</span></summary>`+"\n", prefix, count)
+	fmt.wprintln(w, "<ul>")
+}
+index_group_end :: proc(w: io.Writer) {
+	fmt.wprintln(w, "</ul></details></li>")
+}
+
+toc_group_start :: proc(w: io.Writer, prefix: string, count: int) {
+	fmt.wprintf(w, `<li class="toc-group"><span class="toc-group-label">%s_…</span>`+"\n", prefix)
+	fmt.wprintln(w, "<ul>")
+}
+toc_group_end :: proc(w: io.Writer) {
+	fmt.wprintln(w, "</ul></li>")
+}
 
 write_index_body :: proc(w: io.Writer, entries: []doc.Scope_Entry) {
-	index_group_prefix :: proc(name: string) -> string {
-		if i := strings.index_byte(name, '_'); i > 0 {
-			return name[:i]
-		}
-		return ""
-	}
-	write_index_item :: proc(w: io.Writer, name: string) {
-		fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", name)
-	}
-
-
-	INDEX_MIN_ENTRIES_TO_GROUP :: 16
-	INDEX_MIN_GROUP_SIZE :: 3
-
-
 	if len(entries) < INDEX_MIN_ENTRIES_TO_GROUP {
 		fmt.wprintln(w, "<ul>")
 		for e in entries {
@@ -3149,41 +3196,27 @@ write_index_body :: proc(w: io.Writer, entries: []doc.Scope_Entry) {
 		fmt.wprintln(w, "</ul>")
 		return
 	}
-
 	fmt.wprintln(w, `<ul class="doc-index-list">`)
-	defer fmt.wprintln(w, "</ul>")
+	walk_index_groups(w, entries, {
+		group_start = index_group_start,
+		group_end   = index_group_end,
+		item        = write_index_item,
+	})
+	fmt.wprintln(w, "</ul>")
+}
 
-	for i := 0; i < len(entries); /**/ {
-		prefix := index_group_prefix(str(entries[i].name))
-
-		j := i + 1
-		if prefix != "" {
-			for j < len(entries) && index_group_prefix(str(entries[j].name)) == prefix {
-				j += 1
-			}
+write_toc_section :: proc(w: io.Writer, entries: []doc.Scope_Entry) {
+	if len(entries) < INDEX_MIN_ENTRIES_TO_GROUP {
+		for e in entries {
+			write_index_item(w, str(e.name))
 		}
-		run := entries[i:j]
-
-		if prefix != "" && len(run) >= INDEX_MIN_GROUP_SIZE {
-			// NOTE(bill): Open by default
-			fmt.wprintf(w,
-				`<li class="doc-index-group"><details open><summary>%s_… <span class="doc-index-group-count">(%d)</span></summary>`+"\n",
-				prefix,
-				len(run),
-			)
-			fmt.wprintln(w, "<ul>")
-			for e in run {
-				write_index_item(w, str(e.name))
-			}
-			fmt.wprintln(w, "</ul></details></li>")
-		} else {
-			for e in run {
-				write_index_item(w, str(e.name))
-			}
-		}
-
-		i = j
+		return
 	}
+	walk_index_groups(w, entries, {
+		group_start = toc_group_start,
+		group_end   = toc_group_end,
+		item        = write_index_item,
+	})
 }
 
 write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^Collection, pkg_entries: Pkg_Entries) {
@@ -3345,11 +3378,10 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			write_link(w, "pkg-overview", "Overview")
 		}
 		for eo in pkg_entries.ordering do if len(eo.entries) != 0 {
-			fmt.wprintf(w, `<li><a href="#pkg-{0:s}">{0:s}</a>`, eo.name)
+			slug := slugify(eo.name, context.temp_allocator)
+			fmt.wprintf(w, `<li><a href="#pkg-{0:s}">{1:s}</a>`, slug, eo.name)
 			fmt.wprintln(w, `<ul>`)
-			for e in eo.entries {
-				fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", str(e.name))
-			}
+			write_toc_section(w, eo.entries)
 			fmt.wprintln(w, "</ul>")
 			fmt.wprintln(w, "</li>")
 		}
