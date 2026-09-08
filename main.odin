@@ -136,6 +136,25 @@ main :: proc() {
 	log.infof("[DONE]")
 }
 
+
+@(require_results)
+build_time :: proc() -> time.Time {
+	@(static)
+	_build_time: Maybe(time.Time)
+
+	if t, ok := _build_time.?; ok {
+		return t
+	}
+	t := time.now()
+	if s := os.get_env("SOURCE_DATE_EPOCH", context.temp_allocator); s != "" {
+		if secs, ok := strconv.parse_i64(s); ok {
+			t = time.unix(secs, 0)
+		}
+	}
+	_build_time = t
+	return t
+}
+
 init_cfg_from_header :: proc(header: ^doc.Header, loc := #caller_location) {
 	assert(header != nil, loc=loc)
 	cfg.header   = header
@@ -358,7 +377,7 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: []^Collection) 
 	w := strings.to_writer(b)
 
 	strings.builder_reset(b)
-	now := time.now()
+	now := build_time()
 	fmt.wprintf(w, "/** Generated with odin version %s (vendor %q) %s_%s @ %v */\n", ODIN_VERSION, ODIN_VENDOR, ODIN_OS, ODIN_ARCH, now)
 	fmt.wprint(w, "var odin_pkg_data = {\n")
 	fmt.wprintln(w, `"packages": {`)
@@ -2796,6 +2815,27 @@ write_related_procedure_groups :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc
 	print_procs(w, pkg, parent, groups[:],   proc_names_seen, is_inherited, title="Related Procedure Groups", ignore_procedure_group_suffix=true)
 }
 
+slugify :: proc(s: string, allocator := context.allocator) -> string {
+	b := strings.builder_make(allocator)
+	prev_dash := true // suppress leading separators
+	for r in s {
+		switch {
+		case r >= 'A' && r <= 'Z':
+			strings.write_rune(&b, r + 32)
+			prev_dash = false
+		case (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9'):
+			strings.write_rune(&b, r)
+			prev_dash = false
+		case:
+			if !prev_dash {
+				strings.write_byte(&b, '-')
+				prev_dash = true
+			}
+		}
+	}
+	return strings.trim_right(strings.to_string(b), "-")
+}
+
 
 write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	write_attributes :: proc(w: io.Writer, e: ^doc.Entity) {
@@ -3186,8 +3226,9 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		defer fmt.wprintln(w, `</div>`)
 
 
-		fmt.wprintf(w, `<details class="doc-index" id="doc-index-{0:s}" aria-labelledby="#doc-index-{0:s}-header">`+"\n", name)
-		fmt.wprintf(w, `<summary id="#doc-index-{0:s}-header">`+"\n", name)
+		slug := slugify(name, context.temp_allocator)
+		fmt.wprintf(w, `<details class="doc-index" id="doc-index-{0:s}" aria-labelledby="doc-index-{0:s}-header">`+"\n", slug)
+		fmt.wprintf(w, `<summary id="doc-index-{0:s}-header">`+"\n", slug)
 		io.write_string(w, name)
 		io.write_string(w, " (")
 		io.write_int(w, len(entries))
@@ -3213,9 +3254,9 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	fmt.wprintln(w, "</div>")
 
 
-
 	write_entries :: proc(w: io.Writer, pkg: ^doc.Pkg, title: string, entries: []doc.Scope_Entry) {
-		fmt.wprintf(w, "<h2 id=\"pkg-{0:s}\" class=\"pkg-header\">{0:s}</h2>\n", title)
+		slug := slugify(title, context.temp_allocator)
+		fmt.wprintf(w, "<h2 id=\"pkg-{0:s}\" class=\"pkg-header\">{1:s}</h2>\n", slug, title)
 		if len(entries) == 0 {
 			io.write_string(w, "<p class=\"pkg-empty-section\">This section is empty.</p>\n")
 		} else {
@@ -3271,7 +3312,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 
 	{
 		fmt.wprintln(w, `<h2 id="pkg-generation-information">Generation Information</h2>`)
-		now := time.now()
+		now := build_time()
 		fmt.wprintf(w, "<p>Generated with <code>odin version %s (vendor %q) %s_%s @ %v</code></p>\n", ODIN_VERSION, ODIN_VENDOR, ODIN_OS, ODIN_ARCH, now)
 	}
 
