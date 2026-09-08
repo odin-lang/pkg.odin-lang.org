@@ -3070,6 +3070,68 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	}
 }
 
+
+write_index_body :: proc(w: io.Writer, entries: []doc.Scope_Entry) {
+	index_group_prefix :: proc(name: string) -> string {
+		if i := strings.index_byte(name, '_'); i > 0 {
+			return name[:i]
+		}
+		return ""
+	}
+	write_index_item :: proc(w: io.Writer, name: string) {
+		fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", name)
+	}
+
+
+	INDEX_MIN_ENTRIES_TO_GROUP :: 16
+	INDEX_MIN_GROUP_SIZE :: 3
+
+
+	if len(entries) < INDEX_MIN_ENTRIES_TO_GROUP {
+		fmt.wprintln(w, "<ul>")
+		for e in entries {
+			write_index_item(w, str(e.name))
+		}
+		fmt.wprintln(w, "</ul>")
+		return
+	}
+
+	fmt.wprintln(w, `<ul class="doc-index-list">`)
+	defer fmt.wprintln(w, "</ul>")
+
+	for i := 0; i < len(entries); /**/ {
+		prefix := index_group_prefix(str(entries[i].name))
+
+		j := i + 1
+		if prefix != "" {
+			for j < len(entries) && index_group_prefix(str(entries[j].name)) == prefix {
+				j += 1
+			}
+		}
+		run := entries[i:j]
+
+		if prefix != "" && len(run) >= INDEX_MIN_GROUP_SIZE {
+			// NOTE(bill): Open by default
+			fmt.wprintf(w,
+				`<li class="doc-index-group"><details open><summary>%s_… <span class="doc-index-group-count">(%d)</span></summary>`+"\n",
+				prefix,
+				len(run),
+			)
+			fmt.wprintln(w, "<ul>")
+			for e in run {
+				write_index_item(w, str(e.name))
+			}
+			fmt.wprintln(w, "</ul></details></li>")
+		} else {
+			for e in run {
+				write_index_item(w, str(e.name))
+			}
+		}
+
+		i = j
+	}
+}
+
 write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^Collection, pkg_entries: Pkg_Entries) {
 	fmt.wprintln(w, `<div class="row odin-main my-4" id="pkg">`)
 	defer fmt.wprintln(w, `</div>`)
@@ -3136,11 +3198,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		if len(entries) == 0 {
 			io.write_string(w, "<p class=\"pkg-empty-section\">This section is empty.</p>\n")
 		} else {
-			fmt.wprintln(w, "<ul>")
-			for e in entries {
-				fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", str(e.name))
-			}
-			fmt.wprintln(w, "</ul>")
+			write_index_body(w, entries)
 		}
 	}
 
