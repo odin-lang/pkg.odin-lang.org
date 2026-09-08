@@ -60,7 +60,153 @@ if (odin_search) {
 		return x;
 	}
 
-	// matches one string against a pattern
+	// ---------------------------------------------------------------------
+	// Matching
+	//
+	// A query is split into whitespace/dot separated tokens ("os read" and
+	// "os.read" both become ["os", "read"]). Every token must match an entity
+	// for it to appear, and each token is scored by the best of three
+	// strategies, strongest signal first:
+	//
+	//   1. substring  - the token appears verbatim; graded by where/how well
+	//   2. acronym    - the token maps onto the initials of the words / camel
+	//                    humps of the name (e.g. "rai" -> resource_acquisition_is)
+	//   3. fuzzy      - the token is a scattered subsequence (typo tolerant)
+	//
+	// Each matcher returns { score, indices } where `indices` are positions in
+	// the full name that were matched, used purely for highlighting. Matching
+	// never builds any HTML; formatting happens later and only for the handful
+	// of results actually displayed.
+	// ---------------------------------------------------------------------
+
+	function is_sep(c)   { return c === '_' || c === ' ' || c === '.'; }
+	function is_lower(c) { return c >= 'a' && c <= 'z'; }
+	function is_upper(c) { return c >= 'A' && c <= 'Z'; }
+	function is_digit(c) { return c >= '0' && c <= '9'; }
+
+	// Index in `full` where the declaration name begins, i.e. just past the
+	// single dot that separates the package from the name ("pkg.name"). For
+	// built-ins (no dot) the whole string is the name.
+	function name_start_of(full) {
+		let dot = full.indexOf('.');
+		return dot < 0 ? 0 : dot + 1;
+	}
+
+	// Graded verbatim-substring match. Rather than giving every hit the same
+	// flat score (which forced the sort onto an alphabetical tiebreak and
+	// buried the obvious matches), grade it by *where* and *how well* it lands.
+	function substring_match(str, token) {
+		const lc_str = str.toLowerCase();
+		const lc_tok = token.toLowerCase();
+		let first = lc_str.indexOf(lc_tok);
+		if (first < 0) {
+			return null;
+		}
+
+		const dot_idx    = str.indexOf('.');
+		const name_start = dot_idx < 0 ? 0 : dot_idx + 1;
+		const name_len   = str.length - name_start;
+		const pkg_len    = dot_idx < 0 ? 0 : dot_idx;
+
+		const BASE              = 100000; // keep every substring hit above any acronym/fuzzy hit
+		const NAME_BONUS        =   4000; // match falls in the declaration name, not the package
+		const WORD_START_BONUS  =   2000; // match begins at a word boundary ( _ . space or start )
+		const NAME_PREFIX_BONUS =   2000; // match is the very start of the name
+		const EXACT_NAME_BONUS  =  10000; // the name is exactly the token
+		const CAMEL_BONUS_S     =   1000; // match begins on a camelCase hump
+		const CASE_BONUS        =    250; // matched with the exact case the user typed
+		const COVERAGE_WEIGHT   =   3000; // reward hits that cover more of the segment they land in
+
+		let best_score = -Infinity;
+		let best_idx   = first;
+
+		// The first occurrence is not always the most relevant (a hit in the
+		// package name loses to one in the declaration name), so score every
+		// occurrence and keep the best.
+		for (let i = first; i >= 0; i = lc_str.indexOf(lc_tok, i + 1)) {
+			const end         = i + token.length;
+			const in_name     = i >= name_start;
+			const char_before = i > 0 ? str.charAt(i - 1) : '.';
+			const word_start  = i === name_start || is_sep(char_before);
+			const camel       = i > 0 && (is_lower(str.charAt(i - 1)) || is_digit(str.charAt(i - 1))) && is_upper(str.charAt(i));
+			const exact_name  = in_name && i === name_start && end === str.length;
+
+			let s = BASE;
+			if (in_name)                     s += NAME_BONUS;
+			if (word_start)                  s += WORD_START_BONUS;
+			if (in_name && i === name_start) s += NAME_PREFIX_BONUS;
+			if (camel)                       s += CAMEL_BONUS_S;
+			if (exact_name)                  s += EXACT_NAME_BONUS;
+			if (str.substring(i, end) === token) s += CASE_BONUS;
+
+			// Coverage: how much of the segment it lands in the match fills
+			// (clamped to 1 for tokens that straddle a boundary).
+			const seg = in_name ? name_len : (pkg_len || str.length);
+			s += Math.round(Math.min(token.length / Math.max(seg, 1), 1) * COVERAGE_WEIGHT);
+
+			// Gently prefer shorter identifiers and earlier match positions.
+			s -= Math.min(str.length, 100);
+			s -= Math.min(Math.max(i - name_start, 0), 50);
+
+			if (s > best_score) {
+				best_score = s;
+				best_idx   = i;
+			}
+		}
+
+		let indices = new Array(token.length);
+		for (let k = 0; k < token.length; k++) {
+			indices[k] = best_idx + k;
+		}
+		return {score: best_score, indices: indices};
+	}
+
+	// Acronym / initialism match: the token letters map, in order, onto the
+	// starts of words (after a separator or on a camelCase / digit hump).
+	function acronym_match(str, token) {
+		if (token.length < 2) {
+			return null; // a single-letter "acronym" is noise
+		}
+		const lc_tok      = token.toLowerCase();
+		const name_start  = name_start_of(str);
+
+		let ti      = 0;
+		let indices = [];
+		let anchored_at_name_start = false;
+
+		for (let i = 0; i < str.length && ti < token.length; i++) {
+			const c    = str.charAt(i);
+			const prev = i > 0 ? str.charAt(i - 1) : '';
+			const word_start =
+				i === 0 ||
+				is_sep(prev) ||
+				(is_upper(c) && (is_lower(prev) || is_digit(prev))) ||
+				(is_digit(c) && !is_digit(prev) && !is_sep(prev));
+
+			if (word_start && c.toLowerCase() === lc_tok.charAt(ti)) {
+				if (ti === 0 && i === name_start) {
+					anchored_at_name_start = true;
+				}
+				indices.push(i);
+				ti += 1;
+			}
+		}
+
+		if (ti !== token.length) {
+			return null;
+		}
+
+		const ACRONYM_BASE = 50000; // below any substring hit, above any fuzzy hit
+		let s = ACRONYM_BASE;
+		if (indices[0] >= name_start)  s += 2000; // initials taken from the name, not the package
+		if (anchored_at_name_start)    s += 2000; // ...and starting at the name's first word
+		// Tighter runs (fewer skipped words) are better.
+		s -= Math.min(indices[indices.length - 1] - indices[0], 100);
+		s -= Math.min(str.length, 100);
+		return {score: s, indices: indices};
+	}
+
+	// Fuzzy subsequence match (typo tolerant fallback).
 	function fuzzy_match(str, pattern) {
 		// Score consts
 		const ADJACENCY_BONUS            =  5; // bonus for adjacent matches
@@ -70,72 +216,6 @@ if (odin_search) {
 		const LEADING_LETTER_PENALTY     = -3; // penalty applied for every letter in str before the first match
 		const MAX_LEADING_LETTER_PENALTY = -9; // maximum penalty for leading letters
 		const UNMATCHED_LETTER_PENALTY   = -1; // penalty for every letter that doesn't matter
-
-		{ // NOTE(bill): fast path for when the pattern occurs verbatim somewhere in the string.
-			const lc_str = str.toLowerCase();
-			const lc_pat = pattern.toLowerCase();
-			let first = lc_str.indexOf(lc_pat);
-			if (first >= 0) {
-				const dot_idx    = str.indexOf('.');
-				const name_start = dot_idx < 0 ? 0 : dot_idx + 1;
-				const name_len   = str.length - name_start;
-				const pkg_len    = dot_idx < 0 ? 0 : dot_idx;
-
-				const BASE             = 100000;
-				const NAME_BONUS       =   4000;
-				const WORD_START_BONUS =   2000;
-				const NAME_PREFIX_BONUS=   2000;
-				const EXACT_NAME_BONUS =  10000;
-				const CAMEL_BONUS_S    =   1000;
-				const CASE_BONUS       =    250;
-				const COVERAGE_WEIGHT  =   3000;
-
-				const is_lower = c => c >= 'a' && c <= 'z';
-				const is_upper = c => c >= 'A' && c <= 'Z';
-
-				let best_score = -Infinity;
-				let best_idx   = first;
-
-				// The first occurrence is not always the most relevant one (a hit in
-				// the package name loses to a hit in the declaration name), so score
-				// every occurrence and keep the best.
-				for (let i = first; i >= 0; i = lc_str.indexOf(lc_pat, i + 1)) {
-					const end         = i + pattern.length;
-					const in_name     = i >= name_start;
-					const char_before = i > 0 ? str.charAt(i - 1) : '.';
-					const word_start  = i === name_start || char_before === '_' || char_before === '.' || char_before === ' ';
-					const camel       = i > 0 && is_lower(str.charAt(i - 1)) && is_upper(str.charAt(i));
-					const exact_name  = in_name && i === name_start && end === str.length;
-
-					let s = BASE;
-					if (in_name)                     s += NAME_BONUS;
-					if (word_start)                  s += WORD_START_BONUS;
-					if (in_name && i === name_start) s += NAME_PREFIX_BONUS;
-					if (camel)                       s += CAMEL_BONUS_S;
-					if (exact_name)                  s += EXACT_NAME_BONUS;
-					if (str.substring(i, end) === pattern) s += CASE_BONUS;
-
-					// Coverage: how much of the segment the match lands in it fills.
-					// A full-name match (coverage 1) beats a match that is a small
-					// fragment of a long identifier.
-					const segment_len = in_name ? name_len : (pkg_len || str.length);
-					s += Math.round((pattern.length / Math.max(segment_len, 1)) * COVERAGE_WEIGHT);
-
-					// Gently prefer shorter identifiers and earlier match positions.
-					s -= Math.min(str.length, 100);
-					s -= Math.min(Math.max(i - name_start, 0), 50);
-
-					if (s > best_score) {
-						best_score = s;
-						best_idx   = i;
-					}
-				}
-
-				let i = best_idx;
-				let formatted_str = str.substring(0, i) + '<b>' + str.substring(i, i+pattern.length) + '</b>' + str.substring(i+pattern.length, str.length);
-				return [true, best_score, formatted_str];
-			}
-		}
 
 		// Loop variables
 		let score          = 0;
@@ -239,11 +319,15 @@ if (odin_search) {
 				seen_dot = true;
 			}
 
-			// Match separator
+			// Match separator.
+			//
+			// NOTE: the original code advanced `pattern_idx` here on *every*
+			// separator in the string, regardless of the pattern. That let a
+			// query "complete" simply by consuming enough separators, so
+			// patterns that were not really present were reported as matches
+			// (e.g. "xyzij" matching "a_b_c_d_e"). That advance has been
+			// removed so matching is a correct subsequence test.
 			prev_separator = str_char == '_' || str_char == ' ' || str_char == '.';
-			if (prev_separator && !prev_matched) {
-				pattern_idx += 1
-			}
 
 			str_idx += 1;
 		}
@@ -254,50 +338,139 @@ if (odin_search) {
 			matched_indices.push(best_letter_idx);
 		}
 
-		// Finish out formatted string after last pattern matched
-		// Build formated string based on matched letters
-		let formatted_str = "";
-		let last_idx = 0;
-		let matched_indices_length = matched_indices.length;
-		for (let i = 0; i < matched_indices_length; i++) {
-			let idx = matched_indices[i];
-			formatted_str += str.substring(last_idx, idx) + "<b>" + str.charAt(idx) + "</b>";
-			last_idx = idx + 1;
-		}
-		formatted_str += str.substring(last_idx, str.length);
-
 		let matched = pattern_idx == pattern_length;
-		return [matched, score, formatted_str];
+		if (!matched) {
+			return null;
+		}
+		return {score: score, indices: matched_indices};
+	}
+
+	// Best score for a single token against one entity name.
+	function match_token(str, token) {
+		let best = substring_match(str, token);
+
+		let acr = acronym_match(str, token);
+		if (acr && (best === null || acr.score > best.score)) {
+			best = acr;
+		}
+
+		// Fuzzy is the fallback: only pay for it when nothing stronger matched.
+		if (best === null) {
+			best = fuzzy_match(str, token);
+		}
+		return best;
+	}
+
+	// An entity matches only if *every* token matches; its score is the sum of
+	// the per-token scores and its highlight set is the union of their indices.
+	function match_entity(full, tokens) {
+		let total       = 0;
+		let all_indices = [];
+		for (let t = 0; t < tokens.length; t++) {
+			let m = match_token(full, tokens[t]);
+			if (m === null) {
+				return null;
+			}
+			total += m.score;
+			for (let k = 0; k < m.indices.length; k++) {
+				all_indices.push(m.indices[k]);
+			}
+		}
+		return {score: total, indices: all_indices};
+	}
+
+	function tokenize(text) {
+		return text.split(/[\s.]+/).filter(function(t) { return t.length > 0; });
+	}
+
+	// Kinds a searcher is most likely to be after, used only to break exact
+	// score ties. Lower = higher priority.
+	const KIND_RANK = {
+		"p": 0, // procedure
+		"g": 0, // procedure group
+		"t": 1, // type
+		"b": 2, // builtin / intrinsic
+		"v": 3, // variable
+		"c": 4, // constant
+	};
+
+	// Incremental filtering: the results for a query are always a subset of the
+	// results for any prefix of that query, so when the user is typing forward
+	// we only re-rank the previous match set instead of rescanning everything.
+	let search_cache = {query: "", entities: null};
+
+	function reset_search_cache() {
+		search_cache.query = "";
+		search_cache.entities = null;
 	}
 
 	function fuzzy_entity_match(entities, search_text) {
-		let entities_length = entities.length;
+		let tokens = tokenize(search_text);
+		if (tokens.length === 0) {
+			return [];
+		}
 
-		let result_idx = 0;
-		let results = new Array(entities_length);
-		for (let i = 0; i < entities_length; i++) {
-			let entity = entities[i];
-			let full_name = entity.full;
-			let [matched, score, formatted] = fuzzy_match(full_name, search_text);
-			if (matched) {
-				results[result_idx++] = {
-					"entity":    entity,
-					"score":     score,
-					"formatted": formatted,
-				};
+		let source = entities;
+		if (search_cache.entities && search_cache.query && search_text.startsWith(search_cache.query)) {
+			source = search_cache.entities;
+		}
+
+		let source_length = source.length;
+		let results = [];
+		for (let i = 0; i < source_length; i++) {
+			let entity = source[i];
+			let m = match_entity(entity.full, tokens);
+			if (m !== null) {
+				results.push({
+					"entity":  entity,
+					"score":   m.score,
+					"indices": m.indices,
+				});
 			}
 		}
 
-		results.length = result_idx;
-
 		results.sort(function(a, b) {
-			if (a.score == b.score) {
-				return strcmp(a.entity.name, b.entity.name);
+			if (a.score !== b.score) {
+				return b.score - a.score;
 			}
-			return b.score - a.score;
+			// Tie-break: prefer the more likely kind, then shorter names, then
+			// alphabetical order, so equal-scoring ties resolve toward the more
+			// probable target instead of whatever happens to sort first.
+			let ka = KIND_RANK[a.entity.kind]; if (ka === undefined) ka = 5;
+			let kb = KIND_RANK[b.entity.kind]; if (kb === undefined) kb = 5;
+			if (ka !== kb) {
+				return ka - kb;
+			}
+			if (a.entity.name.length !== b.entity.name.length) {
+				return a.entity.name.length - b.entity.name.length;
+			}
+			return strcmp(a.entity.name, b.entity.name);
 		});
 
+		search_cache.query = search_text;
+		search_cache.entities = results.map(function(r) { return r.entity; });
 		return results;
+	}
+
+	// Wrap the matched index ranges of full[from,to) in <b>, coalescing runs of
+	// adjacent matched characters into a single span.
+	function highlight_range(full, idx_set, from, to) {
+		let out = "";
+		let i = from;
+		while (i < to) {
+			if (idx_set.has(i)) {
+				let j = i;
+				while (j < to && idx_set.has(j)) j++;
+				out += "<b>" + full.substring(i, j) + "</b>";
+				i = j;
+			} else {
+				let j = i;
+				while (j < to && !idx_set.has(j)) j++;
+				out += full.substring(i, j);
+				i = j;
+			}
+		}
+		return out;
 	}
 
 	{
@@ -358,6 +531,20 @@ if (odin_search) {
 		let pkg_headers = getElementsByClassNameArray("pkg-header");
 		let pkg_top = document.getElementById("pkg-top");
 
+		// Accessibility: expose the search box + results as an ARIA combobox
+		// driving a listbox, so screen readers announce the active result.
+		odin_search.setAttribute("role", "combobox");
+		odin_search.setAttribute("aria-autocomplete", "list");
+		odin_search.setAttribute("aria-expanded", "false");
+		odin_search.setAttribute("aria-haspopup", "listbox");
+		if (odin_search_results) {
+			odin_search_results.setAttribute("role", "listbox");
+			if (!odin_search_results.id) {
+				odin_search_results.id = "odin-search-results";
+			}
+			odin_search.setAttribute("aria-controls", odin_search_results.id);
+		}
+
 
 		if (odin_search_filter) {
 			odin_search_filter.onclick = function(ev) {
@@ -381,19 +568,30 @@ if (odin_search) {
 			draw_search_cursor();
 		}
 		function draw_search_cursor() {
+			let active_id = "";
 			for (let i = 0; i < odin_search_results.children.length; i++) {
 				let li = odin_search_results.children[i];
 				if (curr_search_index === i) {
 					li.classList.add("selected");
+					li.setAttribute("aria-selected", "true");
+					active_id = li.id || "";
+					if (li.scrollIntoView) {
+						li.scrollIntoView({block: "nearest"});
+					}
 				} else {
 					li.classList.remove("selected");
+					li.setAttribute("aria-selected", "false");
 				}
 			}
+			odin_search.setAttribute("aria-activedescendant", active_id);
 		}
 
 		function clear_odin_search_doms() {
+			reset_search_cache();
 			odin_search_results.innerHTML = '';
 			odin_search_time.innerHTML = '';
+			odin_search.setAttribute("aria-expanded", "false");
+			odin_search.setAttribute("aria-activedescendant", "");
 			for (let i = 0; i < pkg_entities.length; i++) {
 				let pkg_entity = pkg_entities[i];
 				if (pkg_entity) {
@@ -466,30 +664,35 @@ if (odin_search) {
 
 				}
 			} else {
-				// limit the results
+				// limit the results (only the displayed results are formatted)
 				results_length = Math.min(results_length, MAX_RESULTS_LENGTH);
 
 				let list_contents = [];
 				for (let result_idx = 0; result_idx < results_length; result_idx++) {
 					let result = results[result_idx];
 					let entity = result.entity;
-					let formatted_str = result.formatted;
 
-					let pkg_path = odin_pkg_data.packages[entity.pkg].path;
-
-					let full_path = `${pkg_path}/#${entity.name}`;
-
-					list_contents.push(`<li data-path="${full_path}">`);
-					// list_contents.push(`${result.score}&mdash;`);
+					let full = entity.full;
+					let idx_set = new Set(result.indices);
+					let dot = full.indexOf('.');
 
 					let is_builtin = false;
-					let [formatted_pkg, formatted_name] = [null, ""];
-					if (formatted_str.includes(".")) {
-						[formatted_pkg, formatted_name] = formatted_str.split(".", 2);
+					let formatted_pkg = null;
+					let formatted_name = "";
+					if (dot >= 0) {
+						formatted_pkg  = highlight_range(full, idx_set, 0, dot);
+						formatted_name = highlight_range(full, idx_set, dot + 1, full.length);
 					} else {
 						is_builtin = entity.pkg == "builtin" || entity.pkg == "intrinsics" || entity.pkg == "runtime";
-						formatted_name = formatted_str;
+						formatted_name = highlight_range(full, idx_set, 0, full.length);
 					}
+
+					let pkg_path = odin_pkg_data.packages[entity.pkg].path;
+					let full_path = `${pkg_path}/#${entity.name}`;
+
+					list_contents.push(`<li id="odin-search-result-${result_idx}" role="option" aria-selected="false" data-path="${full_path}">`);
+					// list_contents.push(`${result.score}&mdash;`);
+
 					if (formatted_pkg !== null && (!IS_PACKAGE_PAGE || entity.pkg != odin_pkg_name)) {
 						list_contents.push(`<div><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a></div>`);
 					} else {
@@ -516,6 +719,7 @@ if (odin_search) {
 				}
 
 				odin_search_results.innerHTML = list_contents.join('');
+				odin_search.setAttribute("aria-expanded", "true");
 			}
 
 			let end_time = performance.now();
@@ -526,6 +730,26 @@ if (odin_search) {
 			return;
 		}
 
+		// Coalesce rapid keystrokes: run the search at most once per animation
+		// frame so typing never blocks on a heavy re-scan.
+		let search_raf = 0;
+		function request_search() {
+			if (search_raf) {
+				return;
+			}
+			search_raf = requestAnimationFrame(function() {
+				search_raf = 0;
+				odin_search_input(null);
+			});
+		}
+		function flush_search() {
+			if (search_raf) {
+				cancelAnimationFrame(search_raf);
+				search_raf = 0;
+				odin_search_input(null);
+			}
+		}
+
 		let url_parameters = new URLSearchParams(window.location.search);
 		if (url_parameters.has("q")) {
 			let search_query = url_parameters.get("q");
@@ -534,13 +758,14 @@ if (odin_search) {
 		}
 
 		odin_search.addEventListener("input", ev => {
-			odin_search_input(ev);
+			request_search();
 			ev.stopPropagation();
 		}, false);
 
 		odin_search.addEventListener("keydown", ev => {
 			switch (get_key_string(ev)) {
 			case "Enter":
+				flush_search(); // make sure the list reflects the latest keystroke
 				if (0 <= curr_search_index && curr_search_index < odin_search_results.children.length) {
 					let li = odin_search_results.children[curr_search_index];
 					let path = li.dataset.path;
