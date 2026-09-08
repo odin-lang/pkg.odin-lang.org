@@ -2569,69 +2569,6 @@ write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, met
 	}
 }
 
-write_related_constants :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity) {
-	#partial switch pt := cfg.types[parent.type]; pt.kind {
-	case .Invalid, .Basic, .Generic:
-		// ignore non-useful types
-		return
-	}
-
-	related_constants: [dynamic]^doc.Entity
-	defer delete(related_constants)
-
-	for entry in array(pkg.entries) {
-		e := &cfg.entities[entry.entity]
-		if e.kind == .Constant && e.type == parent.type {
-			if strings.has_prefix(str(e.name), "_") {
-				continue
-			}
-			append(&related_constants, e)
-		}
-	}
-
-	if len(related_constants) == 0 {
-		return
-	}
-
-	the_sort_proc :: proc(a, b: ^doc.Entity) -> (cmp: slice.Ordering) {
-		cmp = slice.cmp(a.kind, b.kind)
-		if cmp != .Equal { return }
-		cmp = slice.cmp(str(a.name), str(b.name))
-		return
-	}
-
-	slice.sort_by_cmp(related_constants[:], the_sort_proc)
-
-	constants_seen := make(map[string]bool)
-	defer delete(constants_seen)
-
-	fmt.wprintfln(w, "<h5>Related Constants</h5>")
-	fmt.wprintln(w, "<ul>")
-	parameter_loop: for e in related_constants {
-		proc_name := str(e.name)
-
-		if constants_seen[proc_name] {
-			continue parameter_loop
-		}
-		constants_seen[proc_name] = true
-
-		collection := cfg.pkg_to_collection[pkg]
-		fmt.wprintf(w, "<li>")
-		fmt.wprintf(
-			w,
-			`<a href="%s/%s/#%s">%s</a>`,
-			collection.base_url,
-			collection.pkg_to_path[pkg],
-			proc_name,
-			proc_name,
-		)
-		fmt.wprintfln(w, "</li>")
-	}
-	fmt.wprintln(w, "</ul>")
-
-}
-
-
 the_sort_proc :: proc(a, b: ^doc.Entity) -> (cmp: slice.Ordering) {
 	cmp = slice.cmp(a.kind, b.kind)
 	if cmp != .Equal { return }
@@ -2711,169 +2648,242 @@ print_procs :: proc(w:               io.Writer,
 	}
 }
 
-write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, proc_names_seen: ^map[string]bool, is_inherited := false) {
-	related_procs_in_parameters:   [dynamic]^doc.Entity
-	related_procs_in_return_types: [dynamic]^doc.Entity
 
-	for entry in array(pkg.entries) {
-		check_proc :: proc(e: ^doc.Entity, parent: ^doc.Entity, is_output: bool) -> (related_proc: ^doc.Entity, ok: bool) {
-			if e.kind != .Procedure {
-				return
-			}
+// One-time reverse indices per package, replacing the per-entity full scans in
+// write_related_* (previously ~O(types * procs); now O(entries)). A type-name
+// entity is "related" to a proc/group by parameter or by result, via the same
+// three matches the old check_proc used, so the rendered lists are unchanged:
+//   *_by_type:   the (possibly dereferenced) parameter type is the entity's type
+//   *_by_entity: a `.Named` parameter refers to the entity itself
+//   *_by_name:   a generic-instantiation parameter's base name equals the name
+Pkg_Relations :: struct {
+	param_by_type:    map[doc.Type_Index][dynamic]^doc.Entity,
+	param_by_entity:  map[^doc.Entity]   [dynamic]^doc.Entity,
+	param_by_name:    map[string]        [dynamic]^doc.Entity,
+	result_by_type:   map[doc.Type_Index][dynamic]^doc.Entity,
+	result_by_entity: map[^doc.Entity]   [dynamic]^doc.Entity,
+	result_by_name:   map[string]        [dynamic]^doc.Entity,
+	groups_by_member: map[^doc.Entity]   [dynamic]^doc.Entity, // proc-groups containing a given procedure
+	consts_by_type:   map[doc.Type_Index][dynamic]^doc.Entity, // constants of a given type
+}
 
-			parent_name := str(parent.name)
-
-			e_pkg      := cfg.entity_to_pkg[e]
-			parent_pkg := cfg.entity_to_pkg[parent]
-			check_for_identical_types := true
-
-			pt := base_type(cfg.types[e.type])
-			(pt.kind == .Proc) or_return
-			params := array(cfg.types[array(pt.types)[int(is_output)]].entities)
-			for param_idx in params {
-				t := &cfg.types[cfg.entities[param_idx].type]
-
-				if check_for_identical_types && e_pkg == parent_pkg && t == &cfg.types[parent.type] {
-					return e, true
-				}
-
-				#partial switch t.kind {
-				case .Named, .Generic:
-					// okay
-				case .Pointer, .Multi_Pointer:
-					t = &cfg.types[array(t.types)[0]]
-				case:
-					continue
-				}
-
-				if check_for_identical_types && e_pkg == parent_pkg && t == &cfg.types[parent.type] {
-					return e, true
-				}
-
-				#partial switch t.kind {
-				case .Named:
-					named_entity := &cfg.entities[array(t.entities)[0]]
-					if parent == named_entity {
-						return e, true
-					}
-
-					gt_name, sep, _ := strings.partition(str(named_entity.name), "(")
-					if sep == "(" && gt_name == parent_name {
-						return e, true
-					}
-				case .Generic:
-					type_types := array(t.types)
-					if len(type_types) != 1 {
-						continue
-					}
-					gt := cfg.types[type_types[0]]
-					if gt.kind != .Named {
-						continue
-					}
-
-					gt_name, sep, _ := strings.partition(str(gt.name), "(")
-					if sep == "(" && gt_name == parent_name {
-						return e, true
-					}
-				}
-			}
+pkg_relations_get :: proc(pkg: ^doc.Pkg) -> ^Pkg_Relations {
+	collect_relations :: proc(src, value: ^doc.Entity, results: bool,
+	                          by_type:   ^map[doc.Type_Index][dynamic]^doc.Entity,
+	                          by_entity: ^map[^doc.Entity][dynamic]^doc.Entity,
+	                          by_name:   ^map[string][dynamic]^doc.Entity) {
+		pt := base_type(cfg.types[src.type])
+		if pt.kind != .Proc {
 			return
 		}
+		tps := array(pt.types)
+		if len(tps) <= int(results) {
+			return
+		}
+		for param_idx in array(cfg.types[tps[int(results)]].entities) {
+			raw_ti := cfg.entities[param_idx].type
+			map_append(by_type, raw_ti, value) // identity match on the raw type
 
-		e := &cfg.entities[entry.entity]
-		e_name := str(e.name)
-		#partial switch e.kind {
-		case .Procedure:
-			if strings.has_prefix(e_name, "_") {
+			t := &cfg.types[raw_ti]
+			#partial switch t.kind {
+			case .Named, .Generic:
+				// no deref
+			case .Pointer, .Multi_Pointer:
+				inner := array(t.types)[0]
+				map_append(by_type, inner, value) // identity match after deref
+				t = &cfg.types[inner]
+			case:
 				continue
 			}
-			if p, ok := check_proc(e, parent, false); ok {
-				append(&related_procs_in_parameters, p)
-			}
-			if !is_inherited {
-				if p, ok := check_proc(e, parent, true); ok {
-					append(&related_procs_in_return_types, p)
-				}
-			}
-		case .Proc_Group:
-			if strings.has_prefix(e_name, "_") {
-				continue
-			}
 
-			for entity_idx in array(e.grouped_entities) {
-				pe := &cfg.entities[entity_idx]
-				if _, ok := check_proc(pe, parent, false); ok {
-					append(&related_procs_in_parameters, e)
-					break
+			#partial switch t.kind {
+			case .Named:
+				ne := &cfg.entities[array(t.entities)[0]]
+				map_append(by_entity, ne, value)
+				if base, sep, _ := strings.partition(str(ne.name), "("); sep == "(" {
+					map_append(by_name, base, value)
 				}
-			}
-			if !is_inherited do for entity_idx in array(e.grouped_entities) {
-				pe := &cfg.entities[entity_idx]
-				if _, ok := check_proc(pe, parent, true); ok {
-					append(&related_procs_in_return_types, e)
-					break
+			case .Generic:
+				tt := array(t.types)
+				if len(tt) == 1 {
+					gt := cfg.types[tt[0]]
+					if gt.kind == .Named {
+						if base, sep, _ := strings.partition(str(gt.name), "("); sep == "(" {
+							map_append(by_name, base, value)
+						}
+					}
 				}
 			}
 		}
 	}
 
-	slice.sort_by_cmp(related_procs_in_parameters[:],   the_sort_proc)
-	slice.sort_by_cmp(related_procs_in_return_types[:], the_sort_proc)
+	map_append :: proc(m: ^map[$K][dynamic]^doc.Entity, k: K, v: ^doc.Entity) {
+		arr := m[k]
+		append(&arr, v)
+		m[k] = arr
+	}
 
-	print_procs(w, pkg, parent, related_procs_in_parameters[:],   proc_names_seen, is_inherited, title="Related Procedures With Parameters")
-	print_procs(w, pkg, parent, related_procs_in_return_types[:], proc_names_seen, is_inherited, title="Related Procedures With Returns")
+	@(static)
+	pkg_relations_cache: map[^doc.Pkg]^Pkg_Relations
 
-	delete(related_procs_in_parameters)
-	delete(related_procs_in_return_types)
+	if r, ok := pkg_relations_cache[pkg]; ok {
+		return r
+	}
+	r := new(Pkg_Relations)
 
-	{ // recursive_inheritance_check
-		parent_type := cfg.types[parent.type]
-		for parent_type.kind == .Named {
-			parent_type = cfg.types[array(parent_type.types)[0]]
+	for entry in array(pkg.entries) {
+		e := &cfg.entities[entry.entity]
+		if strings.has_prefix(str(e.name), "_") {
+			continue // matches the old `_`-prefix skips in every write_related_*
 		}
-		if parent_type.kind != .Struct {
-			return
-		}
-		for entity_index in array(parent_type.entities) {
-			field := &cfg.entities[entity_index]
-			if .Param_Using not_in field.flags {
-				continue
+		#partial switch e.kind {
+		case .Procedure:
+			collect_relations(e, e, false, &r.param_by_type,  &r.param_by_entity,  &r.param_by_name)
+			collect_relations(e, e, true,  &r.result_by_type, &r.result_by_entity, &r.result_by_name)
+		case .Proc_Group:
+			for midx in array(e.grouped_entities) {
+				m := &cfg.entities[midx]
+				collect_relations(m, e, false, &r.param_by_type,  &r.param_by_entity,  &r.param_by_name)
+				collect_relations(m, e, true,  &r.result_by_type, &r.result_by_entity, &r.result_by_name)
+				map_append(&r.groups_by_member, m, e)
 			}
-			field_type := cfg.types[field.type]
-			if field_type.entities.length == 0 {
-				continue
-			}
-			field_type_entity := &cfg.entities[array(field_type.entities)[0]]
-			field_pkg := &cfg.pkgs[cfg.files[field.pos.file].pkg]
-			write_related_procedures(w, field_pkg, field_type_entity, proc_names_seen, true)
+		case .Constant:
+			map_append(&r.consts_by_type, e.type, e)
 		}
+	}
+
+	pkg_relations_cache[pkg] = r
+	return r
+}
+
+relation_list :: proc(m: map[$K][dynamic]^doc.Entity, k: K) -> []^doc.Entity {
+	if arr, ok := m[k]; ok {
+		return arr[:]
+	}
+	return nil
+}
+
+relation_collect :: proc(rel: ^Pkg_Relations, parent: ^doc.Entity, results: bool) -> (out: [dynamic]^doc.Entity) {
+	by_type, by_entity, by_name: []^doc.Entity
+	if results {
+		by_type   = relation_list(rel.result_by_type,   parent.type)
+		by_entity = relation_list(rel.result_by_entity, parent)
+		by_name   = relation_list(rel.result_by_name,   str(parent.name))
+	} else {
+		by_type   = relation_list(rel.param_by_type,   parent.type)
+		by_entity = relation_list(rel.param_by_entity, parent)
+		by_name   = relation_list(rel.param_by_name,   str(parent.name))
+	}
+	ppkg := cfg.entity_to_pkg[parent]
+
+	seen: map[^doc.Entity]bool
+	defer delete(seen)
+	for e in by_type {
+		if cfg.entity_to_pkg[e] != ppkg { continue }
+		if e in seen { continue }
+		seen[e] = true
+		append(&out, e)
+	}
+	for e in by_entity {
+		if e in seen { continue }
+		seen[e] = true
+		append(&out, e)
+	}
+	for e in by_name {
+		if e in seen { continue }
+		seen[e] = true
+		append(&out, e)
+	}
+	slice.sort_by_cmp(out[:], the_sort_proc)
+	return
+}
+
+write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, proc_names_seen: ^map[string]bool, is_inherited := false) {
+	rel := pkg_relations_get(pkg)
+
+	params := relation_collect(rel, parent, false)
+	defer delete(params)
+	print_procs(w, pkg, parent, params[:], proc_names_seen, is_inherited, title="Related Procedures With Parameters")
+
+	results: [dynamic]^doc.Entity
+	defer delete(results)
+	if !is_inherited {
+		results = relation_collect(rel, parent, true)
+	}
+	print_procs(w, pkg, parent, results[:], proc_names_seen, is_inherited, title="Related Procedures With Returns")
+
+	// Recursive `using` inheritance (unchanged).
+	parent_type := cfg.types[parent.type]
+	for parent_type.kind == .Named {
+		parent_type = cfg.types[array(parent_type.types)[0]]
+	}
+	if parent_type.kind != .Struct {
+		return
+	}
+	for entity_index in array(parent_type.entities) {
+		field := &cfg.entities[entity_index]
+		if .Param_Using not_in field.flags {
+			continue
+		}
+		field_type := cfg.types[field.type]
+		if field_type.entities.length == 0 {
+			continue
+		}
+		field_type_entity := &cfg.entities[array(field_type.entities)[0]]
+		field_pkg := &cfg.pkgs[cfg.files[field.pos.file].pkg]
+		write_related_procedures(w, field_pkg, field_type_entity, proc_names_seen, true)
 	}
 }
 
 write_related_procedure_groups :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, proc_names_seen: ^map[string]bool, is_inherited := false) {
+	rel := pkg_relations_get(pkg)
+
 	groups: [dynamic]^doc.Entity
 	defer delete(groups)
-
-	for entry in array(pkg.entries) {
-		e := &cfg.entities[entry.entity]
-		e_name := str(e.name)
-		if e.kind != .Proc_Group ||
-		   strings.has_prefix(e_name, "_") {
-			continue
-		}
-
-		for entity_idx in array(e.grouped_entities) {
-			pe := &cfg.entities[entity_idx]
-			if pe == parent {
-				append(&groups, e)
-				break
-			}
-		}
+	seen: map[^doc.Entity]bool
+	defer delete(seen)
+	for g in relation_list(rel.groups_by_member, parent) {
+		if g in seen { continue }
+		seen[g] = true
+		append(&groups, g)
 	}
-
 	slice.sort_by_cmp(groups[:], the_sort_proc)
 
-	print_procs(w, pkg, parent, groups[:],   proc_names_seen, is_inherited, title="Related Procedure Groups", ignore_procedure_group_suffix=true)
+	print_procs(w, pkg, parent, groups[:], proc_names_seen, is_inherited, title="Related Procedure Groups", ignore_procedure_group_suffix=true)
+}
+
+write_related_constants :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity) {
+	#partial switch pt := cfg.types[parent.type]; pt.kind {
+	case .Invalid, .Basic, .Generic:
+		return
+	}
+
+	rel := pkg_relations_get(pkg)
+	related := relation_list(rel.consts_by_type, parent.type)
+	if len(related) == 0 {
+		return
+	}
+
+	list := make([dynamic]^doc.Entity, 0, len(related))
+	defer delete(list)
+	append(&list, ..related)
+	slice.sort_by_cmp(list[:], the_sort_proc)
+
+	constants_seen := make(map[string]bool)
+	defer delete(constants_seen)
+
+	collection := cfg.pkg_to_collection[pkg]
+	fmt.wprintfln(w, "<h5>Related Constants</h5>")
+	fmt.wprintln(w, "<ul>")
+	for e in list {
+		name := str(e.name)
+		if constants_seen[name] { continue }
+		constants_seen[name] = true
+		fmt.wprintf(w, "<li>")
+		fmt.wprintf(w, `<a href="%s/%s/#%s">%s</a>`, collection.base_url, collection.pkg_to_path[pkg], name, name)
+		fmt.wprintfln(w, "</li>")
+	}
+	fmt.wprintln(w, "</ul>")
 }
 
 slugify :: proc(s: string, allocator := context.allocator) -> string {
