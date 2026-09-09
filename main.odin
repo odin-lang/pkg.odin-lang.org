@@ -146,6 +146,9 @@ main :: proc() {
 }
 
 generate_sitemap :: proc(b: ^strings.Builder, collections: []^Collection) {
+	write_url :: proc(w: io.Writer, loc, lastmod: string) {
+		fmt.wprintf(w, "\t<url><loc>%s</loc><lastmod>%s</lastmod></url>\n", loc, lastmod)
+	}
 	if cfg.domain == "" {
 		log.warn("no `domain` configured; skipping sitemap.xml and robots.txt")
 		return
@@ -155,24 +158,22 @@ generate_sitemap :: proc(b: ^strings.Builder, collections: []^Collection) {
 	origin := fmt.tprintf("https://%s", cfg.domain)
 	w := strings.to_writer(b)
 
-	write_url :: proc(w: io.Writer, loc: string) {
-		fmt.wprintf(w, "\t<url><loc>%s</loc></url>\n", loc)
-	}
+	lastmod := build_date()
 
 	strings.builder_reset(b)
 	io.write_string(w, `<?xml version="1.0" encoding="UTF-8"?>`+"\n")
 	io.write_string(w, `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`+"\n")
 
-	write_url(w, fmt.tprintf("%s/", origin))
+	write_url(w, fmt.tprintf("%s/", origin), lastmod)
 
 	for c in collections {
 		if c.hidden {
 			continue
 		}
-		write_url(w, fmt.tprintf("%s%s/", origin, c.base_url))
+		write_url(w, fmt.tprintf("%s%s/", origin, c.base_url), lastmod)
 		if c.name == "base" {
-			write_url(w, fmt.tprintf("%s%s/builtin/", origin, c.base_url))
-			write_url(w, fmt.tprintf("%s%s/intrinsics/", origin, c.base_url))
+			write_url(w, fmt.tprintf("%s%s/builtin/", origin, c.base_url), lastmod)
+			write_url(w, fmt.tprintf("%s%s/intrinsics/", origin, c.base_url), lastmod)
 		}
 
 		paths := make([dynamic]string, 0, len(c.pkgs), context.temp_allocator)
@@ -184,7 +185,7 @@ generate_sitemap :: proc(b: ^strings.Builder, collections: []^Collection) {
 		}
 		slice.sort(paths[:])
 		for path in paths {
-			write_url(w, fmt.tprintf("%s%s/%s/", origin, c.base_url, path))
+			write_url(w, fmt.tprintf("%s%s/%s/", origin, c.base_url, path), lastmod)
 		}
 	}
 
@@ -235,6 +236,11 @@ build_time :: proc() -> time.Time {
 	}
 	_build_time = t
 	return t
+}
+@(require_results)
+build_date :: proc() -> string {
+	y, m, d := time.date(build_time())
+	return fmt.tprintf("%04d-%02d-%02d", y, int(m), int(d))
 }
 
 init_cfg_from_header :: proc(header: ^doc.Header, loc := #caller_location) {
@@ -2162,7 +2168,10 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 				if strings.has_prefix(line, "##") {
 					n := 0
 					for c in line {
-						if c == '#' { n += 1 } else { break }
+						if c != '#' {
+							break
+						}
+						n += 1
 					}
 					io.write_string(w, "</p>\n")
 					fmt.wprintf(w, "<h%d>", n+2)
