@@ -3119,6 +3119,19 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	fmt.wprintf(w, "</h3>\n")
 	fmt.wprintln(w, `<div>`)
 
+	if raw, ok := find_entity_attribute(e, "deprecated"); ok {
+		msg, _, unq_ok := strconv.unquote_string(raw, context.temp_allocator)
+		if !unq_ok {
+			msg = raw
+		}
+		io.write_string(w, `<div class="doc-deprecated" role="note"><strong>Deprecated.</strong>`)
+		if strings.trim_space(msg) != "" {
+			io.write_byte(w, ' ')
+			write_markup_text(w, msg)
+		}
+		io.write_string(w, "</div>\n")
+	}
+
 	// Important: Don't trim `the_docs`.
 	// See comment block below where we optionally replace it with `e.comment`.
 	the_docs := str(e.docs)
