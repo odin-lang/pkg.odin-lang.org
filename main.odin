@@ -3339,7 +3339,7 @@ INDEX_MIN_ENTRIES_TO_GROUP :: 16
 Index_Group_Handlers :: struct {
 	group_start: proc(w: io.Writer, prefix: string, count: int),
 	group_end:   proc(w: io.Writer),
-	item:        proc(w: io.Writer, name: string),
+	item:        proc(w: io.Writer, entry: doc.Scope_Entry),
 }
 
 index_group_prefix :: proc(name: string) -> string {
@@ -3349,7 +3349,8 @@ index_group_prefix :: proc(name: string) -> string {
 	return ""
 }
 
-write_index_item :: proc(w: io.Writer, name: string) {
+write_index_item :: proc(w: io.Writer, entry: doc.Scope_Entry) {
+	name := str(entry.name)
 	fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", name)
 }
 
@@ -3368,12 +3369,12 @@ walk_index_groups :: proc(w: io.Writer, entries: []doc.Scope_Entry, h: Index_Gro
 		if prefix != "" && len(run) >= INDEX_MIN_GROUP_SIZE {
 			h.group_start(w, prefix, len(run))
 			for e in run {
-				h.item(w, str(e.name))
+				h.item(w, e)
 			}
 			h.group_end(w)
 		} else {
 			for e in run {
-				h.item(w, str(e.name))
+				h.item(w, e)
 			}
 		}
 		i = j
@@ -3400,7 +3401,7 @@ write_index_body :: proc(w: io.Writer, entries: []doc.Scope_Entry) {
 	if len(entries) < INDEX_MIN_ENTRIES_TO_GROUP {
 		fmt.wprintln(w, "<ul>")
 		for e in entries {
-			write_index_item(w, str(e.name))
+			write_toc_item(w, e)
 		}
 		fmt.wprintln(w, "</ul>")
 		return
@@ -3409,15 +3410,25 @@ write_index_body :: proc(w: io.Writer, entries: []doc.Scope_Entry) {
 	walk_index_groups(w, entries, {
 		group_start = index_group_start,
 		group_end   = index_group_end,
-		item        = write_index_item,
+		item        = write_toc_item,
 	})
 	fmt.wprintln(w, "</ul>")
 }
 
+write_toc_item :: proc(w: io.Writer, entry: doc.Scope_Entry) {
+	name := str(entry.name)
+	if _, ok := find_entity_attribute(&cfg.entities[entry.entity], "deprecated"); ok {
+		fmt.wprintf(w, `<li><a class="deprecated" href="#{0:s}" title="Deprecated"><s>{0:s}</s></a></li>`+"\n", name)
+	} else {
+		fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", name)
+	}
+}
+
+
 write_toc_section :: proc(w: io.Writer, entries: []doc.Scope_Entry) {
 	if len(entries) < INDEX_MIN_ENTRIES_TO_GROUP {
 		for e in entries {
-			write_index_item(w, str(e.name))
+			write_index_item(w, e)
 		}
 		return
 	}
