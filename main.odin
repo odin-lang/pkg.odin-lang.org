@@ -3336,17 +3336,15 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 INDEX_MIN_GROUP_SIZE :: 3
 INDEX_MIN_ENTRIES_TO_GROUP :: 16
 
-Index_Group_Handlers :: struct {
-	group_start: proc(w: io.Writer, prefix: string, count: int),
-	group_end:   proc(w: io.Writer),
-	item:        proc(w: io.Writer, entry: doc.Scope_Entry),
-}
-
 index_group_prefix :: proc(name: string) -> string {
 	if i := strings.index_byte(name, '_'); i > 0 {
 		return name[:i]
 	}
 	return ""
+}
+
+scope_entry_name :: proc(e: doc.Scope_Entry) -> string {
+	return str(e.name)
 }
 
 write_index_item :: proc(w: io.Writer, entry: doc.Scope_Entry) {
@@ -3355,26 +3353,32 @@ write_index_item :: proc(w: io.Writer, entry: doc.Scope_Entry) {
 }
 
 
-walk_index_groups :: proc(w: io.Writer, entries: []doc.Scope_Entry, h: Index_Group_Handlers) {
-	i := 0
-	for i < len(entries) {
-		prefix := index_group_prefix(str(entries[i].name))
+walk_index_groups :: proc(
+	w:           io.Writer,
+	entries:     []$T,
+	name_of:     proc(e: T) -> string,
+	item:        proc(w: io.Writer, e: T),
+	group_start: proc(w: io.Writer, prefix: string, count: int),
+	group_end:   proc(w: io.Writer),
+) {
+	for i := 0; i < len(entries); /**/ {
+		prefix := index_group_prefix(name_of(entries[i]))
 		j := i + 1
 		if prefix != "" {
-			for j < len(entries) && index_group_prefix(str(entries[j].name)) == prefix {
+			for j < len(entries) && index_group_prefix(name_of(entries[j])) == prefix {
 				j += 1
 			}
 		}
 		run := entries[i:j]
 		if prefix != "" && len(run) >= INDEX_MIN_GROUP_SIZE {
-			h.group_start(w, prefix, len(run))
+			group_start(w, prefix, len(run))
 			for e in run {
-				h.item(w, e)
+				item(w, e)
 			}
-			h.group_end(w)
+			group_end(w)
 		} else {
 			for e in run {
-				h.item(w, e)
+				item(w, e)
 			}
 		}
 		i = j
@@ -3407,11 +3411,12 @@ write_index_body :: proc(w: io.Writer, entries: []doc.Scope_Entry) {
 		return
 	}
 	fmt.wprintln(w, `<ul class="doc-index-list">`)
-	walk_index_groups(w, entries, {
+	walk_index_groups(w, entries,
+		name_of     = scope_entry_name,
 		group_start = index_group_start,
 		group_end   = index_group_end,
 		item        = write_toc_item,
-	})
+	)
 	fmt.wprintln(w, "</ul>")
 }
 
@@ -3432,11 +3437,12 @@ write_toc_section :: proc(w: io.Writer, entries: []doc.Scope_Entry) {
 		}
 		return
 	}
-	walk_index_groups(w, entries, {
+	walk_index_groups(w, entries,
+		name_of     = scope_entry_name,
 		group_start = toc_group_start,
 		group_end   = toc_group_end,
 		item        = write_index_item,
-	})
+	)
 }
 
 write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^Collection, pkg_entries: Pkg_Entries) {

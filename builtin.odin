@@ -226,6 +226,15 @@ builtins := []Builtin{
 
 }
 
+
+builtin_name_of :: proc(b: Builtin) -> string {
+	return b.name
+}
+
+write_builtin_index_item :: proc(w: io.Writer, b: Builtin) {
+	fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", b.name)
+}
+
 add_styling_to_builtin :: proc(txt: string) -> string {
 	s := scanner.init(&{}, txt)
 	s.flags -= {.Skip_Comments}
@@ -595,9 +604,25 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 		if entry_count == 0 {
 			io.write_string(w, "<p class=\"pkg-empty-section\">This section is empty.</p>\n")
 		} else {
-			fmt.wprintln(w, "<ul>")
+			table_entries := make([dynamic]Builtin, 0, len(entry_table), context.temp_allocator)
 			for b in entry_table do if b.kind == kind {
-				fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", b.name)
+				append(&table_entries, b)
+			}
+
+			grouped := len(table_entries) >= INDEX_MIN_ENTRIES_TO_GROUP
+			if grouped {
+				fmt.wprintln(w, `<ul class="doc-index-list">`)
+				walk_index_groups(w, table_entries[:],
+					name_of     = builtin_name_of,
+					group_start = index_group_start,
+					group_end   = index_group_end,
+					item        = write_builtin_index_item,
+				)
+			} else {
+				fmt.wprintln(w, "<ul>")
+				for b in table_entries {
+					write_builtin_index_item(w, b)
+				}
 			}
 
 			if any_builtin {
@@ -692,10 +717,23 @@ write_table_contents :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, consts: []doc.
 				for e in entries {      
 					fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", str(e.name))
 				}   
-			} else {     
-				for e in entry_table do if e.kind == kind {      
-					fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", e.name)     
-				}   
+			} else {
+				table_entries := make([dynamic]Builtin, 0, len(entry_table), context.temp_allocator)
+				for e in entry_table do if e.kind == kind {
+					append(&table_entries, e)
+				}
+				if len(table_entries) >= INDEX_MIN_ENTRIES_TO_GROUP {
+					walk_index_groups(w, table_entries[:],
+						name_of     = builtin_name_of,
+						group_start = toc_group_start,
+						group_end   = toc_group_end,
+						item        = write_builtin_index_item,
+					)
+				} else {
+					for b in table_entries {
+						write_builtin_index_item(w, b)
+					}
+				}
 			}
 			fmt.wprintln(w, `</ul>`)
 		}
