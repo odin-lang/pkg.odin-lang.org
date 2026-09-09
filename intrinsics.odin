@@ -439,41 +439,49 @@ intrinsics_table := []Builtin{
 		""",
 	},
 	{name = "type_union_variant_count",                 kind = "b", type = "proc($T: typeid) -> int where type_is_union(T)",
-		comment = "Returns the number of possible variants a union can be (excluding a possible `nil` state).\n\n"+
-		"Example:\n"+
-		"\tassert(type_union_variant_count(union {i32, f32})      == 2)\n"+
-		"\tassert(type_union_variant_count(union {i32, f32, b32}) == 3)\n"+
-		"\tassert(type_union_variant_count(union {})              == 0)\n"+
-		"",
+		comment = """
+		Returns the number of possible variants a union can be (excluding a possible `nil` state).
+
+		Example:
+			assert(type_union_variant_count(union {i32, f32})      == 2)
+			assert(type_union_variant_count(union {i32, f32, b32}) == 3)
+			assert(type_union_variant_count(union {})              == 0)
+		""",
 	},
 	{name = "type_variant_type_of",                     kind = "b", type = "proc($T: typeid, $index: int) -> typeid where type_is_union(T)",
-		comment = "Returns the type of a union `T`'s variant at a specified `index`.\n\n"+
-		"Example:\n"+
-		"\tFoo :: union{i32, f32, string}\n"+
-		"\tassert(type_variant_type_of(Foo, 0) == i32)\n"+
-		"\tassert(type_variant_type_of(Foo, 1) == f32)\n"+
-		"\tassert(type_variant_type_of(Foo, 2) == string)\n"+
-		"",
+		comment = """
+		Returns the type of a union `T`'s variant at a specified `index`.
+
+		Example:
+			Foo :: union{i32, f32, string}
+			assert(type_variant_type_of(Foo, 0) == i32)
+			assert(type_variant_type_of(Foo, 1) == f32)
+			assert(type_variant_type_of(Foo, 2) == string)
+		""",
 	},
 	{name = "type_variant_index_of",                    kind = "b", type = "proc($U, $V: typeid) -> int where type_is_union(U)",
-		comment = "Returns the index of a variant `V` of a union `U`.\n\n"+
-		"Example:\n"+
-		"\tFoo :: union{i32, f32, string}\n"+
-		"\tassert(type_variant_type_of(Foo, i32)    == 0)\n"+
-		"\tassert(type_variant_type_of(Foo, f32)    == 1)\n"+
-		"\tassert(type_variant_type_of(Foo, string) == 2)\n"+
-		"",
+		comment = """
+		Returns the index of a variant `V` of a union `U`.
+
+		Example:
+			Foo :: union{i32, f32, string}
+			assert(type_variant_type_of(Foo, i32)    == 0)
+			assert(type_variant_type_of(Foo, f32)    == 1)
+			assert(type_variant_type_of(Foo, string) == 2)
+		""",
 	},
 
 	{name = "type_bit_set_elem_type",       kind = "b", type = "proc($T: typeid) -> typeid where type_is_bit_set(T)",
 		comment = "Returns the element type of a `bit_set` `T`.",
 	},
 	{name = "type_bit_set_underlying_type", kind = "b", type = "proc($T: typeid) -> typeid where type_is_bit_set(T)",
-		comment = "Returns the underlying/backing type of a `bit_set` `T` rather than the element type.\n\n"+
-		"Example:\n"+
-		"\tassert(type_bit_set_underlying_type(bit_set[0..<8])     == u8)\n"+
-		"\tassert(type_bit_set_underlying_type(bit_set[Enum; int]) == int)\n"+
-		"",
+		comment = """
+		Returns the underlying/backing type of a `bit_set` `T` rather than the element type.
+
+		Example:
+			assert(type_bit_set_underlying_type(bit_set[0..<8])     == u8)
+			assert(type_bit_set_underlying_type(bit_set[Enum; int]) == int)
+		""",
 	},
 
 	{name = "type_has_field",                           kind = "b", type = "proc($T: typeid, $name: string) -> bool",
@@ -483,29 +491,37 @@ intrinsics_table := []Builtin{
 	},
 
 	{name = "type_proc_parameter_count",                kind = "b", type = "proc($T: typeid) -> int where type_is_proc(T)",
-		comment = "Returns the number of parameters a procedure type has.\n\n"+
-		"Example:\n"+
-		"\tassert(type_proc_parameter_count(proc(i32, f32) -> bool) == 2)\n"+
-		"",
+		comment = """
+		Returns the number of parameters a procedure type has.
+
+		Example:
+			assert(type_proc_parameter_count(proc(i32, f32) -> bool) == 2)
+		""",
 	},
 	{name = "type_proc_return_count",                   kind = "b", type = "proc($T: typeid) -> int where type_is_proc(T)",
-		comment = "Returns the number of return values a procedure type has.\n\n"+
-		"Example:\n"+
-		"\tassert(type_proc_return_count(proc(i32, f32) -> bool) == 1)\n"+
-		"",
+		comment = """
+		Returns the number of return values a procedure type has.
+
+		Example:
+			assert(type_proc_return_count(proc(i32, f32) -> bool) == 1)
+		""",
 	},
 
 	{name = "type_proc_parameter_type",                 kind = "b", type = "proc($T: typeid, index: int) -> typeid where type_is_proc(T)",
-		comment = "Returns the type of a parameter of a procedure type at the specified `index`.\n\n"+
-		"Example:\n"+
-		"\tassert(type_proc_parameter_type(proc(i32, f32) -> bool, 1) == f32)\n"+
-		"",
+		comment = """
+		Returns the type of a parameter of a procedure type at the specified `index`.
+
+		Example:
+			assert(type_proc_parameter_type(proc(i32, f32) -> bool, 1) == f32)
+		""",
 	},
 	{name = "type_proc_return_type",                    kind = "b", type = "proc($T: typeid, index: int) -> typeid where type_is_proc(T)",
-		comment = "Returns the type of a return value of a procedure type at the specified `index`.\n\n"+
-		"Example:\n"+
-		"\tassert(type_proc_return_type(proc(i32, f32) -> bool, 0) == bool)\n"+
-		"",
+		comment = """
+		Returns the type of a return value of a procedure type at the specified `index`.
+
+		Example:
+			assert(type_proc_return_type(proc(i32, f32) -> bool, 0) == bool)
+		""",
 	},
 
 	{name = "type_proc_calling_convention",            kind = "b", type = "proc($T: typeid) -> Odin_Calling_Convention where type_is_proc(T)",
@@ -517,11 +533,13 @@ intrinsics_table := []Builtin{
 		comment = "Returns the number of fields in a `struct` type.",
 	},
 	{name = "type_struct_has_implicit_padding",         kind = "b", type = "proc($T: typeid) -> bool where type_is_struct(T)",
-		comment = "Returns whether the struct has any implicit padding to ensure correct alignment for the fields.\n\n"+
-		"Example:\n"+
-		"\tFoo :: struct {x: u8, y: u32}\n"+
-		"\tassert(type_struct_has_implicit_padding(Foo) == true)\n"+
-		"",
+		comment = """
+		Returns whether the struct has any implicit padding to ensure correct alignment for the fields.
+
+		Example:
+			Foo :: struct {x: u8, y: u32}
+			assert(type_struct_has_implicit_padding(Foo) == true)
+		""",
 	},
 
 	{name = "type_polymorphic_record_parameter_count",  kind = "b", type = "proc($T: typeid) -> typeid",
@@ -563,25 +581,30 @@ intrinsics_table := []Builtin{
 	{name = "type_map_cell_info",                       kind = "b", type = "proc($T: typeid) -> ^runtime.Map_Cell_Info"},
 
 	{name = "type_convert_variants_to_pointers",        kind = "b", type = "proc($T: typeid) -> typeid where type_is_union(T)",
-		comment = "Returns a type which converts all of the variants of a `union` to be pointer types of those variants.\n\n"+
-		"Example:\n"+
-		"\tFoo :: union {A, B, C}\n"+
-		"\ttype_convert_variants_to_pointers(Foo) == union {^A, ^B, ^C}\n"+
-		"",
+		comment = """
+		Returns a type which converts all of the variants of a `union` to be pointer types of those variants.
+
+		Example:
+			Foo :: union {A, B, C}
+			type_convert_variants_to_pointers(Foo) == union {^A, ^B, ^C}
+		""",
 	},
 	{name = "type_merge",                               kind = "b", type = "proc($U, $V: typeid) -> typeid where type_is_union(U), type_is_union(V)",
-		comment = "Merges to union's variants into one bigger union.\n\n"+
-		"Note: the merging is done is order and duplicate variant types are ignored.\n\n"+
-		"Example:\n"+
-		"\tA :: union{i32, f32, string}\n"+
-		"\tB :: union{bool, complex64}\n"+
-		"\tC :: union{string, bool, i32}\n"+
-		"\t\n"+
-		"\ttype_merge(A, B) == union{i32, f32, string, bool, complex64}\n"+
-		"\ttype_merge(A, C) == union{i32, f32, string, bool}\n"+
-		"\ttype_merge(B, C) == union{bool, complex64, string, i32}\n"+
-		"\ttype_merge(C, A) == union{string, bool, i32, f32}\n"+
-		"",
+		comment = """
+		Merges to union's variants into one bigger union.
+
+		Note: the merging is done is order and duplicate variant types are ignored.
+
+		Example:
+			A :: union{i32, f32, string}
+			B :: union{bool, complex64}
+			C :: union{string, bool, i32}
+
+			type_merge(A, B) == union{i32, f32, string, bool, complex64}
+			type_merge(A, C) == union{i32, f32, string, bool}
+			type_merge(B, C) == union{bool, complex64, string, i32}
+			type_merge(C, A) == union{string, bool, i32, f32}
+		""",
 	},
 
 	{name = "type_integer_to_unsigned",                 kind = "b", type = "proc($T: typeid) -> type where type_is_integer(T), !type_is_unsigned(T)",
@@ -598,9 +621,11 @@ intrinsics_table := []Builtin{
 	},
 
 	{name = "constant_utf16_cstring", kind = "b", type = "proc($literal: string) -> [^]u16",
-		comment = "Returns a runtime value of a constant string UTF-8 value encoded as a UTF-16 NULL terminated string value, useful for interfacing with UTF-16 procedure such as the Windows API.\n\n"+
-		"**Important Note:** This will be deprecated soon as UTF-16 string types and literals are supported natively."+
-		"",
+		comment = """
+		Returns a runtime value of a constant string UTF-8 value encoded as a UTF-16 NULL terminated string value, useful for interfacing with UTF-16 procedure such as the Windows API.
+
+		**Important Note:** This will be deprecated soon as UTF-16 string types and literals are supported natively.
+		""",
 	},
 
 	{name = "constant_log2", kind = "b", type = "proc($v: $T) -> T where type_is_integer(T)",
@@ -727,11 +752,11 @@ intrinsics_table := []Builtin{
 
 
 	{name = "has_target_feature", kind = "b", type = "proc($test: $T) -> bool where type_is_string(T) || type_is_proc(T)",
-		comment =
-		"Checks if the current target supports the given target features.\n\n" +
-		"Takes a constant comma-separated string (eg: \"sha512,sse4.1\"), or a procedure type which has either " +
-		"`@(require_target_feature)` or `@(enable_target_feature)` as its input and returns a boolean indicating " +
-		"if all listed features are supported.",
+		comment = """
+		Checks if the current target supports the given target features.
+
+		Takes a constant comma-separated string (eg: \"sha512,sse4.1\"), or a procedure type which has either `@(require_target_feature)` or `@(enable_target_feature)` as its input and returns a boolean indicating if all listed features are supported.
+		""",
 	},
 
 	{name = "procedure_of", kind = "b", type = "proc(x: $T) -> T where type_is_proc(T)", comment = "Returns the value of the procedure where `x` must be a call expression." },
@@ -741,18 +766,21 @@ intrinsics_table := []Builtin{
 	{name = "wasm_memory_size", kind = "b", type = "proc(index: uintptr) -> int", comment = "WASM targets only"},
 
 	{name = "wasm_memory_atomic_wait32",   kind = "b", type ="proc(ptr: ^u32, expected: u32, timeout_ns: i64) -> u32",
-		comment = "Blocks the calling thread for a given duration if the value pointed to by `ptr` is equal to the value of `expected`.\n"+
-		"`timeout_ns` is the maximum number of nanoseconds the calling thread will be blocked for.  If `timeout_ns` is negative, the calling thread will be blocked forever.\n"+
-		"Returns:\n"+
-		"- `0`: the thread blocked and then was woken up\n"+
-		"- `1`: the loaded value from `ptr` did not match `expected`, the thread did not block\n"+
-		"- `2`: the thread blocked, but the timeout expired\n"+
-		"",
+		comment = """
+		Blocks the calling thread for a given duration if the value pointed to by `ptr` is equal to the value of `expected`.
+		`timeout_ns` is the maximum number of nanoseconds the calling thread will be blocked for.  If `timeout_ns` is negative, the calling thread will be blocked forever.
+		Returns:
+		- `0`: the thread blocked and then was woken up
+		- `1`: the loaded value from `ptr` did not match `expected`, the thread did not block
+		- `2`: the thread blocked, but the timeout expired
+		""",
 	},
 	{name = "wasm_memory_atomic_notify32", kind = "b", type ="proc(ptr: ^u32, waiters: u32) -> (waiters_woken_up: u32)",
-		comment = "Wakes threads waiting on the address indicated by `ptr`, up to the given maximum (`waiters`). If `waiters` is zero, no threads are woken up. Threads previously blocked with `wasm_memory_atomic_wait32` will be woken up.\n"+
-		"Returns:\n"+
-		"The number of threads woken up.\n",
+		comment = """
+		Wakes threads waiting on the address indicated by `ptr`, up to the given maximum (`waiters`). If `waiters` is zero, no threads are woken up. Threads previously blocked with `wasm_memory_atomic_wait32` will be woken up.
+		Returns:
+		The number of threads woken up.
+		""",
 	},
 
 	// x86 Targets (i386, amd64)
@@ -807,10 +835,12 @@ SIMD_REDUCE_MID :: """
 
 """
 
-SIMD_REDUCE_SUFFIX :: "\n"+
-	"\t\t}\n"+
-	"\t\treturn result\n"+
-	"\t}"
+SIMD_REDUCE_SUFFIX :: """
+
+		}
+		return result
+	}
+"""
 
 PREFETCH_COMMENT :: """
 The `prefetch_*` intrinsic are a hint to the code generator to insert a prefetch instruction if supported; otherwise, it is a no-op. Prefetches have no affect on the behaviour of the program but can change its performance characteristics.
