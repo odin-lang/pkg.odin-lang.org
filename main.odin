@@ -2015,24 +2015,48 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 
 		switch block.kind {
 		case .Paragraph:
-			io.write_string(w, "<p>")
-
-			subtitles_to_markup := [?]string{ "Inputs:", "Returns:" }
-			for subtitle in subtitles_to_markup {
-				if ! strings.has_prefix(block_lines[0], subtitle) {
-					continue
+			subtitles := [?]string{"Inputs:", "Returns:"}
+			subtitle := ""
+			for candidate in subtitles {
+				if strings.has_prefix(block_lines[0], candidate) {
+					subtitle = candidate
+					rest := strings.trim_left_space(strings.trim_prefix(block_lines[0], candidate))
+					if rest == "" {
+						block_lines = block_lines[1:]
+					} else {
+						block_lines[0] = rest
+					}
+					break
 				}
-				fmt.wprintf(w, "<b>%v</b><br>", subtitle)
-				removed_subtitle := strings.trim_prefix(block_lines[0], subtitle)
-				removed_subtitle = strings.trim_left_space(removed_subtitle)
-				if removed_subtitle == "" {
-					block_lines = block_lines[1:]
-				} else {
-					block_lines[0] = removed_subtitle
-				}
-				break
 			}
 
+			// NOTE(bill): If the body under Inputs:/Returns: is entirely "- " bullets, render a real list rather than a run-on paragraph.
+			is_bullets := subtitle != "" && len(block_lines) > 0
+			if is_bullets {
+				for line in block_lines {
+					t := strings.trim_space(line)
+					if t == "" { continue }
+					if !strings.has_prefix(t, "- ") { is_bullets = false; break }
+				}
+			}
+			if is_bullets {
+				fmt.wprintf(w, "<p><b>%s</b></p>\n", subtitle)
+				io.write_string(w, `<ul class="doc-params">`)
+				for line in block_lines {
+					t := strings.trim_space(line)
+					if t == "" { continue }
+					io.write_string(w, "<li>")
+					write_markup_text(w, strings.trim_prefix(t, "- "))
+					io.write_string(w, "</li>\n")
+				}
+				io.write_string(w, "</ul>\n")
+				continue
+			}
+
+			io.write_string(w, "<p>")
+			if subtitle != "" {
+				fmt.wprintf(w, "<b>%s</b><br>", subtitle)
+			}
 			for line, line_idx in block_lines {
 				if line_idx > 0 {
 					io.write_string(w, "\n")
@@ -2040,11 +2064,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 				if strings.has_prefix(line, "##") {
 					n := 0
 					for c in line {
-						if c == '#' {
-							n += 1
-						} else {
-							break
-						}
+						if c == '#' { n += 1 } else { break }
 					}
 					io.write_string(w, "</p>\n")
 					fmt.wprintf(w, "<h%d>", n+2)
@@ -2053,8 +2073,6 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 					io.write_string(w, "<p>")
 					continue
 				}
-
-
 				write_markup_text(w, line)
 			}
 			io.write_string(w, "</p>\n")
