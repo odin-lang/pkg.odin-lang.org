@@ -3050,13 +3050,16 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			if skip(name) {
 				continue
 			}
+			io.write_string(w, `<span class="odin-attribute">`)
 			io.write_string(w, "@(")
 			io.write_string(w, escape_html_string(name))
 			if value := str(attr.value); value != "" {
 				io.write_byte(w, '=')
 				io.write_string(w, escape_html_string(value))
 			}
-			io.write_string(w, ")\n")
+			io.write_string(w, ")")
+			io.write_string(w, "</span>")
+			io.write_string(w, "\n")
 		}
 	}
 
