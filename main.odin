@@ -107,7 +107,8 @@ main :: proc() {
 		dir := collection.name
 
 		strings.builder_reset(&b)
-		write_html_header(w, fmt.tprintf("%s library - pkg.odin-lang.org", dir))
+		write_html_header(w, fmt.tprintf("%s library - pkg.odin-lang.org", dir),
+		                  description = fmt.tprintf("Package documentation for the Odin %s collection.", dir))
 		write_collection_directory(w, collection)
 		write_html_footer(w, true)
 		os.make_directory(dir)
@@ -120,7 +121,8 @@ main :: proc() {
 	{
 
 		strings.builder_reset(&b)
-		write_html_header(w, "Packages - pkg.odin-lang.org")
+		write_html_header(w, "Packages - pkg.odin-lang.org",
+		                  description = "Browse API documentation for the Odin base, core, and vendor library collections.")
 		write_home_page(w)
 		write_html_footer(w, true)
 		_ = os.write_entire_file("index.html", b.buf[:])
@@ -410,18 +412,72 @@ copy_assets :: proc() {
 	}
 }
 
+write_attr_value :: proc(w: io.Writer, s: string, max_len := 0) {
+	pending_space := false
+	started := false
+	count := 0
+	for r in s {
+		if strings.is_space(r) {
+			if started {
+				pending_space = true
+			}
+			continue
+		}
+		if max_len > 0 && count >= max_len {
+			io.write_string(w, "…")
+			return
+		}
+		if pending_space {
+			io.write_byte(w, ' ')
+			count += 1
+			pending_space = false
+		}
+		started = true
+		switch r {
+		case '&':  io.write_string(w, "&amp;")
+		case '<':  io.write_string(w, "&lt;")
+		case '>':  io.write_string(w, "&gt;")
+		case '"':  io.write_string(w, "&quot;")
+		case '\'': io.write_string(w, "&#39;")
+		case:      io.write_rune(w, r)
+		}
+		count += 1
+	}
+}
+
+write_head_meta :: proc(w: io.Writer, title, description: string) {
+	tag :: proc(w: io.Writer, attr, name, content: string, max_len := 0) {
+		fmt.wprintf(w, "\n<meta %s=\"%s\" content=\"", attr, name)
+		write_attr_value(w, content, max_len)
+		io.write_string(w, "\">")
+	}
+	io.write_string(w, `<meta property="og:type" content="website">`)
+	tag(w, "name",     "description",     description, 200)
+	tag(w, "property", "og:title",        title)
+	tag(w, "property", "og:description",  description, 200)
+	tag(w, "name",     "twitter:card",    "summary")
+	tag(w, "name",     "twitter:title",   title)
+	tag(w, "name",     "twitter:description", description, 200)
+	io.write_string(w, "\n")
+}
+
+
 Header_Kind :: enum {
 	Normal,
 	Full_Width,
 }
 
-write_html_header :: proc(w: io.Writer, title: string, kind := Header_Kind.Normal) {
+write_html_header :: proc(w: io.Writer, title: string, kind := Header_Kind.Normal, description := "") {
 	fmt.wprintf(w, string(#load("resources/header.txt.html")), title)
 
 	when #config(ODIN_DOC_DEV, false) {
 		io.write_string(w, "\n")
 		io.write_string(w, `<script type="text/javascript" src="https://livejs.com/live.js"></script>`)
 		io.write_string(w, "\n")
+	}
+
+	if description != "" {
+		write_head_meta(w, title, description)
 	}
 
 
@@ -599,7 +655,12 @@ generate_package_from_directory_tree :: proc(b: ^strings.Builder, node: ^Dir_Nod
 		strings.builder_reset(b)
 		w := strings.to_writer(b)
 
-		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width)
+		desc := cfg.pkgs_line_docs[str(pkg.fullpath)]
+		if desc == "" {
+			desc = fmt.tprintf("API documentation for the Odin package %s.", path)
+		}
+
+		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width, description = desc)
 		write_pkg(w, dir, path, pkg, collection, collection.pkg_entries_map[pkg])
 		write_html_footer(w, false)
 		recursive_make_directory(path, dir)
@@ -631,7 +692,8 @@ generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collec
 		path := "builtin"
 
 		strings.builder_reset(b)
-		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width)
+		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width,
+		                  description = "Built-in procedures, types, and constants available in every Odin file.")
 		write_builtin_pkg(w, dir, path, runtime_pkg, collection, "builtin", builtin_docs)
 		write_html_footer(w, false)
 		recursive_make_directory(path, dir)
@@ -640,7 +702,8 @@ generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collec
 
 		path = "intrinsics"
 		strings.builder_reset(b)
-		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width)
+		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width,
+		                  description = "Compiler intrinsics provided by the Odin compiler.")
 		write_builtin_pkg(w, dir, path, runtime_pkg, collection, "intrinsics", intrinsics_docs)
 		write_html_footer(w, false)
 		recursive_make_directory(path, dir)
