@@ -15,6 +15,41 @@ for (const os of osList) {
 	}	
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+	const scope = document.querySelector(".documentation") || document;
+	scope.querySelectorAll("pre").forEach((pre) => {
+		if (pre.querySelector(".copy-code")) {
+			return;
+		}
+		const btn = document.createElement("button");
+		btn.type        = "button";
+		btn.className   = "copy-code";
+		btn.textContent = "Copy";
+		btn.setAttribute("aria-label", "Copy code to clipboard");
+		btn.addEventListener("click", async () => {
+			const code = pre.querySelector("code") || pre;
+			const text = code.innerText.replace(/\s+$/, "");
+			try {
+				await navigator.clipboard.writeText(text);
+			} catch {
+				const r = document.createRange();
+				r.selectNodeContents(code);
+				const sel = getSelection();
+				sel.removeAllRanges();
+				sel.addRange(r);
+				try {
+					document.execCommand("copy");
+				} catch {
+				}
+				sel.removeAllRanges();
+			}
+			btn.textContent = "Copied";
+			setTimeout(() => (btn.textContent = "Copy"), 1200);
+		});
+		pre.appendChild(btn);
+	});
+});
+
 var odin_pkg_name;
 
 let odin_search = document.getElementById("odin-search");
