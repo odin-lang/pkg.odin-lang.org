@@ -135,6 +135,9 @@ main :: proc() {
 	log.infof("generate sitemap")
 	generate_sitemap(&b, not_hidden[:])
 
+	log.infof("generate 404")
+	generate_404(&b)
+
 	log.infof("copy_assets")
 	copy_assets()
 
@@ -197,6 +200,22 @@ generate_sitemap :: proc(b: ^strings.Builder, collections: []^Collection) {
 	if nil != os.write_entire_file("robots.txt", b.buf[:]) {
 		errorf("unable to write the robots.txt file")
 	}
+}
+
+generate_404 :: proc(b: ^strings.Builder) {
+	strings.builder_reset(b)
+	w := strings.to_writer(b)
+	write_html_header(w, "404 Page not found - pkg.odin-lang.org",
+		description = "The page you were looking for could not be found.")
+	io.write_string(w, ```
+		<div class="p-4">
+			<h1>Page not found</h1>
+			<p>The package or page you were looking for does not exist; it may have been moved or renamed.</p>
+			<p><a href="/">Browse all packages</a> or use the search above.</p>
+		</div>
+	```)
+	write_html_footer(w, true)
+	_ = os.write_entire_file("404.html", b.buf[:])
 }
 
 
@@ -266,16 +285,18 @@ generate_from_path :: proc(path: string, all_packages: bool) {
 
 	when ODIN_DEBUG {
 		for c in cfg.collections {
-			log.debugf(`Collection %q configured with:
-	Source URL: %s
-	Base URL: %s
-	Root Path: %s
-	License: %s at %s
-	Hidden: %v
-	Home:
-		Title: %s
-		Description: %s
-		Readme: %s`,
+			log.debugf(```
+				Collection %q configured with:
+					Source URL: %s
+					Base URL: %s
+					Root Path: %s
+					License: %s at %s
+					Hidden: %v
+					Home:
+						Title: %s
+						Description: %s
+						Readme: %s
+				```,
 				c.name,
 				c.source_url,
 				c.base_url,
@@ -412,51 +433,51 @@ copy_assets :: proc() {
 	}
 }
 
-write_attr_value :: proc(w: io.Writer, s: string, max_len := 0) {
-	pending_space := false
-	started := false
-	count := 0
-	for r in s {
-		if strings.is_space(r) {
-			if started {
-				pending_space = true
-			}
-			continue
-		}
-		if max_len > 0 && count >= max_len {
-			io.write_string(w, "…")
-			return
-		}
-		if pending_space {
-			io.write_byte(w, ' ')
-			count += 1
-			pending_space = false
-		}
-		started = true
-		switch r {
-		case '&':  io.write_string(w, "&amp;")
-		case '<':  io.write_string(w, "&lt;")
-		case '>':  io.write_string(w, "&gt;")
-		case '"':  io.write_string(w, "&quot;")
-		case '\'': io.write_string(w, "&#39;")
-		case:      io.write_rune(w, r)
-		}
-		count += 1
-	}
-}
-
 write_head_meta :: proc(w: io.Writer, title, description: string) {
+	write_attr_value :: proc(w: io.Writer, s: string, max_len := 0) {
+		pending_space := false
+		started := false
+		count := 0
+		for r in s {
+			if strings.is_space(r) {
+				if started {
+					pending_space = true
+				}
+				continue
+			}
+			if max_len > 0 && count >= max_len {
+				io.write_string(w, "…")
+				return
+			}
+			if pending_space {
+				io.write_byte(w, ' ')
+				count += 1
+				pending_space = false
+			}
+			started = true
+			switch r {
+			case '&':  io.write_string(w, "&amp;")
+			case '<':  io.write_string(w, "&lt;")
+			case '>':  io.write_string(w, "&gt;")
+			case '"':  io.write_string(w, "&quot;")
+			case '\'': io.write_string(w, "&#39;")
+			case:      io.write_rune(w, r)
+			}
+			count += 1
+		}
+	}
+
 	tag :: proc(w: io.Writer, attr, name, content: string, max_len := 0) {
 		fmt.wprintf(w, "\n<meta %s=\"%s\" content=\"", attr, name)
 		write_attr_value(w, content, max_len)
 		io.write_string(w, "\">")
 	}
 	io.write_string(w, `<meta property="og:type" content="website">`)
-	tag(w, "name",     "description",     description, 200)
-	tag(w, "property", "og:title",        title)
-	tag(w, "property", "og:description",  description, 200)
-	tag(w, "name",     "twitter:card",    "summary")
-	tag(w, "name",     "twitter:title",   title)
+	tag(w, "name",     "description",         description, 200)
+	tag(w, "property", "og:title",            title)
+	tag(w, "property", "og:description",      description, 200)
+	tag(w, "name",     "twitter:card",        "summary")
+	tag(w, "name",     "twitter:title",       title)
 	tag(w, "name",     "twitter:description", description, 200)
 	io.write_string(w, "\n")
 }
@@ -563,10 +584,18 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: []^Collection) 
 
 
 	for collection in collections {
-		for path, pkg in collection.pkgs {
+		paths := make([dynamic]string, 0, len(collection.pkgs), context.temp_allocator)
+		for path in collection.pkgs {
+			append(&paths, path)
+		}
+		slice.sort(paths[:])
+		for path in paths {
+			pkg := collection.pkgs[path]
 			init_cfg_from_pkg(pkg)
 			entries := collection.pkg_entries_map[pkg]
 			if pkg_idx != 0 { fmt.wprintln(w, ",") }
+			defer pkg_idx += 1
+
 			fmt.wprintf(w, "\t\"%s\": {{\n", str(pkg.name))
 			fmt.wprintf(w, "\t\t\"name\": \"%s\",\n", str(pkg.name))
 			fmt.wprintf(w, "\t\t\"collection\": \"%s\",\n", collection.name)
@@ -606,7 +635,6 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: []^Collection) 
 			}
 			fmt.wprint(w, "\n\t\t]")
 			fmt.wprint(w, "\n\t}")
-			pkg_idx += 1
 		}
 	}
 	fmt.wprintln(w, "}};")
