@@ -2035,8 +2035,13 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 			if is_bullets {
 				for line in block_lines {
 					t := strings.trim_space(line)
-					if t == "" { continue }
-					if !strings.has_prefix(t, "- ") { is_bullets = false; break }
+					if t == "" {
+						continue
+					}
+					if !strings.has_prefix(t, "- ") {
+						is_bullets = false
+						break
+					}
 				}
 			}
 			if is_bullets {
@@ -2044,7 +2049,9 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 				io.write_string(w, `<ul class="doc-params">`)
 				for line in block_lines {
 					t := strings.trim_space(line)
-					if t == "" { continue }
+					if t == "" {
+						continue
+					}
 					io.write_string(w, "<li>")
 					write_markup_text(w, strings.trim_prefix(t, "- "))
 					io.write_string(w, "</li>\n")
@@ -2394,7 +2401,7 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 
 	fmt.wprintln(w, `<div>`)
 
-	fmt.wprintln(w, `<h5>Objective-C Method Information</h5>`)
+	fmt.wprintln(w, `<h4>Objective-C Method Information</h4>`)
 	fmt.wprintln(w, `<ul>`)
 	fmt.wprintf(w, `<li>Class: <a href="#%s">%s</a></li>`+"\n", objc_type, objc_type)
 	fmt.wprintf(w, `<li>Name: <strong>%s</strong></li>`+"\n", objc_name)
@@ -2404,7 +2411,7 @@ write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Enti
 	fmt.wprintln(w, `</ul>`)
 	fmt.wprintln(w, `</div>`)
 
-	fmt.wprintln(w, "<h5>Syntax Usage</h5>")
+	fmt.wprintln(w, "<h4>Syntax Usage</h4>")
 	fmt.wprintln(w, "<pre>")
 
 	write_syntax_usage :: proc(w: io.Writer, e: ^doc.Entity, objc_name: string, parent: ^doc.Entity, is_class_method: bool) {
@@ -2529,7 +2536,7 @@ write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, met
 			if is_inherited {
 				fmt.wprintf(
 					w,
-					`<h6>Methods Inherited From <a href="%s/%s/#%s">%s</a></h6>`,
+					`<h5>Methods Inherited From <a href="%s/%s/#%s">%s</a></h5>`,
 					collection.base_url,
 					collection.pkg_to_path[pkg],
 					parent_name,
@@ -2537,7 +2544,7 @@ write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, met
 				)
 				fmt.wprintln(w)
 			} else {
-				fmt.wprintln(w, "<h5>Bound Objective-C Methods</h5>")
+				fmt.wprintln(w, "<h4>Bound Objective-C Methods</h4>")
 			}
 			fmt.wprintln(w, "<ul>")
 			seen_item = true
@@ -2626,7 +2633,7 @@ print_procs :: proc(w:               io.Writer,
 			if is_inherited {
 				fmt.wprintf(
 					w,
-					"<h6 style=\"display:inline-block\">Procedures Through `using` From "+`<a href="%s/%s/#%s">%s</a></h6>`,
+					"<h6 style=\"display:inline-block\">Procedures Through `using` From "+`<a href="%s/%s/#%s">%s</a></h5>`,
 					collection.base_url,
 					collection.pkg_to_path[pkg],
 					parent_name,
@@ -2634,7 +2641,7 @@ print_procs :: proc(w:               io.Writer,
 				)
 				fmt.wprintln(w)
 			} else {
-				fmt.wprintf(w, "<h5 style=\"display:inline-block\">%s</h5>\n", title)
+				fmt.wprintf(w, "<h4 style=\"display:inline-block\">%s</h4>\n", title)
 			}
 			fmt.wprintln(w, "</summary>")
 			fmt.wprintln(w, "<ul>")
@@ -2891,7 +2898,7 @@ write_related_constants :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity
 	defer delete(constants_seen)
 
 	collection := cfg.pkg_to_collection[pkg]
-	fmt.wprintfln(w, "<h5>Related Constants</h5>")
+	fmt.wprintfln(w, "<h4>Related Constants</h4>")
 	fmt.wprintln(w, "<ul>")
 	for e in list {
 		name := str(e.name)
