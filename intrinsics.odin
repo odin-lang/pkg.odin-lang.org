@@ -29,14 +29,16 @@ intrinsics_table := []Builtin{
 
 
 	{name = "concatenate", kind = "b", type = " proc(x, y: $T, z: ..T) -> T where type_is_array(T) || type_is_slice(T)",
-		comment = "concatenates 2+ constant slices or arrays values together to form a new one.\n\n"+
-		"Example:\n"+
-		"\tx :: intrinsics.concatenate([]int{1, 2, 3}, []int{4, 5, 6}, {1, 1, -1})\n"+
-		"\t#assert(type_of(x) == []int)\n"+
-		"\t\n"+
-		"\ty :: intrinsics.concatenate([3]int{1, 2, 3}, [?]int{4, 5}, [?]int{6, 1, 1, -1})\n"+
-		"\t#assert(type_of(y) == [9]int)\n"+
-		"",
+		comment = """
+		concatenates 2+ constant slices or arrays values together to form a new one.
+
+		Example:
+			x :: intrinsics.concatenate([]int{1, 2, 3}, []int{4, 5, 6}, {1, 1, -1})
+			#assert(type_of(x) == []int)
+
+			y :: intrinsics.concatenate([3]int{1, 2, 3}, [?]int{4, 5}, [?]int{6, 1, 1, -1})
+			#assert(type_of(y) == [9]int)
+		""",
 	},
 
 	// Volatile
@@ -75,6 +77,12 @@ intrinsics_table := []Builtin{
 	},
 	{name = "count_leading_zeros",  kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)",
 		comment = "Counts the number of leading unset bits (`0`s) until a set bit (`1`) is seen or all bits have been counted.",
+	},
+	{name = "count_trailing_ones",  kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)",
+		comment = "Counts the number of trailing set bits (`1`s) until an unset bit (`0`) is seen or all bits have been counted.",
+	},
+	{name = "count_leading_ones",   kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)",
+		comment = "Counts the number of leading set bits (`1`s) until an unset bit (`0`) is seen or all bits have been counted.",
 	},
 	{name = "reverse_bits",         kind = "b", type = "proc(x: $T) -> T where type_is_integer(T) || type_is_simd_vector(T)",
 		comment = "Reverses the bits from ascending order to descending order e.g. `0b01110101` -> `0b10101110`",
@@ -148,6 +156,12 @@ intrinsics_table := []Builtin{
 	{name = "expect", kind = "b", type = "proc(val, expected_val: T) -> T",
 		comment = "Provides information about expected (the most probable) value of `val`, which can be used by optimizing backends.",
 	},
+	{name = "likely",   kind = "b", type = "proc(val: $T) -> T where type_is_boolean(T)",
+		comment = "Hints to the optimizing backend that the boolean `val` is most probably `true`. Semantically equivalent to `val`.",
+	},
+	{name = "unlikely", kind = "b", type = "proc(val: $T) -> T where type_is_boolean(T)",
+		comment = "Hints to the optimizing backend that the boolean `val` is most probably `false`. Semantically equivalent to `val`.",
+	},
 
 	// Linux and Darwin Only
 	{name = "syscall", kind = "b", type = "proc(id: uintptr, args: ..uintptr) -> uintptr", comment="system call for Linux and Darwin Only"},
@@ -157,14 +171,16 @@ intrinsics_table := []Builtin{
 	// Atomics
 	{
 		name = "Atomic_Memory_Order", kind = "t",
-		type = `enum {
-	Relaxed = 0, // Unordered
-	Consume = 1, // Monotonic
-	Acquire = 2,
-	Release = 3,
-	Acq_Rel = 4,
-	Seq_Cst = 5,
-}`,
+		type = ```
+		enum {
+			Relaxed = 0, // Unordered
+			Consume = 1, // Monotonic
+			Acquire = 2,
+			Release = 3,
+			Acq_Rel = 4,
+			Seq_Cst = 5,
+		}
+		```,
 	},
 
 
@@ -215,15 +231,17 @@ intrinsics_table := []Builtin{
 
 	},
 	{name = "type_elem_type",                kind = "b", type = "proc($T: typeid) -> type",
-		comment = "Returns the element type of an compound type.\n\n"+
-		"- Complex number: the underlying float type (e.g. `complex64 -> f32`)\n"+
-		"- Quaternion: the underlying float type (e.g. `quaternion256 -> f64`)\n"+
-		"- Pointer: the base type (e.g. `^T -> T`)\n"+
-		"- Array: the element type (e.g. `[N]T -> T`)\n"+
-		"- Enumerated Array: the element type (e.g. `[Enum]T -> T`)\n"+
-		"- Slice: the element type (e.g. `[]T -> T`)\n"+
-		"- Dynamic Array: the element type (e.g. `[dynamic]T -> T`)\n"+
-		"",
+		comment = """
+		Returns the element type of an compound type.
+
+		- Complex number: the underlying float type (e.g. `complex64 -> f32`)
+		- Quaternion: the underlying float type (e.g. `quaternion256 -> f64`)
+		- Pointer: the base type (e.g. `^T -> T`)
+		- Array: the element type (e.g. `[N]T -> T`)
+		- Enumerated Array: the element type (e.g. `[Enum]T -> T`)
+		- Slice: the element type (e.g. `[]T -> T`)
+		- Dynamic Array: the element type (e.g. `[dynamic]T -> T`)
+		""",
 	},
 
 	{name = "type_is_boolean",               kind = "b", type = "proc($T: typeid) -> bool",
@@ -260,46 +278,54 @@ intrinsics_table := []Builtin{
 	{name = "type_is_unsigned",              kind = "b", type = "proc($T: typeid) -> bool",
 		comment = "Returns true if the type is an unsigned integer or an enum backed by an unsigned integer, and false otherwise for any other type"},
 	{name = "type_is_numeric",               kind = "b", type = "proc($T: typeid) -> bool",
-		comment = "Returns true if it is a \"numeric\" type in nature:\n\n"+
-		"- Any integer\n"+
-		"- Any float\n"+
-		"- Any complex number\n"+
-		"- Any quaternion\n"+
-		"- Any enum\n"+
-		"- Any fixed-length array of a numeric type\n"+
-		"",
+		comment = """
+		Returns true if it is a \"numeric\" type in nature:
+
+		- Any integer
+		- Any float
+		- Any complex number
+		- Any quaternion
+		- Any enum
+		- Any fixed-length array of a numeric type
+		""",
 	},
 	{name = "type_is_ordered",               kind = "b", type = "proc($T: typeid) -> bool",
 		comment = "Returns true if the type is an integer, float, rune, any string, pointer, or multi-pointer"},
 	{name = "type_is_ordered_numeric",       kind = "b", type = "proc($T: typeid) -> bool",
 		comment = "Returns true if the type is an integer, float, or rune"},
 	{name = "type_is_indexable",             kind = "b", type = "proc($T: typeid) -> bool",
-		comment = "Returns true if a value of this type can indexed:\n\n"+
-		"- `string` or `string16`\n"+
-		"- Any fixed-length array\n"+
-		"- Any slice\n"+
-		"- Any dynamic array\n"+
-		"- Any map\n"+
-		"- Any multi-pointer\n"+
-		"- Any enumerated array\n"+
-		"- Any matrix\n"+
-		"",
+		comment = """
+		Returns true if a value of this type can indexed:
+
+		- `string` or `string16`
+		- Any fixed-length array
+		- Any slice
+		- Any dynamic array
+		- Any map
+		- Any multi-pointer
+		- Any enumerated array
+		- Any matrix
+		""",
 	},
 	{name = "type_is_sliceable",             kind = "b", type = "proc($T: typeid) -> bool",
-		comment = "Returns true if a value of this type can indexed:\n\n"+
-		"- `string` or `string16`\n"+
-		"- Any fixed-length array\n"+
-		"- Any slice\n"+
-		"- Any dynamic array\n"+
-		"- Any multi-pointer\n"+
-		"",
+		comment = """
+		Returns true if a value of this type can indexed:
+
+		- `string` or `string16`
+		- Any fixed-length array
+		- Any slice
+		- Any dynamic array
+		- Any multi-pointer
+		""",
 	},
 	{name = "type_is_comparable",            kind = "b", type = "proc($T: typeid) -> bool",
-		comment = ""+
-		"Returns true if the type is comparable, which allows for the use of `==` and `!=` binary operators.\n\n"+
-		"One of the following non-compound types (as well as any `distinct` forms): `rune`, `string`, `cstring`, `string16`, `cstring16`, `typeid`, pointer, `#soa` related pointer, multi-pointer, enum, procedure, matrix, `bit_set`, `#simd` vector.\n\n"+
-		"One of the following compound types (as well as any `distinct` forms): any array or enumerated array where its element type is also comparable; any `struct` where all of its fields are comparable; any `struct #raw_union` were all of its fields are simply comparable (see `type_is_simple_compare`); any `union` where all of its variants are comparable.\n"+
-		"",
+		comment = """
+		Returns true if the type is comparable, which allows for the use of `==` and `!=` binary operators.
+
+		One of the following non-compound types (as well as any `distinct` forms): `rune`, `string`, `cstring`, `string16`, `cstring16`, `typeid`, pointer, `#soa` related pointer, multi-pointer, enum, procedure, matrix, `bit_set`, `#simd` vector.
+
+		One of the following compound types (as well as any `distinct` forms): any array or enumerated array where its element type is also comparable; any `struct` where all of its fields are comparable; any `struct #raw_union` were all of its fields are simply comparable (see `type_is_simple_compare`); any `union` where all of its variants are comparable.
+		""",
 	},
 	{name = "type_is_simple_compare",        kind = "b", type = "proc($T: typeid) -> bool", comment = "easily compared using memcmp (`==` and `!=`) (not including floats)"},
 	{name = "type_is_nearly_simple_compare", kind = "b", type = "proc($T: typeid) -> bool", comment = "easily compared using memcmp (`==` and `!=`) (including floats)"},
@@ -320,31 +346,43 @@ intrinsics_table := []Builtin{
 	{name = "type_is_enum",                  kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a `enum`"},
 	{name = "type_is_proc",                  kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a `proc`"},
 	{name = "type_is_bit_set",               kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a `bit_set`"},
+	{name = "type_is_bit_field",             kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a `bit_field`"},
 	{name = "type_is_simd_vector",           kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a simd vector, i.e. `#simd[N]T`"},
 	{name = "type_is_matrix",                kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a `matrix`"},
-	{name = "type_is_raw_union",                kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a `struct #raw_union`"},
+	{name = "type_is_raw_union",                    kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a `struct #raw_union`"},
+	{name = "type_is_fixed_capacity_dynamic_array", kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the base-type is a fixed-capacity dynamic array (a `[dynamic]T` backed by a fixed capacity)"},
+	{name = "type_is_internally_pointer_like",      kind = "b", type = "proc($T: typeid) -> bool", comment = "Returns true if the type is represented internally as a single pointer-sized value, e.g. a pointer, multi-pointer, `cstring`, `#soa` related pointer, or a `Maybe` of such a type"},
 
 
 	{name = "type_has_nil",                             kind = "b", type = "proc($T: typeid) -> bool",
-		comment = "Types that support `nil`:\n\n"+
-		"- `rawptr`\n"+
-		"- `any`\n"+
-		"- `cstring`\n"+
-		"- `cstring16`\n"+
-		"- `typeid`\n"+
-		"- `enum`\n"+
-		"- `bit_set`\n"+
-		"- Slices\n"+
-		"- `proc` values\n"+
-		"- Pointers\n"+
-		"- #soa Pointers\n"+
-		"- Multi-Pointers\n"+
-		"- Dynamic Arrays\n"+
-		"- `map`\n"+
-		"- `union` without the `#no_nil` directive\n"+
-		"- `#soa` slices\n"+
-		"- `#soa` dynamic arrays\n"+
-		"",
+		comment = """
+		Types that support `nil`:
+
+		- `rawptr`
+		- `any`
+		- `cstring`
+		- `cstring16`
+		- `typeid`
+		- `enum`
+		- `bit_set`
+		- Slices
+		- `proc` values
+		- Pointers
+		- #soa Pointers
+		- Multi-Pointers
+		- Dynamic Arrays
+		- `map`
+		- `union` without the `#no_nil` directive
+		- `#soa` slices
+		- `#soa` dynamic arrays
+		""",
+	},
+
+	{name = "type_field_bit_size",                      kind = "b", type = "proc($T: typeid, $name: string) -> int where type_is_bit_field(T)",
+		comment = "Returns the bit size of the field `name` in a `bit_field` type `T`.",
+	},
+	{name = "type_field_bit_offset",                    kind = "b", type = "proc($T: typeid, $name: string) -> int where type_is_bit_field(T)",
+		comment = "Returns the bit offset of the field `name` from the start of a `bit_field` type `T`.",
 	},
 
 	{name = "type_is_matrix_row_major",    kind = "b", type = "proc($T: typeid) -> bool where type_is_matrix(T)",
@@ -353,40 +391,52 @@ intrinsics_table := []Builtin{
 		comment = "Returns true if the type passed is a matrix using `#column_major` ordering, this intrinsic only allows for matrices and will not compile otherwise. Note: The default matrix layout is `#column_major`."},
 
 	{name = "type_is_specialization_of",                kind = "b", type = "proc($T, $S: typeid) -> bool",
-		comment = "Returns true if `T` is a strict specialization of `S`. Identical types are not considered specializations.\n\n"+
-		"Example:\n"+
-		"\tFoo :: struct($T: typeid) {x: T}\n"+
-		"\tassert(type_is_specialization_of(Foo(int), Foo)      == true)\n"+
-		"\tassert(type_is_specialization_of(Foo, Foo)           == false)\n"+
-		"\tassert(type_is_specialization_of(Foo(int), Foo(int)) == false)\n"+
-		"\tassert(type_is_specialization_of(i32, Foo)            == false)\n"+
-		"",
+		comment = """
+		Returns true if `T` is a strict specialization of `S`. Identical types are not considered specializations.
+
+		Example:
+			Foo :: struct($T: typeid) {x: T}
+			assert(type_is_specialization_of(Foo(int), Foo)      == true)
+			assert(type_is_specialization_of(Foo, Foo)           == false)
+			assert(type_is_specialization_of(Foo(int), Foo(int)) == false)
+			assert(type_is_specialization_of(i32, Foo)           == false)
+		""",
 	},
 
 	{name = "type_is_variant_of",                       kind = "b", type = "proc($U, $V: typeid) -> bool where type_is_union(U)",
-		comment = "Returns true if the `V` is a variant of the union type `U`.\n\n"+
-		"Example:\n"+
-		"\tFoo:: union {i32, f32}\n"+
-		"\tassert(type_is_variant_of(Foo, i32)    == true)\n"+
-		"\tassert(type_is_variant_of(Foo, f32)    == true)\n"+
-		"\tassert(type_is_variant_of(Foo, string) == false)\n"+
-		"",
+		comment = """
+		Returns true if the `V` is a variant of the union type `U`.
+
+		Example:
+			Foo:: union {i32, f32}
+			assert(type_is_variant_of(Foo, i32)    == true)
+			assert(type_is_variant_of(Foo, f32)    == true)
+			assert(type_is_variant_of(Foo, string) == false)
+		""",
 	},
 	{name = "type_union_tag_type",                      kind = "b", type = "proc($T: typeid) -> typeid where type_is_union(T)",
-		comment = "Returns the type used to store the tag for a union. If no tag is used (e.g. `Maybe(Pointer_Like_Type)`), then `u8` is returned.\n\n"+
-		"Possible tag types: `u8`, `u16`, `u32`, `u64`",
+		comment = """
+		Returns the type used to store the tag for a union. If no tag is used (e.g. `Maybe(Pointer_Like_Type)`), then `u8` is returned.
+
+		Possible tag types: `u8`, `u16`, `u32`, `u64`
+		""",
 	},
 	{name = "type_union_tag_offset",                    kind = "b", type = "proc($T: typeid) -> uintptr where type_is_union(T)",
-		comment = "Returns the offset to the tag in bytes from the start of the union. If no tag is used (e.g. 'Maybe(Pointer_Like_Type)`), then size of the variant block space is returned.\n\n"+
-		"Note: unions store the tag after the variant block space.",
+		comment = """
+		Returns the offset to the tag in bytes from the start of the union. If no tag is used (e.g. 'Maybe(Pointer_Like_Type)`), then size of the variant block space is returned.
+
+		Note: unions store the tag after the variant block space.
+		""",
 	},
 	{name = "type_union_base_tag_value",                kind = "b", type = "proc($T: typeid) -> int where type_is_union(U)",
-		comment = "Returns the first valid tag value for the first variant. If `#no_nil` is used, the returned value will be `0`, otherwise `1` will be returned.\n\n"+
-		"Example:\n"+
-		"\tassert(type_union_base_tag_value(union {i32, f32})         == 1)\n"+
-		"\tassert(type_union_base_tag_value(union #no_nil {i32, f32}) == 0)\n"+
-		"\tassert(type_union_base_tag_value(Maybe(rawptr})            == 1)\n"+
-		"",
+		comment = """
+		Returns the first valid tag value for the first variant. If `#no_nil` is used, the returned value will be `0`, otherwise `1` will be returned.
+
+		Example:
+			assert(type_union_base_tag_value(union {i32, f32})         == 1)
+			assert(type_union_base_tag_value(union #no_nil {i32, f32}) == 0)
+			assert(type_union_base_tag_value(Maybe(rawptr})            == 1)
+		""",
 	},
 	{name = "type_union_variant_count",                 kind = "b", type = "proc($T: typeid) -> int where type_is_union(T)",
 		comment = "Returns the number of possible variants a union can be (excluding a possible `nil` state).\n\n"+
@@ -458,6 +508,11 @@ intrinsics_table := []Builtin{
 		"",
 	},
 
+	{name = "type_proc_calling_convention",            kind = "b", type = "proc($T: typeid) -> Odin_Calling_Convention where type_is_proc(T)",
+		comment = "Returns the calling convention of a procedure type `T` as an `Odin_Calling_Convention` value.",
+	},
+
+
 	{name = "type_struct_field_count",                  kind = "b", type = "proc($T: typeid) -> int where type_is_struct(T)",
 		comment = "Returns the number of fields in a `struct` type.",
 	},
@@ -483,8 +538,19 @@ intrinsics_table := []Builtin{
 
 	{name = "type_is_subtype_of",                       kind = "b", type = "proc($T, $U: typeid) -> bool",
 		comment = "Returns true if `T` is a subtype (i.e. `using` was applied on a field) to type `U`."},
+	{name = "type_is_superset_of",                      kind = "b", type = "proc($Super, $Sub: typeid) -> bool",
+		comment = "Returns true if the type `Super` contains every field of `Sub`, matched by name and type. This is directional: swapping the arguments can change the result.",
+	},
 
 	{name = "type_field_index_of",                      kind = "b", type = "proc($T: typeid, $name: string) -> uintptr"},
+	{name = "type_fixed_capacity_dynamic_array_len_offset", kind = "b", type = "proc($T: typeid/[dynamic; $N]$E) -> uintptr",
+		comment = "Returns the offset in bytes to the length field of a fixed-capacity dynamic array type.",
+	},
+	{name = "type_enum_is_contiguous",                  kind = "b", type = "proc($T: typeid) -> bool where type_is_enum(T)",
+		comment = "Returns true if the enum's constants, when sorted, have a difference of 0 or 1 between consecutive values (the opposite of a `sparse` enum).",
+	},
+
+
 
 	{name = "type_equal_proc",                          kind = "b", type = "proc($T: typeid) -> (equal:  proc \"contextless\" (rawptr, rawptr) -> bool)                 where type_is_comparable(T)",
 		comment = "Returns the underlying procedure that is used to compare pointers to two values of the same type together. This is used by the `map` type and general complicated comparisons.",
@@ -516,6 +582,19 @@ intrinsics_table := []Builtin{
 		"\ttype_merge(B, C) == union{bool, complex64, string, i32}\n"+
 		"\ttype_merge(C, A) == union{string, bool, i32, f32}\n"+
 		"",
+	},
+
+	{name = "type_integer_to_unsigned",                 kind = "b", type = "proc($T: typeid) -> type where type_is_integer(T), !type_is_unsigned(T)",
+		comment = "Returns the unsigned integer type of the same size as the given signed integer type `T`.",
+	},
+	{name = "type_integer_to_signed",                   kind = "b", type = "proc($T: typeid) -> type where type_is_integer(T), type_is_unsigned(T)",
+		comment = "Returns the signed integer type of the same size as the given unsigned integer type `T`.",
+	},
+	{name = "type_has_shared_fields",                   kind = "b", type = "proc($U, $V: typeid) -> bool where type_is_struct(U), type_is_struct(V)",
+		comment = "Directional: returns true when `U` contains every field of `V`, matched on name and type. Swapping the arguments can change the answer, and an empty `V` returns true.",
+	},
+	{name = "type_canonical_name",                      kind = "b", type = "proc($T: typeid) -> string",
+		comment = "Returns the canonicalized name of the type, which is used to produce the pseudo-unique `typeid`.",
 	},
 
 	{name = "constant_utf16_cstring", kind = "b", type = "proc($literal: string) -> [^]u16",
@@ -578,8 +657,12 @@ intrinsics_table := []Builtin{
 	{name = "simd_extract",            kind = "b", type = "proc(a: #simd[N]T, idx: uint) -> T", comment = "Extracts a single scalar element from a `#simd` vector at a specified index."},
 	{name = "simd_replace",            kind = "b", type = "proc(a: #simd[N]T, idx: uint, elem: T) -> #simd[N]T", comment = "Replaces a single scalar element from a `#simd` vector and returns a new vector."},
 
+	{name = "simd_reduce_add_bisect",  kind = "b", type = "proc(a: #simd[N]T) -> T where type_is_integer(T) || type_is_float(T)", comment = "Reduces the vector by summing lanes in a bisecting (tree) order. Faster than the ordered reduction, but for floats the result may differ due to rounding."},
+	{name = "simd_reduce_mul_bisect",  kind = "b", type = "proc(a: #simd[N]T) -> T where type_is_integer(T) || type_is_float(T)", comment = "Reduces the vector by multiplying lanes in a bisecting (tree) order. Faster than the ordered reduction, but for floats the result may differ due to rounding."},
 	{name = "simd_reduce_add_ordered", kind = "b", type = "proc(a: #simd[N]T) -> T", comment = SIMD_REDUCE_PREFIX + "simd_reduce_add_ordered" + SIMD_REDUCE_MID + "result = result + e"     + SIMD_REDUCE_SUFFIX},
 	{name = "simd_reduce_mul_ordered", kind = "b", type = "proc(a: #simd[N]T) -> T", comment = SIMD_REDUCE_PREFIX + "simd_reduce_mul_ordered" + SIMD_REDUCE_MID + "result = result * e"     + SIMD_REDUCE_SUFFIX},
+	{name = "simd_reduce_add_pairs",   kind = "b", type = "proc(a: #simd[N]T) -> T where type_is_integer(T) || type_is_float(T)", comment = "Reduces the vector to a scalar by repeatedly performing pairwise (horizontal) additions of adjacent lanes."},
+	{name = "simd_reduce_mul_pairs",   kind = "b", type = "proc(a: #simd[N]T) -> T where type_is_integer(T) || type_is_float(T)", comment = "Reduces the vector to a scalar by repeatedly performing pairwise (horizontal) multiplications of adjacent lanes."},
 	{name = "simd_reduce_min",         kind = "b", type = "proc(a: #simd[N]T) -> T", comment = SIMD_REDUCE_PREFIX + "simd_reduce_min"         + SIMD_REDUCE_MID + "result = min(result, e)" + SIMD_REDUCE_SUFFIX},
 	{name = "simd_reduce_max",         kind = "b", type = "proc(a: #simd[N]T) -> T", comment = SIMD_REDUCE_PREFIX + "simd_reduce_max"         + SIMD_REDUCE_MID + "result = max(result, e)" + SIMD_REDUCE_SUFFIX},
 	{name = "simd_reduce_and",         kind = "b", type = "proc(a: #simd[N]T) -> T", comment = SIMD_REDUCE_PREFIX + "simd_reduce_and"         + SIMD_REDUCE_MID + "result = result & e"     + SIMD_REDUCE_SUFFIX},
@@ -605,6 +688,8 @@ intrinsics_table := []Builtin{
 	{name = "simd_masked_expand_load",    kind = "b", type = "proc(ptr: rawptr, val: #simd[N]T, mask: #simd[N]U) -> #simd[N]T where type_is_integer(U) || type_is_boolean(U)"},
 	{name = "simd_masked_compress_store", kind = "b", type = "proc(ptr: rawptr, val: #simd[N]T, mask: #simd[N]U) where type_is_integer(U) || type_is_boolean(U)"},
 
+	{name = "simd_indices",            kind = "b", type = "proc($T: typeid/#simd[$N]$E) -> T where type_is_numeric(T)", comment = "Returns a `#simd` vector whose lanes are set to their own index, i.e. `{0, 1, 2, ..., N-1}`."},
+
 	{name = "simd_shuffle",            kind = "b", type = "proc(a, b: #simd[N]T, $indices: ..int) -> #simd[len(indices)]T"},
 	{name = "simd_select",             kind = "b", type = "proc(cond: #simd[N]boolean_or_integer, true, false: #simd[N]T) -> #simd[N]T"},
 	{name = "simd_runtime_swizzle",    kind = "b", type = "proc(table: #simd[N]T, indices: #simd[N]T) -> #simd[N]T where type_is_integer(T)"},
@@ -616,12 +701,30 @@ intrinsics_table := []Builtin{
 
 	{name = "simd_nearest",            kind = "b", type = "proc(a: #simd[N]any_float) -> #simd[N]any_float", comment = "rounding to the nearest integral value; if two values are equally near, rounds to the even one"},
 
+	{name = "simd_approx_recip",       kind = "b", type = "proc(x: #simd[N]T) -> #simd[N]T where type_is_float(T)", comment = "Returns a fast, target-dependent approximation of the reciprocal (`1/x`) of each lane."},
+	{name = "simd_approx_recip_sqrt",  kind = "b", type = "proc(x: #simd[N]T) -> #simd[N]T where type_is_float(T)", comment = "Returns a fast, target-dependent approximation of the reciprocal square root (`1/sqrt(x)`) of each lane."},
+
+
 	{name = "simd_to_bits",            kind = "b", type = "proc(v: #simd[N]T) -> #simd[N]Integer where size_of(T) == size_of(Integer), type_is_unsigned(Integer)"},
+	{name = "simd_to_bits_signed",     kind = "b", type = "proc(v: #simd[N]T) -> #simd[N]Integer where size_of(T) == size_of(Integer), !type_is_unsigned(Integer)"},
 
 	{name = "simd_lanes_reverse",      kind = "b", type = "proc(a: #simd[N]T) -> #simd[N]T", comment = "equivalent a swizzle with descending indices, e.g. reserve(a, 3, 2, 1, 0)"},
 
 	{name = "simd_lanes_rotate_left",  kind = "b", type = "proc(a: #simd[N]T, $offset: int) -> #simd[N]T"},
 	{name = "simd_lanes_rotate_right", kind = "b", type = "proc(a: #simd[N]T, $offset: int) -> #simd[N]T"},
+
+	{name = "simd_odd_even",           kind = "b", type = "proc(a, b: #simd[N]T) -> #simd[N]T", comment = "Selects lanes alternately from `a` and `b`, returning `{b[0], a[1], b[2], a[3], ...}`."},
+
+	{name = "simd_sums_of_n",          kind = "b", type = "proc(a: #simd[LANES]T, $N: uint) -> #simd[LANES/N]T where is_power_of_two(N)", comment = "Returns a vector where each lane is the sum of `N` consecutive lanes of the input."},
+
+	{name = "simd_pairwise_add",       kind = "b", type = "proc(a, b: #simd[LANES]T) -> #simd[LANES]T where LANES % 2 == 0", comment = "Performs a pairwise (horizontal) add of adjacent lanes drawn from `a` and `b`."},
+	{name = "simd_pairwise_sub",       kind = "b", type = "proc(a, b: #simd[LANES]T) -> #simd[LANES]T where LANES % 2 == 0", comment = "Performs a pairwise (horizontal) subtract of adjacent lanes drawn from `a` and `b`."},
+
+	{name = "simd_interleave",         kind = "b", type = "proc(a, ..#simd[LANES/N]T) -> #simd[LANES]T where N >= 1", comment = "Interleaves the lanes of the input vectors into a single wider vector."},
+	{name = "simd_deinterleave",       kind = "b", type = "proc(a: #simd[LANES]T, $N: uint) -> (..#simd[LANES/N]T) where N >= 1, LANES % N == 0", comment = "Deinterleaves a vector into `N` narrower vectors."},
+
+	{name = "soa_copy_from_slice",     kind = "b", type = "proc(ptr: ^$A/#soa[dynamic]$E, offset: int, args: []$E)", comment = "Copies elements from an ordinary slice `args` into an `#soa` dynamic array at the given `offset`."},
+
 
 	{name = "has_target_feature", kind = "b", type = "proc($test: $T) -> bool where type_is_string(T) || type_is_proc(T)",
 		comment =
@@ -656,13 +759,23 @@ intrinsics_table := []Builtin{
 	{name = "x86_cpuid",  kind = "b", type = "proc(ax, cx: u32) -> (eax, ebx, ecx, edx: u32)", comment = X86_COMMENT + "\nImplements the `cpuid` instruction."},
 	{name = "x86_xgetbv", kind = "b", type = "proc(cx: u32) -> (eax, edx: u32)", comment = X86_COMMENT+"\nImplements in `xgetbv` instruction."},
 
+	// C-specific things
+	{name = "c_va_list",  kind = "t", type = "struct {/* platform specific implementation */}", comment = "Represents C's `va_list` type, for interfacing with C variadic functions."},
+	{name = "c_va_start", kind = "b", type = "proc(list: ^c_va_list, args: ..$T)", comment = "Begins traversal of C variadic arguments; `args` is the parameter marked `#c_vararg`."},
+	{name = "c_va_end",   kind = "b", type = "proc(list: ^c_va_list)", comment = "Ends a traversal started with `c_va_start`."},
+	{name = "c_va_copy",  kind = "b", type = "proc(dst, src: ^c_va_list)", comment = "Copies the current state of one `c_va_list` into another."},
+	{name = "c_va_arg",   kind = "b", type = "proc(list: ^c_va_list, $T: typeid) -> T", comment = "Fetches the next C variadic argument as type `T`."},
+
 	// Darwin targets only
 	{name = "objc_object",            kind = "t", type="struct {}",                             comment = DARWIN_COMMENT + "\nRepresents an Objective-C `object` type."},
 	{name = "objc_selector",          kind = "t", type="struct {}",                             comment = DARWIN_COMMENT + "\nRepresents an Objective-C `selector` type."},
 	{name = "objc_class",             kind = "t", type="struct {}",                             comment = DARWIN_COMMENT + "\nRepresents an Objective-C `class` type."},
+	{name = "objc_ivar",              kind = "t", type="struct {}",                             comment = DARWIN_COMMENT + "\nRepresents an Objective-C instance variable (`Ivar`) type."},
 	{name = "objc_id",                kind = "t", type="^objc_object",                          comment = DARWIN_COMMENT + "\nRepresents an Objective-C `id` type."},
 	{name = "objc_SEL",               kind = "t", type="^objc_selector",                        comment = DARWIN_COMMENT + "\nRepresents an Objective-C `SEL` type."},
 	{name = "objc_Class",             kind = "t", type="^objc_class",                           comment = DARWIN_COMMENT + "\nRepresents an Objective-C `Class` type."},
+	{name = "objc_Ivar",              kind = "t", type="^objc_ivar",                            comment = DARWIN_COMMENT + "\nRepresents an Objective-C `Ivar` type."},
+	{name = "objc_instancetype",      kind = "t", type="distinct objc_id",                      comment = DARWIN_COMMENT + "\nRepresents an Objective-C `instancetype` type."},
 
 	{name = "objc_find_selector",     kind = "b", type="proc($name: string) -> objc_SEL", comment = DARWIN_COMMENT + "\nWill return a run-time cached selector value for the given constant string value."},
 	{name = "objc_register_selector", kind = "b", type="proc($name: string) -> objc_SEL", comment = DARWIN_COMMENT + "\nWill register a selector value at run-time for the given constant string value."},
@@ -686,27 +799,33 @@ FIXED_POINT_COMMENT :: "A fixed point number represents a real data type for a n
 
 
 SIMD_REDUCE_PREFIX :: "Performs a reduction of a `#simd` vector `a`, returning the result as a scalar. The return type matches the element-type `T` of the `#simd` vector input. See the following pseudocode:\n\t"
-SIMD_REDUCE_MID :: " :: proc(v: #simd[N]T) -> T {\n"+
-	"\t\tresult := simd_extract(v, 0)\n"+
-	"\t\tfor i in 1..<N {\n"+
-	"\t\t\te := simd_extract(v, i)\n"+
-	"\t\t\t"
+SIMD_REDUCE_MID :: """
+ :: proc(v: #simd[N]T) -> T {
+		result := simd_extract(v, 0)
+		for i in 1..<N {
+			e := simd_extract(v, i)
+
+"""
 
 SIMD_REDUCE_SUFFIX :: "\n"+
 	"\t\t}\n"+
 	"\t\treturn result\n"+
 	"\t}"
 
-PREFETCH_COMMENT :: ""+
-	"The `prefetch_*` intrinsic are a hint to the code generator to insert a prefetch instruction if supported; otherwise, it is a no-op. Prefetches have no affect on the behaviour of the program but can change its performance characteristics.\n\n"+
-	"The `locality` parameter must be a constant integer, and its temporal locality value ranges from `0` (no locality) to `3` (extremely local, keep in cache)."
+PREFETCH_COMMENT :: """
+The `prefetch_*` intrinsic are a hint to the code generator to insert a prefetch instruction if supported; otherwise, it is a no-op. Prefetches have no affect on the behaviour of the program but can change its performance characteristics.
+
+
+The `locality` parameter must be a constant integer, and its temporal locality value ranges from `0` (no locality) to `3` (extremely local, keep in cache).
+"""
 
 
 
-VOLATILE_COMMENT :: ""+
-	"Tells the optimizing backend of a compiler to not change the number of 'volatile' operations nor change their order of execution relative to other 'volatile' operations. "+
-	"Optimizers are allowed to change the order of volatile operations relative to non-volatile operations.\n\n"+
-	"Note: This has nothing to do with Java's 'volatile' and has no cross-thread synchronization behaviour. Use atomics if this behaviour is wanted."
+VOLATILE_COMMENT :: """
+Tells the optimizing backend of a compiler to not change the number of 'volatile' operations nor change their order of execution relative to other 'volatile' operations. Optimizers are allowed to change the order of volatile operations relative to non-volatile operations.
 
-NON_TEMPORAL_COMMENT :: ""+
-	"Tells the code generator of a compiler that this operation is not expected to be reused in the cache. The code generator may select special instructions to save cache bandwidth (e.g. on x86, `movnt` instruct might be used)."
+
+Note: This has nothing to do with Java's 'volatile' and has no cross-thread synchronization behaviour. Use atomics if this behaviour is wanted.
+"""
+
+NON_TEMPORAL_COMMENT :: "Tells the code generator of a compiler that this operation is not expected to be reused in the cache. The code generator may select special instructions to save cache bandwidth (e.g. on x86, `movnt` instruct might be used)."
