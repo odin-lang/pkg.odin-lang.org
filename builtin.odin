@@ -320,14 +320,14 @@ add_styling_to_builtin :: proc(txt: string) -> string {
 
 			if !found {
 				switch ident {
-				case "runtime":
+				case "runtime", "intrinsics":
 					if scanner.peek(s) == '.' {
 						_ = scanner.scan(s)
 
 						assert(scanner.scan(s) == scanner.Ident)
 						code_ident := scanner.token_text(s)
 
-						append_anchored_span(&b, s, "/base/runtime", "code-typename", code_ident, &prev_offset)
+						append_anchored_span(&b, s, fmt.tprintf("/base/%s", ident), "code-typename", code_ident, &prev_offset)
 					}
 
 				case "where", "distinct":
@@ -345,20 +345,31 @@ add_styling_to_builtin :: proc(txt: string) -> string {
 					append_span(&b, s, "directive", ident, &prev_offset)
 
 				case "Atomic_Memory_Order",
-				     "objc_object", "objc_selector", "objc_class",
-				     "objc_id", "objc_SEL", "objc_Class":
+				     "c_va_list",
+				     "objc_object", "objc_selector", "objc_class", "objc_ivar",
+				     "objc_id", "objc_SEL", "objc_Class", "objc_Ivar", "objc_instancetype":
 					append_anchored_span(&b, s, "/base/intrinsics", "code-typename", ident, &prev_offset)
 
 				case "uintptr", "uint", "int",
-				     "u128", "i128",
-				     "u64",  "i64",
-				     "u32",  "i32",
-				     "u16",  "i16",
+				     "u128", "i128", "u128le", "i128le", "u128be", "i128be",
+				     "u64",  "i64",  "u64le",  "i64le",  "u64be",  "i64be",
+				     "u32",  "i32",  "u32le",  "i32le",  "u32be",  "i32be",
+				     "u16",  "i16",  "u16le",  "i16le",  "u16be",  "i16be",
 				     "u8",
-				     "bool",
-				     "string", "cstring",
+
+				     "f16", "f16le", "f16be",
+				     "f32", "f32le", "f32be",
+				     "f64", "f64le", "f64be",
+
+				     "bool", "b8", "b16", "b32", "b64",
+
+				     "string",   "cstring",
 				     "string16", "cstring16",
-				     "rawptr":
+				     "rawptr",
+				     "complex32", "complex64", "complex128",
+				     "quaternion64", "quaternion128", "quaternion256",
+				     "any",
+				     "rune":
 					append_anchored_span(&b, s, "/base/builtin", "doc-builtin", ident, &prev_offset)
 				}
 			}
