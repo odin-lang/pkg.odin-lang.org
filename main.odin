@@ -1846,17 +1846,7 @@ write_markup_text :: proc(w: io.Writer, s_: string, code_inline := false) {
 			}
 		case '[':
 			write_link :: proc(w: io.Writer, text, raw_url: string) {
-				scheme, host, path, queries, fragment := net.split_url(raw_url, context.temp_allocator)
-				scheme = strings.to_lower(scheme, context.temp_allocator)
-				host   = strings.to_lower(host, context.temp_allocator)
-
-				url := net.join_url(scheme, host, path, queries, fragment, context.temp_allocator)
-
-				if strings.has_suffix(host, cfg.domain) {
-					fmt.wprintf(w, `<a href="%s">`, url)
-				} else {
-					fmt.wprintf(w, `<a href="%s" target="_blank" rel="noopener noreferrer">`, url)
-				}
+				io.write_string(w, doc_link_open_tag(raw_url))
 				io.write_string(w, text)
 				io.write_string(w, "</a>")
 			}
@@ -1949,6 +1939,327 @@ write_markup_text :: proc(w: io.Writer, s_: string, code_inline := false) {
 	io.write_string(w, s[latest_index:])
 }
 
+doc_link_open_tag :: proc(raw_url: string, allocator := context.temp_allocator) -> string {
+	context.allocator = allocator
+	scheme, host, path, queries, fragment := net.split_url(raw_url)
+	scheme = strings.to_lower(scheme)
+	host   = strings.to_lower(host)
+
+	url := net.join_url(scheme, host, path, queries, fragment)
+	url, _ = strings.replace_all(url, "&", "&amp;")
+	url, _ = strings.replace_all(url, `"`, "%22")
+	url, _ = strings.replace_all(url, "<", "%3C")
+	url, _ = strings.replace_all(url, ">", "%3E")
+
+	if strings.has_suffix(host, cfg.domain) {
+		return fmt.aprintf(`<a href="%s">`, url)
+	}
+	return fmt.aprintf(`<a href="%s" target="_blank" rel="noopener noreferrer">`, url)
+}
+
+strip_comment_gutter :: proc(docs: string, allocator := context.temp_allocator) -> string {
+	context.allocator = allocator
+
+	gutter_rest :: proc(line: string) -> (rest: string, ok: bool) {
+		t := strings.trim_left_space(line)
+		if !strings.has_prefix(t, "*") {
+			return
+		}
+		if strings.trim_right(t, "*") == "" {
+			return "", true
+		}
+		switch t[1] {
+		case ' ', '\t':
+			return t[2:], true
+		}
+		return
+	}
+
+	lines := strings.split_lines(docs)
+
+	is_gutter, any_bare, all_aligned := true, false, true
+	non_empty := 0
+	for line in lines {
+		if strings.trim_space(line) == "" {
+			continue
+		}
+		non_empty += 1
+		rest, ok := gutter_rest(line)
+		if !ok {
+			is_gutter = false
+			break
+		}
+		if strings.trim_space(rest) == "" {
+			any_bare = true
+		}
+		i := 0
+		for i < len(line) && line[i] == '\t' {
+			i += 1
+		}
+		if !(i+1 < len(line) && line[i] == ' ' && line[i+1] == '*') {
+			all_aligned = false
+		}
+	}
+	if is_gutter && non_empty > 0 && (any_bare || all_aligned) {
+		for &line in lines {
+			line, _ = gutter_rest(line)
+		}
+		return strings.join(lines, "\n")
+	}
+
+	trimmed := strings.trim_left_space(docs)
+	first, _, after_first := strings.partition(trimmed, "\n")
+	switch {
+	case strings.trim_right(strings.trim_space(first), "*") == "":
+		return after_first
+	case strings.has_prefix(trimmed, "*<"), strings.has_prefix(trimmed, "!<"):
+		return trimmed[2:]
+	case strings.has_prefix(trimmed, "* "), strings.has_prefix(trimmed, "*\t"):
+		for line in strings.split_lines(after_first) {
+			if strings.has_prefix(strings.trim_left_space(line), "*") {
+				return docs
+			}
+		}
+		return trimmed[1:]
+	}
+	return docs
+}
+
+convert_double_bracket_links :: proc(s: string, allocator := context.temp_allocator) -> string {
+	b := strings.builder_make(allocator)
+	latest := 0
+	for i := 0; i < len(s); i += 1 {
+		switch s[i] {
+		case '`':
+			run := 1
+			for i+run < len(s) && s[i+run] == '`' {
+				run += 1
+			}
+			fence := s[i:i+run]
+			if end := strings.index(s[i+run:], fence); end >= 0 {
+				i += run + end + run - 1
+			} else {
+				i += run - 1
+			}
+		case '[':
+			if i+1 >= len(s) || s[i+1] != '[' {
+				break
+			}
+			end := strings.index(s[i+2:], "]]")
+			if end < 0 {
+				break
+			}
+			inner := s[i+2:][:end]
+			if !strings.contains(inner, "//") || strings.contains(inner, "\n") {
+				break
+			}
+			text, url := inner, inner
+			if strings.contains(inner, ";") {
+				text, _, url = strings.partition(inner, ";")
+			}
+			text = strings.trim_space(text)
+			url  = strings.trim_space(url)
+			strings.write_string(&b, s[latest:i])
+			fmt.sbprintf(&b, "[%s](<%s>)", text, url)
+			latest = i + 2 + end + 2
+			i = latest - 1
+		}
+	}
+	strings.write_string(&b, s[latest:])
+	return strings.to_string(b)
+}
+
+write_markdown :: proc(w: io.Writer, lines: []string) {
+	is_blank :: proc(s: string) -> bool {
+		return strings.trim_space(s) == ""
+	}
+	is_list_item :: proc(s: string) -> bool {
+		t := strings.trim_left_space(s)
+		if strings.has_prefix(t, "- ") || strings.has_prefix(t, "* ") || strings.has_prefix(t, "+ ") {
+			return true
+		}
+		i := 0
+		for i < len(t) && '0' <= t[i] && t[i] <= '9' {
+			i += 1
+		}
+		return i > 0 && i+1 < len(t) && (t[i] == '.' || t[i] == ')') && t[i+1] == ' '
+	}
+
+	runtime.DEFAULT_TEMP_ALLOCATOR_TEMP_GUARD()
+
+	// Space indentation shared by every line would otherwise turn the whole block into code
+	indent := max(int)
+	for line in lines {
+		if is_blank(line) {
+			continue
+		}
+		n := 0
+		for n < len(line) && (line[n] == ' ' || line[n] == '\t') {
+			n += 1
+		}
+		indent = min(indent, n)
+	}
+	if indent == max(int) {
+		return
+	}
+	prose := slice.clone(lines, context.temp_allocator)
+	for &line in prose {
+		line = "" if is_blank(line) else line[indent:]
+	}
+
+	// Fences indented four or more spaces would otherwise be indented code showing the backticks
+	for i := 0; i < len(prose); i += 1 {
+		t := strings.trim_left(prose[i], " ")
+		n := len(prose[i]) - len(t)
+		if n < 4 || !(strings.has_prefix(t, "```") || strings.has_prefix(t, "~~~")) {
+			continue
+		}
+		end := i + 1
+		for end < len(prose) && !strings.has_prefix(strings.trim_left_space(prose[end]), t[:3]) {
+			end += 1
+		}
+		if end == len(prose) {
+			continue
+		}
+		for &line in prose[i:end+1] {
+			m := 0
+			for m < n && m < len(line) && line[m] == ' ' {
+				m += 1
+			}
+			line = line[m:]
+		}
+		i = end
+	}
+
+	b := strings.builder_make(context.temp_allocator)
+	for raw_line, i in prose {
+		if raw_line == "" {
+			strings.write_byte(&b, '\n')
+			continue
+		}
+		line := raw_line
+		if i == 0 || prose[i-1] == "" {
+			for subtitle in ([]string{"Inputs:", "Returns:"}) {
+				if !strings.has_prefix(line, subtitle) {
+					continue
+				}
+				rest := strings.trim_left_space(line[len(subtitle):])
+				fmt.sbprintf(&b, "**%s**", subtitle)
+				switch {
+				case rest != "":
+					strings.write_string(&b, "\\\n")
+				case i+1 < len(prose) && !is_blank(prose[i+1]) && !is_list_item(prose[i+1]):
+					strings.write_string(&b, "\\")
+				}
+				line = rest
+				break
+			}
+		}
+		strings.write_string(&b, line)
+		strings.write_byte(&b, '\n')
+	}
+
+	src := convert_double_bracket_links(strings.to_string(b))
+	root := cm.parse_document_from_string(src, cm.DEFAULT_OPTIONS)
+	defer cm.node_free(root)
+
+	// The tree may only be changed once iteration has finished
+	nodes := make([dynamic]^cm.Node, context.temp_allocator)
+	{
+		iter := cm.iter_new(root)
+		defer cm.iter_free(iter)
+		for {
+			ev := cm.iter_next(iter)
+			if ev == .Done {
+				break
+			}
+			if ev != .Enter {
+				continue
+			}
+			node := cm.iter_get_node(iter)
+			#partial switch cm.node_get_type(node) {
+			case .Heading, .HTML_Inline, .HTML_Block, .Link, .Text, .Code_Block:
+				append(&nodes, node)
+			}
+		}
+	}
+
+	new_text :: proc(literal: string) -> ^cm.Node {
+		n := cm.node_new(.Text)
+		cm.node_set_literal(n, strings.clone_to_cstring(literal, context.temp_allocator))
+		return n
+	}
+	new_custom_inline :: proc(on_enter, on_exit: string) -> ^cm.Node {
+		n := cm.node_new(.Custom_Inline)
+		cm.node_set_on_enter(n, strings.clone_to_cstring(on_enter, context.temp_allocator))
+		cm.node_set_on_exit(n,  strings.clone_to_cstring(on_exit,  context.temp_allocator))
+		return n
+	}
+
+	for node in nodes {
+		#partial switch cm.node_get_type(node) {
+		case .Heading:
+			cm.node_set_heading_level(node, min(cm.node_get_heading_level(node) + 2, 6))
+		case .Code_Block:
+			// Stops highlight.js guessing a language
+			if string(cm.node_get_fence_info(node)) == "" {
+				cm.node_set_fence_info(node, "plaintext")
+			}
+		case .HTML_Inline:
+			cm.node_replace(node, new_text(string(cm.node_get_literal(node))))
+			cm.node_free(node)
+		case .HTML_Block:
+			para := cm.node_new(.Paragraph)
+			cm.node_append_child(para, new_text(strings.trim_right_space(string(cm.node_get_literal(node)))))
+			cm.node_replace(node, para)
+			cm.node_free(node)
+		case .Link:
+			url := string(cm.node_get_url(node))
+			scheme, _, _ := strings.partition(strings.to_lower(url, context.temp_allocator), ":")
+			anchor: ^cm.Node
+			switch scheme {
+			case "javascript", "vbscript", "file", "data":
+				anchor = new_custom_inline("", "")
+			case:
+				anchor = new_custom_inline(doc_link_open_tag(url), "</a>")
+			}
+			for child := cm.node_first_child(node); child != nil; child = cm.node_first_child(node) {
+				cm.node_unlink(child)
+				cm.node_append_child(anchor, child)
+			}
+			cm.node_replace(node, anchor)
+			cm.node_free(node)
+		case .Text:
+			IFF_ABBR :: `<abbr title="If and only if (⟺)">iff</abbr>`
+			literal := string(cm.node_get_literal(node))
+			if !strings.contains(literal, "f and only if (⟺)") {
+				continue
+			}
+			for len(literal) > 0 {
+				i := strings.index(literal, "If and only if (⟺)")
+				if j := strings.index(literal, "if and only if (⟺)"); j >= 0 && (i < 0 || j < i) {
+					i = j
+				}
+				if i < 0 {
+					cm.node_insert_before(node, new_text(literal))
+					break
+				}
+				if i > 0 {
+					cm.node_insert_before(node, new_text(literal[:i]))
+				}
+				cm.node_insert_before(node, new_custom_inline(IFF_ABBR, ""))
+				literal = literal[i+len("If and only if (⟺)"):]
+			}
+			cm.node_unlink(node)
+			cm.node_free(node)
+		}
+	}
+
+	html := cm.render_html(root, cm.DEFAULT_OPTIONS)
+	defer cm.free(html)
+	io.write_string(w, string(html))
+}
+
 write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller_location) {
 	docs := docs
 
@@ -1967,6 +2278,11 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 	}
 
 	assert(strings.trim_space(docs) != "", loc=loc)
+
+	docs = strip_comment_gutter(docs)
+	if strings.trim_space(docs) == "" {
+		return
+	}
 
 	// Trim off space (not tabs) from the left.
 	// Tabs actually have meaning.
@@ -2030,7 +2346,6 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 	for line, i in lines_to_process {
 		text := strings.trim_space(line)
 		next_block_kind := curr_block_kind
-		force_write_block := false
 
 		switch curr_block_kind {
 		case .Paragraph:
@@ -2049,8 +2364,6 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 				has_any_output = true
 			case strings.has_prefix(line, "\t"):
 				next_block_kind = .Code
-			case text == "":
-				force_write_block = true
 			case strings.has_prefix(line, "// Defined internally by the compiler"):
 				next_block_kind = .Example
 				has_example = true
@@ -2096,7 +2409,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 			}
 		}
 
-		if curr_block_kind != next_block_kind || force_write_block {
+		if curr_block_kind != next_block_kind {
 			append(&blocks, Block{curr_block_kind, lines_to_process[start:i]})
 			curr_block_kind = next_block_kind
 			start = i
@@ -2139,77 +2452,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 
 		switch block.kind {
 		case .Paragraph:
-			subtitles := [?]string{"Inputs:", "Returns:"}
-			subtitle := ""
-			for candidate in subtitles {
-				if strings.has_prefix(block_lines[0], candidate) {
-					subtitle = candidate
-					rest := strings.trim_left_space(strings.trim_prefix(block_lines[0], candidate))
-					if rest == "" {
-						block_lines = block_lines[1:]
-					} else {
-						block_lines[0] = rest
-					}
-					break
-				}
-			}
-
-			// NOTE(bill): If the body under Inputs:/Returns: is entirely "- " bullets, render a real list rather than a run-on paragraph.
-			is_bullets := subtitle != "" && len(block_lines) > 0
-			if is_bullets {
-				for line in block_lines {
-					t := strings.trim_space(line)
-					if t == "" {
-						continue
-					}
-					if !strings.has_prefix(t, "- ") {
-						is_bullets = false
-						break
-					}
-				}
-			}
-			if is_bullets {
-				fmt.wprintf(w, "<p><b>%s</b></p>\n", subtitle)
-				io.write_string(w, `<ul class="doc-params">`)
-				for line in block_lines {
-					t := strings.trim_space(line)
-					if t == "" {
-						continue
-					}
-					io.write_string(w, "<li>")
-					write_markup_text(w, strings.trim_prefix(t, "- "))
-					io.write_string(w, "</li>\n")
-				}
-				io.write_string(w, "</ul>\n")
-				continue
-			}
-
-			io.write_string(w, "<p>")
-			if subtitle != "" {
-				fmt.wprintf(w, "<b>%s</b><br>", subtitle)
-			}
-			for line, line_idx in block_lines {
-				if line_idx > 0 {
-					io.write_string(w, "\n")
-				}
-				if strings.has_prefix(line, "##") {
-					n := 0
-					for c in line {
-						if c != '#' {
-							break
-						}
-						n += 1
-					}
-					io.write_string(w, "</p>\n")
-					fmt.wprintf(w, "<h%d>", n+2)
-					write_markup_text(w, line[n:])
-					fmt.wprintf(w, "</h%d>", n+2)
-					io.write_string(w, "<p>")
-					continue
-				}
-				write_markup_text(w, line)
-			}
-			io.write_string(w, "</p>\n")
+			write_markdown(w, block_lines)
 		case .Code:
 			all_blank := len(block_lines) > 0
 			for line in block_lines {
