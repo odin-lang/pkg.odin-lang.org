@@ -1845,6 +1845,22 @@ write_markup_text :: proc(w: io.Writer, s_: string, code_inline := false) {
 				index = latest_index
 			}
 		case '[':
+			write_link :: proc(w: io.Writer, text, raw_url: string) {
+				scheme, host, path, queries, fragment := net.split_url(raw_url, context.temp_allocator)
+				scheme = strings.to_lower(scheme, context.temp_allocator)
+				host   = strings.to_lower(host, context.temp_allocator)
+
+				url := net.join_url(scheme, host, path, queries, fragment, context.temp_allocator)
+
+				if strings.has_suffix(host, cfg.domain) {
+					fmt.wprintf(w, `<a href="%s">`, url)
+				} else {
+					fmt.wprintf(w, `<a href="%s" target="_blank" rel="noopener noreferrer">`, url)
+				}
+				io.write_string(w, text)
+				io.write_string(w, "</a>")
+			}
+
 			if index+1 < len(s) && s[index+1] == '[' {
 				end_bracket := strings.index(s[index + 1:], "]]")
 				slash_slash := strings.index(s[index + 1:], "//")
@@ -1860,25 +1876,36 @@ write_markup_text :: proc(w: io.Writer, s_: string, code_inline := false) {
 					url  = strings.trim_space(url)
 
 					io.write_string(w, s[latest_index:index])
-
-					// Case-normalize URI per RFC 3986 §6.2.2.1
-					scheme, host, path, queries, fragment := net.split_url(url, context.temp_allocator)
-					scheme = strings.to_lower(scheme, context.temp_allocator)
-					host  = strings.to_lower(host, context.temp_allocator)
-					url = net.join_url(scheme, host, path, queries, fragment, context.temp_allocator)
-
-					if strings.has_suffix(host, cfg.domain) {
-						// Same domain as cfg.domain
-						fmt.wprintf(w, `<a href="%s">`, url)
-					} else {
-						// External domain, open in new tab.
-						fmt.wprintf(w, `<a href="%s" target="_blank" rel="noopener noreferrer">`, url)
-					}
-					io.write_string(w, text)
-					io.write_string(w, "</a>")
+					write_link(w, text, url)
 					latest_index = end_bracket + 1
 					index = latest_index
 				}
+			} else {
+				// Markdown style `[text](url)`
+				close_bracket := strings.index_byte(s[index + 1:], ']')
+				if close_bracket < 0 {
+					break
+				}
+				close_bracket += index + 1
+				if close_bracket+1 >= len(s) || s[close_bracket+1] != '(' {
+					break
+				}
+				close_paren := strings.index_byte(s[close_bracket + 2:], ')')
+				if close_paren < 0 {
+					break
+				}
+				close_paren += close_bracket + 2
+
+				text := strings.trim_space(s[index + 1:close_bracket])
+				url  := strings.trim_space(s[close_bracket + 2:close_paren])
+				if !strings.contains(url, "//") || strings.contains_any(url, " \t") {
+					break
+				}
+
+				io.write_string(w, s[latest_index:index])
+				write_link(w, text, url)
+				latest_index = close_paren + 1
+				index = close_paren
 			}
 		case '*':
 			Star_Type :: enum {
