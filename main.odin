@@ -1291,7 +1291,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		for line in lines {
 			do_indent(writer, flags)
 			io.write_string(w, "<span class=\"comment\">// ")
-			io.write_string(w, line)
+			io.write_string(w, strip_doxygen_brief(line))
 			io.write_string(w, "</span>\n")
 		}
 	}
@@ -1306,7 +1306,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		}
 
 		io.write_string(w, "<span class=\"comment\">// ")
-		io.write_string(w, strings.trim_right_space(comment))
+		io.write_string(w, strings.trim_right_space(strip_doxygen_brief(comment)))
 		io.write_string(w, "</span>")
 	}
 
@@ -1977,9 +1977,20 @@ strip_comment_gutter :: proc(docs: string, allocator := context.temp_allocator) 
 
 	lines := strings.split_lines(docs)
 
+	// `/** text` leaves no gutter on the first line
+	start := 0
+	for start < len(lines) && strings.trim_space(lines[start]) == "" {
+		start += 1
+	}
+	if start+1 < len(lines) && strings.trim_space(lines[start+1]) != "" {
+		if _, ok := gutter_rest(lines[start]); !ok {
+			start += 1
+		}
+	}
+
 	is_gutter, any_bare, all_aligned := true, false, true
 	non_empty := 0
-	for line in lines {
+	for line in lines[start:] {
 		if strings.trim_space(line) == "" {
 			continue
 		}
@@ -2001,7 +2012,7 @@ strip_comment_gutter :: proc(docs: string, allocator := context.temp_allocator) 
 		}
 	}
 	if is_gutter && non_empty > 0 && (any_bare || all_aligned) {
-		for &line in lines {
+		for &line in lines[start:] {
 			line, _ = gutter_rest(line)
 		}
 		return strings.join(lines, "\n")
@@ -2023,6 +2034,19 @@ strip_comment_gutter :: proc(docs: string, allocator := context.temp_allocator) 
 		return trimmed[1:]
 	}
 	return docs
+}
+
+strip_doxygen_brief :: proc(line: string) -> string {
+	t := strings.trim_left_space(line)
+	if strings.has_prefix(t, "* ") || strings.has_prefix(t, "*\t") {
+		t = strings.trim_left_space(t[1:])
+	}
+	for marker in ([]string{`\brief`, "@brief"}) {
+		if strings.has_prefix(t, marker) && (len(t) == len(marker) || t[len(marker)] == ' ' || t[len(marker)] == '\t') {
+			return strings.trim_left_space(t[len(marker):])
+		}
+	}
+	return line
 }
 
 convert_double_bracket_links :: proc(s: string, allocator := context.temp_allocator) -> string {
@@ -2129,6 +2153,10 @@ write_markdown :: proc(w: io.Writer, lines: []string) {
 			line = line[m:]
 		}
 		i = end
+	}
+
+	for &line in prose {
+		line = strip_doxygen_brief(line)
 	}
 
 	b := strings.builder_make(context.temp_allocator)
