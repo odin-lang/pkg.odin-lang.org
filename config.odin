@@ -37,6 +37,10 @@ Config :: struct {
 	pkgs_line_docs:     map[string]string,
 
 	entity_to_pkg:      map[^doc.Entity]^doc.Pkg,
+
+	// For resolving `[[pkg.name]]` references in docs.
+	pkg_link_names:     map[^doc.Pkg]map[string]bool,
+	pkgs_by_name:       map[string][dynamic]^doc.Pkg,
 }
 
 Collection :: struct {
