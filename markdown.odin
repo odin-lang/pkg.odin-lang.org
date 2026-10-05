@@ -17,6 +17,10 @@ Doc_Context :: struct {
 	heading_prefix: string,   // headings only get ids when set
 	headings:       ^[dynamic]Doc_Heading,
 	used_ids:       map[string]int,
+
+	// The declaration being documented: its own name and its parameters and fields in backticks aren't linked
+	entity:         ^doc.Entity,
+	self_name:      string,
 }
 
 Doc_Heading :: struct {
@@ -343,7 +347,6 @@ convert_double_bracket_links :: proc(s: string, ctx: ^Doc_Context, plain := fals
 	return strings.to_string(b)
 }
 
-// The first line of prose, skipping headings
 doc_summary_line :: proc(docs: string) -> string {
 	docs := docs
 	for line in strings.split_lines_iterator(&docs) {
@@ -354,6 +357,136 @@ doc_summary_line :: proc(docs: string) -> string {
 		return t
 	}
 	return ""
+}
+
+doc_summary :: proc(docs: string) -> string {
+	MAX_LEN :: 160
+
+	b := strings.builder_make(context.temp_allocator)
+	docs := docs
+	for line in strings.split_lines_iterator(&docs) {
+		t := strings.trim_space(line)
+		if strings.builder_len(b) == 0 {
+			if t == "" || strings.has_prefix(t, "#") || strings.trim_right(t, "=-") == "" {
+				continue
+			}
+		} else if t == "" {
+			break
+		}
+		if strings.has_prefix(t, "Inputs:") || strings.has_prefix(t, "Returns:") || strings.has_prefix(t, "Example:") || strings.has_prefix(t, "```") {
+			break
+		}
+		if strings.builder_len(b) > 0 {
+			strings.write_byte(&b, ' ')
+		}
+		strings.write_string(&b, t)
+		if strings.builder_len(b) > 4*MAX_LEN {
+			break
+		}
+	}
+
+	text := markdown_plain_text(strings.to_string(b), context.temp_allocator)
+	for i := 1; i+1 < len(text); i += 1 {
+		// not at "e.g." or "i.e."
+		if text[i] == '.' && text[i+1] == ' ' && !(i >= 2 && text[i-2] == '.') {
+			text = text[:i+1]
+			break
+		}
+	}
+	if len(text) > MAX_LEN {
+		cut := strings.last_index_byte(text[:MAX_LEN], ' ')
+		text = fmt.tprintf("%s…", text[:cut if cut > 0 else MAX_LEN])
+	}
+	return text
+}
+
+auto_link_url :: proc(literal: string, ctx: ^Doc_Context) -> (url: string, ok: bool) {
+	if ctx == nil || ctx.pkg == nil {
+		return
+	}
+	text := strings.trim_suffix(literal, "()")
+	if len(text) < 3 || text[0] == '.' || text[len(text)-1] == '.' || strings.contains(text, "..") {
+		return
+	}
+	for i in 0..<len(text) {
+		c := text[i]
+		if !(c == '_' || c == '.' || 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || i > 0 && '0' <= c && c <= '9') {
+			return
+		}
+	}
+
+	names := cfg.pkg_link_names[ctx.pkg]
+	parts := strings.split(text, ".", context.temp_allocator)
+	is_local := parts[0] == ctx.self_name || is_local_name(ctx.entity, parts[0])
+	if len(parts) == 1 {
+		if !is_local && text in names {
+			return doc_entity_url(ctx.pkg, text), true
+		}
+		return
+	}
+
+	// `strings.Builder`, `NS.String`
+	for k := len(parts)-1; k >= 1; k -= 1 {
+		pkg_ref := strings.join(parts[:k], ".", context.temp_allocator)
+		p := lookup_doc_pkg(pkg_ref, ctx.pkg)
+		if p == nil {
+			for import_path, alias in cfg.import_aliases {
+				if alias == pkg_ref {
+					p = lookup_doc_pkg(import_path, nil)
+				}
+			}
+		}
+		if p != nil && parts[k] in cfg.pkg_link_names[p] {
+			return doc_entity_url(p, parts[k]), true
+		}
+	}
+	// `Allocator_Mode.Alloc`
+	if !is_local && parts[0] in names {
+		return doc_entity_url(ctx.pkg, parts[0]), true
+	}
+	return
+}
+
+is_local_name :: proc(e: ^doc.Entity, name: string) -> bool {
+	in_entities :: proc(indices: []doc.Entity_Index, name: string) -> bool {
+		for i in indices {
+			if str(cfg.entities[i].name) == name {
+				return true
+			}
+		}
+		return false
+	}
+	in_proc_type :: proc(t: doc.Type, name: string) -> bool {
+		for tuple in array(t.types) {
+			if tuple != 0 && in_entities(array(cfg.types[tuple].entities), name) {
+				return true
+			}
+		}
+		return false
+	}
+
+	if e == nil {
+		return false
+	}
+	#partial switch e.kind {
+	case .Procedure:
+		return in_proc_type(base_type(cfg.types[e.type]), name)
+	case .Proc_Group:
+		for member in array(e.grouped_entities) {
+			if is_local_name(&cfg.entities[member], name) {
+				return true
+			}
+		}
+	case .Type_Name:
+		t := base_type(cfg.types[e.type])
+		#partial switch t.kind {
+		case .Struct, .Union, .Enum, .Bit_Field:
+			return in_entities(array(t.entities), name)
+		case .Proc:
+			return in_proc_type(t, name)
+		}
+	}
+	return false
 }
 
 markdown_plain_text :: proc(src: string, allocator := context.allocator) -> string {
@@ -442,18 +575,28 @@ render_markdown :: proc(src: string, ctx: ^Doc_Context, allocator := context.all
 	{
 		iter := cm.iter_new(root)
 		defer cm.iter_free(iter)
+
+		in_link := 0
 		for {
 			ev := cm.iter_next(iter)
 			if ev == .Done {
 				break
 			}
+			node := cm.iter_get_node(iter)
+			type := cm.node_get_type(node)
+			if type == .Link || type == .Heading {
+				in_link += 1 if ev == .Enter else -1
+			}
 			if ev != .Enter {
 				continue
 			}
-			node := cm.iter_get_node(iter)
-			#partial switch cm.node_get_type(node) {
+			#partial switch type {
 			case .Heading, .HTML_Inline, .HTML_Block, .Link, .Text, .Code_Block:
 				append(&nodes, node)
+			case .Code:
+				if in_link == 0 {
+					append(&nodes, node)
+				}
 			}
 		}
 	}
@@ -489,6 +632,11 @@ render_markdown :: proc(src: string, ctx: ^Doc_Context, allocator := context.all
 			if ctx.headings != nil {
 				append(ctx.headings, Doc_Heading{int(level), strings.clone(id), strings.clone(text)})
 			}
+		case .Code:
+			url := auto_link_url(string(cm.node_get_literal(node)), ctx) or_continue
+			anchor := new_custom(.Custom_Inline, doc_link_open_tag(url), "</a>")
+			cm.node_replace(node, anchor)
+			cm.node_append_child(anchor, node)
 		case .Code_Block:
 			// Stops highlight.js guessing a language
 			if string(cm.node_get_fence_info(node)) == "" {

@@ -340,7 +340,7 @@ pre.doc-code .number, ul.doc-objc-methods .number {
 	float: right;
 }
 
-.doc-source a {
+.doc-source a, .doc-source .doc-c-name {
 	text-decoration: none;
 	color: #666666;
 	font-size: 0.75em;
@@ -507,8 +507,77 @@ h3 .doc-badge {
 	color: #f39a5e;
 }
 
-.doc-source a + a {
+.doc-source > * + * {
 	margin-left: 0.75rem;
+}
+
+/* code that links to its declaration takes the link colour, as it already does in light mode */
+.dark-mode a > code {
+	color: inherit;
+}
+
+/* the packages under a package, after its overview */
+.odin-subpkg-table {
+	margin-bottom: 1.5rem;
+}
+
+/* ? lists the keyboard shortcuts */
+.odin-shortcuts {
+	position: fixed;
+	inset: 0;
+	z-index: 1090;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+.odin-shortcuts[hidden] {
+	display: none;
+}
+.odin-shortcuts-box {
+	min-width: min(22rem, 100%);
+	padding: 1.25rem 1.5rem;
+	border: 1px solid var(--odin-card-border);
+	border-radius: 0.5rem;
+	background-color: var(--bs-body-bg, #fff);
+	box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.25);
+	outline: none;
+}
+.dark-mode .odin-shortcuts-box {
+	background-color: var(--dark-background);
+	color: var(--bs-light);
+}
+.odin-shortcuts-box h2 {
+	margin: 0 0 1rem;
+	font-size: 1.125rem;
+	font-weight: 600;
+}
+.odin-shortcuts-box dl {
+	display: grid;
+	grid-template-columns: max-content 1fr;
+	gap: 0.625rem 1.5rem;
+	margin: 0;
+	align-items: baseline;
+}
+.odin-shortcuts-box dt {
+	font-weight: 400;
+	text-align: right;
+}
+.odin-shortcuts-box dd {
+	margin: 0;
+}
+.odin-shortcuts-box kbd {
+	display: inline-block;
+	min-width: 1.75em;
+	padding: 0.125rem 0.375rem;
+	border: 1px solid var(--odin-card-border);
+	border-bottom-width: 2px;
+	border-radius: 0.25rem;
+	background: none;
+	color: inherit;
+	font-size: 0.8125rem;
+	text-align: center;
 }
 
 /* calling a method from Odin, joined to its signature */
@@ -1278,6 +1347,23 @@ h4.pkg-sidebar-title {
 #odin-search-results li .kind {
 	color: #666;
 	font-style: italic;
+}
+/* a result's first sentence takes only the room left between its name and kind */
+#odin-search-results li .summary {
+	flex: 1 1 0;
+	min-width: 0;
+	margin: 0 1rem;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	color: var(--odin-sidebar-muted);
+	font-size: 0.875em;
+	align-self: center;
+}
+@media (max-width: 991.98px), (hover: none) {
+	#odin-search-results li .summary {
+		display: none;
+	}
 }
 
 

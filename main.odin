@@ -612,7 +612,7 @@ write_pkg_data_builtins :: proc(w: io.Writer, collection: ^Collection, name: str
 	fmt.wprint(w, "\n\t}")
 }
 
-write_pkg_data_pkg :: proc(w: io.Writer, collection: ^Collection, path: string, pkg: ^doc.Pkg) {
+write_pkg_data_pkg :: proc(w: io.Writer, collection: ^Collection, path: string, pkg: ^doc.Pkg, summaries := false) {
 	init_cfg_from_pkg(pkg)
 	entries := collection.pkg_entries_map[pkg]
 
@@ -641,10 +641,28 @@ write_pkg_data_pkg :: proc(w: io.Writer, collection: ^Collection, path: string, 
 		fmt.wprintf(w, `"kind": "%s", `,  kind_str)
 		fmt.wprintf(w, `"name": %q`, str(e.name))
 
+		entity := &cfg.entities[e.entity]
 		// so `MTLBuffer` finds `Buffer`
-		if entity := &cfg.entities[e.entity]; entity.kind == .Type_Name {
+		if entity.kind == .Type_Name {
 			if objc_class, ok := find_entity_attribute(entity, "objc_class"); ok {
 				fmt.wprintf(w, `, "objc": %s`, objc_class)
+			}
+		}
+		// and `SDL_CreateWindow` finds `CreateWindow`
+		if c_name := entity_c_name(entity, str(e.name)); c_name != "" {
+			fmt.wprintf(w, `, "c": %q`, c_name)
+		}
+		if _, ok := find_entity_attribute(entity, "deprecated"); ok {
+			io.write_string(w, `, "dep": 1`)
+		}
+		if summaries {
+			docs := str(entity.docs)
+			if strings.trim_space(docs) == "" {
+				docs = str(entity.comment)
+			}
+			if summary := doc_summary(docs); summary != "" {
+				io.write_string(w, `, "d": `)
+				write_json_string(w, summary)
 			}
 		}
 
@@ -717,7 +735,7 @@ generate_package_from_directory_tree :: proc(b: ^strings.Builder, node: ^Dir_Nod
 
 		strings.builder_reset(b)
 		pkg_data_begin(w)
-		write_pkg_data_pkg(w, collection, path, pkg)
+		write_pkg_data_pkg(w, collection, path, pkg, summaries = true)
 		pkg_data_end(w)
 		_ = os.write_entire_file(fmt.tprintf("%s/%s/pkg-data.js", dir, path), b.buf[:])
 
@@ -761,7 +779,7 @@ generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collec
 		pkg_data_begin(w)
 		write_pkg_data_builtins(w, collection, "builtin", builtins)
 		fmt.wprintln(w, ",")
-		write_pkg_data_pkg(w, collection, collection.pkg_to_path[runtime_pkg], runtime_pkg)
+		write_pkg_data_pkg(w, collection, collection.pkg_to_path[runtime_pkg], runtime_pkg, summaries = true)
 		pkg_data_end(w)
 		_ = os.write_entire_file(fmt.tprintf("%s/%s/pkg-data.js", dir, path), b.buf[:])
 
@@ -933,28 +951,46 @@ target_from_pkg :: proc(pkg: ^doc.Pkg) -> (target: string, ok: bool) {
 }
 
 
-write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
-	get_line_doc :: proc(pkg: ^doc.Pkg) -> (line_doc: string, ok: bool) {
-		if pkg == nil {
-			return
-		}
-		line_doc = cfg.pkgs_line_docs[str(pkg.fullpath)]
-		if line_doc == "" {
-			line_doc = doc_summary_line(str(pkg.docs))
-		}
+entity_c_name :: proc(e: ^doc.Entity, name: string) -> string {
+	if .Foreign not_in e.flags || (e.kind != .Procedure && e.kind != .Variable) {
+		return ""
+	}
+	link_name := str(e.link_name)
+	// `system:Kernel32.lib..GetConsoleOutputCP` and `odin_env..abort` name their library first
+	if n := strings.last_index(link_name, ".."); n >= 0 {
+		link_name = link_name[n+2:]
+	}
+	if link_name == "" || link_name == name || link_name == str(e.name) {
+		return ""
+	}
+	if _, ok := find_entity_attribute(e, "link_name"); ok {
+		return ""
+	}
+	return link_name
+}
 
-		if line_doc == "" {
-			return
-		}
-		switch {
-		case strings.has_prefix(line_doc, "*"):
-			return "", false
-		case strings.has_prefix(line_doc, "Copyright"):
-			return "", false
-		}
-		return line_doc, true
+pkg_line_doc :: proc(pkg: ^doc.Pkg) -> (line_doc: string, ok: bool) {
+	if pkg == nil {
+		return
+	}
+	line_doc = cfg.pkgs_line_docs[str(pkg.fullpath)]
+	if line_doc == "" {
+		line_doc = doc_summary_line(str(pkg.docs))
 	}
 
+	if line_doc == "" {
+		return
+	}
+	switch {
+	case strings.has_prefix(line_doc, "*"):
+		return "", false
+	case strings.has_prefix(line_doc, "Copyright"):
+		return "", false
+	}
+	return line_doc, true
+}
+
+write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 
 	packages, declarations := collection_stats(collection)
 
@@ -1025,7 +1061,7 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 			write_doc_line(w, first)
 			io.write_string(w, `.`)
 		case:
-			if line_doc, ok := get_line_doc(dir.pkg); ok {
+			if line_doc, ok := pkg_line_doc(dir.pkg); ok {
 				write_doc_line(w, line_doc, dir.pkg)
 			} else if dir.dir == "sys" {
 				io.write_string(w, `Platform specific packages - documentation may be for a specific platform only`)
@@ -1052,7 +1088,7 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 			io.write_string(w, `</td>`)
 
 			io.write_string(w, `<td class="pkg-desc">`)
-			if child_line_doc, ok := get_line_doc(child.pkg); ok {
+			if child_line_doc, ok := pkg_line_doc(child.pkg); ok {
 				write_doc_line(w, child_line_doc, child.pkg)
 			} else if target, target_ok := target_from_pkg(child.pkg); target_ok {
 				fmt.wprintf(w, `<em>(Generated with <code>-target:%s</code>, please read the source code directly)</em>`, target)
@@ -2961,6 +2997,9 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	if e.pos.file != 0 && e.pos.line > 0 {
 		src_url := fmt.tprintf("%s/%s/%s#L%d", collection.source_url, path, filename, e.pos.line)
 		io.write_string(w, `<div class="doc-source">`)
+		if c_name := entity_c_name(e, name); c_name != "" && is_declared_here {
+			fmt.wprintf(w, "<span class=\"doc-c-name\" title=\"The C symbol this binds\"><em>C</em><span class=\"doc-source-loc\"> &middot; %s</span></span>", c_name)
+		}
 		if class != nil {
 			if url := objc_doc_url(pkg, class.name); url != "" {
 				fmt.wprintf(w, "<a href=\"{0:s}\" title=\"Apple's documentation for {1:s}\"><em>Apple Docs</em><span class=\"doc-source-loc\"> &middot; {1:s}</span></a>", url, class.name)
@@ -2971,7 +3010,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	fmt.wprintf(w, "</h3>\n")
 	fmt.wprintln(w, `<div>`)
 
-	doc_ctx := Doc_Context{pkg = pkg, owner = fmt.tprintf("%s.%s", str(pkg.name), name), heading_prefix = name}
+	doc_ctx := Doc_Context{pkg = pkg, owner = fmt.tprintf("%s.%s", str(pkg.name), name), heading_prefix = name, entity = e, self_name = name}
 
 	if raw, ok := find_entity_attribute(e, "deprecated"); ok {
 		msg, _, unq_ok := strconv.unquote_string(raw, context.temp_allocator)
@@ -3232,27 +3271,27 @@ add_type_preview :: proc(name, html: string) {
 	append(&type_previews, Type_Preview{strings.clone(name), strings.clone(html)})
 }
 
-write_type_previews :: proc(w: io.Writer) {
-	write_json_string :: proc(w: io.Writer, s: string) {
-		io.write_byte(w, '"')
-		for r in s {
-			switch r {
-			case '"':  io.write_string(w, `\"`)
-			case '\\': io.write_string(w, `\\`)
-			case '\n': io.write_string(w, `\n`)
-			case '\t': io.write_string(w, `\t`)
-			case '\r': io.write_string(w, `\r`)
-			case:
-				if r < 0x20 {
-					fmt.wprintf(w, `\u%04x`, r)
-				} else {
-					io.write_rune(w, r)
-				}
+write_json_string :: proc(w: io.Writer, s: string) {
+	io.write_byte(w, '"')
+	for r in s {
+		switch r {
+		case '"':  io.write_string(w, `\"`)
+		case '\\': io.write_string(w, `\\`)
+		case '\n': io.write_string(w, `\n`)
+		case '\t': io.write_string(w, `\t`)
+		case '\r': io.write_string(w, `\r`)
+		case:
+			if r < 0x20 {
+				fmt.wprintf(w, `\u%04x`, r)
+			} else {
+				io.write_rune(w, r)
 			}
 		}
-		io.write_byte(w, '"')
 	}
+	io.write_byte(w, '"')
+}
 
+write_type_previews :: proc(w: io.Writer) {
 	io.write_string(w, "{\n")
 	for p, i in type_previews {
 		if i > 0 {
@@ -3444,6 +3483,38 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		write_docs(w, overview_docs, doc_ctx = &ctx)
 	}
 
+	// e.g. `core:image/png` on `core:image`'s page, which otherwise only the sidebar shows
+	subpackages := make([dynamic]string, context.temp_allocator)
+	if !collection_root_is_package {
+		for sub_path, sub_pkg in collection.pkgs {
+			if strings.has_prefix(sub_path, path) && strings.has_prefix(sub_path[len(path):], "/") && str(sub_pkg.name) != "os2" {
+				append(&subpackages, sub_path)
+			}
+		}
+		slice.sort(subpackages[:])
+	}
+	if len(subpackages) > 0 {
+		fmt.wprintf(w, `<h2 id="pkg-packages">Packages <span class="pkg-count">%d</span></h2>`+"\n", len(subpackages))
+		fmt.wprintln(w, `<table class="odin-pkg-table odin-subpkg-table">`)
+		for sub_path in subpackages {
+			sub_pkg := collection.pkgs[sub_path]
+			if cfg.pkg_to_header[sub_pkg] != cfg.header {
+				init_cfg_from_pkg(sub_pkg)
+			}
+			fmt.wprintf(w, `<tbody><tr><td class="pkg-name"><a href="%s/%s/">%s</a></td><td class="pkg-desc">`, collection.base_url, sub_path, sub_path[len(path)+1:])
+			if line_doc, ok := pkg_line_doc(sub_pkg); ok {
+				write_doc_line(w, line_doc, sub_pkg)
+			}
+			io.write_string(w, `</td><td class="pkg-import">`)
+			write_copy_import_button(w, collection, sub_path, sub_pkg, "import")
+			io.write_string(w, "</td></tr></tbody>\n")
+		}
+		fmt.wprintln(w, `</table>`)
+		if cfg.pkg_to_header[pkg] != cfg.header {
+			init_cfg_from_pkg(pkg)
+		}
+	}
+
 	// Packages may only hold documentation
 	has_entries := len(pkg_entries.all) > 0
 
@@ -3567,6 +3638,9 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 				io.write_string(w, `</ul>`)
 			}
 			fmt.wprintln(w, `</li>`)
+		}
+		if len(subpackages) > 0 {
+			fmt.wprintf(w, `<li><a href="#pkg-packages">Packages<span class="toc-count">%d</span></a></li>`+"\n", len(subpackages))
 		}
 		// Objective-C methods are listed under their classes rather than with the other procedures
 		toc_pkg = pkg

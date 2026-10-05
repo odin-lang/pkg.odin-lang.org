@@ -233,6 +233,67 @@ window.addEventListener("keydown", ev => {
 	}
 });
 
+// ? lists the keyboard shortcuts
+{
+	let sheet = null;
+	let opener = null;
+
+	const close = () => {
+		sheet.hidden = true;
+		if (opener) {
+			opener.focus();
+		}
+	};
+	const open = () => {
+		if (!sheet) {
+			const mac = document.body.classList.contains("os-macos");
+			const rows = [
+				[[mac ? "\u2318K" : "Ctrl+K", "/"], "Search"],
+				[["\u2191", "\u2193", "Enter"], "Choose a search result"],
+				[["Esc"], "Clear the search, then leave it"],
+			];
+			if (document.querySelector(".documentation .pkg-entity")) {
+				rows.push([["j", "k"], "Next or previous declaration"]);
+			}
+			rows.push([["?"], "Show these shortcuts"]);
+
+			sheet = document.createElement("div");
+			sheet.className = "odin-shortcuts";
+			sheet.hidden = true;
+			sheet.innerHTML = `<div class="odin-shortcuts-box" role="dialog" aria-modal="true" aria-labelledby="odin-shortcuts-title" tabindex="-1">
+				<h2 id="odin-shortcuts-title">Keyboard shortcuts</h2>
+				<dl>${rows.map(([keys, what]) => `<dt>${keys.map(k => `<kbd>${k}</kbd>`).join(" ")}</dt><dd>${what}</dd>`).join("")}</dl>
+			</div>`;
+			sheet.addEventListener("click", ev => {
+				if (ev.target === sheet) {
+					close();
+				}
+			});
+			document.body.appendChild(sheet);
+		}
+		opener = document.activeElement;
+		sheet.hidden = false;
+		sheet.firstElementChild.focus();
+	};
+
+	window.addEventListener("keydown", ev => {
+		if (sheet && !sheet.hidden && (ev.key === "Escape" || ev.key === "?")) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			close();
+			return;
+		}
+		if (ev.key !== "?" || ev.ctrlKey || ev.metaKey || ev.altKey) {
+			return;
+		}
+		if (ev.target.closest && ev.target.closest("input, textarea, select, [contenteditable]")) {
+			return;
+		}
+		ev.preventDefault();
+		open();
+	}, true);
+}
+
 {
 	const types_of = new Map();
 	let popover = null;
@@ -342,6 +403,10 @@ let odin_search = document.getElementById("odin-search");
 if (odin_search) {
 	function getElementsByClassNameArray(x) {
 		return Array.from(document.getElementsByClassName(x));
+	}
+
+	function escape_html(text) {
+		return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 	}
 
 	function strcmp(a, b) {
@@ -764,9 +829,12 @@ if (odin_search) {
 			if (a.score !== b.score) {
 				return b.score - a.score;
 			}
-			// Tie-break: prefer the more likely kind, then shorter names, then
-			// alphabetical order, so equal-scoring ties resolve toward the more
-			// probable target instead of whatever happens to sort first.
+			// Tie-break: prefer what isn't deprecated, the more likely kind, then
+			// shorter names, then alphabetical order, so equal-scoring ties resolve
+			// toward the more probable target instead of whatever happens to sort first.
+			if (!a.entity.dep !== !b.entity.dep) {
+				return a.entity.dep ? 1 : -1;
+			}
 			let ka = KIND_RANK[a.entity.kind]; if (ka === undefined) ka = 5;
 			let kb = KIND_RANK[b.entity.kind]; if (kb === undefined) kb = 5;
 			if (ka !== kb) {
@@ -820,12 +888,16 @@ if (odin_search) {
 			entities.push(e);
 		}
 
-		// An Objective-C class is also found by its own name, "MTLBuffer" for Buffer,
-		// and so are its methods, "MTLBuffer.length" for Buffer_length
-		function add_objc_names(pkg_name, pkg_entities) {
+		// A binding is also found by the C name it links to, "SDL_CreateWindow" for CreateWindow.
+		// An Objective-C class is found by its own name, "MTLBuffer" for Buffer,
+		// and so are its methods, "MTLBuffer.length" for Buffer_length.
+		function add_alt_names(pkg_name, pkg_entities) {
 			let classes = null;
 			for (let j = 0; j < pkg_entities.length; j++) {
 				let e = pkg_entities[j];
+				if (e.c !== undefined) {
+					e.alt = pkg_name+'.'+e.c;
+				}
 				if (e.objc !== undefined) {
 					classes = classes || new Map();
 					classes.set(e.name, e.objc);
@@ -848,7 +920,7 @@ if (odin_search) {
 		if (IS_PACKAGE_PAGE) {
 			let pkg_name = odin_pkg_name;
 			let entities = odin_pkg_data.packages[pkg_name].entities;
-			add_objc_names(pkg_name, entities);
+			add_alt_names(pkg_name, entities);
 			for (let j = 0; j < entities.length; j++) {
 				add_entity(pkg_name, entities[j]);
 			}
@@ -867,7 +939,7 @@ if (odin_search) {
 			for (let i = 0; i < all_packages.length; i++) {
 				let [pkg_name, pkg] = all_packages[i];
 				let entities = pkg.entities;
-				add_objc_names(pkg_name, entities);
+				add_alt_names(pkg_name, entities);
 				for (let j = 0; j < entities.length; j++) {
 					let e = entities[j];
 					if (e.builtin) {
@@ -1047,6 +1119,9 @@ if (odin_search) {
 					if (result.alt) {
 						formatted_name = `${entity.name}&nbsp;<span class="odin-search-alt">${formatted_name}</span>`;
 					}
+					if (entity.dep) {
+						formatted_name = `<s>${formatted_name}</s>`;
+					}
 
 					let pkg_path = odin_pkg_data.packages[entity.pkg].path;
 					let full_path = `${pkg_path}/#${entity.name}`;
@@ -1073,7 +1148,14 @@ if (odin_search) {
 					if (is_builtin) {
 						entity_kind = '(built-in)&nbsp;' + entity_kind;
 					}
+					if (entity.dep) {
+						entity_kind = 'deprecated&nbsp;' + entity_kind;
+					}
 
+					// its first sentence, on package pages, and only where there is room for it
+					if (entity.d !== undefined) {
+						list_contents.push(`<div class="summary">${escape_html(entity.d)}</div>`);
+					}
 					list_contents.push(`&nbsp;<div class="kind">${entity_kind}</div>`);
 
 					list_contents.push(`</li>\n`);
