@@ -135,7 +135,7 @@ b {
 	list-style: none;
 	font-size: 0.875rem;
 }
-.odin-collection-meta span {
+.odin-collection-meta > li > span {
 	margin-right: 0.25rem;
 	font-size: 0.75rem;
 	font-weight: 600;
@@ -391,10 +391,25 @@ section.documentation h5 {
 }
 
 details.doc-index > summary {
-	font-size: 1.5rem;
+	font-size: 1.125rem;
+	font-weight: 600;
 }
 details.doc-index ul {
 	list-style-type: none;
+}
+details.doc-index > ul {
+	columns: 14rem;
+	column-gap: 2rem;
+}
+details.doc-index li {
+	break-inside: avoid;
+}
+
+#TableOfContents .toc-count {
+	margin-left: 0.375rem;
+	font-weight: 400;
+	letter-spacing: 0;
+	color: var(--odin-sidebar-muted);
 }
 
 
@@ -417,6 +432,96 @@ details.odin-doc-toggle[open] > summary.hideme {
 
 details.code-example > summary {
 	font-weight: 700;
+}
+
+/* code blocks share the box and colours of the signatures, rather than
+   highlight.js's github-dark theme in both light and dark mode */
+.documentation pre:has(> code) {
+	padding: 0.625rem;
+	border: 1px solid #c6c8ca;
+	border-radius: 0.25rem;
+	background-color: #f8f8f8;
+	tab-size: 8;
+}
+.documentation pre > code.hljs {
+	padding: 0;
+	background: none;
+	color: #202224;
+}
+.dark-mode .documentation pre:has(> code) {
+	border-color: var(--dark-border);
+	background-color: var(--dark-code);
+}
+.dark-mode .documentation pre > code.hljs {
+	color: var(--bs-light);
+}
+.documentation .hljs-keyword, .documentation .hljs-literal {
+	color: #ff5252;
+}
+.documentation .hljs-built_in {
+	color: #ff5252;
+	font-weight: 600;
+}
+.documentation .hljs-string {
+	color: #093;
+}
+.dark-mode .documentation .hljs-string {
+	color: #0a5;
+}
+.documentation .hljs-number {
+	color: #79c0ff;
+}
+.documentation .hljs-comment {
+	color: #888;
+}
+
+/* the "Inputs:" and "Returns:" lists, with the names in a column */
+ul.doc-params {
+	display: grid;
+	grid-template-columns: max-content 1fr;
+	gap: 0.25rem 1.25rem;
+	padding-left: 1.25rem;
+	list-style: none;
+}
+ul.doc-params > li {
+	display: contents;
+}
+.doc-param-name {
+	font-family: var(--bs-font-monospace);
+	font-size: 0.875em;
+	font-weight: 600;
+}
+
+/* under a package's title: the import as Odin code, beside the collection pages' metadata */
+.odin-pkg-meta {
+	margin: 0.25rem 0 1rem;
+}
+code.odin-import {
+	padding: 0.125rem 0.375rem;
+	border: 1px solid #c6c8ca;
+	border-radius: 0.25rem;
+	background-color: #f8f8f8;
+	color: #202224;
+	font-size: 0.875rem;
+}
+code.odin-import .keyword {
+	color: #ff5252;
+}
+code.odin-import .string {
+	color: #093;
+}
+.dark-mode code.odin-import {
+	border-color: var(--dark-border);
+	background-color: var(--dark-code);
+	color: var(--bs-light);
+}
+.dark-mode code.odin-import .string {
+	color: #0a5;
+}
+.odin-pkg-meta .copy-import {
+	margin-left: 0.25rem;
+	opacity: 1;
+	vertical-align: 1px;
 }
 
 @media only screen and (max-width: 991px) {

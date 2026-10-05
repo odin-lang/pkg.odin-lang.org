@@ -57,7 +57,7 @@ document.addEventListener("click", async (ev) => {
 	if (!btn) {
 		return;
 	}
-	const text = `import "${btn.dataset.import}"`;
+	const text = btn.dataset.copy;
 	try {
 		await navigator.clipboard.writeText(text);
 	} catch {
@@ -73,8 +73,10 @@ document.addEventListener("click", async (ev) => {
 		}
 		area.remove();
 	}
+	const label = btn.dataset.label || btn.textContent;
+	btn.dataset.label = label;
 	btn.textContent = "copied";
-	setTimeout(() => (btn.textContent = "import"), 1200);
+	setTimeout(() => (btn.textContent = label), 1200);
 });
 
 var odin_pkg_name;

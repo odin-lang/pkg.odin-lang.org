@@ -12,6 +12,7 @@ import "core:slice"
 import "core:strconv"
 import "core:strings"
 import "core:time"
+import "core:unicode"
 
 import doc "core:odin/doc-format"
 
@@ -1016,7 +1017,7 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 		}
 		io.write_string(w, `</td>`)
 		// builtin is the only one of these that cannot be imported
-		write_copy_import(w, collection, dir.path, dir.pkg != nil || dir.name == "intrinsics")
+		write_copy_import(w, collection, dir.path, dir.pkg, dir.pkg != nil || dir.name == "intrinsics")
 		fmt.wprintf(w, "</tr>\n")
 
 		for child in dir.children {
@@ -1038,17 +1039,17 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 				fmt.wprintf(w, `<em>(Generated with <code>-target:%s</code>, please read the source code directly)</em>`, target)
 			}
 			io.write_string(w, `</td>`)
-			write_copy_import(w, collection, child.path, true)
+			write_copy_import(w, collection, child.path, child.pkg, true)
 			fmt.wprintf(w, "</tr>\n")
 		}
 	}
 
-	write_copy_import :: proc(w: io.Writer, collection: ^Collection, path: string, importable: bool) {
-		if !importable {
-			io.write_string(w, `<td class="pkg-import"></td>`)
-			return
+	write_copy_import :: proc(w: io.Writer, collection: ^Collection, path: string, pkg: ^doc.Pkg, importable: bool) {
+		io.write_string(w, `<td class="pkg-import">`)
+		if importable {
+			write_copy_import_button(w, collection, path, pkg, "import")
 		}
-		fmt.wprintf(w, `<td class="pkg-import"><button type="button" class="copy-import" data-import="{0:s}:{1:s}" title="Copy the import declaration" aria-label="Copy import &quot;{0:s}:{1:s}&quot;">import</button></td>`, collection.name, path)
+		io.write_string(w, `</td>`)
 	}
 
 	if collection.name == "base" {
@@ -1092,6 +1093,81 @@ short_source_url :: proc(url: string) -> string {
 	return fmt.tprintf("%s/%s/%s", parts[0], parts[1], path)
 }
 
+import_declaration :: proc(collection: ^Collection, path: string, pkg: ^doc.Pkg) -> (name, import_path: string) {
+	is_identifier :: proc(s: string) -> bool {
+		for r, i in s {
+			if !(r == '_' || unicode.is_letter(r) || (i > 0 && unicode.is_digit(r))) {
+				return false
+			}
+		}
+		return s != ""
+	}
+
+	import_path = fmt.tprintf("%s:%s", collection.name, path)
+	if !is_identifier(slashpath.base(path)) && pkg != nil {
+		name = str(pkg.name)
+	}
+	return
+}
+
+write_copy_import_button :: proc(w: io.Writer, collection: ^Collection, path: string, pkg: ^doc.Pkg, label: string) {
+	name, import_path := import_declaration(collection, path, pkg)
+	io.write_string(w, `<button type="button" class="copy-import" data-copy="import `)
+	if name != "" {
+		fmt.wprintf(w, "%s ", name)
+	}
+	fmt.wprintf(w, `&quot;%s&quot;" title="Copy the import declaration" aria-label="Copy the import declaration">%s</button>`, import_path, label)
+}
+
+pkg_listed_files :: proc(pkg: ^doc.Pkg) -> (files: [dynamic]string, any_hidden: bool) {
+	files = make([dynamic]string, context.temp_allocator)
+	for file_index in array(pkg.files) {
+		filename := slashpath.base(str(cfg.files[file_index].name))
+		switch {
+		case
+			strings.has_suffix(filename, "_windows.odin"),
+			strings.has_suffix(filename, "_darwin.odin"),
+			strings.has_suffix(filename, "_freebsd.odin"),
+			strings.has_suffix(filename, "_wasi.odin"),
+			strings.has_suffix(filename, "_js.odin"),
+			strings.has_suffix(filename, "_freestanding.odin"),
+
+			strings.has_suffix(filename, "_amd64.odin"),
+			strings.has_suffix(filename, "_i386.odin"),
+			strings.has_suffix(filename, "_arch64.odin"),
+			strings.has_suffix(filename, "_wasm32.odin"),
+			strings.has_suffix(filename, "_wasm64.odin"),
+			strings.has_suffix(filename, "_wasm64p32.odin"),
+			false:
+			any_hidden = true
+		case:
+			append(&files, filename)
+		}
+	}
+	return
+}
+
+// The line under a package's title, like the one on the collection pages
+write_pkg_meta :: proc(w: io.Writer, collection: ^Collection, path: string, pkg: ^doc.Pkg, importable: bool, src_url: string, files, declarations: int) {
+	fmt.wprintln(w, `<ul class="odin-collection-meta odin-pkg-meta">`)
+	if importable {
+		name, import_path := import_declaration(collection, path, pkg)
+		io.write_string(w, `<li><code class="odin-import"><span class="keyword">import</span> `)
+		if name != "" {
+			fmt.wprintf(w, "%s ", name)
+		}
+		fmt.wprintf(w, `<span class="string">&quot;%s&quot;</span></code> `, import_path)
+		write_copy_import_button(w, collection, path, pkg, "copy")
+		io.write_string(w, "</li>\n")
+	}
+	fmt.wprintf(w, `<li><span>Source</span> <a href="%s">%s</a></li>`+"\n", src_url, short_source_url(src_url))
+	if files > 0 {
+		fmt.wprintf(w, `<li><span>Files</span> %d</li>`+"\n", files)
+	}
+	fmt.wprintf(w, `<li><span>Declarations</span> %s</li>`+"\n", thousands(declarations))
+	fmt.wprintln(w, `</ul>`)
+}
+
 write_license :: proc(w: io.Writer, collection: ^Collection) {
 	fmt.wprintln(w, "<ul class=\"license\">")
 	fmt.wprintf(
@@ -1123,6 +1199,7 @@ Write_Type_Flag :: enum {
 	Poly_Names,
 	Ignore_Name,
 	Allow_Multiple_Lines,
+	Force_Multiple_Lines,
 }
 
 Write_Type_Flags :: distinct bit_set[Write_Type_Flag]
@@ -1132,6 +1209,28 @@ Type_Writer :: struct {
 	pkg:    doc.Pkg_Index,
 	indent: int,
 	generic_scope: map[string]bool,
+}
+
+MAX_SIGNATURE_WIDTH :: 100
+
+visible_width :: proc(html: string) -> (width: int) {
+	in_tag, in_entity := false, false
+	for r in html {
+		switch {
+		case in_tag:
+			in_tag = r != '>'
+		case in_entity:
+			in_entity = r != ';'
+		case r == '<':
+			in_tag = true
+		case r == '&':
+			in_entity = true
+			width += 1
+		case:
+			width += 1
+		}
+	}
+	return
 }
 
 calc_name_width :: proc(type_entities: []doc.Entity_Index) -> (name_width: int) {
@@ -1634,11 +1733,15 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		span_multiple_lines := false
 		if .Allow_Multiple_Lines in flags && .Is_Results not_in flags {
 			span_multiple_lines = len(type_entities) >= 6
+			if .Force_Multiple_Lines in flags && len(type_entities) >= 2 {
+				span_multiple_lines = true
+			}
 
 			if strings.has_prefix(str(cfg.pkgs[pkg].name), "objc_") {
 				span_multiple_lines = true
 			}
 		}
+		flags -= {.Force_Multiple_Lines}
 
 		full_name_width :: proc(entity_indices: []doc.Entity_Index) -> (width: int) {
 			for entity_index, i in entity_indices {
@@ -3004,7 +3107,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	fmt.wprintf(w, "<span class=\"a-hidden\">&nbsp;¶</span></a></span>")
 	if e.pos.file != 0 && e.pos.line > 0 {
 		src_url := fmt.tprintf("%s/%s/%s#L%d", collection.source_url, path, filename, e.pos.line)
-		fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", src_url)
+		fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em><span class=\"doc-source-loc\"> &middot; {1:s}:{2:d}</span></a></div>", src_url, filename, e.pos.line)
 	}
 	fmt.wprintf(w, "</h3>\n")
 	fmt.wprintln(w, `<div>`)
@@ -3149,7 +3252,20 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			fmt.wprint(w, `<pre class="doc-code">`)
 			write_declaration_attributes(w, e)
 			fmt.wprintf(w, "%s :: ", name)
+
+			// NOTE(bill): A signature too long for one line gets a parameter per line as those with many parameters do
+			signature := strings.builder_make(context.temp_allocator)
+			writer.w = strings.to_writer(&signature)
 			write_type(writer, cfg.types[e.type], {.Allow_Multiple_Lines})
+			one_line := strings.to_string(signature)
+			if !strings.contains_rune(one_line, '\n') && len(name)+len(" :: ")+visible_width(one_line)+len(" {…}") > MAX_SIGNATURE_WIDTH {
+				strings.builder_reset(&signature)
+				clear(&writer.generic_scope) // filled by the first attempt, and it decides how `$T` is written
+				write_type(writer, cfg.types[e.type], {.Allow_Multiple_Lines, .Force_Multiple_Lines})
+			}
+			writer.w = w
+			io.write_string(w, strings.to_string(signature))
+
 			write_where_clauses(w, array(e.where_clauses))
 			if .Foreign in e.flags {
 				fmt.wprint(w, " ---")
@@ -3377,6 +3493,9 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", pkg_src_url)
 	fmt.wprintf(w, "</h1>\n")
 
+	files, any_hidden_files := pkg_listed_files(pkg)
+	write_pkg_meta(w, collection, path, pkg, !collection_root_is_package, pkg_src_url, len(files), len(pkg_entries.all))
+
 	if specific_target, ok := target_from_pkg(pkg); ok {
 		fmt.wprintf(w, "<h4><strong>Warning:&nbsp;</strong>This was generated for <code>-target:%s</code> and might not represent every target this package supports.</h4>", specific_target)
 	}
@@ -3471,33 +3590,11 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 
 	fmt.wprintln(w, `<h2 id="pkg-source-files">Source Files</h2>`)
 	fmt.wprintln(w, "<ul>")
-	any_hidden := false
-	source_file_loop: for file_index in array(pkg.files) {
-		file := cfg.files[file_index]
-		filename := slashpath.base(str(file.name))
-		switch {
-		case
-			strings.has_suffix(filename, "_windows.odin"),
-			strings.has_suffix(filename, "_darwin.odin"),
-			strings.has_suffix(filename, "_freebsd.odin"),
-			strings.has_suffix(filename, "_wasi.odin"),
-			strings.has_suffix(filename, "_js.odin"),
-			strings.has_suffix(filename, "_freestanding.odin"),
-
-			strings.has_suffix(filename, "_amd64.odin"),
-			strings.has_suffix(filename, "_i386.odin"),
-			strings.has_suffix(filename, "_arch64.odin"),
-			strings.has_suffix(filename, "_wasm32.odin"),
-			strings.has_suffix(filename, "_wasm64.odin"),
-			strings.has_suffix(filename, "_wasm64p32.odin"),
-			false:
-			any_hidden = true
-			continue source_file_loop
-		}
+	for filename in files {
 		fmt.wprintf(w, `<li><a href="%s/%s/%s">%s</a></li>`, collection.source_url, path, filename, filename)
 		fmt.wprintln(w)
 	}
-	if any_hidden {
+	if any_hidden_files {
 		fmt.wprintln(w, "<li><em>(hidden platform specific files)</em></li>")
 	}
 	fmt.wprintln(w, "</ul>")
@@ -3549,7 +3646,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		}
 		for eo in pkg_entries.ordering do if len(eo.entries) != 0 {
 			slug := slugify(eo.name, context.temp_allocator)
-			fmt.wprintf(w, `<li><a href="#pkg-{0:s}">{1:s}</a>`, slug, eo.name)
+			fmt.wprintf(w, `<li><a href="#pkg-{0:s}">{1:s}<span class="toc-count">{2:d}</span></a>`, slug, eo.name, len(eo.entries))
 			fmt.wprintln(w, `<ul>`)
 			write_toc_section(w, eo.entries)
 			fmt.wprintln(w, "</ul>")

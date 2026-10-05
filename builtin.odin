@@ -541,6 +541,10 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em></a></div>", pkg_src_url)
 	fmt.wprintf(w, "</h1>\n")
 
+	// builtin is always there, but intrinsics has to be imported
+	declarations := len(builtins) if pkg_name == "builtin" else len(intrinsics_table)
+	write_pkg_meta(w, collection, path, nil, pkg_name == "intrinsics", pkg_src_url, 0, declarations)
+
 	write_search(w, .Package)
 
 	fmt.wprintln(w, `<div id="pkg-top">`)
@@ -721,20 +725,23 @@ write_table_contents :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, consts: []doc.
 	}
 
 	write_table_entries :: proc(w: io.Writer, runetime_pkg: ^doc.Pkg, title: string, kind: string, entries: []doc.Scope_Entry, entry_table: []Builtin) {
-		// if len(entries) == 0 do return
+		table_entries := make([dynamic]Builtin, 0, len(entry_table), context.temp_allocator)
+		if kind != "g" {
+			for e in entry_table do if e.kind == kind {
+				append(&table_entries, e)
+			}
+		}
+		count := len(entries) if kind == "g" else len(table_entries)
+
 		fmt.wprintln(w, `<li>`)
 		{
-			fmt.wprintf(w, `<a href="#pkg-{0:s}">{0:s}</a>`, title)
+			fmt.wprintf(w, `<a href="#pkg-{0:s}">{0:s}<span class="toc-count">{1:d}</span></a>`, title, count)
 			fmt.wprintln(w, `<ul>`)
-			if kind == "g" {     
-				for e in entries {      
+			if kind == "g" {
+				for e in entries {
 					fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", str(e.name))
-				}   
-			} else {
-				table_entries := make([dynamic]Builtin, 0, len(entry_table), context.temp_allocator)
-				for e in entry_table do if e.kind == kind {
-					append(&table_entries, e)
 				}
+			} else {
 				if len(table_entries) >= INDEX_MIN_ENTRIES_TO_GROUP {
 					walk_index_groups(w, table_entries[:],
 						name_of     = builtin_name_of,

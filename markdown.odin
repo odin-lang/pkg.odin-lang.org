@@ -640,7 +640,92 @@ write_markdown :: proc(w: io.Writer, lines: []string, ctx: ^Doc_Context) {
 		strings.write_byte(&b, '\n')
 	}
 
-	io.write_string(w, render_markdown(strings.to_string(b), ctx, context.temp_allocator))
+	io.write_string(w, format_param_lists(render_markdown(strings.to_string(b), ctx, context.temp_allocator)))
+}
+
+// The "Inputs:" and "Returns:" lists, when every item is `name: description`, become
+// a column of names beside their descriptions; any other list is left as it is
+format_param_lists :: proc(html: string) -> string {
+	Param :: struct {
+		name, desc: string,
+	}
+
+	is_names :: proc(s: string) -> bool {
+		names := strings.split(s, ",", context.temp_allocator)
+		for untrimmed in names {
+			name := strings.trim_space(untrimmed)
+			if name == "" {
+				return false
+			}
+			for r, i in name {
+				if !(r == '_' || ('a' <= r && r <= 'z') || ('A' <= r && r <= 'Z') || (i > 0 && '0' <= r && r <= '9')) {
+					return false
+				}
+			}
+		}
+		return true
+	}
+
+	// a tight list of `<li>name: description</li>`, as cmark renders one
+	parse_params :: proc(items: string) -> (params: [dynamic]Param, ok: bool) {
+		params = make([dynamic]Param, context.temp_allocator)
+		rest := items
+		for rest != "" {
+			if !strings.has_prefix(rest, "<li>") {
+				return
+			}
+			end := strings.index(rest, "</li>\n")
+			if end < 0 {
+				return
+			}
+			item := rest[len("<li>"):end]
+			rest = rest[end+len("</li>\n"):]
+
+			colon := strings.index_byte(item, ':')
+			if colon <= 0 || !is_names(item[:colon]) {
+				return
+			}
+			append(&params, Param{item[:colon], strings.trim_left_space(item[colon+1:])})
+		}
+		return params, len(params) > 0
+	}
+
+	LIST_START :: "</strong></p>\n<ul>\n"
+	LIST_END   :: "</ul>\n"
+
+	b := strings.builder_make(context.temp_allocator)
+	rest := html
+	for {
+		i := strings.index(rest, LIST_START)
+		if i < 0 {
+			break
+		}
+		items_start := i + len(LIST_START)
+		strings.write_string(&b, rest[:i+len("</strong></p>\n")])
+		rest = rest[items_start:]
+
+		end := strings.index(rest, LIST_END)
+		subtitle := html[:len(html)-len(rest)-len(LIST_START)]
+		is_params := strings.has_suffix(subtitle, "<strong>Inputs:") || strings.has_suffix(subtitle, "<strong>Returns:")
+		if end < 0 || !is_params || strings.contains(rest[:end], "<ul") || strings.contains(rest[:end], "<ol") {
+			strings.write_string(&b, "<ul>\n")
+			continue
+		}
+
+		if params, ok := parse_params(rest[:end]); ok {
+			strings.write_string(&b, "<ul class=\"doc-params\">\n")
+			for p in params {
+				fmt.sbprintf(&b, "<li><span class=\"doc-param-name\">%s</span> <span class=\"doc-param-desc\">%s</span></li>\n", p.name, p.desc)
+			}
+		} else {
+			strings.write_string(&b, "<ul>\n")
+			strings.write_string(&b, rest[:end])
+		}
+		strings.write_string(&b, LIST_END)
+		rest = rest[end+len(LIST_END):]
+	}
+	strings.write_string(&b, rest)
+	return strings.to_string(b)
 }
 
 // A single line of Markdown without the surrounding paragraph
