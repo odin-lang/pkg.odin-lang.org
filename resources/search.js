@@ -18,7 +18,7 @@ for (const os of osList) {
 document.addEventListener("DOMContentLoaded", () => {
 	const scope = document.querySelector(".documentation") || document;
 	scope.querySelectorAll("pre").forEach((pre) => {
-		if (pre.querySelector(".copy-code") || pre.closest(".pkg-compact")) {
+		if (pre.querySelector(".copy-code")) {
 			return;
 		}
 		const btn = document.createElement("button");
@@ -94,7 +94,7 @@ document.addEventListener("click", async (ev) => {
 	btn.title       = "Copy a link to this declaration";
 
 	const place = (h3) => {
-		if (h3 && !h3.closest(".pkg-compact") && btn.parentElement !== h3.firstElementChild) {
+		if (h3 && btn.parentElement !== h3.firstElementChild) {
 			h3.firstElementChild.appendChild(btn);
 		}
 	};

@@ -460,6 +460,21 @@ details.doc-index li {
 	font-size: 0.6875rem;
 	color: var(--odin-sidebar-muted);
 	white-space: nowrap;
+	text-indent: 0;
+}
+/* a method's badges line up along the right edge; a column after the longest name would leave the
+   narrow panel no room for the names themselves */
+#TableOfContents li.toc-class > ul > li > a {
+	display: flex;
+	align-items: baseline;
+}
+#TableOfContents li.toc-class > ul > li > a > span:first-child {
+	min-width: 0;
+}
+#TableOfContents li.toc-class .toc-badge {
+	flex: none;
+	margin-left: auto;
+	padding-left: 0.375rem;
 }
 
 .doc-badge {
@@ -659,9 +674,6 @@ code.odin-import .string {
 .documentation h3:target + div > pre.doc-code {
 	animation: odin-target-border 2.5s ease-out;
 }
-.documentation .pkg-compact:has(> h3:target) pre.doc-code {
-	animation: odin-target-flash 2.5s ease-out;
-}
 
 /* moved by search.js into whichever declaration heading is hovered or focused */
 .copy-link {
@@ -732,60 +744,6 @@ pre.doc-code-long:not(.expanded) {
 .doc-code-expand:hover {
 	border-color: var(--odin-sidebar-link);
 	color: inherit;
-}
-
-/* constants with nothing but a value: one compact row each, which run together into a single block */
-.documentation .pkg-entity.pkg-compact {
-	position: relative;
-	padding-bottom: 0;
-	border-bottom: none;
-	contain-intrinsic-size: auto 2rem;
-}
-.documentation :not(.pkg-compact) + .pkg-compact {
-	margin-top: 0.75rem;
-}
-.documentation .pkg-compact:not(:has(+ .pkg-compact)) {
-	margin-bottom: 0.75rem;
-}
-.documentation .pkg-compact > h3 {
-	position: absolute;
-	top: 0;
-	right: 0;
-	z-index: 1;
-	margin: 0;
-	padding: 0.3rem 0.625rem;
-	font-size: 0.875rem;
-}
-/* the name is already in the code; the heading stays for its anchor */
-.documentation .pkg-compact > h3 > span:first-child {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	overflow: hidden;
-	clip-path: inset(50%);
-	white-space: nowrap;
-}
-.documentation .pkg-compact .doc-source {
-	float: none;
-	opacity: 0;
-}
-.documentation .pkg-compact:hover .doc-source, .documentation .pkg-compact .doc-source:focus-within {
-	opacity: 1;
-}
-.documentation .pkg-compact pre.doc-code {
-	margin: 0;
-	padding: 0.25rem 0.625rem;
-	border-top-width: 0;
-	border-radius: 0;
-}
-.documentation :not(.pkg-compact) + .pkg-compact pre.doc-code {
-	border-top-width: 1px;
-	border-top-left-radius: 0.25rem;
-	border-top-right-radius: 0.25rem;
-}
-.documentation .pkg-compact:not(:has(+ .pkg-compact)) pre.doc-code {
-	border-bottom-left-radius: 0.25rem;
-	border-bottom-right-radius: 0.25rem;
 }
 
 /* hovering a type in a signature shows its definition */

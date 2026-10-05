@@ -3271,18 +3271,6 @@ write_type_previews :: proc(w: io.Writer) {
 	clear(&type_previews)
 }
 
-// Constants with nothing but a value are written as compact rows, as some packages have thousands
-is_compact_constant :: proc(pkg: ^doc.Pkg, entry: doc.Scope_Entry) -> bool {
-	e := &cfg.entities[entry.entity]
-	if e.kind != .Constant || str(entry.name) != str(e.name) || &cfg.pkgs[cfg.files[e.pos.file].pkg] != pkg {
-		return false
-	}
-	if strings.trim_space(str(e.docs)) != "" || strings.trim_space(str(e.comment)) != "" {
-		return false
-	}
-	return len(array(e.attributes)) == 0 && !strings.contains_rune(str(e.init_string), '\n')
-}
-
 INDEX_MIN_GROUP_SIZE :: 3
 INDEX_MIN_ENTRIES_TO_GROUP :: 16
 
@@ -3506,11 +3494,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			io.write_string(w, "<p class=\"pkg-empty-section\">This section is empty.</p>\n")
 		} else {
 			for e in entries {
-				if is_compact_constant(pkg, e) {
-					fmt.wprintln(w, `<div class="pkg-entity pkg-compact">`)
-				} else {
-					fmt.wprintln(w, `<div class="pkg-entity">`)
-				}
+				fmt.wprintln(w, `<div class="pkg-entity">`)
 				write_entry(w, pkg, e)
 				fmt.wprintln(w, `</div>`)
 			}

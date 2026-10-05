@@ -609,7 +609,8 @@ write_toc_type_item :: proc(w: io.Writer, entry: doc.Scope_Entry) {
 	fmt.wprintf(w, `<span class="toc-count">%d</span></a>`+"\n", len(class.methods))
 	fmt.wprintln(w, "<ul>")
 	for m in class.methods {
-		fmt.wprintf(w, `<li><a href="#%s">%s`, str(m.entity.name), m.name)
+		// the name and its badges are columns, which line up across the class
+		fmt.wprintf(w, `<li><a href="#%s"><span>%s</span>`, str(m.entity.name), m.name)
 		write_objc_toc_badges(w, objc_badges(toc_pkg, m.entity))
 		io.write_string(w, "</a></li>\n")
 	}
