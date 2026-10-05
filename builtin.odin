@@ -232,7 +232,9 @@ builtin_name_of :: proc(b: Builtin) -> string {
 }
 
 write_builtin_index_item :: proc(w: io.Writer, b: Builtin) {
-	fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", b.name)
+	fmt.wprintf(w, "<li><a href=\"#{0:s}\">", b.name)
+	write_breakable_name(w, b.name)
+	io.write_string(w, "</a></li>\n")
 }
 
 add_styling_to_builtin :: proc(txt: string) -> string {
@@ -524,7 +526,7 @@ write_builtin_pkg :: proc(w: io.Writer, dir, path: string, runtime_pkg: ^doc.Pkg
 		return a.kind < b.kind
 	})
 
-	fmt.wprintln(w, `<div class="row odin-main" id="pkg">`)
+	fmt.wprintln(w, `<div class="row odin-main odin-docs-layout" id="pkg">`)
 	defer fmt.wprintln(w, `</div>`)
 
 	write_pkg_sidebar(w, nil, collection, pkg_name, path)
@@ -752,6 +754,7 @@ write_table_contents :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, consts: []doc.
 	}
 
 	fmt.wprintln(w, `<div class="col-lg-2 odin-toc-border navbar-light"><div class="sticky-top odin-below-navbar py-3">`)
+	write_sidebar_toggle(w, "toc-sidebar", "Contents")
 	fmt.wprintln(w, `<nav id="TableOfContents">`)
 	fmt.wprintln(w, `<ul>`)
 

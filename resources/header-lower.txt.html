@@ -27,8 +27,23 @@
 			if (OSDarkModeQuery().matches) setDarkMode()
 			else removeDarkMode()
 		}
+		function toggleSidebar(button) {
+			const name = button.dataset.sidebar;
+			const collapsed = document.documentElement.classList.toggle(name + "-collapsed");
+			button.setAttribute("aria-expanded", !collapsed);
+			window.localStorage.setItem(name, collapsed ? "collapsed" : "expanded");
+		}
+		for (const name of ["pkg-sidebar", "toc-sidebar"]) {
+			if (window.localStorage.getItem(name) === "collapsed") {
+				document.documentElement.classList.add(name + "-collapsed");
+			}
+		}
 		document.addEventListener("DOMContentLoaded", () => {
 			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
+			for (const button of document.querySelectorAll(".odin-sidebar-toggle")) {
+				const collapsed = document.documentElement.classList.contains(button.dataset.sidebar + "-collapsed");
+				button.setAttribute("aria-expanded", !collapsed);
+			}
 		});
 	</script>
 	<link rel="stylesheet" type="text/css" href="https://odin-lang.org/css/style.css">
