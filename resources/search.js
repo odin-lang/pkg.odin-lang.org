@@ -424,6 +424,9 @@ window.addEventListener("keydown", ev => {
 			if (document.querySelector(".documentation .pkg-entity")) {
 				rows.push([["j", "k"], "Next or previous declaration"]);
 			}
+			if (document.querySelector(".odin-sidebar-toggle")) {
+				rows.push([["[", "]"], "Collapse or expand the sidebars"]);
+			}
 			rows.push([["?"], "Show these shortcuts"]);
 
 			sheet = document.createElement("div");
@@ -461,7 +464,29 @@ window.addEventListener("keydown", ev => {
 		ev.preventDefault();
 		open();
 	}, true);
+
+	document.addEventListener("click", ev => {
+		if (ev.target.closest && ev.target.closest(".odin-shortcuts-button")) {
+			ev.preventDefault();
+			open();
+		}
+	});
 }
+
+// [ and ] collapse or expand the packages and contents sidebars
+window.addEventListener("keydown", ev => {
+	if (ev.ctrlKey || ev.metaKey || ev.altKey || (ev.key !== "[" && ev.key !== "]")) {
+		return;
+	}
+	if (ev.target.closest && ev.target.closest("input, textarea, select, [contenteditable]")) {
+		return;
+	}
+	const button = document.querySelector(`.odin-sidebar-toggle[data-sidebar="${ev.key === "[" ? "pkg-sidebar" : "toc-sidebar"}"]`);
+	if (button && button.offsetParent !== null) {
+		ev.preventDefault();
+		toggleSidebar(button);
+	}
+});
 
 {
 	const types_of = new Map();

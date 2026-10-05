@@ -106,9 +106,10 @@ main :: proc() {
 	}
 
 	for collection in not_hidden {
-		dir := collection.name
-
 		init_pkg_entries_map(collection, collection.root)
+	}
+	for collection in not_hidden {
+		dir := collection.name
 
 		strings.builder_reset(&b)
 		write_html_header(w, fmt.tprintf("%s library - pkg.odin-lang.org", dir), .Full_Width,
@@ -2683,6 +2684,22 @@ pkg_entries_gather :: proc(pkg: ^doc.Pkg) -> (entries: Pkg_Entries) {
 		}
 	}
 
+	for entry in entries.procs {
+		e := &cfg.entities[entry.entity]
+		if e.kind != .Procedure || str(entry.name) != str(e.name) || &cfg.pkgs[cfg.files[e.pos.file].pkg] != pkg {
+			continue
+		}
+		if .Foreign in e.flags {
+			// NOTE(bill): foreign procedure often fit callback types without being meant for them
+			continue
+		}
+		if key, ok := proc_signature_key(e.type); ok {
+			matches := procs_by_signature[key]
+			append(&matches, Signature_Match{pkg, str(entry.name)})
+			procs_by_signature[key] = matches
+		}
+	}
+
 	slice.sort_by_key(entries.procs[:],         entity_key)
 	slice.sort_by_key(entries.proc_groups[:],   entity_key)
 	slice.sort_by_key(entries.types[:],         entity_key)
@@ -2727,6 +2744,7 @@ write_search :: proc(w: io.Writer, kind: enum { Package, Collection, All}, hint 
 				<div class="odin-search-key key-windows">Ctrl+K</div>
 				<span class="odin-search-or">or</span>
 				<div class="odin-search-key">/</div>
+				<button type="button" class="odin-shortcuts-button" title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts">?</button>
 			</div>
 		</div>
 	`, class)
@@ -3012,6 +3030,218 @@ write_related_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entit
 		field_pkg := &cfg.pkgs[cfg.files[field.pos.file].pkg]
 		write_related_procedures(w, field_pkg, field_type_entity, proc_names_seen, true)
 	}
+}
+
+Signature_Match :: struct {
+	pkg:  ^doc.Pkg,
+	name: string,
+}
+
+procs_by_signature: map[string][dynamic]Signature_Match
+
+proc_signature_key :: proc(t: doc.Type_Index) -> (key: string, ok: bool) {
+	pt := base_type(cfg.types[t])
+	if pt.kind != .Proc {
+		return
+	}
+	proc_flags := transmute(doc.Type_Flags_Proc)pt.flags
+	if .Polymorphic in proc_flags {
+		return
+	}
+
+	b := strings.builder_make()
+	writer := Type_Writer{w = strings.to_writer(&b), pkg = max(doc.Pkg_Index)} // every named type written in full
+	defer delete(writer.generic_scope)
+
+	cc := str(pt.calling_convention)
+	switch cc {
+	case "odin":  cc = ""
+	case "cdecl": cc = "c"
+	}
+	fmt.sbprintf(&b, "%s %v (", cc, proc_flags)
+	types := array(pt.types)
+	for tuple, i in types[:min(len(types), 2)] {
+		if i == 1 {
+			strings.write_string(&b, ") -> (")
+		}
+		if tuple == 0 {
+			continue
+		}
+		for param in array(cfg.types[tuple].entities) {
+			e := &cfg.entities[param]
+			for flag in e.flags {
+				fmt.sbprint(&b, entity_flag_strings[flag], "")
+			}
+			write_type(&writer, cfg.types[e.type], {})
+			strings.write_string(&b, ", ")
+		}
+	}
+	strings.write_byte(&b, ')')
+
+	key = strings.to_string(b)
+	if strings.contains_rune(key, '$') {
+		strings.builder_destroy(&b)
+		return "", false
+	}
+	return key, true
+}
+
+write_matching_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, e: ^doc.Entity) {
+	if base_type(cfg.types[e.type]).kind != .Proc {
+		return
+	}
+	key, ok := proc_signature_key(e.type)
+	if !ok {
+		return
+	}
+	defer delete(key)
+	matches := procs_by_signature[key]
+	// only for an interface: one that mentions a declared type, as `Allocator_Proc` does,
+	// rather than `proc()` or `proc(int) -> int`, which so much would match
+	if !strings.contains(key, `class="code-typename"`) || len(matches) == 0 {
+		return
+	}
+
+	sorted := slice.clone(matches[:], context.temp_allocator)
+	slice.sort_by(sorted, proc(a, b: Signature_Match) -> bool {
+		pa, pb := pkg_import_path(a.pkg), pkg_import_path(b.pkg)
+		return pa < pb if pa != pb else a.name < b.name
+	})
+
+	fmt.wprintln(w, `<details class="odin-doc-toggle">`)
+	fmt.wprintf(w, `<summary class="hideme"><h4 style="display:inline-block">Matching Procedures (%d)</h4></summary>`+"\n", len(sorted))
+	fmt.wprintln(w, "<ul>")
+	for m in sorted {
+		collection := cfg.pkg_to_collection[m.pkg]
+		if collection == nil {
+			continue
+		}
+		io.write_string(w, "<li>")
+		if m.pkg != pkg {
+			fmt.wprintf(w, `<a href="%s/%s/">%s</a>.`, collection.base_url, collection.pkg_to_path[m.pkg], pkg_import_name(m.pkg))
+		}
+		fmt.wprintf(w, `<a href="{0:s}/{1:s}/#{2:s}">{2:s}</a></li>`+"\n", collection.base_url, collection.pkg_to_path[m.pkg], m.name)
+	}
+	fmt.wprintln(w, "</ul>")
+	fmt.wprintln(w, "</details>")
+}
+
+write_using_fields :: proc(w: io.Writer, pkg: ^doc.Pkg, e: ^doc.Entity) {
+	Field :: struct {
+		e:   ^doc.Entity,
+		via: string, // the `using` fields in between, e.g. "inner"
+	}
+
+	struct_of :: proc(t: doc.Type) -> (fields: []doc.Entity_Index, ok: bool) {
+		t := t
+		if t.kind == .Pointer {
+			t = cfg.types[array(t.types)[0]]
+		}
+		if t.kind != .Named {
+			return // an anonymous struct's fields are in the definition already
+		}
+		bt := base_type(t)
+		return array(bt.entities), bt.kind == .Struct
+	}
+
+	collect :: proc(fields: []doc.Entity_Index, via: string, shadowed: ^map[string]bool, out: ^[dynamic]Field, depth: int) {
+		for index in fields {
+			f := &cfg.entities[index]
+			name := str(f.name)
+			if .Param_Using in f.flags {
+				if inner, ok := struct_of(cfg.types[f.type]); ok && depth < 8 {
+					collect(inner, fmt.tprintf("%s.%s", via, name) if via != "" else name, shadowed, out, depth+1)
+				}
+			} else if name != "" && name != "_" && !shadowed[name] {
+				shadowed[name] = true
+				append(out, Field{f, via})
+			}
+		}
+	}
+
+	if _, is_objc := find_entity_attribute(e, "objc_class"); is_objc {
+		return
+	}
+	t := base_type(cfg.types[e.type])
+	if t.kind != .Struct {
+		return
+	}
+	own := array(t.entities)
+	shadowed: map[string]bool
+	defer delete(shadowed)
+	for index in own {
+		shadowed[str(cfg.entities[index].name)] = true
+	}
+
+	writer := &Type_Writer{w = w, pkg = doc.Pkg_Index(intrinsics.ptr_sub(pkg, &cfg.pkgs[0]))}
+	defer delete(writer.generic_scope)
+
+	groups: [dynamic][dynamic]Field
+	defer {
+		for g in groups {
+			delete(g)
+		}
+		delete(groups)
+	}
+	sources: [dynamic]^doc.Entity
+	defer delete(sources)
+	total := 0
+	for index in own {
+		f := &cfg.entities[index]
+		if .Param_Using not_in f.flags {
+			continue
+		}
+		inner, ok := struct_of(cfg.types[f.type])
+		if !ok {
+			continue
+		}
+		found: [dynamic]Field
+		collect(inner, "", &shadowed, &found, 0)
+		if len(found) == 0 {
+			delete(found)
+			continue
+		}
+		total += len(found)
+		append(&groups, found)
+		append(&sources, f)
+	}
+	if total == 0 {
+		return
+	}
+
+	fmt.wprintln(w, `<details class="odin-doc-toggle">`)
+	fmt.wprintf(w, `<summary class="hideme"><h4 style="display:inline-block">Fields Through <code>using</code> (%d)</h4></summary>`+"\n", total)
+	for found, i in groups {
+		source := sources[i]
+		io.write_string(w, `<h6>From <code>using `)
+		io.write_string(w, str(source.name))
+		io.write_string(w, `: `)
+		write_type(writer, cfg.types[source.type], {})
+		io.write_string(w, "</code></h6>\n")
+
+		name_width := 0
+		for f in found {
+			name_width = max(name_width, len(str(f.e.name)))
+		}
+		fmt.wprintln(w, `<ul class="doc-objc-methods">`)
+		for f in found {
+			name := str(f.e.name)
+			io.write_string(w, "<li>")
+			io.write_string(w, name)
+			io.write_string(w, ":")
+			for _ in len(name)..<name_width {
+				io.write_byte(w, ' ')
+			}
+			io.write_byte(w, ' ')
+			write_type(writer, cfg.types[f.e.type], {})
+			if f.via != "" {
+				fmt.wprintf(w, ` <span class="comment">// through %s</span>`, f.via)
+			}
+			io.write_string(w, "</li>\n")
+		}
+		fmt.wprintln(w, "</ul>")
+	}
+	fmt.wprintln(w, "</details>")
 }
 
 write_related_procedure_groups :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, proc_names_seen: ^map[string]bool, is_inherited := false) {
@@ -3436,6 +3666,10 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		write_related_procedures(w, pkg, e, &proc_names_seen)
 		write_related_constants(w, pkg, e)
 		delete(proc_names_seen)
+		if is_declared_here {
+			write_matching_procedures(w, pkg, e)
+			write_using_fields(w, pkg, e)
+		}
 	}
 	if e.kind == .Procedure {
 		proc_names_seen: map[string]bool
