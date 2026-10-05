@@ -6,7 +6,6 @@ import "base:runtime"
 import "core:fmt"
 import "core:io"
 import "core:log"
-import "core:net"
 import "core:os"
 import "core:path/slashpath"
 import "core:slice"
@@ -68,6 +67,8 @@ main :: proc() {
 			generate_from_path(arg, false)
 		}
 	}
+
+	build_doc_link_index()
 
 
 	b := strings.builder_make()
@@ -141,6 +142,9 @@ main :: proc() {
 	log.infof("copy_assets")
 	copy_assets()
 
+	if doc_warning_count > 0 {
+		log.warnf("%d documentation warnings", doc_warning_count)
+	}
 
 	log.infof("[DONE]")
 }
@@ -345,7 +349,7 @@ generate_from_path :: proc(path: string, all_packages: bool) {
 
 		fullpath_loop: for pkg in pkgs {
 			fullpath := str(pkg.fullpath)
-			if len(array(pkg.entries)) == 0 {
+			if len(array(pkg.entries)) == 0 && strings.trim_space(str(pkg.docs)) == "" {
 				log.infof("Package at %s does not contain anything", fullpath)
 				continue fullpath_loop
 			}
@@ -679,17 +683,14 @@ generate_package_from_directory_tree :: proc(b: ^strings.Builder, node: ^Dir_Nod
 		}
 
 		if str(pkg.fullpath) not_in cfg.pkgs_line_docs {
-			docs := str(pkg.docs)
-			docs = strings.trim_space(docs)
-			line_doc, _, _ := strings.partition(docs, "\n")
-			line_doc = strings.trim_space(line_doc)
+			line_doc := doc_summary_line(str(pkg.docs))
 			cfg.pkgs_line_docs[strings.clone(str(pkg.fullpath))] = strings.clone(line_doc)
 		}
 
 		strings.builder_reset(b)
 		w := strings.to_writer(b)
 
-		desc := cfg.pkgs_line_docs[str(pkg.fullpath)]
+		desc := markdown_plain_text(cfg.pkgs_line_docs[str(pkg.fullpath)], context.temp_allocator)
 		if desc == "" {
 			desc = fmt.tprintf("API documentation for the Odin package %s.", path)
 		}
@@ -877,10 +878,7 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 		}
 		line_doc = cfg.pkgs_line_docs[str(pkg.fullpath)]
 		if line_doc == "" {
-			docs := str(pkg.docs)
-			docs = strings.trim_space(docs)
-			line_doc, _, _ = strings.partition(docs, "\n")
-			line_doc = strings.trim_space(line_doc)
+			line_doc = doc_summary_line(str(pkg.docs))
 		}
 
 		if line_doc == "" {
@@ -975,7 +973,7 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 			io.write_string(w, `.`)
 		case:
 			if line_doc, ok := get_line_doc(dir.pkg); ok {
-				write_doc_line(w, line_doc)
+				write_doc_line(w, line_doc, dir.pkg)
 			} else if dir.dir == "sys" {
 				io.write_string(w, `Platform specific packages - documentation may be for a specific platform only`)
 			} else {
@@ -1000,15 +998,13 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 
 				io.write_string(w, `<td class="pkg-line pkg-line-doc">`)
 				if child_line_doc, ok := get_line_doc(child.pkg); ok {
-					write_doc_line(w, child_line_doc)
+					write_doc_line(w, child_line_doc, child.pkg)
 				} else if target, target_ok := target_from_pkg(child.pkg); target_ok {
 					fmt.wprintf(w, `<em>(Generated with <code>-target:%s</code>, please read the source code directly)</em>`, target)
 				} else {
 					io.write_string(w, `&nbsp;`)
 				}
 				io.write_string(w, `</td>`)
-
-				fmt.wprintf(w, "</td>")
 				fmt.wprintf(w, "</tr>\n")
 			}
 		}
@@ -1291,7 +1287,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		for line in lines {
 			do_indent(writer, flags)
 			io.write_string(w, "<span class=\"comment\">// ")
-			io.write_string(w, line)
+			io.write_string(w, strip_doxygen_brief(line))
 			io.write_string(w, "</span>\n")
 		}
 	}
@@ -1306,7 +1302,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		}
 
 		io.write_string(w, "<span class=\"comment\">// ")
-		io.write_string(w, strings.trim_right_space(comment))
+		io.write_string(w, strings.trim_right_space(strip_doxygen_brief(comment)))
 		io.write_string(w, "</span>")
 	}
 
@@ -1796,161 +1792,16 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 	}
 }
 
-write_doc_line :: proc(w: io.Writer, text: string) {
-	write_markup_text(w, text, true)
+write_doc_line :: proc(w: io.Writer, text: string, pkg: ^doc.Pkg = nil) {
+	ctx := Doc_Context{pkg = pkg, owner = str(pkg.name) if pkg != nil else "directory"}
+	write_markdown_inline(w, text, &ctx, "code-inline")
 }
 
-write_markup_text :: proc(w: io.Writer, s_: string, code_inline := false) {
-	// We need to ensure that we don't escape html tags in our docs
-	s := escape_html_string(s_)
-	// Consume '- ' if the string begins with one
-	// this means we need to make a bullet point
-	is_list_element: bool
-	if len(s) > 1 && strings.has_prefix(s, "- ") {
-		s = strings.trim_left_space(s[2:])
-		// NOTE: The reason for a span rather than <li> is that list items cannpt be in a paragraph
-		io.write_string(w, "<span class=\"doc-list\">")
-		is_list_element = true
-	}
-	defer if is_list_element do io.write_string(w, "</span>")
-	// In markdown 2 spaces at the end a line indicates a break is needed
-	need_break: bool
-	if len(s) >= 2 && s[len(s) - 2:] == "  " {
-		s = s[:len(s) - 2]
-		need_break = true
-	}
-	defer if need_break do io.write_string(w, "<br>")
-
-	runtime.DEFAULT_TEMP_ALLOCATOR_TEMP_GUARD()
-
-	needles := []string{"If and only if (⟺)", "if and only if (⟺)"}
-	for needle in needles {
-		if strings.index(s, needle) != -1 {
-			s, _ = strings.replace_all(s, needle, "<abbr title=\"If and only if (⟺)\">iff</abbr>", context.temp_allocator)
-		}
-	}
-
-	latest_index := 0
-	for index := 0; index < len(s); index += 1 {
-		switch s[index] {
-		case '`':
-			next_tick := strings.index_byte(s[index + 1:], '`')
-			if next_tick >= 0 {
-				next_tick += index + 1
-				io.write_string(w, s[latest_index:index])
-				io.write_string(w, "<code class=\"code-inline\">" if code_inline else "<code>")
-				io.write_string(w, s[index + 1:next_tick])
-				io.write_string(w, "</code>")
-				latest_index = next_tick + 1
-				index = latest_index
-			}
-		case '[':
-			write_link :: proc(w: io.Writer, text, raw_url: string) {
-				scheme, host, path, queries, fragment := net.split_url(raw_url, context.temp_allocator)
-				scheme = strings.to_lower(scheme, context.temp_allocator)
-				host   = strings.to_lower(host, context.temp_allocator)
-
-				url := net.join_url(scheme, host, path, queries, fragment, context.temp_allocator)
-
-				if strings.has_suffix(host, cfg.domain) {
-					fmt.wprintf(w, `<a href="%s">`, url)
-				} else {
-					fmt.wprintf(w, `<a href="%s" target="_blank" rel="noopener noreferrer">`, url)
-				}
-				io.write_string(w, text)
-				io.write_string(w, "</a>")
-			}
-
-			if index+1 < len(s) && s[index+1] == '[' {
-				end_bracket := strings.index(s[index + 1:], "]]")
-				slash_slash := strings.index(s[index + 1:], "//")
-				if end_bracket >= 0 && slash_slash < end_bracket {
-					end_bracket += index + 2
-
-					text := s[index + 2:end_bracket-1]
-					url := text
-					if strings.contains(text, ";") {
-						text, _, url = strings.partition(text, ";")
-					}
-					text = strings.trim_space(text)
-					url  = strings.trim_space(url)
-
-					io.write_string(w, s[latest_index:index])
-					write_link(w, text, url)
-					latest_index = end_bracket + 1
-					index = latest_index
-				}
-			} else {
-				// Markdown style `[text](url)`
-				close_bracket := strings.index_byte(s[index + 1:], ']')
-				if close_bracket < 0 {
-					break
-				}
-				close_bracket += index + 1
-				if close_bracket+1 >= len(s) || s[close_bracket+1] != '(' {
-					break
-				}
-				close_paren := strings.index_byte(s[close_bracket + 2:], ')')
-				if close_paren < 0 {
-					break
-				}
-				close_paren += close_bracket + 2
-
-				text := strings.trim_space(s[index + 1:close_bracket])
-				url  := strings.trim_space(s[close_bracket + 2:close_paren])
-				if !strings.contains(url, "//") || strings.contains_any(url, " \t") {
-					break
-				}
-
-				io.write_string(w, s[latest_index:index])
-				write_link(w, text, url)
-				latest_index = close_paren + 1
-				index = close_paren
-			}
-		case '*':
-			Star_Type :: enum {
-				none,
-				bold,
-				italics,
-			}
-			star_type := Star_Type.none
-			next_star := strings.index_byte(s[index + 1:], '*')
-			if next_star == 0 {
-				// double star we are bold
-				star_type = .bold
-			} else if next_star > 0 {
-				star_type = .italics
-			}
-			switch star_type {
-			case .bold:
-				ending_star := strings.index(s[index + 2:], "**")
-				if ending_star < 0 {
-					continue
-				}
-				ending_star += index + 2
-				io.write_string(w, s[latest_index:index])
-				io.write_string(w, "<b>")
-				io.write_string(w, s[index + 2:ending_star])
-				io.write_string(w, "</b>")
-				latest_index = ending_star + 2
-				index = latest_index
-			case .italics:
-				next_star += index + 1
-				io.write_string(w, s[latest_index:index])
-				io.write_string(w, "<i>")
-				io.write_string(w, s[index + 1:next_star])
-				io.write_string(w, "</i>")
-				latest_index = next_star + 1
-				index = latest_index
-			case .none: // nothing
-			}
-		}
-	}
-	io.write_string(w, s[latest_index:])
-}
-
-write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller_location) {
+write_docs :: proc(w: io.Writer, docs: string, name: string = "", doc_ctx: ^Doc_Context = nil) {
 	docs := docs
+
+	default_ctx := Doc_Context{owner = name}
+	ctx := doc_ctx if doc_ctx != nil else &default_ctx
 
 	trim_empty_and_subtitle_lines_and_replace_lt :: proc(lines: []string, subtitle: string) -> []string {
 		lines := lines
@@ -1966,7 +1817,13 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 		return lines
 	}
 
-	assert(strings.trim_space(docs) != "", loc=loc)
+	if strings.trim_space(docs) == "" {
+		return
+	}
+	docs = strip_comment_gutter(docs)
+	if strings.trim_space(docs) == "" {
+		return
+	}
 
 	// Trim off space (not tabs) from the left.
 	// Tabs actually have meaning.
@@ -2030,7 +1887,6 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 	for line, i in lines_to_process {
 		text := strings.trim_space(line)
 		next_block_kind := curr_block_kind
-		force_write_block := false
 
 		switch curr_block_kind {
 		case .Paragraph:
@@ -2049,8 +1905,6 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 				has_any_output = true
 			case strings.has_prefix(line, "\t"):
 				next_block_kind = .Code
-			case text == "":
-				force_write_block = true
 			case strings.has_prefix(line, "// Defined internally by the compiler"):
 				next_block_kind = .Example
 				has_example = true
@@ -2096,7 +1950,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 			}
 		}
 
-		if curr_block_kind != next_block_kind || force_write_block {
+		if curr_block_kind != next_block_kind {
 			append(&blocks, Block{curr_block_kind, lines_to_process[start:i]})
 			curr_block_kind = next_block_kind
 			start = i
@@ -2108,7 +1962,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 	}
 
 	if has_any_output && !has_example {
-		errorf("The documentation for %q has an output block but no example\n", name)
+		doc_warnf("The documentation for %q has an output block but no example", ctx.owner)
 	}
 
 	for &block in blocks {
@@ -2139,77 +1993,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", loc := #caller
 
 		switch block.kind {
 		case .Paragraph:
-			subtitles := [?]string{"Inputs:", "Returns:"}
-			subtitle := ""
-			for candidate in subtitles {
-				if strings.has_prefix(block_lines[0], candidate) {
-					subtitle = candidate
-					rest := strings.trim_left_space(strings.trim_prefix(block_lines[0], candidate))
-					if rest == "" {
-						block_lines = block_lines[1:]
-					} else {
-						block_lines[0] = rest
-					}
-					break
-				}
-			}
-
-			// NOTE(bill): If the body under Inputs:/Returns: is entirely "- " bullets, render a real list rather than a run-on paragraph.
-			is_bullets := subtitle != "" && len(block_lines) > 0
-			if is_bullets {
-				for line in block_lines {
-					t := strings.trim_space(line)
-					if t == "" {
-						continue
-					}
-					if !strings.has_prefix(t, "- ") {
-						is_bullets = false
-						break
-					}
-				}
-			}
-			if is_bullets {
-				fmt.wprintf(w, "<p><b>%s</b></p>\n", subtitle)
-				io.write_string(w, `<ul class="doc-params">`)
-				for line in block_lines {
-					t := strings.trim_space(line)
-					if t == "" {
-						continue
-					}
-					io.write_string(w, "<li>")
-					write_markup_text(w, strings.trim_prefix(t, "- "))
-					io.write_string(w, "</li>\n")
-				}
-				io.write_string(w, "</ul>\n")
-				continue
-			}
-
-			io.write_string(w, "<p>")
-			if subtitle != "" {
-				fmt.wprintf(w, "<b>%s</b><br>", subtitle)
-			}
-			for line, line_idx in block_lines {
-				if line_idx > 0 {
-					io.write_string(w, "\n")
-				}
-				if strings.has_prefix(line, "##") {
-					n := 0
-					for c in line {
-						if c != '#' {
-							break
-						}
-						n += 1
-					}
-					io.write_string(w, "</p>\n")
-					fmt.wprintf(w, "<h%d>", n+2)
-					write_markup_text(w, line[n:])
-					fmt.wprintf(w, "</h%d>", n+2)
-					io.write_string(w, "<p>")
-					continue
-				}
-				write_markup_text(w, line)
-			}
-			io.write_string(w, "</p>\n")
+			write_markdown(w, block_lines, ctx)
 		case .Code:
 			all_blank := len(block_lines) > 0
 			for line in block_lines {
@@ -3149,6 +2933,8 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	fmt.wprintf(w, "</h3>\n")
 	fmt.wprintln(w, `<div>`)
 
+	doc_ctx := Doc_Context{pkg = pkg, owner = fmt.tprintf("%s.%s", str(pkg.name), name), heading_prefix = name}
+
 	if raw, ok := find_entity_attribute(e, "deprecated"); ok {
 		msg, _, unq_ok := strconv.unquote_string(raw, context.temp_allocator)
 		if !unq_ok {
@@ -3157,7 +2943,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		io.write_string(w, `<div class="doc-deprecated" role="note"><strong>Deprecated.</strong>`)
 		if strings.trim_space(msg) != "" {
 			io.write_byte(w, ' ')
-			write_markup_text(w, msg)
+			write_markdown_inline(w, msg, &doc_ctx)
 		}
 		io.write_string(w, "</div>\n")
 	}
@@ -3201,7 +2987,10 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			the_type := cfg.types[e.type]
 
 			init_string := escape_html_string(str(e.init_string))
-			assert(init_string != "")
+			if init_string == "" {
+				doc_warnf("%s: constant has no value", doc_ctx.owner)
+				init_string = "…"
+			}
 
 			ignore_type := true
 			if the_type.kind == .Basic && is_type_untyped(the_type) {
@@ -3329,7 +3118,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	if the_docs != "" {
 		fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
 		fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
-		write_docs(w, the_docs, str(e.name))
+		write_docs(w, the_docs, doc_ctx = &doc_ctx)
 		fmt.wprintln(w, `</details>`)
 	}
 
@@ -3337,7 +3126,10 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	if raw_cls_name, ok := find_entity_attribute(e, "objc_class"); ok {
 		cls_name, allocated, cls_name_ok := strconv.unquote_string(raw_cls_name)
 		defer if allocated { delete(cls_name) }
-		assert(cls_name_ok)
+		if !cls_name_ok {
+			doc_warnf("%s: could not unquote objc_class %s", doc_ctx.owner, raw_cls_name)
+			cls_name = raw_cls_name
+		}
 
 		fmt.wprintln(w, `<div>`)
 		defer fmt.wprintln(w, `</div>`)
@@ -3512,16 +3304,23 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	fmt.wprintln(w, `<div id="pkg-top">`)
 
 	overview_docs := str(pkg.docs)
+	overview_headings: [dynamic]Doc_Heading
 	if strings.trim_space(overview_docs) != "" {
 		fmt.wprintln(w, "<h2>Overview</h2>")
 		fmt.wprintln(w, "<div id=\"pkg-overview\">")
 		defer fmt.wprintln(w, "</div>")
 
-		write_docs(w, overview_docs)
+		ctx := Doc_Context{pkg = pkg, owner = path, heading_prefix = "overview", headings = &overview_headings}
+		write_docs(w, overview_docs, doc_ctx = &ctx)
 	}
 
-	fmt.wprintln(w, `<div id="pkg-index">`)
-	fmt.wprintln(w, `<h2>Index</h2>`)
+	// Packages may only hold documentation
+	has_entries := len(pkg_entries.all) > 0
+
+	if has_entries {
+		fmt.wprintln(w, `<div id="pkg-index">`)
+		fmt.wprintln(w, `<h2>Index</h2>`)
+	}
 
 
 	write_index :: proc(w: io.Writer, name: string, entries: []doc.Scope_Entry) {
@@ -3546,14 +3345,15 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		}
 	}
 
-	for eo in pkg_entries.ordering {
-		if eo.ignore {
-			continue
+	if has_entries {
+		for eo in pkg_entries.ordering {
+			if eo.ignore {
+				continue
+			}
+			write_index(w, eo.name, eo.entries)
 		}
-		write_index(w, eo.name, eo.entries)
+		fmt.wprintln(w, "</div>")
 	}
-
-	fmt.wprintln(w, "</div>")
 	fmt.wprintln(w, "</div>")
 
 
@@ -3571,14 +3371,16 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		}
 	}
 
-	fmt.wprintln(w, `<section class="documentation">`)
-	for eo in pkg_entries.ordering {
-		if eo.ignore {
-			continue
+	if has_entries {
+		fmt.wprintln(w, `<section class="documentation">`)
+		for eo in pkg_entries.ordering {
+			if eo.ignore {
+				continue
+			}
+			write_entries(w, pkg, eo.name, eo.entries)
 		}
-		write_entries(w, pkg, eo.name, eo.entries)
+		fmt.wprintln(w, "</section>")
 	}
-	fmt.wprintln(w, "</section>")
 
 	fmt.wprintln(w, `<h2 id="pkg-source-files">Source Files</h2>`)
 	fmt.wprintln(w, "<ul>")
@@ -3631,7 +3433,31 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		fmt.wprintln(w, `<nav id="TableOfContents">`)
 		fmt.wprintln(w, `<ul>`)
 		if overview_docs != "" {
-			write_link(w, "pkg-overview", "Overview")
+			io.write_string(w, `<li><a href="#pkg-overview">Overview</a>`)
+			if len(overview_headings) > 0 {
+				top, next := max(int), max(int)
+				for h in overview_headings {
+					top = min(top, h.level)
+				}
+				count := 0
+				for h in overview_headings {
+					count += int(h.level == top)
+					if h.level > top {
+						next = min(next, h.level)
+					}
+				}
+				// A lone title is skipped for the sections below it
+				if count == 1 && next != max(int) {
+					top = next
+				}
+				fmt.wprintln(w, `<ul>`)
+				for h in overview_headings do if h.level == top {
+					text, _ := strings.replace_all(h.text, "&", "&amp;", context.temp_allocator)
+					fmt.wprintf(w, `<li><a href="#%s">%s</a></li>`+"\n", h.id, escape_html_string(text, context.temp_allocator))
+				}
+				io.write_string(w, `</ul>`)
+			}
+			fmt.wprintln(w, `</li>`)
 		}
 		for eo in pkg_entries.ordering do if len(eo.entries) != 0 {
 			slug := slugify(eo.name, context.temp_allocator)
