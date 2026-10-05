@@ -1937,7 +1937,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 					v, ok = int_value_of_type(value, cfg.types[type_types[0]])
 				}
 				if ok && !(init_string != "" && adds_nothing(init_string, v)) {
-					hover = format_int_value(v)
+					hover = format_int_value(v, init_string)
 				}
 			}
 

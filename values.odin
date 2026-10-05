@@ -1,5 +1,6 @@
 package odin_html_docs
 
+import "base:intrinsics"
 import "base:runtime"
 import "core:fmt"
 import "core:strconv"
@@ -44,7 +45,7 @@ constant_hover :: proc(e: ^doc.Entity) -> (res: string) {
 	if !ok || adds_nothing(str(e.init_string), v) {
 		return
 	}
-	return format_int_value(v)
+	return format_int_value(v, str(e.init_string))
 }
 
 adds_nothing :: proc(literal: string, v: Int_Value) -> bool {
@@ -102,7 +103,7 @@ int_value_of_type :: proc(value: i128, t: doc.Type) -> (v: Int_Value, ok: bool) 
 	return v, true
 }
 
-format_int_value :: proc(v: Int_Value) -> string {
+format_int_value :: proc(v: Int_Value, source := "") -> string {
 	// `_` every `size` digits from the right, once there are more than four
 	grouped :: proc(digits: string, size: int) -> string {
 		if len(digits) <= 4 {
@@ -128,20 +129,59 @@ format_int_value :: proc(v: Int_Value) -> string {
 		return fmt.tprintf("= %s", decimal)
 	}
 
-	hex: string
-	switch {
-	case !negative:
-		hex = fmt.tprintf("0x%s", grouped(fmt.tprintf("%X", magnitude), 4))
-	case v.bits > 0:
-		bits := u128(v.value)
+	// the bits as stored, which an untyped negative value has none of
+	stored, has_stored := magnitude, !negative
+	if negative && v.bits > 0 {
+		stored, has_stored = u128(v.value), true
 		if v.bits < 128 {
-			bits &= (u128(1) << uint(v.bits)) - 1
+			stored &= (u128(1) << uint(v.bits)) - 1
 		}
-		hex = fmt.tprintf("0x%s", grouped(fmt.tprintf("%X", bits), 4))
-	case:
-		hex = fmt.tprintf("-0x%s", grouped(fmt.tprintf("%X", magnitude), 4))
 	}
-	return fmt.tprintf("= %s (%s)", decimal, hex)
+
+	// a single bit is clearer as `1 << n` than as its hexadecimal
+	second := ""
+	if has_stored && stored & (stored - 1) == 0 {
+		if !is_shift_literal(source) {
+			second = fmt.tprintf("1 << %d", intrinsics.count_trailing_zeros(stored))
+		}
+	} else if !is_hex_literal(source) {
+		hex := grouped(fmt.tprintf("%X", stored if has_stored else magnitude), 4)
+		second = fmt.tprintf("0x%s", hex) if has_stored else fmt.tprintf("-0x%s", hex)
+	}
+
+	if second == "" {
+		return fmt.tprintf("= %s", decimal)
+	}
+	return fmt.tprintf("= %s (%s)", decimal, second)
+}
+
+@(private="file")
+is_hex_literal :: proc(source: string) -> bool {
+	s := strings.trim_prefix(strings.trim_space(source), "-")
+	if !strings.has_prefix(s, "0x") && !strings.has_prefix(s, "0X") || len(s) == 2 {
+		return false
+	}
+	for c in transmute([]byte)s[2:] {
+		if !('0' <= c && c <= '9' || 'a' <= c && c <= 'f' || 'A' <= c && c <= 'F' || c == '_') {
+			return false
+		}
+	}
+	return true
+}
+
+@(private="file")
+is_shift_literal :: proc(source: string) -> bool {
+	s, _ := strings.remove_all(source, " ", context.temp_allocator)
+	s = strings.trim_space(s)
+	if !strings.has_prefix(s, "1<<") || len(s) == 3 {
+		return false
+	}
+	for c in transmute([]byte)s[3:] {
+		if !('0' <= c && c <= '9') {
+			return false
+		}
+	}
+	return true
 }
 
 
