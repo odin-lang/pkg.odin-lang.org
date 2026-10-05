@@ -726,34 +726,30 @@ write_table_contents :: proc(w: io.Writer, runtime_pkg: ^doc.Pkg, consts: []doc.
 
 	write_table_entries :: proc(w: io.Writer, runetime_pkg: ^doc.Pkg, title: string, kind: string, entries: []doc.Scope_Entry, entry_table: []Builtin) {
 		table_entries := make([dynamic]Builtin, 0, len(entry_table), context.temp_allocator)
-		if kind != "g" {
-			for e in entry_table do if e.kind == kind {
-				append(&table_entries, e)
-			}
+		for e in entry_table do if e.kind == kind {
+			append(&table_entries, e)
 		}
-		count := len(entries) if kind == "g" else len(table_entries)
+		count := len(table_entries) + len(entries)
 
 		fmt.wprintln(w, `<li>`)
 		{
 			fmt.wprintf(w, `<a href="#pkg-{0:s}">{0:s}<span class="toc-count">{1:d}</span></a>`, title, count)
 			fmt.wprintln(w, `<ul>`)
-			if kind == "g" {
-				for e in entries {
-					fmt.wprintf(w, "<li><a href=\"#{0:s}\">{0:s}</a></li>\n", str(e.name))
-				}
+			if len(table_entries) >= INDEX_MIN_ENTRIES_TO_GROUP {
+				walk_index_groups(w, table_entries[:],
+					name_of     = builtin_name_of,
+					group_start = toc_group_start,
+					group_end   = toc_group_end,
+					item        = write_builtin_index_item,
+				)
 			} else {
-				if len(table_entries) >= INDEX_MIN_ENTRIES_TO_GROUP {
-					walk_index_groups(w, table_entries[:],
-						name_of     = builtin_name_of,
-						group_start = toc_group_start,
-						group_end   = toc_group_end,
-						item        = write_builtin_index_item,
-					)
-				} else {
-					for b in table_entries {
-						write_builtin_index_item(w, b)
-					}
+				for b in table_entries {
+					write_builtin_index_item(w, b)
 				}
+			}
+			// the @(builtin) declarations of package runtime, after the built-ins as in the Index
+			for e in entries {
+				write_index_item(w, e)
 			}
 			fmt.wprintln(w, `</ul>`)
 		}

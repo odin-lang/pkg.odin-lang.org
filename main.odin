@@ -3659,7 +3659,14 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			}
 		}
 
-		for eo in pkg_entries.ordering do if len(eo.entries) != 0 {
+		for eo in pkg_entries.ordering do if has_entries && !eo.ignore {
+			slug := slugify(eo.name, context.temp_allocator)
+			if len(eo.entries) == 0 {
+				// listed like the Index lists it, and odin-lang.org's script.js needs a link for each heading
+				fmt.wprintf(w, `<li class="toc-empty"><a href="#pkg-{0:s}">{1:s}<span class="toc-count">0</span></a></li>`+"\n", slug, eo.name)
+				continue
+			}
+
 			entries := eo.entries
 			item := write_index_item
 			if len(class_names) > 0 {
@@ -3676,7 +3683,6 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 				}
 			}
 
-			slug := slugify(eo.name, context.temp_allocator)
 			fmt.wprintf(w, `<li><a href="#pkg-{0:s}">{1:s}`, slug, eo.name)
 			if len(entries) > 0 {
 				fmt.wprintf(w, `<span class="toc-count">%d</span>`, len(entries))
@@ -3688,6 +3694,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			fmt.wprintln(w, "</li>")
 		}
 		write_link(w, "pkg-source-files", "Source Files")
+		write_link(w, "pkg-generation-information", "Generation Information")
 		fmt.wprintln(w, `</ul>`)
 		fmt.wprintln(w, `</nav>`)
 		fmt.wprintln(w, `</div></div>`)
