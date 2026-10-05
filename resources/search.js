@@ -250,6 +250,7 @@ window.addEventListener("keydown", ev => {
 			const rows = [
 				[[mac ? "\u2318K" : "Ctrl+K", "/"], "Search"],
 				[["\u2191", "\u2193", "Enter"], "Choose a search result"],
+				[[mac ? "\u2318Enter" : "Ctrl+Enter"], "Open a search result in a new tab"],
 				[["Esc"], "Clear the search, then leave it"],
 			];
 			if (document.querySelector(".documentation .pkg-entity")) {
@@ -1198,6 +1199,13 @@ if (odin_search) {
 			let search_query = url_parameters.get("q");
 			odin_search.value = search_query.trim();
 			odin_search_input(null);
+		} else if (window.odin_not_found) {
+			// what the missing page was most likely about
+			let parts = location.pathname.split("/").filter(part => part !== "" && part !== "index.html");
+			if (parts.length > 0) {
+				odin_search.value = decodeURIComponent(parts[parts.length - 1]).replace(/\.html$/, "");
+				odin_search_input(null);
+			}
 		}
 
 		odin_search.addEventListener("input", ev => {
@@ -1206,6 +1214,16 @@ if (odin_search) {
 		}, false);
 
 		odin_search.addEventListener("keydown", ev => {
+			if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey)) {
+				flush_search();
+				let li = odin_search_results.children[curr_search_index];
+				if (li && li.dataset.path) {
+					window.open(li.dataset.path, "_blank", "noopener");
+				}
+				ev.preventDefault();
+				ev.stopPropagation();
+				return;
+			}
 			switch (get_key_string(ev)) {
 			case "Enter":
 				flush_search(); // make sure the list reflects the latest keystroke

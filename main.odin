@@ -142,6 +142,9 @@ main :: proc() {
 	log.infof("generate 404")
 	generate_404(&b)
 
+	log.infof("generate moved package redirects")
+	generate_moved_redirects(&b)
+
 	log.infof("copy_assets")
 	copy_assets()
 
@@ -223,8 +226,57 @@ generate_404 :: proc(b: ^strings.Builder) {
 	```)
 	write_search(w, .All)
 	io.write_string(w, "</div>\n")
+
+	// NOTE(bill): search.js fills the search with the last part of the missing path
+	io.write_string(w, "<script>var odin_not_found = true;</script>\n")
 	write_html_footer(w, "/pkg-data.js")
 	_ = os.write_entire_file("404.html", b.buf[:])
+}
+
+generate_moved_redirects :: proc(b: ^strings.Builder) {
+	find :: proc(import_path: string) -> (collection: ^Collection, path: string, ok: bool) {
+		name, _, rest := strings.partition(import_path, ":")
+		for c in cfg.collections {
+			if c.name == name {
+				return c, rest, rest != ""
+			}
+		}
+		return
+	}
+
+	for old, new in cfg.moved_packages {
+		old_collection, old_path, old_ok := find(old)
+		new_collection, new_path, new_ok := find(new)
+		if !old_ok || !new_ok || new_path not_in new_collection.pkgs {
+			log.warnf("moved_packages: cannot redirect %q to %q", old, new)
+			continue
+		}
+		if old_path in old_collection.pkgs {
+			continue // it is there again
+		}
+
+		url := fmt.tprintf("%s/%s/", new_collection.base_url, new_path)
+		strings.builder_reset(b)
+		fmt.sbprintf(b, ```
+			<!doctype html>
+			<html lang="en">
+			<head>
+			<meta charset="utf-8">
+			<title>package {0:s} moved to {1:s} - pkg.odin-lang.org</title>
+			<link rel="canonical" href="{2:s}">
+			<meta name="robots" content="noindex">
+			<meta http-equiv="refresh" content="0; url={2:s}">
+			<script>location.replace("{2:s}" + location.hash)</script>
+			</head>
+			<body>
+			<p>Package <code>{0:s}</code> has moved to <a href="{2:s}"><code>{1:s}</code></a>.</p>
+			</body>
+			</html>
+			```,
+			old, new, url)
+		recursive_make_directory(old_path, old_collection.name)
+		_ = os.write_entire_file(fmt.tprintf("%s/%s/index.html", old_collection.name, old_path), b.buf[:])
+	}
 }
 
 
@@ -967,6 +1019,51 @@ entity_c_name :: proc(e: ^doc.Entity, name: string) -> string {
 		return ""
 	}
 	return link_name
+}
+
+parse_integer_literal :: proc(literal: string) -> (value: i128, ok: bool) {
+	s := strings.trim_space(literal)
+	negative := strings.has_prefix(s, "-")
+	if negative {
+		s = s[1:]
+	}
+	if s == "" || !('0' <= s[0] && s[0] <= '9') {
+		return
+	}
+	digits, _ := strings.remove_all(s, "_", context.temp_allocator)
+	value = strconv.parse_i128(digits) or_return
+	return -value if negative else value, true
+}
+
+write_config_flag :: proc(w: io.Writer, init_string: string) {
+	inner := strings.trim_space(init_string)
+	if !strings.has_prefix(inner, "#config(") || !strings.has_suffix(inner, ")") {
+		return
+	}
+	inner = inner[len("#config("):len(inner)-1]
+	name, _, default := strings.partition(inner, ",")
+	name, default = strings.trim_space(name), strings.trim_space(default)
+	if name == "" {
+		return
+	}
+
+	io.write_string(w, `<pre class="doc-code doc-code-usage">-define:`)
+	io.write_string(w, name)
+	io.write_byte(w, '=')
+	// only a literal can be given to -define, so anything else is left for you to fill in
+	switch {
+	case default == "true" || default == "false":
+		fmt.wprintf(w, `<span class="keyword">%s</span>`, default)
+	case strings.has_prefix(default, `"`) && strings.has_suffix(default, `"`) && len(default) >= 2:
+		fmt.wprintf(w, `<span class="string">%s</span>`, escape_html_string(default, context.temp_allocator))
+	case:
+		if _, ok := parse_integer_literal(default); ok {
+			fmt.wprintf(w, `<span class="number">%s</span>`, default)
+		} else {
+			io.write_string(w, "&lt;value&gt;")
+		}
+	}
+	io.write_string(w, "</pre>\n")
 }
 
 pkg_line_doc :: proc(pkg: ^doc.Pkg) -> (line_doc: string, ok: bool) {
@@ -1752,6 +1849,8 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		name_width := calc_name_width(type_entities)
 		field_width := calc_field_width(type_entities)
 
+		value, value_known := i128(-1), true
+
 		for entity_index, i in type_entities {
 			e := &cfg.entities[entity_index]
 			docs, comment := str(e.docs), str(e.comment)
@@ -1759,10 +1858,22 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			write_lead_comment(writer, flags, docs, i)
 
 			name := str(e.name)
+			init_string := str(e.init_string)
+
+			implicit := init_string == "" && value_known
+			if init_string == "" {
+				value += 1
+			} else {
+				value, value_known = parse_integer_literal(init_string)
+			}
+
 			do_indent(writer, flags)
+			if implicit {
+				// shown on hover by the stylesheet
+				fmt.wprintf(w, `<span class="doc-enum-member" data-value="%d">`, value)
+			}
 			io.write_string(w, name)
 
-			init_string := str(e.init_string)
 			if init_string != "" {
 				for _ in 0..<name_width-len(name) {
 					io.write_byte(w, ' ')
@@ -1780,6 +1891,9 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			}
 
 			write_line_comment(writer, flags, field_width-curr_field_width, comment)
+			if implicit {
+				io.write_string(w, "</span>")
+			}
 
 			do_newline(writer, flags)
 		}
@@ -3107,6 +3221,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 				io.write_string(w, init_string)
 			}
 			fmt.wprintln(w, "</pre>")
+			write_config_flag(w, str(e.init_string))
 		case .Variable:
 			fmt.wprint(w, `<pre class="doc-code">`)
 			write_declaration_attributes(w, e)

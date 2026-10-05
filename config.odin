@@ -47,6 +47,8 @@ Config :: struct {
 	import_aliases: map[string]string,
 	// Links Objective-C classes to Apple's documentation
 	objc_docs:      Objc_Docs,
+
+	moved_packages: map[string]string,
 }
 
 Collection :: struct {

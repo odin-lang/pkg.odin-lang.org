@@ -398,7 +398,7 @@ write_objc_call :: proc(w: io.Writer, pkg: ^doc.Pkg, e: ^doc.Entity) {
 	if m == nil {
 		return
 	}
-	io.write_string(w, `<pre class="doc-code doc-objc-call">`)
+	io.write_string(w, `<pre class="doc-code doc-code-usage">`)
 	if e.kind == .Proc_Group {
 		for member, i in array(e.grouped_entities) {
 			if i > 0 {

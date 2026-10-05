@@ -516,6 +516,12 @@ h3 .doc-badge {
 	color: inherit;
 }
 
+/* an enum member without a value of its own shows it while hovered */
+pre.doc-code .doc-enum-member:hover::after {
+	content: " // = " attr(data-value);
+	color: #888;
+}
+
 /* the packages under a package, after its overview */
 .odin-subpkg-table {
 	margin-bottom: 1.5rem;
@@ -580,14 +586,14 @@ h3 .doc-badge {
 	text-align: center;
 }
 
-/* calling a method from Odin, joined to its signature */
-.documentation pre.doc-code:has(+ pre.doc-objc-call) {
+/* how to use a declaration, joined to it: calling a method, or setting a #config value */
+.documentation pre.doc-code:has(+ pre.doc-code-usage) {
 	margin-bottom: 0;
 	border-bottom-style: dashed;
 	border-bottom-left-radius: 0;
 	border-bottom-right-radius: 0;
 }
-.documentation pre.doc-objc-call {
+.documentation pre.doc-code-usage {
 	border-top: 0;
 	border-top-left-radius: 0;
 	border-top-right-radius: 0;
