@@ -446,9 +446,10 @@ h4.pkg-sidebar-title {
 	/* an inset box-shadow leaves hairlines on its other edges at fractional display scales */
 	background: linear-gradient(var(--bs-secondary), var(--bs-secondary)) no-repeat left / 2px 100%;
 }
+/* paint-only: making it bold changes its width, which relays out every entry (~9000 on core:sys/windows) as you scroll */
 #TableOfContents li.active > a {
 	color: var(--bs-secondary);
-	font-weight: 600;
+	background-color: rgba(var(--bs-secondary-rgb), 0.12);
 }
 
 .odin-sidebar-toggle {
@@ -583,6 +584,14 @@ h4.pkg-sidebar-title {
 .odin-main > article {
 	padding-top: 0 !important;
 }
+
+/* off-screen entities skip layout and paint, which keeps huge packages responsive;
+   their content is still in the page, so links, anchors and find-in-page are unaffected */
+.pkg-entity {
+	content-visibility: auto;
+	contain-intrinsic-size: auto 180px;
+}
+
 .odin-article h1 {
 	padding-top: 3rem !important;
 }
