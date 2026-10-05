@@ -28,7 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		btn.setAttribute("aria-label", "Copy code to clipboard");
 		btn.addEventListener("click", async () => {
 			const code = pre.querySelector("code") || pre;
+			btn.hidden = true;
 			const text = code.innerText.replace(/\s+$/, "");
+			btn.hidden = false;
 			try {
 				await navigator.clipboard.writeText(text);
 			} catch {
