@@ -1435,29 +1435,66 @@ h4.pkg-sidebar-title {
 	list-style: none;
 	padding: 0.5rem 1.0rem;
 	display: flex;
-	justify-content: space-between;
+	align-items: center;
+	gap: 0.75rem;
 }
-
-#odin-search-results li:nth-child(odd) {
-	background-color: #f8f8f8;
+#odin-search-results li + li {
+	border-top: 1px solid var(--odin-card-border);
 }
-
+#odin-search-results li:hover {
+	background-color: var(--odin-sidebar-hover);
+}
+/* drawn inside the row, so moving the selection moves nothing */
 #odin-search-results li.selected {
-	border: 2px solid #333;
-	border-radius: 0.25rem;
-	background-color: #d5e5f6;
+	background-color: rgba(56, 130, 210, 0.12);
+	box-shadow: inset 3px 0 0 var(--odin-sidebar-link);
+}
+.dark-mode #odin-search-results li.selected {
+	background-color: rgba(122, 173, 229, 0.16);
 }
 
-
+/* a result's kind comes first, in a badge like the declarations' own, coloured by kind */
 #odin-search-results li .kind {
-	color: #666;
-	font-style: italic;
+	flex: none;
+	width: 4.5rem;
+	padding: 0.2rem 0 0.3rem;
+	border: 1px solid rgba(var(--kind-rgb), 0.55);
+	border-radius: 0.2rem;
+	background-color: rgba(var(--kind-rgb), 0.1);
+	color: var(--kind-color);
+	font-size: 0.75rem;
+	font-weight: 500;
+	line-height: 1.1;
+	letter-spacing: 0.02em;
+	text-align: center;
+	white-space: nowrap;
+	cursor: default;
 }
-/* a result's first sentence takes only the room left between its name and kind */
+#odin-search-results li .kind.deprecated {
+	opacity: 0.55;
+}
+/* a procedure group is a set of procedures: the procedures' colour, in outline */
+#odin-search-results li .kind-g {
+	background-color: transparent;
+}
+.kind-t   { --kind-rgb:  56, 130, 210; --kind-color: #2b6cb0; }
+.kind-p,
+.kind-g   { --kind-rgb: 124,  77, 206; --kind-color: #6741b0; }
+.kind-c   { --kind-rgb: 184,  83,  14; --kind-color: #b8530e; }
+.kind-v   { --kind-rgb:  47, 138,  62; --kind-color: #2a7a37; }
+.kind-b   { --kind-rgb: 181,  51, 138; --kind-color: #a3307c; }
+.kind-pkg { --kind-rgb: 108, 117, 125; --kind-color: var(--odin-sidebar-muted); }
+.dark-mode .kind-t   { --kind-color: #7aade5; }
+.dark-mode .kind-p,
+.dark-mode .kind-g   { --kind-color: #b59cf0; }
+.dark-mode .kind-c   { --kind-color: #f39a5e; }
+.dark-mode .kind-v   { --kind-color: #7fcf8b; }
+.dark-mode .kind-b   { --kind-color: #e88ac6; }
+/* a result's first sentence takes only the room left after its name */
 #odin-search-results li .summary {
 	flex: 1 1 0;
 	min-width: 0;
-	margin: 0 1rem;
+	margin-left: 0.5rem;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -1513,9 +1550,6 @@ h4.pkg-sidebar-title {
 	color: var(--bs-light);
 }
 
-.dark-mode #odin-search-results li:nth-child(odd) {
-	background-color: var(--dark-border)!important;
-}
 
 
 .dark-mode #odin-search {

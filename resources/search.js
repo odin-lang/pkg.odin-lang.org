@@ -1665,8 +1665,8 @@ if (odin_search) {
 
 					if (entity.kind === "pkg") {
 						list_contents.push(`<li id="odin-search-result-${result_idx}" role="option" aria-selected="false" data-path="${entity.path}">`);
-						list_contents.push(`<div><a href="${entity.path}">${highlight_range(entity.full, new Set(result.indices), 0, entity.full.length)}</a></div>`);
-						list_contents.push(`&nbsp;<div class="kind">package</div></li>\n`);
+						list_contents.push(`<div class="kind kind-pkg" title="package">package</div>`);
+						list_contents.push(`<div><a href="${entity.path}">${highlight_range(entity.full, new Set(result.indices), 0, entity.full.length)}</a></div></li>\n`);
 						continue;
 					}
 
@@ -1697,6 +1697,28 @@ if (odin_search) {
 					list_contents.push(`<li id="odin-search-result-${result_idx}" role="option" aria-selected="false" data-path="${full_path}">`);
 					// list_contents.push(`${result.score}&mdash;`);
 
+					const entity_kind_map = {
+						"c": ["const", "constant"],
+						"v": ["var",   "variable"],
+						"t": ["type",  "type"],
+						"p": ["proc",  "procedure"],
+						"g": ["group", "procedure group"],
+						"b": (entity.pkg == "intrinsics") ? ["intrinsic", "intrinsic"] : ["builtin", "built-in"],
+					};
+
+					let [label, entity_kind] = entity_kind_map[entity.kind];
+					let kind_class = `kind-${entity.kind}`;
+					if (is_builtin && entity.kind !== "b") {
+						label = "builtin";
+						kind_class = "kind-b";
+						entity_kind = `built-in ${entity_kind}`;
+					}
+					if (entity.dep) {
+						kind_class += " deprecated";
+						entity_kind = `deprecated ${entity_kind}`;
+					}
+					list_contents.push(`<div class="kind ${kind_class}" title="${entity_kind}">${label}</div>`);
+
 					let use = entity.use ? ` <a class="odin-search-use" href="${entity.use_url}">\u2192 ${escape_html(entity.use)}</a>` : "";
 					if (formatted_pkg !== null && (!IS_PACKAGE_PAGE || entity.pkg != odin_pkg_name)) {
 						let collection = IS_GLOBAL ? `<span class="odin-search-collection">${odin_pkg_data.packages[entity.pkg].collection}:</span>` : "";
@@ -1705,28 +1727,10 @@ if (odin_search) {
 						list_contents.push(`<div><a href="${full_path}">${formatted_name}</a>${use}</div>`);
 					}
 
-					const entity_kind_map = {
-						"c": "constant",
-						"v": "variable",
-						"t": "type",
-						"p": "procedure",
-						"g": "procedure&nbsp;group",
-						"b": (entity.pkg == "intrinsics") ? "intrinsics" : "builtin",
-					};
-
-					let entity_kind = entity_kind_map[entity.kind];
-					if (is_builtin) {
-						entity_kind = '(built-in)&nbsp;' + entity_kind;
-					}
-					if (entity.dep) {
-						entity_kind = 'deprecated&nbsp;' + entity_kind;
-					}
-
 					// its first sentence, on package pages, and only where there is room for it
 					if (entity.d !== undefined) {
 						list_contents.push(`<div class="summary">${escape_html(entity.d)}</div>`);
 					}
-					list_contents.push(`&nbsp;<div class="kind">${entity_kind}</div>`);
 
 					list_contents.push(`</li>\n`);
 				}
