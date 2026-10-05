@@ -233,19 +233,57 @@ h2 .pkg-count {
 		opacity: 1;
 	}
 }
-/* phones: let long names wrap rather than widen the page, and leave out copying imports */
+/* phones: each package is a block with its name above its description, as two columns
+   squeeze the names until they break mid-word; copying imports is left out */
 @media (max-width: 575.98px) {
-	.odin-pkg-table td.pkg-name {
+	.odin-pkg-table, .odin-pkg-table tbody, .odin-pkg-table tr, .odin-pkg-table td {
+		display: block;
+	}
+	.odin-pkg-table tr {
+		position: relative;
+		border-bottom: 1px solid var(--odin-rule);
+	}
+	.odin-pkg-table td, .odin-pkg-table td.pkg-name {
 		width: auto;
+		border-bottom: none;
 		white-space: normal;
 	}
-	/* links and code set their own overflow-wrap, so they need it too */
-	.odin-pkg-table td.pkg-name, .odin-pkg-table td.pkg-name *,
-	.odin-pkg-table td.pkg-desc, .odin-pkg-table td.pkg-desc * {
-		overflow-wrap: anywhere;
+	.odin-pkg-table td.pkg-name {
+		padding-bottom: 0;
+	}
+	.odin-pkg-table td.pkg-desc,
+	.odin-pkg-table tbody.pkg-group > tr.pkg-group-head > td.pkg-desc,
+	.odin-pkg-table tbody.pkg-group + tbody:not(.pkg-group) > tr > td.pkg-desc {
+		padding-top: 0.125rem;
+	}
+	.odin-pkg-table td.pkg-desc:empty {
+		display: none;
+	}
+	.odin-pkg-table td.pkg-name:has(+ td.pkg-desc:empty) {
+		padding-bottom: 0.375rem;
 	}
 	.odin-pkg-table td.pkg-import {
 		display: none;
+	}
+	/* the guide line runs past both the name and the description of a child package */
+	.odin-pkg-table tr.pkg-child td {
+		padding-left: 1.75rem;
+	}
+	.odin-pkg-table tr.pkg-child td.pkg-name::before {
+		content: none;
+	}
+	.odin-pkg-table tr.pkg-child::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 1rem;
+		border-left: 1px solid var(--odin-card-border);
+	}
+	/* a name or code word longer than the screen still must not widen the page;
+	   links and code set their own overflow-wrap, so they need it too */
+	.odin-pkg-table td, .odin-pkg-table td * {
+		overflow-wrap: anywhere;
 	}
 }
 
