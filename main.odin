@@ -1160,7 +1160,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			io.write_string(w, `</a>`)
 		case:
 			the_type := cfg.types[e.type]
-			type_flags := flags - {.Is_Results}
+			type_flags := flags
 			if .Param_Ellipsis in e.flags {
 				type_flags += {.Variadic}
 			}
@@ -1366,7 +1366,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		}
 	case .Generic:
 		name := str(type.name)
-		if name not_in generic_scope {
+		if name not_in generic_scope && .Is_Results not_in flags {
 			io.write_byte(w, '$')
 		}
 		io.write_string(w, name)
