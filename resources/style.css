@@ -516,10 +516,19 @@ h3 .doc-badge {
 	color: inherit;
 }
 
-/* an enum member without a value of its own shows it while hovered */
-pre.doc-code .doc-enum-member:hover::after {
-	content: " // = " attr(data-value);
+/* a constant or enum member shows its value while hovered, in decimal and hexadecimal */
+pre.doc-code .doc-value:hover::after {
+	content: " // " attr(data-value);
 	color: #888;
+}
+
+/* a parameter in a signature and its description in the Inputs list light up together */
+ul.doc-params > li.doc-param-active {
+	border-radius: 0.25rem;
+	background-color: rgba(var(--bs-secondary-rgb), 0.12);
+}
+::highlight(odin-param) {
+	background-color: rgba(var(--bs-secondary-rgb), 0.3);
 }
 
 /* the packages under a package, after its overview */

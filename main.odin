@@ -700,8 +700,14 @@ write_pkg_data_pkg :: proc(w: io.Writer, collection: ^Collection, path: string, 
 				fmt.wprintf(w, `, "objc": %s`, objc_class)
 			}
 		}
-		// and `SDL_CreateWindow` finds `CreateWindow`
-		if c_name := entity_c_name(entity, str(e.name)); c_name != "" {
+		// and `SDL_CreateWindow` finds `CreateWindow`, as does `vkCreateInstance` `CreateInstance`
+		c_name := entity_c_name(entity, str(e.name))
+		if c_name == "" {
+			if _, _, upstream_name := upstream_doc(pkg, entity, str(e.name)); upstream_name != str(e.name) {
+				c_name = upstream_name
+			}
+		}
+		if c_name != "" {
 			fmt.wprintf(w, `, "c": %q`, c_name)
 		}
 		if _, ok := find_entity_attribute(entity, "deprecated"); ok {
@@ -1003,7 +1009,7 @@ target_from_pkg :: proc(pkg: ^doc.Pkg) -> (target: string, ok: bool) {
 }
 
 
-entity_c_name :: proc(e: ^doc.Entity, name: string) -> string {
+entity_link_name :: proc(e: ^doc.Entity) -> string {
 	if .Foreign not_in e.flags || (e.kind != .Procedure && e.kind != .Variable) {
 		return ""
 	}
@@ -1012,6 +1018,11 @@ entity_c_name :: proc(e: ^doc.Entity, name: string) -> string {
 	if n := strings.last_index(link_name, ".."); n >= 0 {
 		link_name = link_name[n+2:]
 	}
+	return link_name
+}
+
+entity_c_name :: proc(e: ^doc.Entity, name: string) -> string {
+	link_name := entity_link_name(e)
 	if link_name == "" || link_name == name || link_name == str(e.name) {
 		return ""
 	}
@@ -1019,6 +1030,56 @@ entity_c_name :: proc(e: ^doc.Entity, name: string) -> string {
 		return ""
 	}
 	return link_name
+}
+
+upstream_doc :: proc(pkg: ^doc.Pkg, e: ^doc.Entity, name: string) -> (title, url, c_name: string) {
+	docs, ok := cfg.upstream_docs[pkg_import_path(pkg)]
+	if !ok {
+		return
+	}
+	switch docs.names {
+	case "vulkan":
+		c_name = vulkan_c_name(e, name)
+	case:
+		c_name = entity_link_name(e)
+	}
+	if c_name == "" {
+		return
+	}
+	for prefix in docs.skip {
+		if strings.has_prefix(c_name, prefix) {
+			return "", "", ""
+		}
+	}
+	url, _ = strings.replace_all(docs.url, "{name}", c_name, context.temp_allocator)
+	return docs.title, url, c_name
+}
+
+vulkan_c_name :: proc(e: ^doc.Entity, name: string) -> string {
+	if name == "" || !('A' <= name[0] && name[0] <= 'Z') || strings.has_prefix(name, "Proc") || strings.to_upper(name, context.temp_allocator) == name {
+		return ""
+	}
+	#partial switch e.kind {
+	case .Variable:
+		if base_type(cfg.types[e.type]).kind == .Proc {
+			return fmt.tprintf("vk%s", name)
+		}
+	case .Type_Name:
+		// the video codecs' own types are named differently in C
+		if strings.has_prefix(name, "Video") {
+			for codec in ([]string{"H264", "H265", "AV1", "VP9"}) {
+				if strings.contains(name, codec) {
+					return ""
+				}
+			}
+		}
+		// `ColorComponentFlag` is `VkColorComponentFlagBits`, and `…FlagKHR` is `…FlagBitsKHR`
+		if n := strings.last_index(name, "Flag"); n >= 0 && strings.to_upper(name[n+4:], context.temp_allocator) == name[n+4:] {
+			return fmt.tprintf("Vk%sFlagBits%s", name[:n], name[n+4:])
+		}
+		return fmt.tprintf("Vk%s", name)
+	}
+	return ""
 }
 
 parse_integer_literal :: proc(literal: string) -> (value: i128, ok: bool) {
@@ -1850,6 +1911,8 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		field_width := calc_field_width(type_entities)
 
 		value, value_known := i128(-1), true
+		members: map[string]i128
+		defer delete(members)
 
 		for entity_index, i in type_entities {
 			e := &cfg.entities[entity_index]
@@ -1860,17 +1923,28 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			name := str(e.name)
 			init_string := str(e.init_string)
 
-			implicit := init_string == "" && value_known
 			if init_string == "" {
 				value += 1
 			} else {
-				value, value_known = parse_integer_literal(init_string)
+				value, value_known = eval_integer(init_string, &cfg.pkgs[cfg.files[e.pos.file].pkg], &members)
+			}
+			hover := ""
+			if value_known {
+				members[name] = value
+				// an enum is an `int` unless it says otherwise
+				v, ok := Int_Value{value = value, bits = 64, signed = true}, true
+				if len(type_types) != 0 {
+					v, ok = int_value_of_type(value, cfg.types[type_types[0]])
+				}
+				if ok && !(init_string != "" && adds_nothing(init_string, v)) {
+					hover = format_int_value(v)
+				}
 			}
 
 			do_indent(writer, flags)
-			if implicit {
+			if hover != "" {
 				// shown on hover by the stylesheet
-				fmt.wprintf(w, `<span class="doc-enum-member" data-value="%d">`, value)
+				fmt.wprintf(w, `<span class="doc-value" data-value="%s">`, hover)
 			}
 			io.write_string(w, name)
 
@@ -1891,7 +1965,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			}
 
 			write_line_comment(writer, flags, field_width-curr_field_width, comment)
-			if implicit {
+			if hover != "" {
 				io.write_string(w, "</span>")
 			}
 
@@ -3111,7 +3185,9 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	if e.pos.file != 0 && e.pos.line > 0 {
 		src_url := fmt.tprintf("%s/%s/%s#L%d", collection.source_url, path, filename, e.pos.line)
 		io.write_string(w, `<div class="doc-source">`)
-		if c_name := entity_c_name(e, name); c_name != "" && is_declared_here {
+		if title, url, upstream_name := upstream_doc(pkg, e, name); url != "" && is_declared_here {
+			fmt.wprintf(w, "<a href=\"{0:s}\" title=\"{1:s}: {2:s}\"><em>{1:s}</em><span class=\"doc-source-loc\"> &middot; {2:s}</span></a>", url, title, upstream_name)
+		} else if c_name := entity_c_name(e, name); c_name != "" && is_declared_here {
 			fmt.wprintf(w, "<span class=\"doc-c-name\" title=\"The C symbol this binds\"><em>C</em><span class=\"doc-source-loc\"> &middot; %s</span></span>", c_name)
 		}
 		if class != nil {
@@ -3179,6 +3255,10 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			fmt.wprint(w, `<pre class="doc-code">`)
 			write_declaration_attributes(w, e)
 			the_type := cfg.types[e.type]
+			hover := constant_hover(e)
+			if hover != "" {
+				fmt.wprintf(w, `<span class="doc-value" data-value="%s">`, hover)
+			}
 
 			init_string := escape_html_string(str(e.init_string))
 			if init_string == "" {
@@ -3219,6 +3299,9 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 				}
 			} else {
 				io.write_string(w, init_string)
+			}
+			if hover != "" {
+				io.write_string(w, "</span>")
 			}
 			fmt.wprintln(w, "</pre>")
 			write_config_flag(w, str(e.init_string))

@@ -49,6 +49,7 @@ Config :: struct {
 	objc_docs:      Objc_Docs,
 
 	moved_packages: map[string]string,
+	upstream_docs:  map[string]Upstream_Docs,
 }
 
 Collection :: struct {
@@ -77,6 +78,15 @@ Objc_Docs :: struct {
 	// The framework of a class outside its package's, "framework/page" when the page is not named
 	// after the class, or "" for none
 	classes:  map[string]string,
+}
+
+Upstream_Docs :: struct {
+	title: string, // e.g. "SDL Wiki"
+	url:   string, // "{name}" is replaced by the C name
+
+	// "vulkan" works the C names out from the Odin names, as Vulkan's procedures are loaded rather than linked
+	names: string,
+	skip:  []string, // C names starting with these have no page
 }
 
 Collection_License :: struct {

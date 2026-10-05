@@ -233,6 +233,139 @@ window.addEventListener("keydown", ev => {
 	}
 });
 
+// Hovering a parameter in a signature highlights its description in the Inputs list, and the other way around
+{
+	const can_highlight = typeof CSS !== "undefined" && CSS.highlights && typeof Highlight !== "undefined";
+	let active = null;
+
+	const clear = () => {
+		if (active) {
+			active.classList.remove("doc-param-active");
+			active = null;
+		}
+		if (can_highlight) {
+			CSS.highlights.delete("odin-param");
+		}
+	};
+	const names_of = li => li.querySelector(".doc-param-name").textContent.split(",").map(name => name.trim());
+	const signature_of = entity => entity.querySelector(":scope > div > pre.doc-code");
+	const entity_of = el => el.closest(".pkg-entity");
+	const rows_of = entity => entity.querySelectorAll("ul.doc-params > li");
+
+	// where a signature declares `name`: followed by `:` or `,`, as in `(a, b: int, c := 0)`
+	const ranges_of = (pre, names) => {
+		const walker = document.createTreeWalker(pre, NodeFilter.SHOW_TEXT);
+		const nodes = [];
+		let text = "";
+		for (let node; (node = walker.nextNode()); ) {
+			if (!node.parentElement.closest(".copy-code")) {
+				nodes.push([node, text.length]);
+				text += node.data;
+			}
+		}
+		const at = offset => {
+			let i = nodes.length - 1;
+			while (i > 0 && nodes[i][1] > offset) {
+				i -= 1;
+			}
+			return [nodes[i][0], offset - nodes[i][1]];
+		};
+		const ranges = [];
+		for (const name of names) {
+			const re = new RegExp(`(^|[^\\w.])(${name.replace(/[^\w]/g, "")})(?=\\s*[:,])`, "g");
+			for (let m; (m = re.exec(text)); ) {
+				const start = m.index + m[1].length;
+				const range = new Range();
+				range.setStart(...at(start));
+				range.setEnd(...at(start + m[2].length));
+				ranges.push(range);
+			}
+		}
+		return ranges;
+	};
+	const light = (li, ranges) => {
+		if (active !== li) {
+			clear();
+			active = li;
+			li.classList.add("doc-param-active");
+		}
+		if (can_highlight && ranges.length > 0) {
+			CSS.highlights.set("odin-param", new Highlight(...ranges));
+		}
+	};
+
+	// the word under the mouse in a signature
+	const word_at = (x, y) => {
+		let node, offset;
+		if (document.caretPositionFromPoint) {
+			const pos = document.caretPositionFromPoint(x, y);
+			if (pos) {
+				[node, offset] = [pos.offsetNode, pos.offset];
+			}
+		} else if (document.caretRangeFromPoint) {
+			const range = document.caretRangeFromPoint(x, y);
+			if (range) {
+				[node, offset] = [range.startContainer, range.startOffset];
+			}
+		}
+		if (!node || node.nodeType !== Node.TEXT_NODE) {
+			return null;
+		}
+		const text = node.data;
+		let start = offset, end = offset;
+		while (start > 0 && /\w/.test(text[start - 1])) {
+			start -= 1;
+		}
+		while (end < text.length && /\w/.test(text[end])) {
+			end += 1;
+		}
+		if (start === end || text[start - 1] === "." || !/^\s*[:,]/.test(text.slice(end))) {
+			return null;
+		}
+		const range = new Range();
+		range.setStart(node, start);
+		range.setEnd(node, end);
+		return [text.slice(start, end), range];
+	};
+
+	document.addEventListener("mouseover", ev => {
+		const li = ev.target.closest && ev.target.closest("ul.doc-params > li");
+		if (!li) {
+			return;
+		}
+		const pre = signature_of(entity_of(li));
+		light(li, pre ? ranges_of(pre, names_of(li)) : []);
+	});
+	document.addEventListener("mouseout", ev => {
+		const li = ev.target.closest && ev.target.closest("ul.doc-params > li");
+		if (li && li === active && !li.contains(ev.relatedTarget)) {
+			clear();
+		}
+	});
+
+	let scheduled = false;
+	document.addEventListener("mousemove", ev => {
+		const pre = ev.target.closest && ev.target.closest(".pkg-entity > div > pre.doc-code:first-child");
+		if (!pre || scheduled) {
+			if (!pre && active && !active.matches(":hover")) {
+				clear();
+			}
+			return;
+		}
+		scheduled = true;
+		requestAnimationFrame(() => {
+			scheduled = false;
+			const found = word_at(ev.clientX, ev.clientY);
+			const li = found && [...rows_of(entity_of(pre))].find(row => names_of(row).includes(found[0]));
+			if (li) {
+				light(li, [found[1]]);
+			} else if (active) {
+				clear();
+			}
+		});
+	});
+}
+
 // ? lists the keyboard shortcuts
 {
 	let sheet = null;
@@ -363,7 +496,28 @@ window.addEventListener("keydown", ev => {
 		popover.style.top  = (window.scrollY + y) + "px";
 	};
 
-	const link_of = ev => ev.target.closest && ev.target.closest("pre.doc-code a.code-typename");
+	// types in signatures, and links to any declaration on this page outside the headings and the Index
+	const link_of = ev => {
+		const link = ev.target.closest && ev.target.closest("a[href]");
+		if (!link || link.closest(".odin-type-preview")) {
+			return null;
+		}
+		if (link.matches("pre.doc-code a.code-typename")) {
+			return link;
+		}
+		if (!link.closest(".documentation") || link.closest("h3, #pkg-index")) {
+			return null;
+		}
+		const url = new URL(link.href, location.href);
+		if (!url.hash || url.pathname.replace(/\/?$/, "/") !== location.pathname.replace(/\/?$/, "/")) {
+			return null;
+		}
+		const h3 = document.getElementById(decodeURIComponent(url.hash.slice(1)));
+		if (!h3 || !h3.matches(".pkg-entity > h3") || link.closest(".pkg-entity") === h3.parentElement) {
+			return null;
+		}
+		return link;
+	};
 	document.addEventListener("mouseover", ev => {
 		const link = link_of(ev);
 		if (link && link !== current && !link.closest(".odin-type-preview")) {
@@ -466,7 +620,7 @@ if (odin_search) {
 	// of results actually displayed.
 	// ---------------------------------------------------------------------
 
-	function is_sep(c)   { return c === '_' || c === ' ' || c === '.'; }
+	function is_sep(c)   { return c === '_' || c === ' ' || c === '.' || c === '/' || c === ':'; }
 	function is_lower(c) { return c >= 'a' && c <= 'z'; }
 	function is_upper(c) { return c >= 'A' && c <= 'Z'; }
 	function is_digit(c) { return c >= '0' && c <= '9'; }
@@ -774,6 +928,7 @@ if (odin_search) {
 	// Kinds a searcher is most likely to be after, used only to break exact
 	// score ties. Lower = higher priority.
 	const KIND_RANK = {
+		"pkg": -1, // package
 		"p": 0, // procedure
 		"g": 0, // procedure group
 		"t": 1, // type
@@ -808,6 +963,13 @@ if (odin_search) {
 		for (let i = 0; i < source_length; i++) {
 			let entity = source[i];
 			let m = match_entity(entity.full, tokens);
+			// a package named in full, `png` or `image/png`, comes first
+			if (m !== null && entity.kind === "pkg") {
+				let query = search_text.trim().toLowerCase();
+				if (query === entity.name.toLowerCase() || query === entity.name.slice(entity.name.lastIndexOf("/") + 1).toLowerCase()) {
+					m.score += 20000;
+				}
+			}
 			let alt = false;
 			if (entity.alt !== undefined) {
 				let a = match_entity(entity.alt, tokens);
@@ -948,6 +1110,15 @@ if (odin_search) {
 						add_entity("", be);
 					}
 					add_entity(pkg_name, e);
+				}
+			}
+			// e.g. `core:image/png`, which leads to the package's page
+			for (let i = 0; i < all_packages.length; i++) {
+				let [pkg_name, pkg] = all_packages[i];
+				let parts = pkg.path.split("/");
+				let path = parts.slice(parts.indexOf(pkg.collection) + 1).join("/");
+				if (path !== "") {
+					entities.push({kind: "pkg", name: path, pkg: pkg_name, full: `${pkg.collection}:${path}`, path: pkg.path});
 				}
 			}
 		}
@@ -1102,6 +1273,13 @@ if (odin_search) {
 				for (let result_idx = 0; result_idx < results_length; result_idx++) {
 					let result = results[result_idx];
 					let entity = result.entity;
+
+					if (entity.kind === "pkg") {
+						list_contents.push(`<li id="odin-search-result-${result_idx}" role="option" aria-selected="false" data-path="${entity.path}">`);
+						list_contents.push(`<div><a href="${entity.path}">${highlight_range(entity.full, new Set(result.indices), 0, entity.full.length)}</a></div>`);
+						list_contents.push(`&nbsp;<div class="kind">package</div></li>\n`);
+						continue;
+					}
 
 					let full = result.alt ? entity.alt : entity.full;
 					let idx_set = new Set(result.indices);
