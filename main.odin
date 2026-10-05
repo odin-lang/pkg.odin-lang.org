@@ -219,9 +219,10 @@ generate_404 :: proc(b: ^strings.Builder) {
 		<div class="p-4">
 			<h1>Page not found</h1>
 			<p>The package or page you were looking for does not exist; it may have been moved or renamed.</p>
-			<p><a href="/">Browse all packages</a> or use the search above.</p>
-		</div>
+			<p><a href="/">Browse all packages</a> or search for it below.</p>
 	```)
+	write_search(w, .All)
+	io.write_string(w, "</div>\n")
 	write_html_footer(w, "/pkg-data.js")
 	_ = os.write_entire_file("404.html", b.buf[:])
 }
@@ -712,6 +713,10 @@ generate_package_from_directory_tree :: proc(b: ^strings.Builder, node: ^Dir_Nod
 		write_pkg_data_pkg(w, collection, path, pkg)
 		pkg_data_end(w)
 		_ = os.write_entire_file(fmt.tprintf("%s/%s/pkg-data.js", dir, path), b.buf[:])
+
+		strings.builder_reset(b)
+		write_type_previews(w)
+		_ = os.write_entire_file(fmt.tprintf("%s/%s/types.json", dir, path), b.buf[:])
 	}
 	for child in node.children {
 		res := generate_package_from_directory_tree(b, child)
@@ -753,6 +758,9 @@ generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collec
 		pkg_data_end(w)
 		_ = os.write_entire_file(fmt.tprintf("%s/%s/pkg-data.js", dir, path), b.buf[:])
 
+		strings.builder_reset(b)
+		write_type_previews(w)
+		_ = os.write_entire_file(fmt.tprintf("%s/%s/types.json", dir, path), b.buf[:])
 
 		path = "intrinsics"
 		strings.builder_reset(b)
@@ -768,6 +776,10 @@ generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collec
 		write_pkg_data_builtins(w, collection, "intrinsics", intrinsics_table)
 		pkg_data_end(w)
 		_ = os.write_entire_file(fmt.tprintf("%s/%s/pkg-data.js", dir, path), b.buf[:])
+
+		strings.builder_reset(b)
+		write_type_previews(w)
+		_ = os.write_entire_file(fmt.tprintf("%s/%s/types.json", dir, path), b.buf[:])
 	}
 }
 
@@ -2014,6 +2026,19 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", doc_ctx: ^Doc_
 	has_example: bool
 	has_operation: bool
 
+	is_list_item :: proc(text: string) -> bool {
+		if strings.has_prefix(text, "- ") || strings.has_prefix(text, "* ") || strings.has_prefix(text, "+ ") {
+			return true
+		}
+		i := 0
+		for i < len(text) && '0' <= text[i] && text[i] <= '9' {
+			i += 1
+		}
+		return i > 0 && i+1 < len(text) && (text[i] == '.' || text[i] == ')') && text[i+1] == ' '
+	}
+	// Tab-indented lines straight after a list item continue it, rather than starting a code block
+	in_list := false
+
 	// Find the minimum common prefix length of tabs, so an entire doc comment can be indented
 	// without it rendering in a <pre> tag.
 	if len(lines_to_process) > 0 {
@@ -2062,7 +2087,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", doc_ctx: ^Doc_
 			case strings.has_prefix(line, "Possible Output:"):
 				next_block_kind = .Possible_Output
 				has_any_output = true
-			case strings.has_prefix(line, "\t"):
+			case strings.has_prefix(line, "\t") && !in_list:
 				next_block_kind = .Code
 			case strings.has_prefix(line, "// Defined internally by the compiler"):
 				next_block_kind = .Example
@@ -2113,6 +2138,12 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", doc_ctx: ^Doc_
 			append(&blocks, Block{curr_block_kind, lines_to_process[start:i]})
 			curr_block_kind = next_block_kind
 			start = i
+		}
+
+		if next_block_kind == .Paragraph {
+			in_list = is_list_item(text) || (in_list && strings.has_prefix(line, "\t") && text != "")
+		} else {
+			in_list = false
 		}
 	}
 
@@ -3132,10 +3163,13 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	the_docs := str(e.docs)
 
 	if name != entity_name || entity_pkg != pkg {
-		fmt.wprint(w, `<pre class="doc-code">`)
-		fmt.wprintf(w, "%s :: ", name)
-		write_entity_reference(w, pkg, e, name)
-		fmt.wprintln(w, "</pre>")
+		reference := strings.builder_make(context.temp_allocator)
+		fmt.sbprintf(&reference, "%s :: ", name)
+		write_entity_reference(strings.to_writer(&reference), pkg, e, name)
+		fmt.wprintf(w, `<pre class="doc-code">%s</pre>`+"\n", strings.to_string(reference))
+		if e.kind == .Type_Name {
+			add_type_preview(name, strings.to_string(reference))
+		}
 
 		// If `e` doesn't have a comment and it's a reference to a built-in or intrinsic with a comment, copy its comment.
 		// Saves work and prevents those comments going out of sync.
@@ -3219,30 +3253,33 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			fmt.wprintln(w, "</pre>")
 
 		case .Type_Name:
-			fmt.wprint(w, `<pre class="doc-code">`)
-			defer fmt.wprintln(w, "</pre>")
-			write_declaration_attributes(w, e)
-			fmt.wprintf(w, "%s :: ", name)
+			definition := strings.builder_make(context.temp_allocator)
+			dw := strings.to_writer(&definition)
+			writer.w = dw
+			write_declaration_attributes(dw, e)
+			fmt.wprintf(dw, "%s :: ", name)
 			the_type := cfg.types[e.type]
 			type_to_print := the_type
 			if base_type(type_to_print).kind == .Basic && str(pkg.name) == "c" {
-				io.write_string(w, str(e.init_string))
-				break
-			}
-
-			if the_type.kind == .Named && .Type_Alias not_in e.flags {
-				if e.pos == cfg.entities[array(the_type.entities)[0]].pos {
-					bt := base_type(the_type)
-					#partial switch bt.kind {
-					case .Struct, .Union, .Proc, .Enum:
-						// Okay
-					case:
-						io.write_string(w, `<span class="keyword-type">distinct</span> `)
+				io.write_string(dw, str(e.init_string))
+			} else {
+				if the_type.kind == .Named && .Type_Alias not_in e.flags {
+					if e.pos == cfg.entities[array(the_type.entities)[0]].pos {
+						bt := base_type(the_type)
+						#partial switch bt.kind {
+						case .Struct, .Union, .Proc, .Enum:
+							// Okay
+						case:
+							io.write_string(dw, `<span class="keyword-type">distinct</span> `)
+						}
+						type_to_print = bt
 					}
-					type_to_print = bt
 				}
+				write_type(writer, type_to_print, {.Allow_Indent})
 			}
-			write_type(writer, type_to_print, {.Allow_Indent})
+			writer.w = w
+			write_definition(w, strings.to_string(definition))
+			add_type_preview(name, strings.to_string(definition))
 		case .Builtin:
 			fmt.wprint(w, `<pre class="doc-code">`)
 			fmt.wprintf(w, "%s :: ", name)
@@ -3345,6 +3382,81 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		write_related_procedure_groups(w, pkg, e, &proc_names_seen)
 		delete(proc_names_seen)
 	}
+}
+
+// Definitions longer than this show only their first lines until expanded
+LONG_DEFINITION_LINES :: 50
+
+write_definition :: proc(w: io.Writer, html: string) {
+	lines := strings.count(html, "\n") + 1
+	if lines <= LONG_DEFINITION_LINES {
+		fmt.wprintf(w, `<pre class="doc-code">%s</pre>`+"\n", html)
+		return
+	}
+	fmt.wprintf(w, `<pre class="doc-code doc-code-long">%s</pre>`+"\n", html)
+	fmt.wprintf(w, `<button type="button" class="doc-code-expand" aria-expanded="false">Show all %d lines</button>`+"\n", lines)
+}
+
+// A package's type definitions, written to the "types.json" beside its page,
+// from which hovering a type in a signature shows its definition
+Type_Preview :: struct {
+	name, html: string,
+}
+type_previews: [dynamic]Type_Preview
+
+add_type_preview :: proc(name, html: string) {
+	append(&type_previews, Type_Preview{strings.clone(name), strings.clone(html)})
+}
+
+write_type_previews :: proc(w: io.Writer) {
+	write_json_string :: proc(w: io.Writer, s: string) {
+		io.write_byte(w, '"')
+		for r in s {
+			switch r {
+			case '"':  io.write_string(w, `\"`)
+			case '\\': io.write_string(w, `\\`)
+			case '\n': io.write_string(w, `\n`)
+			case '\t': io.write_string(w, `\t`)
+			case '\r': io.write_string(w, `\r`)
+			case:
+				if r < 0x20 {
+					fmt.wprintf(w, `\u%04x`, r)
+				} else {
+					io.write_rune(w, r)
+				}
+			}
+		}
+		io.write_byte(w, '"')
+	}
+
+	io.write_string(w, "{\n")
+	for p, i in type_previews {
+		if i > 0 {
+			io.write_string(w, ",\n")
+		}
+		write_json_string(w, p.name)
+		io.write_string(w, ": ")
+		write_json_string(w, p.html)
+	}
+	io.write_string(w, "\n}\n")
+
+	for p in type_previews {
+		delete(p.name)
+		delete(p.html)
+	}
+	clear(&type_previews)
+}
+
+// Constants with nothing but a value are written as compact rows, as some packages have thousands
+is_compact_constant :: proc(pkg: ^doc.Pkg, entry: doc.Scope_Entry) -> bool {
+	e := &cfg.entities[entry.entity]
+	if e.kind != .Constant || str(entry.name) != str(e.name) || &cfg.pkgs[cfg.files[e.pos.file].pkg] != pkg {
+		return false
+	}
+	if strings.trim_space(str(e.docs)) != "" || strings.trim_space(str(e.comment)) != "" {
+		return false
+	}
+	return len(array(e.attributes)) == 0 && !strings.contains_rune(str(e.init_string), '\n')
 }
 
 INDEX_MIN_GROUP_SIZE :: 3
@@ -3570,7 +3682,11 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			io.write_string(w, "<p class=\"pkg-empty-section\">This section is empty.</p>\n")
 		} else {
 			for e in entries {
-				fmt.wprintln(w, `<div class="pkg-entity">`)
+				if is_compact_constant(pkg, e) {
+					fmt.wprintln(w, `<div class="pkg-entity pkg-compact">`)
+				} else {
+					fmt.wprintln(w, `<div class="pkg-entity">`)
+				}
 				write_entry(w, pkg, e)
 				fmt.wprintln(w, `</div>`)
 			}

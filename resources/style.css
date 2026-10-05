@@ -330,7 +330,7 @@ pre.doc-code .string {
 	color: #093;
 }
 pre.doc-code .number {
-	color: #79c0ff!important;
+	color: #0b7285!important;
 }
 
 
@@ -469,6 +469,9 @@ details.code-example > summary {
 	color: #0a5;
 }
 .documentation .hljs-number {
+	color: #0b7285;
+}
+.dark-mode .documentation .hljs-number {
 	color: #79c0ff;
 }
 .documentation .hljs-comment {
@@ -522,6 +525,168 @@ code.odin-import .string {
 	margin-left: 0.25rem;
 	opacity: 1;
 	vertical-align: 1px;
+}
+
+/* the declaration you jumped to stands out for a moment */
+@keyframes odin-target-flash {
+	from { background-color: rgba(var(--bs-secondary-rgb), 0.25); }
+	to   { background-color: transparent; }
+}
+@keyframes odin-target-border {
+	from { border-color: var(--bs-secondary); }
+}
+.documentation h3:target .doc-id-link {
+	border-radius: 0.25rem;
+	animation: odin-target-flash 2.5s ease-out;
+}
+.documentation h3:target + div > pre.doc-code {
+	animation: odin-target-border 2.5s ease-out;
+}
+.documentation .pkg-compact:has(> h3:target) pre.doc-code {
+	animation: odin-target-flash 2.5s ease-out;
+}
+
+/* moved by search.js into whichever declaration heading is hovered or focused */
+.copy-link {
+	margin-left: 0.5rem;
+	padding: 0.125rem 0.375rem;
+	border: 1px solid var(--odin-card-border);
+	border-radius: 0.25rem;
+	background: none;
+	color: var(--odin-sidebar-muted);
+	font-size: 0.75rem;
+	font-weight: 400;
+	line-height: 1;
+	vertical-align: middle;
+	opacity: 0;
+	cursor: pointer;
+}
+.pkg-entity > h3:hover .copy-link, .copy-link:focus {
+	opacity: 1;
+}
+.copy-link:hover {
+	border-color: var(--odin-sidebar-link);
+	color: inherit;
+}
+
+/* the section being read, under the navbar; search.js adds it and keeps it up to date */
+.odin-section-label {
+	position: sticky;
+	top: 59px;
+	z-index: 10;
+	order: -2147483647;
+	height: 0;
+}
+.odin-section-label > span {
+	display: block;
+	padding: 0.375rem 0;
+	border-bottom: 1px solid var(--odin-rule);
+	background-color: #fff;
+	color: var(--odin-sidebar-muted);
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	visibility: hidden;
+}
+.dark-mode .odin-section-label > span {
+	background-color: var(--dark-background);
+}
+.odin-section-label.visible > span {
+	visibility: visible;
+}
+
+/* very long definitions show about 30 lines until expanded */
+pre.doc-code-long:not(.expanded) {
+	max-height: 45em;
+	overflow: hidden;
+	mask-image: linear-gradient(to bottom, #000 calc(100% - 4em), transparent);
+}
+.doc-code-expand {
+	margin: -0.5rem 0 1rem;
+	padding: 0.125rem 0.5rem;
+	border: 1px solid var(--odin-card-border);
+	border-radius: 0.25rem;
+	background: none;
+	color: var(--odin-sidebar-muted);
+	font-size: 0.8125rem;
+	cursor: pointer;
+}
+.doc-code-expand:hover {
+	border-color: var(--odin-sidebar-link);
+	color: inherit;
+}
+
+/* constants with nothing but a value: one compact row each, which run together into a single block */
+.documentation .pkg-entity.pkg-compact {
+	position: relative;
+	padding-bottom: 0;
+	border-bottom: none;
+	contain-intrinsic-size: auto 2rem;
+}
+.documentation :not(.pkg-compact) + .pkg-compact {
+	margin-top: 0.75rem;
+}
+.documentation .pkg-compact:not(:has(+ .pkg-compact)) {
+	margin-bottom: 0.75rem;
+}
+.documentation .pkg-compact > h3 {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 1;
+	margin: 0;
+	padding: 0.3rem 0.625rem;
+	font-size: 0.875rem;
+}
+/* the name is already in the code; the heading stays for its anchor */
+.documentation .pkg-compact > h3 > span:first-child {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+.documentation .pkg-compact .doc-source {
+	float: none;
+	opacity: 0;
+}
+.documentation .pkg-compact:hover .doc-source, .documentation .pkg-compact .doc-source:focus-within {
+	opacity: 1;
+}
+.documentation .pkg-compact pre.doc-code {
+	margin: 0;
+	padding: 0.25rem 0.625rem;
+	border-top-width: 0;
+	border-radius: 0;
+}
+.documentation :not(.pkg-compact) + .pkg-compact pre.doc-code {
+	border-top-width: 1px;
+	border-top-left-radius: 0.25rem;
+	border-top-right-radius: 0.25rem;
+}
+.documentation .pkg-compact:not(:has(+ .pkg-compact)) pre.doc-code {
+	border-bottom-left-radius: 0.25rem;
+	border-bottom-right-radius: 0.25rem;
+}
+
+/* hovering a type in a signature shows its definition */
+.odin-type-preview {
+	position: absolute;
+	z-index: 1080;
+	max-width: min(44rem, calc(100vw - 1rem));
+	border-radius: 0.25rem;
+	box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.25);
+	pointer-events: none;
+}
+.odin-type-preview pre.doc-code {
+	max-height: 22rem;
+	margin: 0;
+	overflow: hidden;
+}
+.odin-type-preview pre.doc-code.cut-off {
+	mask-image: linear-gradient(to bottom, #000 calc(100% - 3em), transparent);
 }
 
 @media only screen and (max-width: 991px) {
@@ -1126,7 +1291,7 @@ h4.pkg-sidebar-title {
 	color: #ff5252;
 }
 .dark-mode pre.doc-code .directive {
-	color: #05a;
+	color: #58a6ff;
 }
 .dark-mode pre.doc-code .string {
 	color: #0a5;

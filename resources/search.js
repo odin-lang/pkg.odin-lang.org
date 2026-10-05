@@ -18,7 +18,7 @@ for (const os of osList) {
 document.addEventListener("DOMContentLoaded", () => {
 	const scope = document.querySelector(".documentation") || document;
 	scope.querySelectorAll("pre").forEach((pre) => {
-		if (pre.querySelector(".copy-code")) {
+		if (pre.querySelector(".copy-code") || pre.closest(".pkg-compact")) {
 			return;
 		}
 		const btn = document.createElement("button");
@@ -52,12 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 });
 
-document.addEventListener("click", async (ev) => {
-	const btn = ev.target.closest(".copy-import");
-	if (!btn) {
-		return;
-	}
-	const text = btn.dataset.copy;
+async function copy_text(text) {
 	try {
 		await navigator.clipboard.writeText(text);
 	} catch {
@@ -73,11 +68,230 @@ document.addEventListener("click", async (ev) => {
 		}
 		area.remove();
 	}
+}
+
+function flash_copied(btn) {
 	const label = btn.dataset.label || btn.textContent;
 	btn.dataset.label = label;
 	btn.textContent = "copied";
 	setTimeout(() => (btn.textContent = label), 1200);
+}
+
+document.addEventListener("click", async (ev) => {
+	const btn = ev.target.closest(".copy-import");
+	if (!btn) {
+		return;
+	}
+	await copy_text(btn.dataset.copy);
+	flash_copied(btn);
 });
+
+{
+	const btn = document.createElement("button");
+	btn.type        = "button";
+	btn.className   = "copy-link";
+	btn.textContent = "copy link";
+	btn.title       = "Copy a link to this declaration";
+
+	const place = (h3) => {
+		if (h3 && !h3.closest(".pkg-compact") && btn.parentElement !== h3.firstElementChild) {
+			h3.firstElementChild.appendChild(btn);
+		}
+	};
+	document.addEventListener("mouseover", ev => place(ev.target.closest && ev.target.closest(".pkg-entity > h3")));
+	document.addEventListener("focusin", ev => {
+		if (ev.target !== btn) {
+			place(ev.target.closest(".pkg-entity > h3"));
+		}
+	});
+	btn.addEventListener("click", async () => {
+		await copy_text(location.origin + location.pathname + "#" + btn.closest("h3").id);
+		flash_copied(btn);
+	});
+}
+
+document.addEventListener("click", ev => {
+	const btn = ev.target.closest(".doc-code-expand");
+	if (!btn) {
+		return;
+	}
+	const label = btn.dataset.label || btn.textContent;
+	btn.dataset.label = label;
+	const expanded = btn.previousElementSibling.classList.toggle("expanded");
+	btn.setAttribute("aria-expanded", expanded);
+	btn.textContent = expanded ? "Show fewer lines" : label;
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+	const list = document.querySelector("#pkg-sidebar .odin-sidebar-content");
+	const active = list && list.querySelector("a.active");
+	if (!active || list.scrollHeight <= list.clientHeight) {
+		return;
+	}
+	const top = active.getBoundingClientRect().top - list.getBoundingClientRect().top;
+	if (top < 0 || top > list.clientHeight - active.offsetHeight) {
+		list.scrollTop += top - list.clientHeight/2;
+	}
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+	const section = document.querySelector("section.documentation");
+	const headers = section ? [...section.querySelectorAll(":scope > h2.pkg-header")] : [];
+	if (headers.length === 0) {
+		return;
+	}
+	const label = document.createElement("div");
+	label.className = "odin-section-label";
+	label.setAttribute("aria-hidden", "true");
+	label.appendChild(document.createElement("span"));
+	section.prepend(label);
+
+	let scheduled = false;
+	const update = () => {
+		scheduled = false;
+		const top = label.getBoundingClientRect().top + label.firstElementChild.offsetHeight;
+		let current = null;
+		for (const h of headers) {
+			if (h.offsetParent !== null && h.getBoundingClientRect().bottom < top) {
+				current = h;
+			}
+		}
+		label.classList.toggle("visible", current !== null);
+		if (current !== null) {
+			label.firstElementChild.textContent = current.textContent;
+		}
+	};
+	window.addEventListener("scroll", () => {
+		if (!scheduled) {
+			scheduled = true;
+			requestAnimationFrame(update);
+		}
+	}, {passive: true});
+	update();
+});
+
+// j and k move to the next and previous declaration
+window.addEventListener("keydown", ev => {
+	if (ev.ctrlKey || ev.metaKey || ev.altKey || (ev.key !== "j" && ev.key !== "k")) {
+		return;
+	}
+	if (ev.target.closest && ev.target.closest("input, textarea, select, [contenteditable]")) {
+		return;
+	}
+	const entities = [...document.querySelectorAll(".documentation .pkg-entity")]
+		.filter(e => e.offsetParent !== null)
+		.map(e => e.getBoundingClientRect().top)
+		.sort((a, b) => a - b);
+	if (entities.length === 0) {
+		return;
+	}
+	ev.preventDefault();
+	// where a declaration lands: below the navbar and the section label
+	const line = 100;
+	const target = ev.key === "j" ? entities.find(top => top > line + 2) : entities.findLast(top => top < line - 2);
+	if (target !== undefined) {
+		window.scrollBy(0, target - line);
+	}
+});
+
+{
+	const types_of = new Map();
+	let popover = null;
+	let current = null;
+	let timer   = 0;
+
+	const definition_of = async (link) => {
+		const url = new URL(link.getAttribute("href"), location.href);
+		const id = decodeURIComponent(url.hash.slice(1));
+		const dir = url.pathname.replace(/\/?$/, "/");
+		if (dir === location.pathname.replace(/\/?$/, "/")) {
+			const h3 = document.getElementById(id);
+			const pre = h3 && h3.parentElement.querySelector(":scope > div > pre.doc-code");
+			if (!pre) {
+				return null;
+			}
+			const definition = pre.cloneNode(true);
+			definition.querySelectorAll(".copy-code").forEach(btn => btn.remove());
+			return definition.innerHTML;
+		}
+		const json = dir + "types.json";
+		if (!types_of.has(json)) {
+			types_of.set(json, fetch(json).then(r => r.ok ? r.json() : null).catch(() => null));
+		}
+		const types = await types_of.get(json);
+		return (types && types[id]) || null;
+	};
+
+	const hide = () => {
+		clearTimeout(timer);
+		current = null;
+		if (popover) {
+			popover.hidden = true;
+		}
+	};
+
+	const show = async (link) => {
+		const html = await definition_of(link);
+		if (!html || current !== link) {
+			return;
+		}
+		if (!popover) {
+			popover = document.createElement("div");
+			popover.className = "odin-type-preview";
+			popover.setAttribute("role", "tooltip");
+			popover.appendChild(document.createElement("pre")).className = "doc-code";
+			document.body.appendChild(popover);
+		}
+		const pre = popover.firstElementChild;
+		pre.innerHTML = html;
+		popover.hidden = false;
+		pre.classList.toggle("cut-off", pre.scrollHeight > pre.clientHeight);
+
+		const r = link.getBoundingClientRect();
+		const width = document.documentElement.clientWidth;
+		let x = Math.min(r.left, width - popover.offsetWidth - 8);
+		let y = r.bottom + 6;
+		if (y + popover.offsetHeight > window.innerHeight && r.top - 6 - popover.offsetHeight > 59) {
+			y = r.top - 6 - popover.offsetHeight;
+		}
+		popover.style.left = (window.scrollX + Math.max(8, x)) + "px";
+		popover.style.top  = (window.scrollY + y) + "px";
+	};
+
+	const link_of = ev => ev.target.closest && ev.target.closest("pre.doc-code a.code-typename");
+	document.addEventListener("mouseover", ev => {
+		const link = link_of(ev);
+		if (link && link !== current && !link.closest(".odin-type-preview")) {
+			current = link;
+			clearTimeout(timer);
+			timer = setTimeout(() => show(link), 250);
+		}
+	});
+	document.addEventListener("mouseout", ev => {
+		const link = link_of(ev);
+		if (link && !link.contains(ev.relatedTarget)) {
+			hide();
+		}
+	});
+	document.addEventListener("focusin", ev => {
+		const link = link_of(ev);
+		if (link) {
+			current = link;
+			show(link);
+		}
+	});
+	document.addEventListener("focusout", ev => {
+		if (link_of(ev)) {
+			hide();
+		}
+	});
+	document.addEventListener("keydown", ev => {
+		if (ev.key === "Escape") {
+			hide();
+		}
+	});
+	window.addEventListener("scroll", hide, {passive: true});
+}
 
 var odin_pkg_name;
 
@@ -842,6 +1056,9 @@ if (odin_search) {
 			case "Esc":
 				curr_search_index = -1;
 				draw_search_cursor();
+				if (odin_search.value === "") {
+					odin_search.blur(); // so j and k move through the page
+				}
 				break;
 			case "Up":
 				move_search_cursor(-1);
