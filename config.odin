@@ -16,7 +16,6 @@ Config :: struct {
 	url_prefix:   string,
 	domain:       string, // Used to determine if a link is external, to add `target="_blank"`.
 
-
 	// -- Start non configurable --
 	header:   ^doc.Header,
 	files:    []doc.File,
@@ -41,6 +40,13 @@ Config :: struct {
 	// For resolving `[[pkg.name]]` references in docs.
 	pkg_link_names:     map[^doc.Pkg]map[string]bool,
 	pkgs_by_name:       map[string][dynamic]^doc.Pkg,
+
+
+	// The names packages are conventionally imported as, keyed by import path,
+	// e.g. "core:sys/darwin/Foundation": "NS" writes `NS.String` rather than `objc_Foundation.String`
+	import_aliases: map[string]string,
+	// Links Objective-C classes to Apple's documentation
+	objc_docs:      Objc_Docs,
 }
 
 Collection :: struct {
@@ -59,6 +65,16 @@ Collection :: struct {
 	pkgs:            map[string]^doc.Pkg,
 	pkg_to_path:     map[^doc.Pkg]string,
 	pkg_entries_map: map[^doc.Pkg]Pkg_Entries,
+}
+
+Objc_Docs :: struct {
+	// "{framework}" and "{class}" (lowercased) are replaced
+	url:      string,
+	// The framework of each package's classes, keyed by import path
+	packages: map[string]string,
+	// The framework of a class outside its package's, "framework/page" when the page is not named
+	// after the class, or "" for none
+	classes:  map[string]string,
 }
 
 Collection_License :: struct {

@@ -298,38 +298,38 @@ pre.doc-code {
 	border-radius: 0.25rem;
 	padding: 0.625rem;
 }
-pre.doc-code a {
+pre.doc-code a, ul.doc-objc-methods a {
 	font-family: Consolas,Liberation Mono,Menlo,monospace!important;
 	text-decoration: none;
 	color: #2179d8;
 	font-weight: 800;
 }
 
-pre.doc-code a.code-procedure {
+pre.doc-code a.code-procedure, ul.doc-objc-methods a.code-procedure {
 	color: #047919;
 }
 
-pre.doc-code span.comment {
+pre.doc-code span.comment, ul.doc-objc-methods span.comment {
 	color: #888;
 }
-pre.doc-code span.doc-builtin {
+pre.doc-code span.doc-builtin, ul.doc-objc-methods span.doc-builtin {
 	color: #ff5252;
 	font-weight: 600;
 }
 
-pre.doc-code .keyword-type {
+pre.doc-code .keyword-type, ul.doc-objc-methods .keyword-type {
 	color: #ff5252;
 }
-pre.doc-code .keyword {
+pre.doc-code .keyword, ul.doc-objc-methods .keyword {
 	color: #ff5252;
 }
-pre.doc-code .directive {
+pre.doc-code .directive, ul.doc-objc-methods .directive {
 	color: #05a;
 }
-pre.doc-code .string {
+pre.doc-code .string, ul.doc-objc-methods .string {
 	color: #093;
 }
-pre.doc-code .number {
+pre.doc-code .number, ul.doc-objc-methods .number {
 	color: #0b7285!important;
 }
 
@@ -362,6 +362,10 @@ section.documentation {
 
 section.documentation h3 {
 	font-size: calc(1.1rem + .2vw);
+}
+/* a Source link too long to fit beside the name drops below it rather than narrowing the code */
+section.documentation .pkg-entity > h3 {
+	display: flow-root;
 }
 
 section.documentation h1,
@@ -410,6 +414,122 @@ details.doc-index li {
 	font-weight: 400;
 	letter-spacing: 0;
 	color: var(--odin-sidebar-muted);
+}
+
+/* Objective-C */
+
+/* a class's methods, hidden until opened by its toggle or by reading the class */
+#TableOfContents li.toc-class {
+	position: relative;
+}
+#TableOfContents li.toc-class:not(.open) > ul {
+	display: none;
+}
+.toc-class-toggle {
+	position: absolute;
+	top: 0;
+	left: -0.875rem;
+	width: 0.875rem;
+	height: 1.375em;
+	padding: 0;
+	border: none;
+	border-radius: 0.25rem;
+	background: none;
+	color: var(--odin-sidebar-muted);
+	font-size: inherit;
+	line-height: 1;
+}
+.toc-class-toggle::before {
+	content: "";
+	display: inline-block;
+	border-left: 0.3rem solid currentColor;
+	border-top: 0.25rem solid transparent;
+	border-bottom: 0.25rem solid transparent;
+	vertical-align: middle;
+	transition: transform 0.12s ease;
+}
+.toc-class.open > .toc-class-toggle::before {
+	transform: rotate(90deg);
+}
+.toc-class-toggle:hover {
+	color: var(--odin-sidebar-link);
+	background-color: var(--odin-sidebar-hover);
+}
+#TableOfContents .toc-badge {
+	margin-left: 0.375rem;
+	font-size: 0.6875rem;
+	color: var(--odin-sidebar-muted);
+	white-space: nowrap;
+}
+
+.doc-badge {
+	display: inline-block;
+	margin-left: 0.125rem;
+	padding: 0.125rem 0.4375rem;
+	border: 1px solid var(--odin-card-border);
+	border-radius: 1rem;
+	color: var(--odin-sidebar-muted);
+	font-family: var(--bs-body-font-family);
+	font-size: 0.6875rem;
+	font-weight: 500;
+	line-height: 1.1;
+	letter-spacing: 0.02em;
+	white-space: nowrap;
+	text-indent: 0;
+	vertical-align: 0.15em;
+	cursor: default;
+}
+h3 .doc-badge {
+	font-size: 0.75rem;
+	vertical-align: middle;
+}
+.doc-badge.doc-badge-owned {
+	border-color: rgba(var(--bs-secondary-rgb), 0.55);
+	background-color: rgba(var(--bs-secondary-rgb), 0.1);
+	color: #b8530e;
+}
+.dark-mode .doc-badge.doc-badge-owned {
+	color: #f39a5e;
+}
+
+.doc-id-sep {
+	color: var(--odin-sidebar-muted);
+	font-weight: 400;
+}
+.doc-source a + a {
+	margin-left: 0.75rem;
+}
+
+/* calling a method from Odin, joined to its signature */
+.documentation pre.doc-code:has(+ pre.doc-objc-call) {
+	margin-bottom: 0;
+	border-bottom-style: dashed;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+.documentation pre.doc-objc-call {
+	border-top: 0;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.documentation ul.doc-objc-methods {
+	padding-left: 0;
+	list-style: none;
+	font-family: Consolas, Liberation Mono, Menlo, monospace;
+	font-size: 0.875em;
+}
+.documentation ul.doc-objc-methods > li {
+	padding-left: 1.5rem;
+	text-indent: -1.5rem;
+}
+.documentation ul.doc-objc-methods > li + li {
+	margin-top: 0.125rem;
+}
+
+.odin-search-alt {
+	color: var(--odin-sidebar-muted);
+	font-weight: 400;
 }
 
 
@@ -535,11 +655,11 @@ code.odin-import .string {
 @keyframes odin-target-border {
 	from { border-color: var(--bs-secondary); }
 }
-.documentation h3:target .doc-id-link {
+.documentation h3:target > span > .doc-id-link:first-child, .documentation h3 .doc-id-link:target {
 	border-radius: 0.25rem;
 	animation: odin-target-flash 2.5s ease-out;
 }
-.documentation h3:target + div > pre.doc-code {
+.documentation h3:target + div > pre.doc-code, .documentation h3:has(.doc-id-link:target) + div > pre.doc-code {
 	animation: odin-target-border 2.5s ease-out;
 }
 .documentation .pkg-compact:has(> h3:target) pre.doc-code {
@@ -1268,34 +1388,35 @@ h4.pkg-sidebar-title {
 	background-color: var(--dark-code);
 	color: var(--bs-light);
 	border-color: var(--dark-border);
+	color-scheme: dark; /* a dark scrollbar for long lines */
 }
-.dark-mode pre.doc-code a {
+.dark-mode pre.doc-code a, .dark-mode ul.doc-objc-methods a {
 	color: #2179d8;
 }
 
-.dark-mode pre.doc-code a.code-procedure {
+.dark-mode pre.doc-code a.code-procedure, .dark-mode ul.doc-objc-methods a.code-procedure {
 	color: #42b557;
 }
 
-.dark-mode pre.doc-code span.comment {
+.dark-mode pre.doc-code span.comment, .dark-mode ul.doc-objc-methods span.comment {
 	color: #888;
 }
-.dark-mode pre.doc-code span.doc-builtin {
+.dark-mode pre.doc-code span.doc-builtin, .dark-mode ul.doc-objc-methods span.doc-builtin {
 	color: #ff5252;
 }
 
-.dark-mode pre.doc-code .keyword-type {
+.dark-mode pre.doc-code .keyword-type, .dark-mode ul.doc-objc-methods .keyword-type {
 	color: #ff5252;
 }
-.dark-mode pre.doc-code .keyword {
+.dark-mode pre.doc-code .keyword, .dark-mode ul.doc-objc-methods .keyword {
 	color: #ff5252;
 }
-.dark-mode pre.doc-code .directive {
+.dark-mode pre.doc-code .directive, .dark-mode ul.doc-objc-methods .directive {
 	color: #58a6ff;
 }
-.dark-mode pre.doc-code .string {
+.dark-mode pre.doc-code .string, .dark-mode ul.doc-objc-methods .string {
 	color: #0a5;
 }
-.dark-mode pre.doc-code .number {
+.dark-mode pre.doc-code .number, .dark-mode ul.doc-objc-methods .number {
 	color: #79c0ff!important;
 }

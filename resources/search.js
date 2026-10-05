@@ -170,6 +170,45 @@ document.addEventListener("DOMContentLoaded", () => {
 	update();
 });
 
+// A class in the Contents panel shows its methods when toggled, and while you are reading it
+document.addEventListener("DOMContentLoaded", () => {
+	const toc = document.getElementById("TableOfContents");
+	if (!toc || !toc.querySelector("li.toc-class")) {
+		return;
+	}
+	const set_open = (li, open) => {
+		li.classList.toggle("open", open);
+		li.firstElementChild.setAttribute("aria-expanded", open);
+	};
+
+	let opened_by_reading = null;
+	toc.addEventListener("click", ev => {
+		const button = ev.target.closest(".toc-class-toggle");
+		if (button) {
+			const li = button.parentElement;
+			set_open(li, !li.classList.contains("open"));
+			if (li === opened_by_reading) {
+				opened_by_reading = null; // it stays as the reader leaves it
+			}
+		}
+	});
+
+	// odin-lang.org's script.js marks the entry of what you are reading as active
+	new MutationObserver(() => {
+		const active = toc.querySelector("li.active");
+		const li = active && active.closest("li.toc-class");
+		if (opened_by_reading && opened_by_reading !== li) {
+			set_open(opened_by_reading, false);
+			opened_by_reading = null;
+		}
+		if (li && !li.classList.contains("open")) {
+			set_open(li, true);
+			opened_by_reading = li;
+			active.querySelector(":scope > a").scrollIntoView({block: "nearest"});
+		}
+	}).observe(toc, {attributes: true, attributeFilter: ["class"], subtree: true});
+});
+
 // j and k move to the next and previous declaration
 window.addEventListener("keydown", ev => {
 	if (ev.ctrlKey || ev.metaKey || ev.altKey || (ev.key !== "j" && ev.key !== "k")) {
@@ -206,6 +245,10 @@ window.addEventListener("keydown", ev => {
 		const dir = url.pathname.replace(/\/?$/, "/");
 		if (dir === location.pathname.replace(/\/?$/, "/")) {
 			const h3 = document.getElementById(id);
+			const preview = h3 && h3.parentElement.querySelector(":scope > div > template.doc-type-preview");
+			if (preview) {
+				return preview.innerHTML;
+			}
 			const pre = h3 && h3.parentElement.querySelector(":scope > div > pre.doc-code");
 			if (!pre) {
 				return null;
@@ -657,8 +700,9 @@ if (odin_search) {
 		return {score: total, indices: all_indices};
 	}
 
+	// "Buffer->length", as an Objective-C method is called, is "Buffer length" too
 	function tokenize(text) {
-		return text.split(/[\s.]+/).filter(function(t) { return t.length > 0; });
+		return text.replace(/->/g, ".").split(/[\s.]+/).filter(function(t) { return t.length > 0; });
 	}
 
 	// Kinds a searcher is most likely to be after, used only to break exact
@@ -698,11 +742,20 @@ if (odin_search) {
 		for (let i = 0; i < source_length; i++) {
 			let entity = source[i];
 			let m = match_entity(entity.full, tokens);
+			let alt = false;
+			if (entity.alt !== undefined) {
+				let a = match_entity(entity.alt, tokens);
+				if (a !== null && (m === null || a.score > m.score)) {
+					m = a;
+					alt = true;
+				}
+			}
 			if (m !== null) {
 				results.push({
 					"entity":  entity,
 					"score":   m.score,
 					"indices": m.indices,
+					"alt":     alt,
 				});
 			}
 		}
@@ -767,9 +820,35 @@ if (odin_search) {
 			entities.push(e);
 		}
 
+		// An Objective-C class is also found by its own name, "MTLBuffer" for Buffer,
+		// and so are its methods, "MTLBuffer.length" for Buffer_length
+		function add_objc_names(pkg_name, pkg_entities) {
+			let classes = null;
+			for (let j = 0; j < pkg_entities.length; j++) {
+				let e = pkg_entities[j];
+				if (e.objc !== undefined) {
+					classes = classes || new Map();
+					classes.set(e.name, e.objc);
+					e.alt = pkg_name+'.'+e.objc;
+				}
+			}
+			if (classes === null) {
+				return;
+			}
+			for (let j = 0; j < pkg_entities.length; j++) {
+				let e = pkg_entities[j];
+				let sep = e.name.indexOf('_');
+				let objc = (e.kind == "p" || e.kind == "g") && sep > 0 ? classes.get(e.name.substring(0, sep)) : undefined;
+				if (objc !== undefined) {
+					e.alt = pkg_name+'.'+objc+'.'+e.name.substring(sep + 1);
+				}
+			}
+		}
+
 		if (IS_PACKAGE_PAGE) {
 			let pkg_name = odin_pkg_name;
 			let entities = odin_pkg_data.packages[pkg_name].entities;
+			add_objc_names(pkg_name, entities);
 			for (let j = 0; j < entities.length; j++) {
 				add_entity(pkg_name, entities[j]);
 			}
@@ -788,6 +867,7 @@ if (odin_search) {
 			for (let i = 0; i < all_packages.length; i++) {
 				let [pkg_name, pkg] = all_packages[i];
 				let entities = pkg.entities;
+				add_objc_names(pkg_name, entities);
 				for (let j = 0; j < entities.length; j++) {
 					let e = entities[j];
 					if (e.builtin) {
@@ -930,8 +1010,13 @@ if (odin_search) {
 
 				for (let i = 0; i < pkg_entities.length; i++) {
 					let pkg_entity = pkg_entities[i];
-					let name = pkg_entity.getElementsByTagName('h3')[0].id;
-					let result = result_map[name];
+					let h3 = pkg_entity.getElementsByTagName('h3')[0];
+					let result = result_map[h3.id];
+					// a property's getter and setter share an entry
+					let also = h3.dataset.also && result_map[h3.dataset.also];
+					if (also && (!result || also.score > result.score)) {
+						result = also;
+					}
 					if (result) {
 						pkg_entity.style.display = null;
 						pkg_entity.style.order = -result.score;
@@ -950,7 +1035,7 @@ if (odin_search) {
 					let result = results[result_idx];
 					let entity = result.entity;
 
-					let full = entity.full;
+					let full = result.alt ? entity.alt : entity.full;
 					let idx_set = new Set(result.indices);
 					let dot = full.indexOf('.');
 
@@ -963,6 +1048,9 @@ if (odin_search) {
 					} else {
 						is_builtin = entity.pkg == "builtin" || entity.pkg == "intrinsics" || entity.pkg == "runtime";
 						formatted_name = highlight_range(full, idx_set, 0, full.length);
+					}
+					if (result.alt) {
+						formatted_name = `${entity.name}&nbsp;<span class="odin-search-alt">${formatted_name}</span>`;
 					}
 
 					let pkg_path = odin_pkg_data.packages[entity.pkg].path;

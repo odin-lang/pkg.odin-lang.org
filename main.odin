@@ -641,6 +641,13 @@ write_pkg_data_pkg :: proc(w: io.Writer, collection: ^Collection, path: string, 
 		fmt.wprintf(w, `"kind": "%s", `,  kind_str)
 		fmt.wprintf(w, `"name": %q`, str(e.name))
 
+		// so `MTLBuffer` finds `Buffer`
+		if entity := &cfg.entities[e.entity]; entity.kind == .Type_Name {
+			if objc_class, ok := find_entity_attribute(entity, "objc_class"); ok {
+				fmt.wprintf(w, `, "objc": %s`, objc_class)
+			}
+		}
+
 
 		if str(pkg.name) == "runtime" {
 			for attr in array(cfg.entities[e.entity].attributes) {
@@ -1116,10 +1123,31 @@ import_declaration :: proc(collection: ^Collection, path: string, pkg: ^doc.Pkg)
 	}
 
 	import_path = fmt.tprintf("%s:%s", collection.name, path)
-	if !is_identifier(slashpath.base(path)) && pkg != nil {
+	if alias, ok := cfg.import_aliases[import_path]; ok {
+		name = alias
+	} else if !is_identifier(slashpath.base(path)) && pkg != nil {
 		name = str(pkg.name)
 	}
 	return
+}
+
+// e.g. "core:sys/darwin/Foundation"
+pkg_import_path :: proc(pkg: ^doc.Pkg) -> string {
+	collection := cfg.pkg_to_collection[pkg]
+	if collection == nil {
+		return ""
+	}
+	return fmt.tprintf("%s:%s", collection.name, collection.pkg_to_path[pkg])
+}
+
+pkg_import_name :: proc(pkg: ^doc.Pkg) -> string {
+	@(static) names: map[^doc.Pkg]string
+	if name, ok := names[pkg]; ok {
+		return name
+	}
+	name := cfg.import_aliases[pkg_import_path(pkg)] or_else str(pkg.name)
+	names[pkg] = name
+	return name
 }
 
 write_copy_import_button :: proc(w: io.Writer, collection: ^Collection, path: string, pkg: ^doc.Pkg, label: string) {
@@ -1495,6 +1523,10 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		collection: Collection
 		if c := cfg.pkg_to_collection[&cfg.pkgs[tn_pkg]]; c != nil {
 			collection = c^
+		} else if str(cfg.pkgs[tn_pkg].name) == "" {
+			// e.g. `objc_class`, from base:intrinsics, which has no package of its own here
+			fmt.wprintf(w, `intrinsics.<a class="code-typename" href="/base/intrinsics#{0:s}">{0:s}</a>`, name)
+			break
 		}
 
 		if tn_pkg != pkg {
@@ -1504,7 +1536,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 				name_prefix = name_prefix[:n]
 			}
 			if !strings.contains_rune(name_prefix, '.') {
-				fmt.wprintf(w, `%s.`, str(cfg.pkgs[tn_pkg].name))
+				fmt.wprintf(w, `%s.`, pkg_import_name(&cfg.pkgs[tn_pkg]))
 			}
 		}
 		if .Private in e.flags {
@@ -1746,10 +1778,6 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		if .Allow_Multiple_Lines in flags && .Is_Results not_in flags {
 			span_multiple_lines = len(type_entities) >= 6
 			if .Force_Multiple_Lines in flags && len(type_entities) >= 2 {
-				span_multiple_lines = true
-			}
-
-			if strings.has_prefix(str(cfg.pkgs[pkg].name), "objc_") {
 				span_multiple_lines = true
 			}
 		}
@@ -2433,6 +2461,19 @@ pkg_entries_gather :: proc(pkg: ^doc.Pkg) -> (entries: Pkg_Entries) {
 		}
 	}
 
+	// a property's setter is written in its getter's entry
+	objc := objc_info_get(pkg)
+	if len(objc.method_of) > 0 {
+		kept := 0
+		for entry in entries.procs {
+			if m := objc.method_of[&cfg.entities[entry.entity]]; m == nil || m.getter == nil || str(entry.name) != str(m.entity.name) {
+				entries.procs[kept] = entry
+				kept += 1
+			}
+		}
+		resize(&entries.procs, kept)
+	}
+
 	slice.sort_by_key(entries.procs[:],         entity_key)
 	slice.sort_by_key(entries.proc_groups[:],   entity_key)
 	slice.sort_by_key(entries.types[:],         entity_key)
@@ -2496,223 +2537,6 @@ write_search :: proc(w: io.Writer, kind: enum { Package, Collection, All}, hint 
 	}
 	fmt.wprintln(w, `</div>`)
 	fmt.wprintln(w, `<ul id="odin-search-results"></ul>`)
-}
-
-write_objc_method_info :: proc(writer: ^Type_Writer, pkg: ^doc.Pkg, e: ^doc.Entity) -> bool {
-	w := writer.w
-
-	objc_name := find_entity_attribute(e, "objc_name") or_return
-	objc_type := find_entity_attribute(e, "objc_type") or_return
-	objc_name, _ = strconv.unquote_string(objc_name)   or_return
-
-	objc_is_class_method, _ := find_entity_attribute(e, "objc_is_class_method")
-	is_class_method := objc_is_class_method == "true"
-
-	parent: ^doc.Entity
-	for entry in array(pkg.entries) {
-		entity := &cfg.entities[entry.entity]
-		if entity.kind == .Type_Name && str(entity.name) == objc_type {
-			parent = entity
-			break
-		}
-	}
-	if parent == nil {
-		return false
-	}
-
-	fmt.wprintln(w, `<div>`)
-
-	fmt.wprintln(w, `<h4>Objective-C Method Information</h4>`)
-	fmt.wprintln(w, `<ul>`)
-	fmt.wprintf(w, `<li>Class: <a href="#%s">%s</a></li>`+"\n", objc_type, objc_type)
-	fmt.wprintf(w, `<li>Name: <strong>%s</strong></li>`+"\n", objc_name)
-	if is_class_method {
-		fmt.wprintf(w, `<li>Kind: <em>Class Method</em></li>`+"\n")
-	}
-	fmt.wprintln(w, `</ul>`)
-	fmt.wprintln(w, `</div>`)
-
-	fmt.wprintln(w, "<h4>Syntax Usage</h4>")
-	fmt.wprintln(w, "<pre>")
-
-	write_syntax_usage :: proc(w: io.Writer, e: ^doc.Entity, objc_name: string, parent: ^doc.Entity, is_class_method: bool) {
-		assert(e.kind == .Procedure)
-		pt := base_type(cfg.types[e.type])
-		pentities: []doc.Entity_Index
-		rentities: []doc.Entity_Index
-
-		params := &cfg.types[array(pt.types)[0]]
-		if params.kind == .Parameters {
-			pentities = array(params.entities)
-			if !is_class_method {
-				pentities = pentities[1:]
-			}
-		}
-
-		results := &cfg.types[array(pt.types)[1]]
-		if results.kind == .Parameters {
-			rentities = array(results.entities)
-		}
-
-		if len(rentities) != 0 {
-			for e_idx, i in rentities {
-				if i != 0 {
-					fmt.wprintf(w, ", ")
-				}
-				entity := &cfg.entities[e_idx]
-				name := str(entity.name)
-				if name != "" {
-					fmt.wprintf(w, "%s", name)
-				} else {
-					if len(rentities) == 1 {
-						fmt.wprintf(w, "res")
-					} else {
-						fmt.wprintf(w, "res%d", i)
-					}
-				}
-			}
-			fmt.wprintf(w, " := ")
-		}
-
-		if is_class_method {
-			fmt.wprintf(w, `<a href="#{0:s}">{0:s}</a>.`, str(parent.name))
-		} else {
-			fmt.wprintf(w, "self->")
-		}
-
-		fmt.wprintf(w, `<a href="#{0:s}">{1:s}</a>(`, str(e.name), objc_name)
-		if len(pentities) > 1 {
-			fmt.wprintf(w, "\n")
-			for entity_idx in pentities {
-				entity := &cfg.entities[entity_idx]
-				fmt.wprintf(w, "\t%s,\n", str(entity.name))
-			}
-		} else {
-			for e_idx, i in pentities {
-				if i != 0 {
-					fmt.wprintf(w, ", ")
-				}
-				entity := &cfg.entities[e_idx]
-				fmt.wprintf(w, "%s", str(entity.name))
-			}
-		}
-		fmt.wprintf(w, ")\n")
-	}
-
-	#partial switch e.kind {
-	case .Procedure:
-		write_syntax_usage(w, e, objc_name, parent, is_class_method)
-	case .Proc_Group:
-		for e_idx in array(e.grouped_entities) {
-			entity := &cfg.entities[e_idx]
-			write_syntax_usage(w, entity, objc_name, parent, is_class_method)
-		}
-	}
-
-	fmt.wprintln(w, "</pre>")
-	return true
-}
-
-write_objc_methods :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity, method_names_seen: ^map[string]bool, is_inherited := false) {
-	methods: [dynamic]^doc.Entity
-
-	parent_name := str(parent.name)
-
-	for entry in array(pkg.entries) {
-		e := &cfg.entities[entry.entity]
-		if e.kind == .Proc_Group {
-			if type_name, ok := find_entity_attribute(e, "objc_type"); ok && parent_name == type_name {
-				append(&methods, e)
-			}
-		}
-	}
-	for entry in array(pkg.entries) {
-		e := &cfg.entities[entry.entity]
-		if e.kind == .Procedure {
-			if type_name, ok := find_entity_attribute(e, "objc_type"); ok && parent_name == type_name {
-				append(&methods, e)
-			}
-		}
-	}
-
-	seen_item := false
-
-
-	slice.sort_by_key(methods[:], proc(e: ^doc.Entity) -> string {
-		return str(e.name)
-	})
-
-	loop: for e in methods {
-		method_name := find_entity_attribute(e, "objc_name") or_else panic("unable to find objc_name")
-		method_name, _ = strconv.unquote_string(method_name) or_else panic("unable to unquote method name")
-
-		if method_names_seen[method_name] {
-			continue loop
-		}
-
-		collection := cfg.pkg_to_collection[pkg]
-
-		method_names_seen[method_name] = true
-		if !seen_item {
-			if is_inherited {
-				fmt.wprintf(
-					w,
-					`<h5>Methods Inherited From <a href="%s/%s/#%s">%s</a></h5>`,
-					collection.base_url,
-					collection.pkg_to_path[pkg],
-					parent_name,
-					parent_name,
-				)
-				fmt.wprintln(w)
-			} else {
-				fmt.wprintln(w, "<h4>Bound Objective-C Methods</h4>")
-			}
-			fmt.wprintln(w, "<ul>")
-			seen_item = true
-		}
-
-		fmt.wprintf(w, "<li>")
-		fmt.wprintf(
-			w,
-			`<a href="%s/%s/#%s">%s</a>`,
-			collection.base_url,
-			collection.pkg_to_path[pkg],
-			str(e.name),
-			method_name,
-		)
-
-		if v, ok := find_entity_attribute(e, "objc_is_class_method"); ok && v == "true" {
-			fmt.wprintf(w, `&nbsp;<em>(class method)</em>`)
-		}
-		if e.kind == .Proc_Group {
-			fmt.wprintf(w, `&nbsp;<em>(overloaded method)</em>`)
-		}
-
-		fmt.wprintf(w, "</li>")
-
-		fmt.wprintln(w)
-	}
-
-	if seen_item {
-		fmt.wprintln(w, "</ul>")
-	}
-
-	delete(methods)
-
-	recursive_inheritance_check: {
-		parent_type := base_type(cfg.types[parent.type])
-		(parent_type.kind == .Struct) or_break recursive_inheritance_check
-		fields := array(parent_type.entities)
-		for field_idx := len(fields)-1; field_idx >= 0; field_idx -= 1 {
-			field := &cfg.entities[fields[field_idx]]
-			if .Param_Using in field.flags {
-				field_type := cfg.types[field.type]
-				field_type_entity := &cfg.entities[array(field_type.entities)[0]]
-				field_pkg := &cfg.pkgs[cfg.files[field.pos.file].pkg]
-				write_objc_methods(w, field_pkg, field_type_entity, method_names_seen, true)
-			}
-		}
-	}
 }
 
 the_sort_proc :: proc(a, b: ^doc.Entity) -> (cmp: slice.Ordering) {
@@ -3104,7 +2928,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			}
 			return
 		} else if pkg != this_pkg {
-			fmt.wprintf(w, "%s.", str(this_pkg.name))
+			fmt.wprintf(w, "%s.", pkg_import_name(this_pkg))
 		}
 		collection := cfg.pkg_to_collection[this_pkg]
 
@@ -3116,6 +2940,38 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		fmt.wprintf(w, `<a class="{3:s}" href="{2:s}/{0:s}/#{1:s}">`, collection.pkg_to_path[this_pkg], name, collection.base_url, class)
 		io.write_string(w, name)
 		io.write_string(w, `</a>`)
+	}
+
+	// `name :: proc(…) {…}`, with the name padded to line up with the declarations written with it
+	write_proc_declaration :: proc(writer: ^Type_Writer, name: string, e: ^doc.Entity, name_width: int) {
+		w := writer.w
+		write_declaration_attributes(w, e)
+		io.write_string(w, name)
+		for _ in len(name)..<name_width {
+			io.write_byte(w, ' ')
+		}
+		io.write_string(w, " :: ")
+
+		// NOTE(bill): A signature too long for one line gets a parameter per line as those with many parameters do
+		clear(&writer.generic_scope)
+		signature := strings.builder_make(context.temp_allocator)
+		writer.w = strings.to_writer(&signature)
+		write_type(writer, cfg.types[e.type], {.Allow_Multiple_Lines})
+		one_line := strings.to_string(signature)
+		if !strings.contains_rune(one_line, '\n') && name_width+len(" :: ")+visible_width(one_line)+len(" {…}") > MAX_SIGNATURE_WIDTH {
+			strings.builder_reset(&signature)
+			clear(&writer.generic_scope) // filled by the first attempt, and it decides how `$T` is written
+			write_type(writer, cfg.types[e.type], {.Allow_Multiple_Lines, .Force_Multiple_Lines})
+		}
+		writer.w = w
+		io.write_string(w, strings.to_string(signature))
+
+		write_where_clauses(w, array(e.where_clauses))
+		if .Foreign in e.flags {
+			io.write_string(w, " ---")
+		} else {
+			io.write_string(w, " {…}")
+		}
 	}
 
 	name := str(entry.name)
@@ -3132,13 +2988,46 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	defer delete(writer.generic_scope)
 	collection := cfg.pkg_to_collection[pkg]
 
+	// Objective-C: a property's setter is written in its getter's entry, and a class links to Apple's documentation
+	is_declared_here := name == entity_name && entity_pkg == pkg
+	setter: ^Objc_Method
+	class:  ^Objc_Class
+	if is_declared_here {
+		if m := objc_method_of(pkg, e); m != nil {
+			setter = m.setter
+		}
+		if e.kind == .Type_Name {
+			class = objc_class_of(pkg, e)
+		}
+	}
+
 	path := collection.pkg_to_path[pkg]
 	filename := slashpath.base(str(cfg.files[e.pos.file].name))
-	fmt.wprintf(w, "<h3 id=\"{0:s}\"><span><a class=\"doc-id-link\" href=\"#{0:s}\">{0:s}", name)
-	fmt.wprintf(w, "<span class=\"a-hidden\">&nbsp;¶</span></a></span>")
+	if setter != nil {
+		fmt.wprintf(w, "<h3 id=\"{0:s}\" data-also=\"{1:s}\">", name, str(setter.entity.name))
+	} else {
+		fmt.wprintf(w, "<h3 id=\"{0:s}\">", name)
+	}
+	if setter != nil {
+		// the hidden ¶ only after the second name, as it would leave a gap before the separator
+		fmt.wprintf(w, "<span><a class=\"doc-id-link\" href=\"#{0:s}\">{0:s}</a>", name)
+		fmt.wprintf(w, " <span class=\"doc-id-sep\">&middot;</span> <a class=\"doc-id-link\" id=\"{0:s}\" href=\"#{0:s}\">{0:s}<span class=\"a-hidden\">&nbsp;¶</span></a>", str(setter.entity.name))
+	} else {
+		fmt.wprintf(w, "<span><a class=\"doc-id-link\" href=\"#{0:s}\">{0:s}<span class=\"a-hidden\">&nbsp;¶</span></a>", name)
+	}
+	if is_declared_here {
+		write_objc_badges(w, objc_badges(pkg, e))
+	}
+	fmt.wprintf(w, "</span>")
 	if e.pos.file != 0 && e.pos.line > 0 {
 		src_url := fmt.tprintf("%s/%s/%s#L%d", collection.source_url, path, filename, e.pos.line)
-		fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"{0:s}\"><em>Source</em><span class=\"doc-source-loc\"> &middot; {1:s}:{2:d}</span></a></div>", src_url, filename, e.pos.line)
+		io.write_string(w, `<div class="doc-source">`)
+		if class != nil {
+			if url := objc_doc_url(pkg, class.name); url != "" {
+				fmt.wprintf(w, "<a href=\"{0:s}\" title=\"Apple's documentation for {1:s}\"><em>Apple Docs</em><span class=\"doc-source-loc\"> &middot; {1:s}</span></a>", url, class.name)
+			}
+		}
+		fmt.wprintf(w, "<a href=\"{0:s}\"><em>Source</em><span class=\"doc-source-loc\"> &middot; {1:s}:{2:d}</span></a></div>", src_url, filename, e.pos.line)
 	}
 	fmt.wprintf(w, "</h3>\n")
 	fmt.wprintln(w, `<div>`)
@@ -3279,7 +3168,15 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			}
 			writer.w = w
 			write_definition(w, strings.to_string(definition))
-			add_type_preview(name, strings.to_string(definition))
+			if class != nil {
+				// hovering a class shows what it is rather than `struct { using _: Parent }`
+				preview := strings.builder_make(context.temp_allocator)
+				write_objc_class_preview(strings.to_writer(&preview), pkg, class, strings.to_string(definition))
+				add_type_preview(name, strings.to_string(preview))
+				fmt.wprintf(w, `<template class="doc-type-preview">%s</template>`+"\n", strings.to_string(preview))
+			} else {
+				add_type_preview(name, strings.to_string(definition))
+			}
 		case .Builtin:
 			fmt.wprint(w, `<pre class="doc-code">`)
 			fmt.wprintf(w, "%s :: ", name)
@@ -3287,31 +3184,17 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			fmt.wprint(w, `</pre>`)
 		case .Procedure:
 			fmt.wprint(w, `<pre class="doc-code">`)
-			write_declaration_attributes(w, e)
-			fmt.wprintf(w, "%s :: ", name)
-
-			// NOTE(bill): A signature too long for one line gets a parameter per line as those with many parameters do
-			signature := strings.builder_make(context.temp_allocator)
-			writer.w = strings.to_writer(&signature)
-			write_type(writer, cfg.types[e.type], {.Allow_Multiple_Lines})
-			one_line := strings.to_string(signature)
-			if !strings.contains_rune(one_line, '\n') && len(name)+len(" :: ")+visible_width(one_line)+len(" {…}") > MAX_SIGNATURE_WIDTH {
-				strings.builder_reset(&signature)
-				clear(&writer.generic_scope) // filled by the first attempt, and it decides how `$T` is written
-				write_type(writer, cfg.types[e.type], {.Allow_Multiple_Lines, .Force_Multiple_Lines})
-			}
-			writer.w = w
-			io.write_string(w, strings.to_string(signature))
-
-			write_where_clauses(w, array(e.where_clauses))
-			if .Foreign in e.flags {
-				fmt.wprint(w, " ---")
+			if setter != nil {
+				name_width := max(len(name), len(str(setter.entity.name)))
+				write_proc_declaration(writer, name, e, name_width)
+				io.write_byte(w, '\n')
+				write_proc_declaration(writer, str(setter.entity.name), setter.entity, name_width)
 			} else {
-				fmt.wprint(w, " {…}")
+				write_proc_declaration(writer, name, e, len(name))
 			}
 			fmt.wprintln(w, "</pre>")
 
-			write_objc_method_info(writer, pkg, e)
+			write_objc_call(w, pkg, e)
 
 		case .Proc_Group:
 			fmt.wprint(w, `<pre class="doc-code">`)
@@ -3327,7 +3210,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			fmt.wprintln(w, "}")
 			fmt.wprintln(w, "</pre>")
 
-			write_objc_method_info(writer, pkg, e)
+			write_objc_call(w, pkg, e)
 		}
 	}
 	fmt.wprintln(w, `</div>`)
@@ -3350,27 +3233,29 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		write_docs(w, the_docs, doc_ctx = &doc_ctx)
 		fmt.wprintln(w, `</details>`)
 	}
-
-
-	if raw_cls_name, ok := find_entity_attribute(e, "objc_class"); ok {
-		cls_name, allocated, cls_name_ok := strconv.unquote_string(raw_cls_name)
-		defer if allocated { delete(cls_name) }
-		if !cls_name_ok {
-			doc_warnf("%s: could not unquote objc_class %s", doc_ctx.owner, raw_cls_name)
-			cls_name = raw_cls_name
+	if setter != nil {
+		setter_name := str(setter.entity.name)
+		setter_docs := str(setter.entity.docs)
+		if strings.trim_space(setter_docs) == "" {
+			setter_docs = str(setter.entity.comment)
 		}
+		if setter_docs != "" {
+			setter_ctx := Doc_Context{pkg = pkg, owner = fmt.tprintf("%s.%s", str(pkg.name), setter_name), heading_prefix = setter_name}
+			fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
+			fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
+			write_docs(w, setter_docs, doc_ctx = &setter_ctx)
+			fmt.wprintln(w, `</details>`)
+		}
+	}
 
+
+	if _, ok := find_entity_attribute(e, "objc_class"); ok {
 		fmt.wprintln(w, `<div>`)
 		defer fmt.wprintln(w, `</div>`)
 
 		method_names_seen: map[string]bool
-		write_objc_methods(w, pkg, e, &method_names_seen)
+		write_objc_methods(w, pkg, entity_pkg, e, &method_names_seen)
 		delete(method_names_seen)
-
-		switch str(pkg.name) {
-		case "objc_Metal":
-			fmt.wprintf(w, `<em>Apple's Metal Documentation: <a href="https://developer.apple.com/documentation/metal/%s?language=objc">%s</a></em>`, cls_name, cls_name)
-		}
 	} else if e.kind == .Type_Name {
 		proc_names_seen: map[string]bool
 		write_related_procedures(w, pkg, e, &proc_names_seen)
@@ -3380,6 +3265,9 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	if e.kind == .Procedure {
 		proc_names_seen: map[string]bool
 		write_related_procedure_groups(w, pkg, e, &proc_names_seen)
+		if setter != nil {
+			write_related_procedure_groups(w, pkg, setter.entity, &proc_names_seen)
+		}
 		delete(proc_names_seen)
 	}
 }
@@ -3567,10 +3455,10 @@ write_toc_item :: proc(w: io.Writer, entry: doc.Scope_Entry) {
 }
 
 
-write_toc_section :: proc(w: io.Writer, entries: []doc.Scope_Entry) {
+write_toc_section :: proc(w: io.Writer, entries: []doc.Scope_Entry, item: proc(w: io.Writer, entry: doc.Scope_Entry) = write_index_item) {
 	if len(entries) < INDEX_MIN_ENTRIES_TO_GROUP {
 		for e in entries {
-			write_index_item(w, e)
+			item(w, e)
 		}
 		return
 	}
@@ -3578,7 +3466,7 @@ write_toc_section :: proc(w: io.Writer, entries: []doc.Scope_Entry) {
 		name_of     = scope_entry_name,
 		group_start = toc_group_start,
 		group_end   = toc_group_end,
-		item        = write_index_item,
+		item        = item,
 	)
 }
 
@@ -3760,11 +3648,42 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			}
 			fmt.wprintln(w, `</li>`)
 		}
+		// Objective-C methods are listed under their classes rather than with the other procedures
+		toc_pkg = pkg
+		class_names: map[string]bool
+		defer delete(class_names)
+		for entry in pkg_entries.types {
+			e := &cfg.entities[entry.entity]
+			if class := objc_class_of(pkg, e); class != nil && len(class.methods) > 0 && str(entry.name) == str(e.name) {
+				class_names[str(e.name)] = true
+			}
+		}
+
 		for eo in pkg_entries.ordering do if len(eo.entries) != 0 {
+			entries := eo.entries
+			item := write_index_item
+			if len(class_names) > 0 {
+				if eo.name == "Types" {
+					item = write_toc_type_item
+				} else {
+					listed := make([dynamic]doc.Scope_Entry, context.temp_allocator)
+					for entry in entries {
+						if !objc_listed_under_class(pkg, entry, class_names) {
+							append(&listed, entry)
+						}
+					}
+					entries = listed[:]
+				}
+			}
+
 			slug := slugify(eo.name, context.temp_allocator)
-			fmt.wprintf(w, `<li><a href="#pkg-{0:s}">{1:s}<span class="toc-count">{2:d}</span></a>`, slug, eo.name, len(eo.entries))
+			fmt.wprintf(w, `<li><a href="#pkg-{0:s}">{1:s}`, slug, eo.name)
+			if len(entries) > 0 {
+				fmt.wprintf(w, `<span class="toc-count">%d</span>`, len(entries))
+			}
+			io.write_string(w, `</a>`)
 			fmt.wprintln(w, `<ul>`)
-			write_toc_section(w, eo.entries)
+			write_toc_section(w, entries, item)
 			fmt.wprintln(w, "</ul>")
 			fmt.wprintln(w, "</li>")
 		}
