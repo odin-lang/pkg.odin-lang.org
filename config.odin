@@ -87,6 +87,9 @@ Upstream_Docs :: struct {
 	// "vulkan" works the C names out from the Odin names, as Vulkan's procedures are loaded rather than linked
 	names: string,
 	skip:  []string, // C names starting with these have no page
+
+	// types have no C names in the doc data, so theirs are this and the Odin name, e.g. "SDL_" for `SDL_Window`
+	type_prefix: string,
 }
 
 Collection_License :: struct {

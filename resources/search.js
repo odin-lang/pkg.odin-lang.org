@@ -423,6 +423,7 @@ window.addEventListener("keydown", ev => {
 			];
 			if (document.querySelector(".documentation .pkg-entity")) {
 				rows.push([["j", "k"], "Next or previous declaration"]);
+				rows.push([[":Type"], "Search for what mentions a type"]);
 			}
 			if (document.querySelector(".odin-sidebar-toggle")) {
 				rows.push([["[", "]"], "Collapse or expand the sidebars"]);
@@ -528,7 +529,7 @@ window.addEventListener("keydown", ev => {
 		}
 	};
 
-	const show = async (key, rect_of, html_of) => {
+	const show = async (key, rect_of, html_of, beside = false) => {
 		const html = await html_of();
 		if (!html || current !== key) {
 			return;
@@ -542,21 +543,40 @@ window.addEventListener("keydown", ev => {
 		}
 		const pre = popover.firstElementChild;
 		pre.innerHTML = html;
+		pre.style.maxHeight = "";
 		popover.hidden = false;
+
+		// always wholly in view: below the navbar, within the window, and no taller than it
+		const navbar = document.querySelector(".odin-menu");
+		const top = Math.max(0, navbar ? navbar.getBoundingClientRect().bottom : 0) + 8;
+		const bottom = window.innerHeight - 8;
+		if (popover.offsetHeight > bottom - top) {
+			pre.style.maxHeight = (bottom - top) + "px";
+		}
 		pre.classList.toggle("cut-off", pre.scrollHeight > pre.clientHeight);
 
 		const r = rect_of();
 		const width = document.documentElement.clientWidth;
-		let x = Math.min(r.left, width - popover.offsetWidth - 8);
-		let y = r.bottom + 6;
-		if (y + popover.offsetHeight > window.innerHeight && r.top - 6 - popover.offsetHeight > 59) {
-			y = r.top - 6 - popover.offsetHeight;
+		let x, y;
+		if (beside && r.left - popover.offsetWidth - 12 >= 8) {
+			// to the left of the Contents panel, rather than over the list being read
+			x = r.left - popover.offsetWidth - 12;
+			y = r.top - 8;
+		} else {
+			x = r.left;
+			y = r.bottom + 6;
+			if (y + popover.offsetHeight > bottom) {
+				y = r.top - 6 - popover.offsetHeight;
+			}
 		}
-		popover.style.left = (window.scrollX + Math.max(8, x)) + "px";
+		x = Math.max(8, Math.min(x, width - popover.offsetWidth - 8));
+		y = Math.max(top, Math.min(y, bottom - popover.offsetHeight));
+		popover.style.left = (window.scrollX + x) + "px";
 		popover.style.top  = (window.scrollY + y) + "px";
 	};
 
-	// types in signatures, and links to any declaration on this page outside the headings and the Index
+	// types in signatures, and links to any declaration on this page, from the docs, the Contents and the Index
+	const in_list = link => link.closest("#TableOfContents, #pkg-index");
 	const link_of = ev => {
 		const link = ev.target.closest && ev.target.closest("a[href]");
 		if (!link || link.closest(".odin-type-preview")) {
@@ -565,7 +585,7 @@ window.addEventListener("keydown", ev => {
 		if (link.matches("pre.doc-code a.code-typename")) {
 			return link;
 		}
-		if (!link.closest(".documentation") || link.closest("h3, #pkg-index")) {
+		if (!in_list(link) && (!link.closest(".documentation") || link.closest("h3"))) {
 			return null;
 		}
 		const url = new URL(link.href, location.href);
@@ -578,13 +598,14 @@ window.addEventListener("keydown", ev => {
 		}
 		return link;
 	};
-	const show_link = link => show(link, () => link.getBoundingClientRect(), () => definition_of(link.getAttribute("href")));
+	const show_link = link => show(link, () => link.getBoundingClientRect(), () => definition_of(link.getAttribute("href")), !!link.closest("#TableOfContents"));
 	document.addEventListener("mouseover", ev => {
 		const link = link_of(ev);
 		if (link && link !== current && !link.closest(".odin-type-preview")) {
 			current = link;
 			clearTimeout(timer);
-			timer = setTimeout(() => show_link(link), 250);
+			// longer in the lists, so running the mouse down one doesn't flash a preview for each
+			timer = setTimeout(() => show_link(link), in_list(link) ? 450 : 250);
 		}
 	});
 	document.addEventListener("mouseout", ev => {
@@ -610,7 +631,8 @@ window.addEventListener("keydown", ev => {
 			hide();
 		}
 	});
-	window.addEventListener("scroll", hide, {passive: true});
+	// any scroll, the Contents panel's included
+	document.addEventListener("scroll", hide, {passive: true, capture: true});
 
 	// Names in examples, e.g. `strings.split`, look as they did, but hovering one shows what it is,
 	// and Ctrl+click (Cmd+click) goes to it; a plain click still selects text
@@ -1441,6 +1463,46 @@ if (odin_search) {
 			}
 		}
 
+		// `:Builder` finds the declarations whose signature or definition mentions the type `Builder`,
+		// the declaration itself first, then procedures; lowercase matches either case
+		let signatures = null;
+		function type_match(type) {
+			if (!/^[A-Za-z_][\w.]*$/.test(type)) {
+				return [];
+			}
+			if (!signatures) {
+				signatures = [];
+				for (let i = 0; i < pkg_entities.length; i++) {
+					let h3 = pkg_entities[i].querySelector(":scope > h3");
+					let pre = pkg_entities[i].querySelector(":scope > div > pre.doc-code");
+					if (!h3 || !pre) {
+						continue;
+					}
+					let text = "";
+					for (let node of pre.childNodes) {
+						if (!(node.nodeType === Node.ELEMENT_NODE && node.classList.contains("copy-code"))) {
+							text += node.textContent;
+						}
+					}
+					signatures.push([h3.id, text]);
+				}
+			}
+			let any_case = !/[A-Z]/.test(type);
+			let re = new RegExp(`(?<![\\w])${type.replace(/\./g, "\\.")}(?![\\w])`, any_case ? "i" : "");
+			let by_name = new Map(entities.map(e => [e.name, e]));
+			let found = [];
+			for (let [name, text] of signatures) {
+				let entity = by_name.get(name);
+				if (entity && re.test(text)) {
+					let itself = any_case ? name.toLowerCase() === type.toLowerCase() : name === type;
+					let score = itself ? 2 : (entity.kind === "p" || entity.kind === "g") ? 1 : 0;
+					found.push({"entity": entity, "score": score, "indices": []});
+				}
+			}
+			found.sort((a, b) => b.score - a.score || strcmp(a.entity.name, b.entity.name));
+			return found;
+		}
+
 		function odin_search_input(ev) {
 			let search_text = odin_search.value.trim();
 			if (curr_search_value == search_text) {
@@ -1456,7 +1518,7 @@ if (odin_search) {
 
 			let start_time = performance.now();
 
-			let results = fuzzy_entity_match(entities, search_text);
+			let results = IS_PACKAGE_PAGE && search_text.startsWith(":") ? type_match(search_text.slice(1).trim()) : fuzzy_entity_match(entities, search_text);
 			if (!results.length) {
 				clear_odin_search_doms();
 				return;
@@ -1620,6 +1682,24 @@ if (odin_search) {
 			request_search();
 			ev.stopPropagation();
 		}, false);
+
+		// the search is kept in the address, so it can be shared, and Back after opening a result returns to it
+		let address_timer = 0;
+		odin_search.addEventListener("input", () => {
+			clearTimeout(address_timer);
+			address_timer = setTimeout(() => {
+				let url = new URL(location.href);
+				let query = odin_search.value.trim();
+				if (query) {
+					url.searchParams.set("q", query);
+				} else {
+					url.searchParams.delete("q");
+				}
+				if (url.href !== location.href) {
+					history.replaceState(history.state, "", url);
+				}
+			}, 400);
+		});
 
 		odin_search.addEventListener("keydown", ev => {
 			if (ev.key === "Enter" && (ev.ctrlKey || ev.metaKey)) {

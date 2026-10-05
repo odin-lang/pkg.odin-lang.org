@@ -1048,6 +1048,15 @@ upstream_doc :: proc(pkg: ^doc.Pkg, e: ^doc.Entity, name: string) -> (title, url
 		c_name = vulkan_c_name(e, name)
 	case:
 		c_name = entity_link_name(e)
+
+		// not a lowercase C helper, nor an Odin `…Flag` enum, which C only has as the `…Flags` it is a bit_set of
+		if e.kind == .Type_Name &&
+		   docs.type_prefix != "" &&
+		   name != "" &&
+		   'A' <= name[0] && name[0] <= 'Z' &&
+		   !strings.has_suffix(name, "Flag") {
+			c_name = fmt.tprintf("%s%s", docs.type_prefix, name)
+		}
 	}
 	if c_name == "" {
 		return
