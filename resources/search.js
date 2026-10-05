@@ -1010,13 +1010,8 @@ if (odin_search) {
 
 				for (let i = 0; i < pkg_entities.length; i++) {
 					let pkg_entity = pkg_entities[i];
-					let h3 = pkg_entity.getElementsByTagName('h3')[0];
-					let result = result_map[h3.id];
-					// a property's getter and setter share an entry
-					let also = h3.dataset.also && result_map[h3.dataset.also];
-					if (also && (!result || also.score > result.score)) {
-						result = also;
-					}
+					let name = pkg_entity.getElementsByTagName('h3')[0].id;
+					let result = result_map[name];
 					if (result) {
 						pkg_entity.style.display = null;
 						pkg_entity.style.order = -result.score;

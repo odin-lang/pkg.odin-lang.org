@@ -16,17 +16,12 @@ Objc_Method :: struct {
 	name:            string, // its `objc_name`
 	is_class_method: bool,
 	owned:           bool, // returns an object the caller must release
-
-	// A getter `x` and its setter `setX` are a property, written as one entry under the getter's name
-	setter:          ^Objc_Method,
-	getter:          ^Objc_Method,
 }
 
 Objc_Class :: struct {
-	entity:     ^doc.Entity,
-	name:       string, // its `objc_class`, e.g. "MTLBuffer"
-	methods:    [dynamic]^Objc_Method, // the methods then the properties, without their setters
-	properties: int,
+	entity:  ^doc.Entity,
+	name:    string, // its `objc_class`, e.g. "MTLBuffer"
+	methods: [dynamic]^Objc_Method, // by name
 }
 
 Objc_Info :: struct {
@@ -94,43 +89,7 @@ objc_info_get :: proc(pkg: ^doc.Pkg) -> ^Objc_Info {
 	}
 
 	for _, class in info.classes {
-		by_name: map[string]^Objc_Method
-		defer delete(by_name)
-		for m in class.methods {
-			by_name[m.name] = m
-		}
-		for setter in class.methods {
-			if setter.is_class_method || len(setter.name) <= 3 || !strings.has_prefix(setter.name, "set") || !is_upper(setter.name[3]) {
-				continue
-			}
-			field := setter.name[3:]
-			lower := fmt.tprintf("%c%s", field[0] + ('a' - 'A'), field[1:])
-			// `label` and `setLabel`, `URL` and `setURL`, `isOpaque` and `setOpaque`
-			for getter_name in ([]string{lower, field, fmt.tprintf("is%s", field)}) {
-				getter, ok := by_name[getter_name]
-				if ok && objc_is_property(getter, setter) {
-					getter.setter = setter
-					setter.getter = getter
-					break
-				}
-			}
-		}
-
-		kept := 0
-		for m in class.methods {
-			if m.getter == nil {
-				class.methods[kept] = m
-				kept += 1
-			}
-			if m.setter != nil {
-				class.properties += 1
-			}
-		}
-		resize(&class.methods, kept)
 		slice.sort_by(class.methods[:], proc(a, b: ^Objc_Method) -> bool {
-			if (a.setter != nil) != (b.setter != nil) {
-				return a.setter == nil
-			}
 			return a.name < b.name
 		})
 	}
@@ -240,35 +199,11 @@ objc_function_is_owned :: proc(pkg: ^doc.Pkg, e: ^doc.Entity) -> bool {
 	return (has_word(name, "Create") || has_word(name, "Copy")) && returns_object(e)
 }
 
-objc_is_property :: proc(getter, setter: ^Objc_Method) -> bool {
-	if getter.is_class_method || getter.setter != nil || getter.entity.kind != .Procedure || setter.entity.kind != .Procedure {
-		return false
-	}
-	getter_params, getter_results := proc_tuples(getter.entity)
-	setter_params, setter_results := proc_tuples(setter.entity)
-	if len(getter_params) != 1 || len(getter_results) != 1 || len(setter_params) != 2 || len(setter_results) != 0 {
-		return false
-	}
-
-	render :: proc(t: doc.Type_Index) -> string {
-		b := strings.builder_make(context.temp_allocator)
-		writer := Type_Writer{w = strings.to_writer(&b)}
-		defer delete(writer.generic_scope)
-		write_type(&writer, cfg.types[t], {})
-		return strings.to_string(b)
-	}
-
-	a := cfg.entities[getter_results[0]].type
-	b := cfg.entities[setter_params[1]].type
-	return a == b || render(a) == render(b)
-}
-
 
 Objc_Badge :: enum {
 	Class_Method,
 	Owned,
 	Owned_Function,
-	Property,
 	Overloaded,
 }
 Objc_Badges :: bit_set[Objc_Badge]
@@ -286,9 +221,6 @@ objc_badges :: proc(pkg: ^doc.Pkg, e: ^doc.Entity) -> (badges: Objc_Badges) {
 	}
 	if m.owned {
 		badges += {.Owned}
-	}
-	if m.setter != nil {
-		badges += {.Property}
 	}
 	if e.kind == .Proc_Group {
 		badges += {.Overloaded}
@@ -309,9 +241,6 @@ write_objc_badges :: proc(w: io.Writer, badges: Objc_Badges) {
 	if .Owned_Function in badges {
 		fmt.wprintf(w, ` <span class="doc-badge doc-badge-owned" title="%s">owned</span>`, OWNED_FUNCTION_TITLE)
 	}
-	if .Property in badges {
-		io.write_string(w, ` <span class="doc-badge" title="A property's getter and setter">get/set</span>`)
-	}
 	if .Overloaded in badges {
 		io.write_string(w, ` <span class="doc-badge" title="A procedure group of methods with the same name">overloaded</span>`)
 	}
@@ -326,9 +255,6 @@ write_objc_toc_badges :: proc(w: io.Writer, badges: Objc_Badges) {
 	}
 	if .Owned in badges || .Owned_Function in badges {
 		append(&words, "owned")
-	}
-	if .Property in badges {
-		append(&words, "get/set")
 	}
 	if len(words) > 0 {
 		fmt.wprintf(w, `<span class="toc-badge">%s</span>`, strings.join(words[:], " &middot; ", context.temp_allocator))
@@ -482,10 +408,6 @@ write_objc_call :: proc(w: io.Writer, pkg: ^doc.Pkg, e: ^doc.Entity) {
 		}
 	} else {
 		write_objc_call_line(w, m, e)
-		if m.setter != nil {
-			io.write_byte(w, '\n')
-			write_objc_call_line(w, m.setter, m.setter.entity)
-		}
 	}
 	io.write_string(w, "</pre>\n")
 }
@@ -509,36 +431,34 @@ write_objc_methods :: proc(w: io.Writer, page_pkg, pkg: ^doc.Pkg, class_entity: 
 	}
 	defer delete(writer.generic_scope)
 
-	seen_item := false
+	listed := make([dynamic]^Objc_Method, context.temp_allocator)
+	name_width := 0
 	if class := objc_class_of(pkg, class_entity); class != nil {
-		for m in class.methods {
-			if names_seen[m.name] {
-				continue
-			}
+		for m in class.methods do if !names_seen[m.name] {
 			names_seen[m.name] = true
-			if m.setter != nil {
-				names_seen[m.setter.name] = true
-			}
+			append(&listed, m)
+			name_width = max(name_width, len(m.name))
+		}
+	}
 
-			if !seen_item {
-				seen_item = true
-				if is_inherited {
-					fmt.wprintf(w, `<h5>Methods Inherited From <a href="%s#%s">%s</a></h5>`+"\n", base, str(class_entity.name), class_name)
-				} else {
-					fmt.wprintln(w, "<h4>Bound Objective-C Methods</h4>")
-				}
-				fmt.wprintln(w, `<ul class="doc-objc-methods">`)
-			}
-
+	if len(listed) > 0 {
+		if is_inherited {
+			fmt.wprintf(w, `<h5>Methods Inherited From <a href="%s#%s">%s</a></h5>`+"\n", base, str(class_entity.name), class_name)
+		} else {
+			fmt.wprintln(w, "<h4>Bound Objective-C Methods</h4>")
+		}
+		fmt.wprintln(w, `<ul class="doc-objc-methods">`)
+		for m in listed {
 			fmt.wprintf(w, `<li><a class="code-procedure" href="%s#%s">%s</a>`, base, str(m.entity.name), m.name)
+			// padded so the signatures line up
+			for _ in len(m.name)..<name_width {
+				io.write_byte(w, ' ')
+			}
+
 			params, results := proc_tuples(m.entity)
-			switch {
-			case m.entity.kind == .Proc_Group:
+			if m.entity.kind == .Proc_Group {
 				io.write_string(w, "(…)")
-			case m.setter != nil:
-				io.write_string(w, ": ")
-				write_type(writer, cfg.types[cfg.entities[results[0]].type], {})
-			case:
+			} else {
 				if !m.is_class_method && len(params) > 0 {
 					params = params[1:]
 				}
@@ -566,8 +486,6 @@ write_objc_methods :: proc(w: io.Writer, page_pkg, pkg: ^doc.Pkg, class_entity: 
 			write_objc_badges(w, objc_badges(pkg, m.entity))
 			io.write_string(w, "</li>\n")
 		}
-	}
-	if seen_item {
 		fmt.wprintln(w, "</ul>")
 	}
 
@@ -639,19 +557,8 @@ write_objc_class_preview :: proc(w: io.Writer, page_pkg: ^doc.Pkg, class: ^Objc_
 		io.write_string(w, "</span>")
 	}
 
-	methods := len(class.methods) - class.properties
-	if methods > 0 || class.properties > 0 {
-		io.write_string(w, "\n<span class=\"comment\">// ")
-		if methods > 0 {
-			fmt.wprintf(w, "%d method%s", methods, "" if methods == 1 else "s")
-		}
-		if class.properties > 0 {
-			if methods > 0 {
-				io.write_string(w, ", ")
-			}
-			fmt.wprintf(w, "%d propert%s", class.properties, "y" if class.properties == 1 else "ies")
-		}
-		io.write_string(w, "</span>")
+	if methods := len(class.methods); methods > 0 {
+		fmt.wprintf(w, "\n<span class=\"comment\">// %d method%s</span>", methods, "" if methods == 1 else "s")
 	}
 }
 

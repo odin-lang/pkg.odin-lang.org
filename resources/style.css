@@ -492,10 +492,6 @@ h3 .doc-badge {
 	color: #f39a5e;
 }
 
-.doc-id-sep {
-	color: var(--odin-sidebar-muted);
-	font-weight: 400;
-}
 .doc-source a + a {
 	margin-left: 0.75rem;
 }
@@ -513,15 +509,16 @@ h3 .doc-badge {
 	border-top-right-radius: 0;
 }
 
+/* the names are padded with spaces so the signatures line up, like code */
 .documentation ul.doc-objc-methods {
 	padding-left: 0;
 	list-style: none;
 	font-family: Consolas, Liberation Mono, Menlo, monospace;
 	font-size: 0.875em;
+	overflow-x: auto;
 }
 .documentation ul.doc-objc-methods > li {
-	padding-left: 1.5rem;
-	text-indent: -1.5rem;
+	white-space: pre;
 }
 .documentation ul.doc-objc-methods > li + li {
 	margin-top: 0.125rem;
@@ -655,11 +652,11 @@ code.odin-import .string {
 @keyframes odin-target-border {
 	from { border-color: var(--bs-secondary); }
 }
-.documentation h3:target > span > .doc-id-link:first-child, .documentation h3 .doc-id-link:target {
+.documentation h3:target .doc-id-link {
 	border-radius: 0.25rem;
 	animation: odin-target-flash 2.5s ease-out;
 }
-.documentation h3:target + div > pre.doc-code, .documentation h3:has(.doc-id-link:target) + div > pre.doc-code {
+.documentation h3:target + div > pre.doc-code {
 	animation: odin-target-border 2.5s ease-out;
 }
 .documentation .pkg-compact:has(> h3:target) pre.doc-code {

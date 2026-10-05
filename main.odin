@@ -2461,19 +2461,6 @@ pkg_entries_gather :: proc(pkg: ^doc.Pkg) -> (entries: Pkg_Entries) {
 		}
 	}
 
-	// a property's setter is written in its getter's entry
-	objc := objc_info_get(pkg)
-	if len(objc.method_of) > 0 {
-		kept := 0
-		for entry in entries.procs {
-			if m := objc.method_of[&cfg.entities[entry.entity]]; m == nil || m.getter == nil || str(entry.name) != str(m.entity.name) {
-				entries.procs[kept] = entry
-				kept += 1
-			}
-		}
-		resize(&entries.procs, kept)
-	}
-
 	slice.sort_by_key(entries.procs[:],         entity_key)
 	slice.sort_by_key(entries.proc_groups[:],   entity_key)
 	slice.sort_by_key(entries.types[:],         entity_key)
@@ -2942,38 +2929,6 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		io.write_string(w, `</a>`)
 	}
 
-	// `name :: proc(…) {…}`, with the name padded to line up with the declarations written with it
-	write_proc_declaration :: proc(writer: ^Type_Writer, name: string, e: ^doc.Entity, name_width: int) {
-		w := writer.w
-		write_declaration_attributes(w, e)
-		io.write_string(w, name)
-		for _ in len(name)..<name_width {
-			io.write_byte(w, ' ')
-		}
-		io.write_string(w, " :: ")
-
-		// NOTE(bill): A signature too long for one line gets a parameter per line as those with many parameters do
-		clear(&writer.generic_scope)
-		signature := strings.builder_make(context.temp_allocator)
-		writer.w = strings.to_writer(&signature)
-		write_type(writer, cfg.types[e.type], {.Allow_Multiple_Lines})
-		one_line := strings.to_string(signature)
-		if !strings.contains_rune(one_line, '\n') && name_width+len(" :: ")+visible_width(one_line)+len(" {…}") > MAX_SIGNATURE_WIDTH {
-			strings.builder_reset(&signature)
-			clear(&writer.generic_scope) // filled by the first attempt, and it decides how `$T` is written
-			write_type(writer, cfg.types[e.type], {.Allow_Multiple_Lines, .Force_Multiple_Lines})
-		}
-		writer.w = w
-		io.write_string(w, strings.to_string(signature))
-
-		write_where_clauses(w, array(e.where_clauses))
-		if .Foreign in e.flags {
-			io.write_string(w, " ---")
-		} else {
-			io.write_string(w, " {…}")
-		}
-	}
-
 	name := str(entry.name)
 	e := &cfg.entities[entry.entity]
 	entity_name := str(e.name)
@@ -2988,33 +2943,17 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	defer delete(writer.generic_scope)
 	collection := cfg.pkg_to_collection[pkg]
 
-	// Objective-C: a property's setter is written in its getter's entry, and a class links to Apple's documentation
+	// An Objective-C class links to Apple's documentation
 	is_declared_here := name == entity_name && entity_pkg == pkg
-	setter: ^Objc_Method
-	class:  ^Objc_Class
-	if is_declared_here {
-		if m := objc_method_of(pkg, e); m != nil {
-			setter = m.setter
-		}
-		if e.kind == .Type_Name {
-			class = objc_class_of(pkg, e)
-		}
+	class: ^Objc_Class
+	if is_declared_here && e.kind == .Type_Name {
+		class = objc_class_of(pkg, e)
 	}
 
 	path := collection.pkg_to_path[pkg]
 	filename := slashpath.base(str(cfg.files[e.pos.file].name))
-	if setter != nil {
-		fmt.wprintf(w, "<h3 id=\"{0:s}\" data-also=\"{1:s}\">", name, str(setter.entity.name))
-	} else {
-		fmt.wprintf(w, "<h3 id=\"{0:s}\">", name)
-	}
-	if setter != nil {
-		// the hidden ¶ only after the second name, as it would leave a gap before the separator
-		fmt.wprintf(w, "<span><a class=\"doc-id-link\" href=\"#{0:s}\">{0:s}</a>", name)
-		fmt.wprintf(w, " <span class=\"doc-id-sep\">&middot;</span> <a class=\"doc-id-link\" id=\"{0:s}\" href=\"#{0:s}\">{0:s}<span class=\"a-hidden\">&nbsp;¶</span></a>", str(setter.entity.name))
-	} else {
-		fmt.wprintf(w, "<span><a class=\"doc-id-link\" href=\"#{0:s}\">{0:s}<span class=\"a-hidden\">&nbsp;¶</span></a>", name)
-	}
+	fmt.wprintf(w, "<h3 id=\"{0:s}\"><span><a class=\"doc-id-link\" href=\"#{0:s}\">{0:s}", name)
+	fmt.wprintf(w, "<span class=\"a-hidden\">&nbsp;¶</span></a>")
 	if is_declared_here {
 		write_objc_badges(w, objc_badges(pkg, e))
 	}
@@ -3184,13 +3123,27 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			fmt.wprint(w, `</pre>`)
 		case .Procedure:
 			fmt.wprint(w, `<pre class="doc-code">`)
-			if setter != nil {
-				name_width := max(len(name), len(str(setter.entity.name)))
-				write_proc_declaration(writer, name, e, name_width)
-				io.write_byte(w, '\n')
-				write_proc_declaration(writer, str(setter.entity.name), setter.entity, name_width)
+			write_declaration_attributes(w, e)
+			fmt.wprintf(w, "%s :: ", name)
+
+			// NOTE(bill): A signature too long for one line gets a parameter per line as those with many parameters do
+			signature := strings.builder_make(context.temp_allocator)
+			writer.w = strings.to_writer(&signature)
+			write_type(writer, cfg.types[e.type], {.Allow_Multiple_Lines})
+			one_line := strings.to_string(signature)
+			if !strings.contains_rune(one_line, '\n') && len(name)+len(" :: ")+visible_width(one_line)+len(" {…}") > MAX_SIGNATURE_WIDTH {
+				strings.builder_reset(&signature)
+				clear(&writer.generic_scope) // filled by the first attempt, and it decides how `$T` is written
+				write_type(writer, cfg.types[e.type], {.Allow_Multiple_Lines, .Force_Multiple_Lines})
+			}
+			writer.w = w
+			io.write_string(w, strings.to_string(signature))
+
+			write_where_clauses(w, array(e.where_clauses))
+			if .Foreign in e.flags {
+				fmt.wprint(w, " ---")
 			} else {
-				write_proc_declaration(writer, name, e, len(name))
+				fmt.wprint(w, " {…}")
 			}
 			fmt.wprintln(w, "</pre>")
 
@@ -3233,20 +3186,6 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		write_docs(w, the_docs, doc_ctx = &doc_ctx)
 		fmt.wprintln(w, `</details>`)
 	}
-	if setter != nil {
-		setter_name := str(setter.entity.name)
-		setter_docs := str(setter.entity.docs)
-		if strings.trim_space(setter_docs) == "" {
-			setter_docs = str(setter.entity.comment)
-		}
-		if setter_docs != "" {
-			setter_ctx := Doc_Context{pkg = pkg, owner = fmt.tprintf("%s.%s", str(pkg.name), setter_name), heading_prefix = setter_name}
-			fmt.wprintln(w, `<details class="odin-doc-toggle" open>`)
-			fmt.wprintln(w, `<summary class="hideme"><span>&nbsp;</span></summary>`)
-			write_docs(w, setter_docs, doc_ctx = &setter_ctx)
-			fmt.wprintln(w, `</details>`)
-		}
-	}
 
 
 	if _, ok := find_entity_attribute(e, "objc_class"); ok {
@@ -3265,9 +3204,6 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	if e.kind == .Procedure {
 		proc_names_seen: map[string]bool
 		write_related_procedure_groups(w, pkg, e, &proc_names_seen)
-		if setter != nil {
-			write_related_procedure_groups(w, pkg, setter.entity, &proc_names_seen)
-		}
 		delete(proc_names_seen)
 	}
 }
