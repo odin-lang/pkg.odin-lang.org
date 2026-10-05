@@ -52,6 +52,31 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 });
 
+document.addEventListener("click", async (ev) => {
+	const btn = ev.target.closest(".copy-import");
+	if (!btn) {
+		return;
+	}
+	const text = `import "${btn.dataset.import}"`;
+	try {
+		await navigator.clipboard.writeText(text);
+	} catch {
+		const area = document.createElement("textarea");
+		area.value = text;
+		area.style.position = "fixed";
+		area.style.opacity = "0";
+		document.body.appendChild(area);
+		area.select();
+		try {
+			document.execCommand("copy");
+		} catch {
+		}
+		area.remove();
+	}
+	btn.textContent = "copied";
+	setTimeout(() => (btn.textContent = "import"), 1200);
+});
+
 var odin_pkg_name;
 
 let odin_search = document.getElementById("odin-search");

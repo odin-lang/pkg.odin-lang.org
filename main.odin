@@ -107,8 +107,10 @@ main :: proc() {
 	for collection in not_hidden {
 		dir := collection.name
 
+		init_pkg_entries_map(collection, collection.root)
+
 		strings.builder_reset(&b)
-		write_html_header(w, fmt.tprintf("%s library - pkg.odin-lang.org", dir),
+		write_html_header(w, fmt.tprintf("%s library - pkg.odin-lang.org", dir), .Full_Width,
 		                  description = fmt.tprintf("Package documentation for the Odin %s collection.", dir))
 		write_collection_directory(w, collection)
 		write_html_footer(w, "/pkg-data.js")
@@ -725,8 +727,6 @@ generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collec
 
 	dir := collection.name
 
-	init_pkg_entries_map(collection, collection.root)
-
 	runtime_pkg := generate_package_from_directory_tree(b, collection.root)
 
 	if runtime_pkg != nil &&
@@ -770,43 +770,33 @@ generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collec
 	}
 }
 
-write_home_sidebar :: proc(w: io.Writer) {
-	fmt.wprintln(w, `<nav class="col-lg-2 odin-sidebar-border navbar-light">`)
-	defer fmt.wprintln(w, `</nav>`)
-	fmt.wprintln(w, `<div class="sticky-top odin-below-navbar py-3">`)
-	defer fmt.wprintln(w, `</div>`)
-
-	fmt.wprintln(w, `<ul class="nav nav-pills d-flex flex-column">`)
-	defer fmt.wprintln(w, `</ul>`)
-
-	for c in cfg.collections {
-		if c.hidden do continue
-
-		fmt.wprintf(
-			w,
-			`<li class="nav-item"><a class="nav-link" style="text-transform: capitalize;" href="%s">%s Library</a></li>`,
-			c.base_url,
-			c.name,
-		)
+collection_stats :: proc(c: ^Collection) -> (packages, declarations: int) {
+	for _, pkg in c.pkgs {
+		packages += 1
+		declarations += len(c.pkg_entries_map[pkg].all)
 	}
+	if c.name == "base" { // builtin and intrinsics are documented as packages of their own
+		packages += 2
+		declarations += len(builtins) + len(intrinsics_table)
+	}
+	return
+}
+
+// 12345 -> "12,345"
+thousands :: proc(n: int) -> string {
+	digits := fmt.tprintf("%d", n)
+	b := strings.builder_make(context.temp_allocator)
+	for c, i in digits {
+		if i > 0 && (len(digits)-i) % 3 == 0 {
+			strings.write_byte(&b, ',')
+		}
+		strings.write_rune(&b, c)
+	}
+	return strings.to_string(b)
 }
 
 write_home_page :: proc(w: io.Writer) {
-	fmt.wprintln(w, `<div class="row odin-main">`)
-	defer fmt.wprintln(w, `</div>`)
-
-	write_home_sidebar(w)
-
-	fmt.wprintln(w, `<article class="col-lg-8 p-4">`)
-	defer fmt.wprintln(w, `</article>`)
-
-	fmt.wprintln(w, "<article><header>")
-	fmt.wprintln(w, `<h1 class="odin-package-header">Odin Packages</h1>`)
-	write_search(w, .All)
-	fmt.wprintln(w, "</header></article>")
-	fmt.wprintln(w, "<div>")
-	defer fmt.wprintln(w, "</div>")
-
+	collections := make([dynamic]^Collection, 0, len(cfg.collections), context.temp_allocator)
 	for c in cfg.collections {
 		if cfg.hide_base && (c.name == "base") {
 			continue
@@ -814,24 +804,52 @@ write_home_page :: proc(w: io.Writer) {
 		if cfg.hide_core && (c.name == "core" || c.name == "vendor") {
 			continue
 		}
+		append(&collections, c)
+	}
 
-		fmt.wprintln(w, `<div class="mt-5">`)
-			defer fmt.wprintln(w, `</div>`)
+	total_packages, total_declarations: int
+	for c in collections {
+		packages, declarations := collection_stats(c)
+		total_packages     += packages
+		total_declarations += declarations
+	}
 
-			fmt.wprintf(
-				w,
-				`<a href="%s" class="link-primary text-decoration-node"><h3>%s</h3></a>`,
-				c.base_url,
-				c.home.title.? or_else c.name,
-			)
+	fmt.wprintln(w, `<div class="odin-home">`)
+	defer fmt.wprintln(w, `</div>`)
 
-			if d, ok := c.home.description.?; ok {
-				fmt.wprintf(w, `<p>%s</p>`, d)
-			}
+	fmt.wprintln(w, `<header class="odin-home-hero">`)
+	fmt.wprintln(w, `<h1>Odin Packages</h1>`)
+	io.write_string(w, `<p class="odin-home-lead">API documentation for the `)
+	for c, i in collections {
+		if i > 0 {
+			io.write_string(w, i+1 == len(collections) ? " and " : ", ")
+		}
+		fmt.wprintf(w, `<code>%s</code>`, c.name)
+	}
+	fmt.wprintf(w, " library collection%s.</p>\n", len(collections) == 1 ? "" : "s")
+	write_search(w, .All, fmt.tprintf("Search %s declarations across %d packages.", thousands(total_declarations), total_packages))
+	fmt.wprintln(w, `</header>`)
 
+	fmt.wprintln(w, `<section class="odin-home-collections">`)
+	for c in collections {
+		packages, declarations := collection_stats(c)
+		fmt.wprintln(w, `<div class="odin-collection-card">`)
+		fmt.wprintf(w, `<h2><a href="%s">%s</a></h2>`+"\n", c.base_url, c.home.title.? or_else c.name)
+		fmt.wprintf(w, `<div class="odin-collection-stats">%d packages &middot; %s declarations</div>`+"\n", packages, thousands(declarations))
+		if d, ok := c.home.description.?; ok {
+			fmt.wprintf(w, "<p>%s</p>\n", d)
+		}
+		fmt.wprintln(w, `</div>`)
+	}
+	fmt.wprintln(w, `</section>`)
+
+	// a readme is too long for a card, so it goes below them
+	for c in collections {
 		if path, ok := c.home.embed_readme.?; ok {
 			log.infof("Writing readme from path at: %s", path)
+			fmt.wprintf(w, `<section class="odin-home-readme"><h2><a href="%s">%s</a></h2>`+"\n", c.base_url, c.home.title.? or_else c.name)
 			write_readme(w, path)
+			fmt.wprintln(w, `</section>`)
 		}
 	}
 }
@@ -918,6 +936,8 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 	}
 
 
+	packages, declarations := collection_stats(collection)
+
 	fmt.wprintln(w, `<div class="row odin-main odin-docs-layout my-4">`)
 	defer fmt.wprintln(w, `</div>`)
 
@@ -925,48 +945,37 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 
 	fmt.wprintln(w, `<article class="col-lg-10 p-4">`)
 	defer fmt.wprintln(w, `</article>`)
-	{
-		fmt.wprintln(w, `<article class="p-4">`)
-		fmt.wprintln(w, `<header class="collection-header">`)
-		fmt.wprintf(
-			w,
-			"<h1 style=\"text-transform: capitalize\">%s Library Collection</h1>\n",
-			collection.name,
-		)
 
-		write_license(w, collection)
-		write_search(w, .Collection)
-
-		fmt.wprintln(w, "</header>")
-		fmt.wprintln(w, "</article>")
-		fmt.wprintln(w, `<hr class="collection-hr">`)
+	fmt.wprintln(w, `<header class="odin-collection-header">`)
+	fmt.wprintf(w, "<h1 style=\"text-transform: capitalize\">%s Library Collection</h1>\n", collection.name)
+	if d, ok := collection.home.description.?; ok {
+		fmt.wprintf(w, `<p class="odin-collection-lead">%s</p>`+"\n", d)
 	}
+	fmt.wprintln(w, `<ul class="odin-collection-meta">`)
+	fmt.wprintf(w, `<li><span>License</span> <a href="%s">%s</a></li>`+"\n", collection.license.url, collection.license.text)
+	fmt.wprintf(w, `<li><span>Source</span> <a href="%s">%s</a></li>`+"\n", collection.source_url, short_source_url(collection.source_url))
+	fmt.wprintf(w, `<li><span>Packages</span> %d</li>`+"\n", packages)
+	fmt.wprintf(w, `<li><span>Declarations</span> %s</li>`+"\n", thousands(declarations))
+	fmt.wprintln(w, `</ul>`)
+	write_search(w, .Collection)
+	fmt.wprintln(w, `</header>`)
 
-	fmt.wprintln(w, "<header>")
-	fmt.wprintln(w, `<h2><i class="bi bi-folder"></i>Directories</h2>`)
-	fmt.wprintln(w, "</header>")
-
-	fmt.wprintln(w, "<div>")
-	fmt.wprintln(w, "\t<table class=\"doc-directory mt-4 mb-4\">")
-	fmt.wprintln(w, "\t\t<tbody>")
+	fmt.wprintf(w, `<h2 id="pkg-list" class="odin-pkg-list-title">Packages <span class="pkg-count">%d</span></h2>`+"\n", packages)
+	fmt.wprintln(w, `<table class="odin-pkg-table">`)
+	defer fmt.wprintln(w, `</table>`)
 
 	write_directory :: proc(w: io.Writer, dir: ^Dir_Node, collection: ^Collection) {
-		has_children := len(dir.children) != 0
-		if len(dir.children) != 0 {
-			fmt.wprint(w, `<tr aria-controls="`)
-			for child in dir.children {
-				fmt.wprintf(w, "pkg-%s ", child.name)
-			}
-			fmt.wprint(w, `" class="directory-pkg">`)
-
-			fmt.wprint(w, `<td class="pkg-line pkg-name" data-aria-owns="`)
-			for child in dir.children {
-				fmt.wprintf(w, "pkg-%s ", child.name)
-			}
-			fmt.wprintf(w, `" id="pkg-%s">`, dir.dir)
-		} else {
-			fmt.wprintf(w, `<tr id="pkg-%s" class="directory-pkg"><td class="pkg-name">`, dir.dir)
+		children := 0
+		for child in dir.children {
+			children += int(str(child.pkg.name) != "os2")
 		}
+
+		if len(dir.children) != 0 {
+			fmt.wprintf(w, `<tbody class="pkg-group"><tr id="pkg-%s" class="pkg-group-head"><td class="pkg-name">`, dir.dir)
+		} else {
+			fmt.wprintf(w, `<tbody><tr id="pkg-%s"><td class="pkg-name">`, dir.dir)
+		}
+		defer io.write_string(w, "</tbody>\n")
 
 		if dir.pkg != nil {
 			init_cfg_from_pkg(dir.pkg)
@@ -974,10 +983,10 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 		} else if dir.name == "builtin" || dir.name == "intrinsics" {
 			fmt.wprintf(w, `<a href="%s/%s">%s</a>`, collection.base_url, dir.path, dir.name)
 		} else {
-			fmt.wprintf(w, "%s", dir.name)
+			fmt.wprintf(w, `<span class="pkg-group-label">%s</span>`, dir.name)
 		}
 		io.write_string(w, `</td>`)
-		io.write_string(w, `<td class="pkg-line pkg-line-doc">`)
+		io.write_string(w, `<td class="pkg-desc">`)
 		switch dir.name {
 		case "builtin":
 			first, _, _ := strings.partition(builtin_docs, ".")
@@ -1000,38 +1009,46 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 				write_doc_line(w, line_doc, dir.pkg)
 			} else if dir.dir == "sys" {
 				io.write_string(w, `Platform specific packages - documentation may be for a specific platform only`)
-			} else {
-				io.write_string(w, `&nbsp;`)
 			}
+		}
+		if len(dir.children) != 0 {
+			fmt.wprintf(w, ` <span class="pkg-count">%d package%s</span>`, children, children == 1 ? "" : "s")
 		}
 		io.write_string(w, `</td>`)
+		// builtin is the only one of these that cannot be imported
+		write_copy_import(w, collection, dir.path, dir.pkg != nil || dir.name == "intrinsics")
 		fmt.wprintf(w, "</tr>\n")
 
-		if has_children {
-			for child in dir.children {
-				assert(child.pkg != nil)
-				init_cfg_from_pkg(child.pkg)
+		for child in dir.children {
+			assert(child.pkg != nil)
+			init_cfg_from_pkg(child.pkg)
 
-				if str(child.pkg.name) == "os2" {
-					continue
-				}
-
-				fmt.wprintf(w, `<tr id="pkg-%s" class="directory-pkg directory-child visible"><td class="pkg-line pkg-name">`, child.name)
-				fmt.wprintf(w, `<a href="%s/%s/">%s</a>`, collection.base_url, child.path, child.name)
-				io.write_string(w, `</td>`)
-
-				io.write_string(w, `<td class="pkg-line pkg-line-doc">`)
-				if child_line_doc, ok := get_line_doc(child.pkg); ok {
-					write_doc_line(w, child_line_doc, child.pkg)
-				} else if target, target_ok := target_from_pkg(child.pkg); target_ok {
-					fmt.wprintf(w, `<em>(Generated with <code>-target:%s</code>, please read the source code directly)</em>`, target)
-				} else {
-					io.write_string(w, `&nbsp;`)
-				}
-				io.write_string(w, `</td>`)
-				fmt.wprintf(w, "</tr>\n")
+			if str(child.pkg.name) == "os2" {
+				continue
 			}
+
+			fmt.wprintf(w, `<tr id="pkg-%s" class="pkg-child"><td class="pkg-name">`, child.name)
+			fmt.wprintf(w, `<a href="%s/%s/">%s</a>`, collection.base_url, child.path, child.name)
+			io.write_string(w, `</td>`)
+
+			io.write_string(w, `<td class="pkg-desc">`)
+			if child_line_doc, ok := get_line_doc(child.pkg); ok {
+				write_doc_line(w, child_line_doc, child.pkg)
+			} else if target, target_ok := target_from_pkg(child.pkg); target_ok {
+				fmt.wprintf(w, `<em>(Generated with <code>-target:%s</code>, please read the source code directly)</em>`, target)
+			}
+			io.write_string(w, `</td>`)
+			write_copy_import(w, collection, child.path, true)
+			fmt.wprintf(w, "</tr>\n")
 		}
+	}
+
+	write_copy_import :: proc(w: io.Writer, collection: ^Collection, path: string, importable: bool) {
+		if !importable {
+			io.write_string(w, `<td class="pkg-import"></td>`)
+			return
+		}
+		fmt.wprintf(w, `<td class="pkg-import"><button type="button" class="copy-import" data-import="{0:s}:{1:s}" title="Copy the import declaration" aria-label="Copy import &quot;{0:s}:{1:s}&quot;">import</button></td>`, collection.name, path)
 	}
 
 	if collection.name == "base" {
@@ -1054,10 +1071,25 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 	for dir in collection.root.children {
 		write_directory(w, dir, collection)
 	}
+}
 
-	fmt.wprintln(w, "\t\t</tbody>")
-	fmt.wprintln(w, "\t</table>")
-	fmt.wprintln(w, "</div>")
+// "https://github.com/odin-lang/Odin/tree/master/core" -> "odin-lang/Odin/core"
+short_source_url :: proc(url: string) -> string {
+	s := strings.trim_prefix(strings.trim_prefix(url, "https://"), "http://")
+	if !strings.has_prefix(s, "github.com/") {
+		return s
+	}
+	s = s[len("github.com/"):]
+	parts := strings.split(s, "/", context.temp_allocator)
+	if len(parts) < 4 || parts[2] != "tree" {
+		return s
+	}
+	// drop the "tree/<branch>" between the repository and the path
+	path := strings.join(parts[4:], "/", context.temp_allocator)
+	if path == "" {
+		return fmt.tprintf("%s/%s", parts[0], parts[1])
+	}
+	return fmt.tprintf("%s/%s/%s", parts[0], parts[1], path)
 }
 
 write_license :: proc(w: io.Writer, collection: ^Collection) {
@@ -2296,7 +2328,7 @@ pkg_entries_destroy :: proc(entries: ^Pkg_Entries) {
 	entries^ = {}
 }
 
-write_search :: proc(w: io.Writer, kind: enum { Package, Collection, All}) {
+write_search :: proc(w: io.Writer, kind: enum { Package, Collection, All}, hint := "") {
 	class := ""
 	switch kind {
 	case .Package:    class = "odin-search-package"
@@ -2315,6 +2347,9 @@ write_search :: proc(w: io.Writer, kind: enum { Package, Collection, All}) {
 		</div>
 	`, class)
 	fmt.wprintln(w)
+	if hint != "" {
+		fmt.wprintf(w, `<p class="odin-search-hint">%s</p>`+"\n", hint)
+	}
 
 	fmt.wprintln(w, `<div id="odin-search-info">`)
 	fmt.wprintln(w, `<div id="odin-search-time"></div>`)

@@ -21,37 +21,215 @@ table.directory {
 	list-style-type: none;
 }
 
-hr.collection-hr {
-	margin: 0;
-	padding: 0;
-}
-
 b {
     font-weight: bold;
 }
 
-.doc-directory tr {
-	padding-left: 1em!important;
-	border-top: 1px solid #ccc!important;
-	border-bottom: 1px solid #ccc!important;
+
+/* home page */
+
+.odin-home {
+	max-width: 70rem;
+	margin: 0 auto;
+	padding: 3rem 0 4rem;
+}
+.odin-home-hero h1 {
+	margin-bottom: 0.5rem;
+}
+.odin-home-lead {
+	max-width: 46rem;
+	margin-bottom: 1.5rem;
+	font-size: 1.125rem;
+	color: var(--odin-sidebar-muted);
+}
+.odin-search-hint {
+	margin: 0.5rem 0 0;
+	font-size: 0.875rem;
+	color: var(--odin-sidebar-muted);
 }
 
-.doc-directory td {
-	padding: 0.25em 0.5em;
+.odin-home-collections {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+	gap: 1.25rem;
+	margin-top: 3rem;
 }
-.directory-child td:first-child {
-	padding-left: 2em!important;
+.odin-collection-card {
+	position: relative;
+	padding: 1.25rem 1.25rem 1rem;
+	border: 1px solid var(--odin-card-border);
+	border-radius: 0.5rem;
+	transition: border-color 0.12s ease;
+}
+.odin-collection-card:hover {
+	border-color: var(--odin-sidebar-link);
+}
+.odin-collection-card h2 {
+	margin: 0;
+	font-size: 1.375rem;
+	font-weight: 600;
+	text-transform: capitalize;
+}
+.odin-collection-card h2 a {
+	color: var(--odin-sidebar-link);
+	text-decoration: none;
+}
+/* the whole card opens the collection, but links in the description stay clickable */
+.odin-collection-card h2 a::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+}
+.odin-collection-card p a {
+	position: relative;
+	z-index: 1;
+}
+.odin-collection-stats {
+	margin: 0.125rem 0 0.75rem;
+	font-size: 0.8125rem;
+	color: var(--odin-sidebar-muted);
+}
+.odin-collection-card p {
+	margin-bottom: 0.25rem;
 }
 
-.doc-directory tr[aria-expanded=true] td.pkg-name:before {
-	content: "\2193";
-}
-.doc-directory tr[aria-expanded=false] td.pkg-name:before {
-	content: "\2192"!important;
+.odin-home-readme {
+	margin-top: 3rem;
 }
 
-.doc-directory tr[aria-hidden=true] {
-	display: none;
+
+/* collection pages */
+
+.odin-collection-header h1 {
+	margin-bottom: 0.25rem;
+}
+.odin-collection-lead {
+	max-width: 48rem;
+	margin-bottom: 0.75rem;
+	font-size: 1.0625rem;
+	color: var(--odin-sidebar-muted);
+}
+.odin-collection-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem 1.5rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-size: 0.875rem;
+}
+.odin-collection-meta span {
+	margin-right: 0.25rem;
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: var(--odin-sidebar-muted);
+}
+
+.odin-pkg-list-title {
+	margin-top: 2.5rem;
+}
+.pkg-count {
+	font-size: 0.875rem;
+	font-weight: 400;
+	color: var(--odin-sidebar-muted);
+}
+h2 .pkg-count {
+	margin-left: 0.25rem;
+	font-size: 1rem;
+}
+
+.odin-pkg-table {
+	width: 100%;
+	margin: 0.75rem 0 3rem;
+	border-collapse: collapse;
+	line-height: 1.5;
+}
+.odin-pkg-table td {
+	padding: 0.375rem 0.75rem;
+	border-bottom: 1px solid var(--odin-rule);
+	vertical-align: baseline;
+}
+.odin-pkg-table tr:hover td {
+	background-color: var(--odin-sidebar-hover);
+}
+.odin-pkg-table td.pkg-name {
+	width: 12rem;
+	white-space: nowrap;
+}
+.odin-pkg-table a {
+	color: var(--odin-sidebar-link);
+}
+
+/* groups get some space, and their packages hang off the same guide line as in the sidebar */
+.odin-pkg-table tbody.pkg-group > tr.pkg-group-head > td,
+.odin-pkg-table tbody.pkg-group + tbody:not(.pkg-group) > tr > td {
+	padding-top: 1.25rem;
+}
+.odin-pkg-table tr.pkg-group-head .pkg-name {
+	font-weight: 600;
+}
+.odin-pkg-table .pkg-group-label {
+	color: var(--odin-sidebar-muted);
+}
+.odin-pkg-table tr.pkg-child td.pkg-name {
+	position: relative;
+	padding-left: 1.75rem;
+}
+.odin-pkg-table tr.pkg-child td.pkg-name::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 1rem;
+	border-left: 1px solid var(--odin-card-border);
+}
+
+.odin-pkg-table td.pkg-import {
+	width: 1%;
+	white-space: nowrap;
+	text-align: right;
+}
+.copy-import {
+	padding: 0.0625rem 0.5rem;
+	border: 1px solid var(--odin-card-border);
+	border-radius: 0.25rem;
+	background: none;
+	font-family: var(--bs-font-monospace);
+	font-size: 0.75rem;
+	color: var(--odin-sidebar-muted);
+	opacity: 0;
+	transition: opacity 0.12s ease;
+	cursor: pointer;
+}
+.odin-pkg-table tr:hover .copy-import, .copy-import:focus {
+	opacity: 1;
+}
+.copy-import:hover {
+	border-color: var(--odin-sidebar-link);
+	color: inherit;
+}
+/* without hover there is no other way to find them */
+@media (hover: none) {
+	.copy-import {
+		opacity: 1;
+	}
+}
+/* phones: let long names wrap rather than widen the page, and leave out copying imports */
+@media (max-width: 575.98px) {
+	.odin-pkg-table td.pkg-name {
+		width: auto;
+		white-space: normal;
+	}
+	/* links and code set their own overflow-wrap, so they need it too */
+	.odin-pkg-table td.pkg-name, .odin-pkg-table td.pkg-name *,
+	.odin-pkg-table td.pkg-desc, .odin-pkg-table td.pkg-desc * {
+		overflow-wrap: anywhere;
+	}
+	.odin-pkg-table td.pkg-import {
+		display: none;
+	}
 }
 
 
@@ -100,11 +278,6 @@ pre.doc-code .number {
 	color: #79c0ff!important;
 }
 
-
-.pkg-line-doc {
-	color: #444;
-	width: 100%;
-}
 
 
 .doc-source {
@@ -296,10 +469,6 @@ main > .container.full-width {
 	max-width: calc(100% - 2em) !important;
 }
 
-h1.odin-package-header {
-	margin-top: 1rem;
-}
-
 /* sidebars */
 
 :root {
@@ -310,10 +479,14 @@ h1.odin-package-header {
 	--odin-sidebar-muted: #6c757d;
 	--odin-sidebar-hover: rgba(127, 127, 127, 0.12);
 	--odin-sidebar-thumb: rgba(127, 127, 127, 0.3);
+	--odin-rule:          #e9ecef;
+	--odin-card-border:   #dee2e6;
 }
 .dark-mode {
 	--odin-sidebar-link:  #7aade5;
 	--odin-sidebar-muted: #8b98a9;
+	--odin-rule:          #1c2430;
+	--odin-card-border:   var(--dark-border);
 }
 
 #pkg-sidebar, #TableOfContents {
@@ -709,23 +882,6 @@ h4.pkg-sidebar-title {
 
 
 
-/* Table borders  */
-.doc-directory tr {
-	border: none !important;
-}
-.doc-directory td:not(:first-child) {
-	/*border-top: 1px solid #ccc !important;
-	border-bottom: 1px solid #ccc !important;*/
-}
-.doc-directory {
-	line-height:  1.6em;
-	color: var(--bs-gray-700);
-}
-/* Table shading */
-.doc-directory tr:nth-child(even) {
-	background-color: #f8f8f8;
-}
-
 .pkg-breadcrumb {
 	padding-top: 1rem;
 }
@@ -759,15 +915,6 @@ h4.pkg-sidebar-title {
 	#odin-search-time, #odin-search-options {
 		flex: 100%;
 	}
-}
-
-.dark-mode .doc-directory tr,
-.dark-mode .doc-directory td {
-	color: var(--bs-light);
-}
-
-.dark-mode .doc-directory tr:nth-child(even) {
-	background-color: var(--dark-border);
 }
 
 

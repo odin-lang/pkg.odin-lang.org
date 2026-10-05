@@ -83,9 +83,11 @@ sort_directory_tree :: proc(node: ^Dir_Node) {
 	})
 
 	// Remove duplicates
+	// Each merged doc file adds its own copy of a package and the children may hang off any of them so keep those
 	for i := 1; i < len(node.children); /**/ {
 		if node.children[i-1].name == node.children[i].name {
 			log.infof("duplicate: %v", node.children[i].name)
+			append(&node.children[i-1].children, ..node.children[i].children[:])
 			ordered_remove(&node.children, i)
 		} else {
 			i += 1
