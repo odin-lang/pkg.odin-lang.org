@@ -2747,14 +2747,18 @@ write_search :: proc(w: io.Writer, kind: enum { Package, Collection, All}, hint 
 	}
 	fmt.wprintf(w, `
 		<div class="odin-search-wrapper">
-			<input type="search" id="odin-search" class="%s" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search..." autofocus>
-			<div class="odin-search-shortcut">
-				<div class="odin-search-key key-macos">⌘K</div>
-				<div class="odin-search-key key-windows">Ctrl+K</div>
-				<span class="odin-search-or">or</span>
-				<div class="odin-search-key">/</div>
-				<button type="button" class="odin-shortcuts-button" title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts">?</button>
+			<div class="odin-search-field">
+				<input type="search" id="odin-search" class="%s" autocomplete="off" spellcheck="false" placeholder="Fuzzy Search..." autofocus>
+				<div class="odin-search-shortcut">
+					<div class="odin-search-key key-macos">⌘K</div>
+					<div class="odin-search-key key-windows">Ctrl+K</div>
+					<span class="odin-search-or">or</span>
+					<div class="odin-search-key">/</div>
+				</div>
 			</div>
+			<button type="button" class="odin-shortcuts-button" title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts">
+				<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M6.5 10h.01M9.5 10h.01M12.5 10h.01M15.5 10h.01M18 10h.01M6.5 14h.01M17.5 14h.01M9.5 14h5"/></svg>
+			</button>
 		</div>
 	`, class)
 	fmt.wprintln(w)

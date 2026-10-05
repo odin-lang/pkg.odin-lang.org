@@ -1290,8 +1290,14 @@ h4.pkg-sidebar-title {
 }
 
 .odin-search-wrapper {
-	position: relative;
+	display: flex;
+	gap: 0.5rem;
 	margin-top: 1rem;
+}
+.odin-search-field {
+	position: relative;
+	flex: 1;
+	min-width: 0;
 }
 
 .odin-search-shortcut {
@@ -1367,29 +1373,41 @@ h4.pkg-sidebar-title {
 	padding-right: 6.5rem;
 }
 
-/* the way to the keyboard shortcuts, beside the search's own keys and looking like them */
+/* the way to the keyboard shortcuts: a button of its own beside the search box, as tall as it */
 .odin-shortcuts-button {
+	flex: none;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	width: 30px;
-	height: 30px;
-	margin-left: 0.375rem;
+	width: 3rem;
 	padding: 0;
-	border: 1px solid rgba(0, 0, 0, 0.2);
-	border-radius: 50%;
+	border: 1px solid #888;
+	border-radius: 0.25rem;
 	background: none;
-	color: inherit;
-	font: inherit;
-	font-weight: 600;
+	color: var(--odin-sidebar-muted);
 	cursor: pointer;
 }
+.odin-shortcuts-button svg {
+	width: 1.5rem;
+	height: 1.5rem;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.5;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
 .dark-mode .odin-shortcuts-button {
-	border-color: rgba(255, 255, 255, 0.25);
+	border-color: var(--dark-border);
+	background-color: var(--dark-background);
 }
 .odin-shortcuts-button:hover, .odin-shortcuts-button:focus-visible {
 	border-color: var(--odin-sidebar-link);
 	color: var(--odin-sidebar-link);
+}
+/* no keyboard, no shortcuts */
+.os-ios .odin-shortcuts-button,
+.os-android .odin-shortcuts-button {
+	display: none;
 }
 
 .os-ios .odin-search-shortcut,
