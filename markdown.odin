@@ -447,6 +447,50 @@ auto_link_url :: proc(literal: string, ctx: ^Doc_Context) -> (url: string, ok: b
 	return
 }
 
+link_code_names :: proc(text: string, ctx: ^Doc_Context) -> (linked, first_name, first_url: string) {
+	is_start :: proc(c: byte) -> bool {
+		return c == '_' || 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z'
+	}
+	is_part :: proc(c: byte) -> bool {
+		return is_start(c) || '0' <= c && c <= '9'
+	}
+
+	b := strings.builder_make(context.temp_allocator)
+	for i := 0; i < len(text); /**/ {
+		if !is_start(text[i]) || i > 0 && is_part(text[i-1]) {
+			strings.write_byte(&b, text[i])
+			i += 1
+			continue
+		}
+		j := i
+		for j < len(text) && (is_part(text[j]) || text[j] == '.' && j+1 < len(text) && is_start(text[j+1])) {
+			j += 1
+		}
+		name := text[i:j]
+		is_call := j < len(text) && text[j] == '('
+
+		// only what looks like code, as in "Use strconv.parse_int() instead": with a `.` or `_`, or called
+		url := ""
+		if strings.contains_any(name, "._") || is_call {
+			if declared, ok := auto_link_url(name, ctx); ok {
+				url = declared
+			} else if builtin, is_builtin := builtin_url("builtin", name); is_builtin && is_call {
+				url = builtin
+			}
+		}
+		if url != "" {
+			fmt.sbprintf(&b, "[%s](%s)", name, url)
+			if first_url == "" {
+				first_name, first_url = name, url
+			}
+		} else {
+			strings.write_string(&b, name)
+		}
+		i = j
+	}
+	return strings.to_string(b), first_name, first_url
+}
+
 is_local_name :: proc(e: ^doc.Entity, name: string) -> bool {
 	in_entities :: proc(indices: []doc.Entity_Index, name: string) -> bool {
 		for i in indices {

@@ -52,6 +52,22 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 });
 
+function text_at_point(x, y) {
+	let node = null, offset = 0;
+	if (document.caretPositionFromPoint) {
+		const pos = document.caretPositionFromPoint(x, y);
+		if (pos) {
+			[node, offset] = [pos.offsetNode, pos.offset];
+		}
+	} else if (document.caretRangeFromPoint) {
+		const range = document.caretRangeFromPoint(x, y);
+		if (range) {
+			[node, offset] = [range.startContainer, range.startOffset];
+		}
+	}
+	return node && node.nodeType === Node.TEXT_NODE ? [node, offset] : null;
+}
+
 async function copy_text(text) {
 	try {
 		await navigator.clipboard.writeText(text);
@@ -93,14 +109,43 @@ document.addEventListener("click", async (ev) => {
 	btn.textContent = "copy link";
 	btn.title       = "Copy a link to this declaration";
 
+	const report = document.createElement("a");
+	report.className = "doc-report";
+	report.target    = "_blank";
+	report.rel       = "noopener";
+	report.title     = "Report a problem with these docs";
+	report.setAttribute("aria-label", report.title);
+	report.innerHTML = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.75 15 14.25H1z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6.25v3.75M8 12.1v.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+
+	const issue_url = (h3, source) => {
+		const repo = source.href.match(/^https:\/\/github\.com\/[^/]+\/[^/]+/);
+		if (!repo) {
+			return null;
+		}
+		const import_path = document.querySelector(".odin-import .string");
+		const pkg = import_path ? import_path.textContent.replace(/"/g, "") : document.title.replace(/^package\s+|\s+-.*$/g, "");
+		const title = `Docs: ${pkg}.${h3.id}`;
+		const body = `${location.origin}${location.pathname}#${h3.id}\n${source.href}\n\n`;
+		return `${repo[0]}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
+	};
+
 	const place = (h3) => {
 		if (h3 && btn.parentElement !== h3.firstElementChild) {
 			h3.firstElementChild.appendChild(btn);
+			const links = h3.querySelectorAll(".doc-source > a");
+			const source = links[links.length - 1];
+			const url = source && issue_url(h3, source);
+			if (url) {
+				report.href = url;
+				source.parentElement.appendChild(report);
+			} else {
+				report.remove();
+			}
 		}
 	};
 	document.addEventListener("mouseover", ev => place(ev.target.closest && ev.target.closest(".pkg-entity > h3")));
 	document.addEventListener("focusin", ev => {
-		if (ev.target !== btn) {
+		if (ev.target !== btn && ev.target !== report) {
 			place(ev.target.closest(".pkg-entity > h3"));
 		}
 	});
@@ -296,21 +341,11 @@ window.addEventListener("keydown", ev => {
 
 	// the word under the mouse in a signature
 	const word_at = (x, y) => {
-		let node, offset;
-		if (document.caretPositionFromPoint) {
-			const pos = document.caretPositionFromPoint(x, y);
-			if (pos) {
-				[node, offset] = [pos.offsetNode, pos.offset];
-			}
-		} else if (document.caretRangeFromPoint) {
-			const range = document.caretRangeFromPoint(x, y);
-			if (range) {
-				[node, offset] = [range.startContainer, range.startOffset];
-			}
-		}
-		if (!node || node.nodeType !== Node.TEXT_NODE) {
+		const at = text_at_point(x, y);
+		if (!at) {
 			return null;
 		}
+		const [node, offset] = at;
 		const text = node.data;
 		let start = offset, end = offset;
 		while (start > 0 && /\w/.test(text[start - 1])) {
@@ -434,8 +469,8 @@ window.addEventListener("keydown", ev => {
 	let current = null;
 	let timer   = 0;
 
-	const definition_of = async (link) => {
-		const url = new URL(link.getAttribute("href"), location.href);
+	const definition_of = async (href) => {
+		const url = new URL(href, location.href);
 		const id = decodeURIComponent(url.hash.slice(1));
 		const dir = url.pathname.replace(/\/?$/, "/");
 		if (dir === location.pathname.replace(/\/?$/, "/")) {
@@ -468,9 +503,9 @@ window.addEventListener("keydown", ev => {
 		}
 	};
 
-	const show = async (link) => {
-		const html = await definition_of(link);
-		if (!html || current !== link) {
+	const show = async (key, rect_of, html_of) => {
+		const html = await html_of();
+		if (!html || current !== key) {
 			return;
 		}
 		if (!popover) {
@@ -485,7 +520,7 @@ window.addEventListener("keydown", ev => {
 		popover.hidden = false;
 		pre.classList.toggle("cut-off", pre.scrollHeight > pre.clientHeight);
 
-		const r = link.getBoundingClientRect();
+		const r = rect_of();
 		const width = document.documentElement.clientWidth;
 		let x = Math.min(r.left, width - popover.offsetWidth - 8);
 		let y = r.bottom + 6;
@@ -518,12 +553,13 @@ window.addEventListener("keydown", ev => {
 		}
 		return link;
 	};
+	const show_link = link => show(link, () => link.getBoundingClientRect(), () => definition_of(link.getAttribute("href")));
 	document.addEventListener("mouseover", ev => {
 		const link = link_of(ev);
 		if (link && link !== current && !link.closest(".odin-type-preview")) {
 			current = link;
 			clearTimeout(timer);
-			timer = setTimeout(() => show(link), 250);
+			timer = setTimeout(() => show_link(link), 250);
 		}
 	});
 	document.addEventListener("mouseout", ev => {
@@ -536,7 +572,7 @@ window.addEventListener("keydown", ev => {
 		const link = link_of(ev);
 		if (link) {
 			current = link;
-			show(link);
+			show_link(link);
 		}
 	});
 	document.addEventListener("focusout", ev => {
@@ -550,6 +586,174 @@ window.addEventListener("keydown", ev => {
 		}
 	});
 	window.addEventListener("scroll", hide, {passive: true});
+
+	// Names in examples, e.g. `strings.split`, look as they did, but hovering one shows what it is,
+	// and Ctrl+click (Cmd+click) goes to it; a plain click still selects text
+	const here = location.pathname.replace(/\/?$/, "/");
+	const mac = document.body.classList.contains("os-macos");
+	const KINDS = {c: "constant", v: "variable", t: "type", p: "procedure", g: "procedure group", b: "built-in"};
+	const escape = text => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+	// `import "core:strings"` and `import str "core:strings"` in the example name its packages
+	const imports = new WeakMap();
+	const imports_of = code => {
+		if (!imports.has(code)) {
+			const found = new Map();
+			for (const m of code.textContent.matchAll(/^\s*import\s+(?:(\w+)\s+)?"(\w+):([^"]+)"/gm)) {
+				found.set(m[1] || m[3].split("/").pop(), `/${m[2]}/${m[3]}/`);
+			}
+			imports.set(code, found);
+		}
+		return imports.get(code);
+	};
+
+	// another package's declarations, from the search data beside its page
+	const packages = new Map();
+	const package_at = dir => {
+		if (!packages.has(dir)) {
+			packages.set(dir, fetch(dir + "pkg-data.js")
+				.then(r => r.ok ? r.text() : null)
+				.then(text => {
+					if (!text) {
+						return null;
+					}
+					const pkg = Object.values(new Function(text + "\nreturn odin_pkg_data;")().packages)[0];
+					return {name: pkg.name, entities: new Map(pkg.entities.map(e => [e.name, e]))};
+				})
+				.catch(() => null));
+		}
+		return packages.get(dir);
+	};
+
+	const name_at = (x, y) => {
+		const at = text_at_point(x, y);
+		if (!at) {
+			return null;
+		}
+		const [node, offset] = at;
+		const code = node.parentElement && node.parentElement.closest("pre > code");
+		if (!code || !code.closest(".documentation") || node.parentElement.closest(".hljs-comment, .hljs-string")) {
+			return null;
+		}
+		const text = node.data;
+		let start = offset, end = offset;
+		while (start > 0 && /[\w.]/.test(text[start - 1])) {
+			start -= 1;
+		}
+		while (end < text.length && /[\w.]/.test(text[end])) {
+			end += 1;
+		}
+		const parts = text.slice(start, end).split(".");
+		if (parts.length < 2 || !/^[A-Za-z_]\w*$/.test(parts[0]) || !/^[A-Za-z_]\w*$/.test(parts[1])) {
+			return null;
+		}
+		const range = new Range();
+		range.setStart(node, start);
+		range.setEnd(node, start + parts[0].length + 1 + parts[1].length);
+		return {code, alias: parts[0], name: parts[1], range, key: `${parts[0]}.${parts[1]}`};
+	};
+
+	const resolve = async found => {
+		let dir = imports_of(found.code).get(found.alias) || (found.alias === window.odin_pkg_name ? here : null);
+		if (!dir) {
+			// otherwise a core package, unless the example declares it, as in `sb := strings.builder_make()`
+			if (new RegExp(`\\b${found.alias}\\s*(:=|:|,)`).test(found.code.textContent)) {
+				return null;
+			}
+			dir = `/core/${found.alias}/`;
+		}
+		if (dir === here) {
+			const h3 = document.getElementById(found.name);
+			if (!h3 || !h3.matches(".pkg-entity > h3")) {
+				return null;
+			}
+			return {href: `#${found.name}`, html: () => definition_of(`#${found.name}`)};
+		}
+		const pkg = await package_at(dir);
+		const entity = pkg && pkg.entities.get(found.name);
+		if (!entity) {
+			return null;
+		}
+		const href = `${dir}#${found.name}`;
+		return {href, html: async () => {
+			const definition = entity.kind === "t" ? await definition_of(href) : null;
+			return definition || `${escape(pkg.name)}.${escape(entity.name)}  <span class="comment">// ${KINDS[entity.kind] || ""}</span>` +
+				(entity.d ? `\n<span class="comment">// ${escape(entity.d)}</span>` : "");
+		}};
+	};
+
+	let hovered = null;
+	let scheduled = false;
+	document.addEventListener("mousemove", ev => {
+		const in_code = ev.target.closest && ev.target.closest(".documentation pre > code");
+		if (scheduled || (!in_code && !hovered)) {
+			return;
+		}
+		scheduled = true;
+		requestAnimationFrame(() => {
+			scheduled = false;
+			const found = in_code ? name_at(ev.clientX, ev.clientY) : null;
+			if (found && hovered && found.key === hovered.key) {
+				return;
+			}
+			if (hovered && current === hovered) {
+				hide();
+			}
+			hovered = found;
+			if (!found) {
+				return;
+			}
+			current = found;
+			clearTimeout(timer);
+			timer = setTimeout(async () => {
+				const target = await resolve(found);
+				if (target && current === found) {
+					const hint = `\n<span class="comment">// ${mac ? "\u2318" : "Ctrl"}+click to go to it</span>`;
+					show(found, () => found.range.getBoundingClientRect(), async () => (await target.html()) + hint);
+				}
+			}, 250);
+		});
+	});
+	// a value too long to show at the end of its line, where the box would cut it off, shows here instead
+	const measure = document.createElement("canvas").getContext("2d");
+	document.addEventListener("mouseover", ev => {
+		const span = ev.target.closest && ev.target.closest("pre.doc-code .doc-value");
+		if (!span || span === current || span.closest(".odin-type-preview")) {
+			return;
+		}
+		const pre = span.closest("pre");
+		const style = getComputedStyle(pre);
+		measure.font = `${style.fontSize} ${style.fontFamily}`;
+		const room = pre.getBoundingClientRect().right - parseFloat(style.paddingRight) - span.getBoundingClientRect().right;
+		const long = measure.measureText(` // ${span.dataset.value}`).width > room;
+		span.classList.toggle("doc-value-long", long);
+		if (long) {
+			current = span;
+			clearTimeout(timer);
+			show(span, () => span.getBoundingClientRect(), () => `<span class="comment doc-value-wrap">// ${escape(span.dataset.value)}</span>`);
+		}
+	});
+	document.addEventListener("mouseout", ev => {
+		const span = ev.target.closest && ev.target.closest("pre.doc-code .doc-value");
+		if (span && span === current && !span.contains(ev.relatedTarget)) {
+			hide();
+		}
+	});
+
+	document.addEventListener("click", async ev => {
+		if (!(ev.ctrlKey || ev.metaKey)) {
+			return;
+		}
+		const found = name_at(ev.clientX, ev.clientY);
+		if (!found) {
+			return;
+		}
+		ev.preventDefault();
+		const target = await resolve(found);
+		if (target) {
+			location.href = new URL(target.href, location.href).href;
+		}
+	});
 }
 
 var odin_pkg_name;
@@ -1308,10 +1512,11 @@ if (odin_search) {
 					list_contents.push(`<li id="odin-search-result-${result_idx}" role="option" aria-selected="false" data-path="${full_path}">`);
 					// list_contents.push(`${result.score}&mdash;`);
 
+					let use = entity.use ? ` <a class="odin-search-use" href="${entity.use_url}">\u2192 ${escape_html(entity.use)}</a>` : "";
 					if (formatted_pkg !== null && (!IS_PACKAGE_PAGE || entity.pkg != odin_pkg_name)) {
-						list_contents.push(`<div><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a></div>`);
+						list_contents.push(`<div><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a>${use}</div>`);
 					} else {
-						list_contents.push(`<div><a href="${full_path}">${formatted_name}</a></div>`);
+						list_contents.push(`<div><a href="${full_path}">${formatted_name}</a>${use}</div>`);
 					}
 
 					const entity_kind_map = {

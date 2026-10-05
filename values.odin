@@ -17,8 +17,24 @@ Int_Value :: struct {
 	signed: bool,
 }
 
+Enum_Member :: struct {
+	name:  string,
+	value: i128,
+	known: bool,
+}
+
+// the elements of a bit_set: bit `i` is element `lower + i`
+Set_Type :: struct {
+	lower:   i128,
+	all:     u128, // every element
+	members: []Enum_Member,
+	runes:   bool,
+}
+
 constant_values:   map[^doc.Entity]Maybe(Int_Value)
+constant_sets:     map[^doc.Entity]Maybe(u128)
 constants_by_name: map[^doc.Pkg]map[string]^doc.Entity
+enum_members_of:   map[^doc.Entity][]Enum_Member // by the first member
 
 constant_value :: proc(e: ^doc.Entity, depth := 0) -> (v: Int_Value, ok: bool) {
 	if e.kind != .Constant {
@@ -41,6 +57,9 @@ constant_value :: proc(e: ^doc.Entity, depth := 0) -> (v: Int_Value, ok: bool) {
 }
 
 constant_hover :: proc(e: ^doc.Entity) -> (res: string) {
+	if set, is_set := set_type_of(cfg.types[e.type]); is_set {
+		return constant_set_hover(e, &set)
+	}
 	v, ok := constant_value(e)
 	if !ok || adds_nothing(str(e.init_string), v) {
 		return
@@ -188,24 +207,221 @@ is_shift_literal :: proc(source: string) -> bool {
 // `locals` are, e.g., the members of an enum before the one being worked out
 eval_integer :: proc(src: string, pkg: ^doc.Pkg, locals: ^map[string]i128, depth := 0) -> (value: i128, ok: bool) {
 	runtime.DEFAULT_TEMP_ALLOCATOR_TEMP_GUARD()
+	return eval_expr(parse_value(src), pkg, locals, depth)
+}
 
-	expr: ^ast.Expr
-	{
-		context.allocator = context.temp_allocator
+@(private="file")
+parse_value :: proc(src: string) -> ^ast.Expr {
+	context.allocator = context.temp_allocator
 
-		p := parser.default_parser()
-		p.err  = proc(pos: tokenizer.Pos, msg: string, args: ..any) {}
-		p.warn = p.err
-		file := ast.File{src = src, fullpath = "constant value"}
-		p.file = &file
-		tokenizer.init(&p.tok, src, file.fullpath, p.err)
-		parser.advance_token(&p)
-		expr = parser.parse_expr(&p, false)
-		if p.error_count > 0 || p.curr_tok.kind != .EOF {
-			return
+	p := parser.default_parser()
+	p.err  = proc(pos: tokenizer.Pos, msg: string, args: ..any) {}
+	p.warn = p.err
+	file := ast.File{src = src, fullpath = "constant value"}
+	p.file = &file
+	tokenizer.init(&p.tok, src, file.fullpath, p.err)
+	parser.advance_token(&p)
+	expr := parser.parse_expr(&p, false)
+	if p.error_count > 0 || p.curr_tok.kind != .EOF {
+		return nil
+	}
+	return expr
+}
+
+enum_members :: proc(t: doc.Type) -> []Enum_Member {
+	entities := array(t.entities)
+	if len(entities) == 0 {
+		return nil
+	}
+	key := &cfg.entities[entities[0]]
+	if members, ok := enum_members_of[key]; ok {
+		return members
+	}
+
+	members := make([]Enum_Member, len(entities))
+	locals: map[string]i128
+	defer delete(locals)
+	value, known := i128(-1), true
+	for entity_index, i in entities {
+		e := &cfg.entities[entity_index]
+		name, init := str(e.name), str(e.init_string)
+		if init == "" {
+			value += 1
+		} else {
+			value, known = eval_integer(init, &cfg.pkgs[cfg.files[e.pos.file].pkg], &locals)
+		}
+		members[i] = {name, value, known}
+		if known {
+			locals[name] = value
 		}
 	}
-	return eval_expr(expr, pkg, locals, depth)
+	enum_members_of[key] = members
+	return members
+}
+
+set_type_of :: proc(t: doc.Type) -> (set: Set_Type, ok: bool) {
+	bt := base_type(t)
+	if bt.kind != .Bit_Set {
+		return
+	}
+	types := array(bt.types)
+	lower, upper := i128(bt.elem_counts[0]), i128(bt.elem_counts[1])
+	// as the compiler does, a backing type starts the bits at zero
+	set.lower = min(0, lower) if .Underlying_Type in transmute(doc.Type_Flags_Bit_Set)bt.flags else lower
+	if upper - set.lower >= 128 {
+		return
+	}
+
+	if len(types) > 0 {
+		elem := base_type(cfg.types[types[0]])
+		if elem.kind == .Enum {
+			set.members = enum_members(elem)
+		}
+		set.runes = elem.kind == .Basic && str(elem.name) == "rune"
+	}
+	if set.members != nil {
+		for m in set.members {
+			if !m.known {
+				return
+			}
+			set.all |= u128(1) << uint(m.value - set.lower)
+		}
+	} else {
+		for v in lower..=upper {
+			set.all |= u128(1) << uint(v - set.lower)
+		}
+	}
+	return set, true
+}
+
+constant_set_value :: proc(e: ^doc.Entity, set: ^Set_Type, depth := 0) -> (bits: u128, ok: bool) {
+	if e.kind != .Constant {
+		return
+	}
+	if cached, found := constant_sets[e]; found {
+		return cached.?
+	}
+	if depth > 32 {
+		return
+	}
+	constant_sets[e] = nil
+
+	runtime.DEFAULT_TEMP_ALLOCATOR_TEMP_GUARD()
+	pkg := &cfg.pkgs[cfg.files[e.pos.file].pkg]
+	bits = eval_set(parse_value(str(e.init_string)), set, pkg, depth+1) or_return
+	constant_sets[e] = bits
+	return bits, true
+}
+
+constant_set_hover :: proc(e: ^doc.Entity, set: ^Set_Type) -> string {
+	{
+		runtime.DEFAULT_TEMP_ALLOCATOR_TEMP_GUARD()
+		// one that lists its elements already says it
+		if expr := parse_value(str(e.init_string)); expr != nil {
+			if _, is_literal := expr.derived_expr.(^ast.Comp_Lit); is_literal {
+				return ""
+			}
+		}
+	}
+	bits, ok := constant_set_value(e, set)
+	if !ok {
+		return ""
+	}
+
+	elems := make([dynamic]string, context.temp_allocator)
+	for i in 0..<128 {
+		if bits & (u128(1) << uint(i)) == 0 {
+			continue
+		}
+		v := set.lower + i128(i)
+		name := ""
+		for m in set.members {
+			if m.value == v {
+				name = fmt.tprintf(".%s", m.name)
+				break
+			}
+		}
+		switch {
+		case name != "":
+		case set.runes:
+			name = fmt.tprintf("%q", rune(v))
+		case:
+			name = fmt.tprintf("%d", v)
+		}
+		append(&elems, name)
+	}
+	return fmt.tprintf("= {{%s}}", strings.join(elems[:], ", ", context.temp_allocator))
+}
+
+@(private="file")
+eval_set :: proc(expr: ^ast.Expr, set: ^Set_Type, pkg: ^doc.Pkg, depth: int) -> (bits: u128, ok: bool) {
+	if expr == nil {
+		return
+	}
+	#partial switch e in expr.derived_expr {
+	case ^ast.Comp_Lit:
+		for elem in e.elems {
+			v := set_element(elem, set, pkg, depth) or_return
+			bit := v - set.lower
+			if bit < 0 || bit >= 128 {
+				return
+			}
+			bits |= u128(1) << uint(bit)
+		}
+		return bits, true
+
+	case ^ast.Ident:
+		constant := constants_of(pkg)[e.name] or_return
+		return constant_set_value(constant, set, depth+1)
+
+	case ^ast.Paren_Expr:
+		return eval_set(e.expr, set, pkg, depth)
+
+	case ^ast.Unary_Expr:
+		x := eval_set(e.expr, set, pkg, depth) or_return
+		#partial switch e.op.kind {
+		case .Add: return x, true
+		case .Xor: return ~x & set.all, true // as the compiler does, the complement is of the elements
+		}
+
+	case ^ast.Binary_Expr:
+		x := eval_set(e.left,  set, pkg, depth) or_return
+		y := eval_set(e.right, set, pkg, depth) or_return
+		#partial switch e.op.kind {
+		case .Add, .Or: return x | y, true
+		case .Sub:      return x &~ y, true
+		case .And:      return x & y, true
+		case .Xor:      return x ~ y, true
+		}
+
+	case ^ast.Type_Cast:
+		// `transmute(Flags)u32(0xc0000000)` takes the bits as they are
+		if e.tok.kind == .Transmute {
+			v := eval_expr(e.expr, pkg, nil, depth) or_return
+			return u128(v), true
+		}
+	}
+	return
+}
+
+@(private="file")
+set_element :: proc(elem: ^ast.Expr, set: ^Set_Type, pkg: ^doc.Pkg, depth: int) -> (value: i128, ok: bool) {
+	field := ""
+	#partial switch e in elem.derived_expr {
+	case ^ast.Implicit_Selector_Expr:
+		field = e.field.name
+	case ^ast.Selector_Expr:
+		field = e.field.name
+	}
+	if field != "" {
+		for m in set.members {
+			if m.name == field && m.known {
+				return m.value, true
+			}
+		}
+		return
+	}
+	return eval_expr(elem, pkg, nil, depth)
 }
 
 @(private="file")

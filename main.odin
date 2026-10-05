@@ -710,8 +710,13 @@ write_pkg_data_pkg :: proc(w: io.Writer, collection: ^Collection, path: string, 
 		if c_name != "" {
 			fmt.wprintf(w, `, "c": %q`, c_name)
 		}
-		if _, ok := find_entity_attribute(entity, "deprecated"); ok {
+		if raw, ok := find_entity_attribute(entity, "deprecated"); ok {
 			io.write_string(w, `, "dep": 1`)
+			msg, _, _ := strconv.unquote_string(raw, context.temp_allocator)
+			ctx := Doc_Context{pkg = pkg, entity = entity, self_name = str(e.name)}
+			if _, use, use_url := link_code_names(msg, &ctx); use != "" {
+				fmt.wprintf(w, `, "use": %q, "use_url": %q`, use, use_url)
+			}
 		}
 		if summaries {
 			docs := str(entity.docs)
@@ -1910,9 +1915,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		name_width := calc_name_width(type_entities)
 		field_width := calc_field_width(type_entities)
 
-		value, value_known := i128(-1), true
-		members: map[string]i128
-		defer delete(members)
+		members := enum_members(type)
 
 		for entity_index, i in type_entities {
 			e := &cfg.entities[entity_index]
@@ -1923,14 +1926,9 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			name := str(e.name)
 			init_string := str(e.init_string)
 
-			if init_string == "" {
-				value += 1
-			} else {
-				value, value_known = eval_integer(init_string, &cfg.pkgs[cfg.files[e.pos.file].pkg], &members)
-			}
 			hover := ""
-			if value_known {
-				members[name] = value
+			if members[i].known {
+				value := members[i].value
 				// an enum is an `int` unless it says otherwise
 				v, ok := Int_Value{value = value, bits = 64, signed = true}, true
 				if len(type_types) != 0 {
@@ -3210,7 +3208,8 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		io.write_string(w, `<div class="doc-deprecated" role="note"><strong>Deprecated.</strong>`)
 		if strings.trim_space(msg) != "" {
 			io.write_byte(w, ' ')
-			write_markdown_inline(w, msg, &doc_ctx)
+			linked, _, _ := link_code_names(msg, &doc_ctx)
+			write_markdown_inline(w, linked, &doc_ctx)
 		}
 		io.write_string(w, "</div>\n")
 	}

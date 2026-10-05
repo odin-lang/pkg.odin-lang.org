@@ -510,6 +510,30 @@ h3 .doc-badge {
 .doc-source > * + * {
 	margin-left: 0.75rem;
 }
+/* put by search.js into a hovered declaration's heading: above its Source link, in the space there,
+   so that nothing moves (outside the declaration, its content-visibility would clip it) */
+section.documentation .pkg-entity > h3 {
+	position: relative;
+}
+.doc-source a.doc-report {
+	position: absolute;
+	top: 0.5rem;
+	right: 0;
+	color: var(--odin-sidebar-muted);
+	opacity: 0;
+}
+.pkg-entity > h3:hover .doc-report {
+	opacity: 0.6;
+}
+.doc-source a.doc-report:hover, .doc-source a.doc-report:focus {
+	opacity: 1;
+	color: var(--bs-secondary);
+}
+.doc-report svg {
+	display: block;
+	width: 1em;
+	height: 1em;
+}
 
 /* code that links to its declaration takes the link colour, as it already does in light mode */
 .dark-mode a > code {
@@ -520,6 +544,13 @@ h3 .doc-badge {
 pre.doc-code .doc-value:hover::after {
 	content: " // " attr(data-value);
 	color: #888;
+}
+/* too long for the end of its line, the value shows in the preview instead */
+pre.doc-code .doc-value.doc-value-long:hover::after {
+	content: none;
+}
+.doc-value-wrap {
+	white-space: pre-wrap;
 }
 
 /* a parameter in a signature and its description in the Inputs list light up together */
@@ -626,6 +657,11 @@ ul.doc-params > li.doc-param-active {
 .odin-search-alt {
 	color: var(--odin-sidebar-muted);
 	font-weight: 400;
+}
+#odin-search-results a.odin-search-use {
+	margin-left: 0.375rem;
+	color: var(--odin-sidebar-muted);
+	font-size: 0.875em;
 }
 
 
