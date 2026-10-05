@@ -90,7 +90,33 @@ function flash_copied(btn) {
 	const label = btn.dataset.label || btn.textContent;
 	btn.dataset.label = label;
 	btn.textContent = "copied";
-	setTimeout(() => (btn.textContent = label), 1200);
+	btn.classList.add("copied");
+	clearTimeout(btn.copied_timer);
+	btn.copied_timer = setTimeout(() => {
+		btn.textContent = label;
+		btn.classList.remove("copied");
+	}, 1200);
+}
+
+// where j and k bring a declaration to: below the navbar and the section label
+const READING_LINE = 100;
+
+// the declaration across that line, else the first in view below it
+function declaration_being_read() {
+	for (const entity of document.querySelectorAll(".documentation .pkg-entity")) {
+		if (entity.offsetParent === null) {
+			continue;
+		}
+		const r = entity.getBoundingClientRect();
+		if (r.bottom > READING_LINE) {
+			return r.top < window.innerHeight ? entity : null;
+		}
+	}
+	return null;
+}
+
+function is_typing(ev) {
+	return ev.target.closest && ev.target.closest("input, textarea, select, [contenteditable]");
 }
 
 document.addEventListener("click", async (ev) => {
@@ -151,6 +177,22 @@ document.addEventListener("click", async (ev) => {
 	});
 	btn.addEventListener("click", async () => {
 		await copy_text(location.origin + location.pathname + "#" + btn.closest("h3").id);
+		flash_copied(btn);
+	});
+
+	// l copies a link to the declaration being read
+	window.addEventListener("keydown", async ev => {
+		if (ev.key !== "l" || ev.ctrlKey || ev.metaKey || ev.altKey || is_typing(ev)) {
+			return;
+		}
+		const entity = declaration_being_read();
+		const h3 = entity && entity.querySelector(":scope > h3");
+		if (!h3) {
+			return;
+		}
+		ev.preventDefault();
+		place(h3);
+		await copy_text(location.origin + location.pathname + "#" + h3.id);
 		flash_copied(btn);
 	});
 }
@@ -270,11 +312,42 @@ window.addEventListener("keydown", ev => {
 		return;
 	}
 	ev.preventDefault();
-	// where a declaration lands: below the navbar and the section label
-	const line = 100;
+	const line = READING_LINE;
 	const target = ev.key === "j" ? entities.find(top => top > line + 2) : entities.findLast(top => top < line - 2);
 	if (target !== undefined) {
 		window.scrollBy(0, target - line);
+	}
+});
+
+window.addEventListener("keydown", ev => {
+	if (ev.ctrlKey || ev.metaKey || ev.altKey || (ev.key !== "s" && ev.key !== "d") || is_typing(ev)) {
+		return;
+	}
+	if (ev.key === "s") {
+		const entity = declaration_being_read();
+		const links = entity ? [...entity.querySelectorAll(":scope > h3 .doc-source > a")] : [];
+		const source = links.find(a => a.textContent.startsWith("Source"));
+		if (source) {
+			ev.preventDefault();
+			source.click();
+		}
+		return;
+	}
+	const descriptions = [...document.querySelectorAll(".documentation .pkg-entity details.odin-doc-toggle")]
+		.filter(d => d.querySelector(":scope > summary > span"));
+	if (descriptions.length === 0) {
+		return;
+	}
+	ev.preventDefault();
+	// the declaration being read stays where it is, however much everything above it changes height
+	const anchor = declaration_being_read();
+	const before = anchor && anchor.getBoundingClientRect().top;
+	const open = !descriptions.some(d => d.open);
+	for (const d of descriptions) {
+		d.open = open;
+	}
+	if (anchor) {
+		window.scrollBy(0, anchor.getBoundingClientRect().top - before);
 	}
 });
 
@@ -423,6 +496,11 @@ window.addEventListener("keydown", ev => {
 			];
 			if (document.querySelector(".documentation .pkg-entity")) {
 				rows.push([["j", "k"], "Next or previous declaration"]);
+				rows.push([["s"], "Open the source of the declaration at the top"]);
+				rows.push([["l"], "Copy a link to the declaration at the top"]);
+				if (document.querySelector(".documentation .pkg-entity details.odin-doc-toggle > summary > span")) {
+					rows.push([["d"], "Collapse or expand every description"]);
+				}
 				rows.push([[":Type"], "Search for what mentions a type"]);
 			}
 			if (document.querySelector(".odin-sidebar-toggle")) {
@@ -521,6 +599,44 @@ window.addEventListener("keydown", ev => {
 		return (types && types[id]) || null;
 	};
 
+	// another package's declarations, from the search data beside its page
+	const packages = new Map();
+	const package_at = dir => {
+		if (!packages.has(dir)) {
+			packages.set(dir, fetch(dir + "pkg-data.js")
+				.then(r => r.ok ? r.text() : null)
+				.then(text => {
+					if (!text) {
+						return null;
+					}
+					const pkg = Object.values(new Function(text + "\nreturn odin_pkg_data;")().packages)[0];
+					return {name: pkg.name, entities: new Map(pkg.entities.map(e => [e.name, e]))};
+				})
+				.catch(() => null));
+		}
+		return packages.get(dir);
+	};
+
+	const KINDS = {c: "constant", v: "variable", t: "type", p: "procedure", g: "procedure group", b: "built-in"};
+	const escape = text => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+	// a type's definition; for anything else in another package, what it is and its first sentence
+	const preview_of = async href => {
+		const url = new URL(href, location.href);
+		const dir = url.pathname.replace(/\/?$/, "/");
+		if (dir === location.pathname.replace(/\/?$/, "/")) {
+			return definition_of(href);
+		}
+		const pkg = await package_at(dir);
+		const entity = pkg && pkg.entities.get(decodeURIComponent(url.hash.slice(1)));
+		if (!entity) {
+			return null;
+		}
+		const definition = entity.kind === "t" ? await definition_of(href) : null;
+		return definition || `${escape(pkg.name)}.${escape(entity.name)}  <span class="comment">// ${KINDS[entity.kind] || ""}</span>` +
+			(entity.d ? `\n<span class="comment doc-value-wrap">// ${escape(entity.d)}</span>` : "");
+	};
+
 	const hide = () => {
 		clearTimeout(timer);
 		current = null;
@@ -575,7 +691,8 @@ window.addEventListener("keydown", ev => {
 		popover.style.top  = (window.scrollY + y) + "px";
 	};
 
-	// types in signatures, and links to any declaration on this page, from the docs, the Contents and the Index
+	// types in signatures, links to any declaration on this page from the docs, the Contents and the Index,
+	// and links from the docs to other packages' declarations
 	const in_list = link => link.closest("#TableOfContents, #pkg-index");
 	const link_of = ev => {
 		const link = ev.target.closest && ev.target.closest("a[href]");
@@ -589,8 +706,13 @@ window.addEventListener("keydown", ev => {
 			return null;
 		}
 		const url = new URL(link.href, location.href);
-		if (!url.hash || url.pathname.replace(/\/?$/, "/") !== location.pathname.replace(/\/?$/, "/")) {
+		if (!url.hash) {
 			return null;
+		}
+		const dir = url.pathname.replace(/\/?$/, "/");
+		if (dir !== location.pathname.replace(/\/?$/, "/")) {
+			// a package's page, not a collection's or the home page
+			return url.origin === location.origin && dir.split("/").length > 3 ? link : null;
 		}
 		const h3 = document.getElementById(decodeURIComponent(url.hash.slice(1)));
 		if (!h3 || !h3.matches(".pkg-entity > h3") || link.closest(".pkg-entity") === h3.parentElement) {
@@ -598,7 +720,7 @@ window.addEventListener("keydown", ev => {
 		}
 		return link;
 	};
-	const show_link = link => show(link, () => link.getBoundingClientRect(), () => definition_of(link.getAttribute("href")), !!link.closest("#TableOfContents"));
+	const show_link = link => show(link, () => link.getBoundingClientRect(), () => preview_of(link.getAttribute("href")), !!link.closest("#TableOfContents"));
 	document.addEventListener("mouseover", ev => {
 		const link = link_of(ev);
 		if (link && link !== current && !link.closest(".odin-type-preview")) {
@@ -638,8 +760,6 @@ window.addEventListener("keydown", ev => {
 	// and Ctrl+click (Cmd+click) goes to it; a plain click still selects text
 	const here = location.pathname.replace(/\/?$/, "/");
 	const mac = document.body.classList.contains("os-macos");
-	const KINDS = {c: "constant", v: "variable", t: "type", p: "procedure", g: "procedure group", b: "built-in"};
-	const escape = text => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 	// `import "core:strings"` and `import str "core:strings"` in the example name its packages
 	const imports = new WeakMap();
@@ -652,24 +772,6 @@ window.addEventListener("keydown", ev => {
 			imports.set(code, found);
 		}
 		return imports.get(code);
-	};
-
-	// another package's declarations, from the search data beside its page
-	const packages = new Map();
-	const package_at = dir => {
-		if (!packages.has(dir)) {
-			packages.set(dir, fetch(dir + "pkg-data.js")
-				.then(r => r.ok ? r.text() : null)
-				.then(text => {
-					if (!text) {
-						return null;
-					}
-					const pkg = Object.values(new Function(text + "\nreturn odin_pkg_data;")().packages)[0];
-					return {name: pkg.name, entities: new Map(pkg.entities.map(e => [e.name, e]))};
-				})
-				.catch(() => null));
-		}
-		return packages.get(dir);
 	};
 
 	const name_at = (x, y) => {
@@ -717,16 +819,11 @@ window.addEventListener("keydown", ev => {
 			return {href: `#${found.name}`, html: () => definition_of(`#${found.name}`)};
 		}
 		const pkg = await package_at(dir);
-		const entity = pkg && pkg.entities.get(found.name);
-		if (!entity) {
+		if (!pkg || !pkg.entities.has(found.name)) {
 			return null;
 		}
 		const href = `${dir}#${found.name}`;
-		return {href, html: async () => {
-			const definition = entity.kind === "t" ? await definition_of(href) : null;
-			return definition || `${escape(pkg.name)}.${escape(entity.name)}  <span class="comment">// ${KINDS[entity.kind] || ""}</span>` +
-				(entity.d ? `\n<span class="comment">// ${escape(entity.d)}</span>` : "");
-		}};
+		return {href, html: () => preview_of(href)};
 	};
 
 	let hovered = null;
@@ -1288,6 +1385,7 @@ if (odin_search) {
 
 	{
 		const IS_PACKAGE_PAGE = odin_search.className == "odin-search-package";
+		const IS_GLOBAL = odin_search.className == "odin-search-all";
 		const IS_PACKAGE_BUILTIN = IS_PACKAGE_PAGE && odin_pkg_name == "builtin";
 
 		let entities = [];
@@ -1601,7 +1699,8 @@ if (odin_search) {
 
 					let use = entity.use ? ` <a class="odin-search-use" href="${entity.use_url}">\u2192 ${escape_html(entity.use)}</a>` : "";
 					if (formatted_pkg !== null && (!IS_PACKAGE_PAGE || entity.pkg != odin_pkg_name)) {
-						list_contents.push(`<div><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a>${use}</div>`);
+						let collection = IS_GLOBAL ? `<span class="odin-search-collection">${odin_pkg_data.packages[entity.pkg].collection}:</span>` : "";
+						list_contents.push(`<div><a href="${pkg_path}">${collection}${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a>${use}</div>`);
 					} else {
 						list_contents.push(`<div><a href="${full_path}">${formatted_name}</a>${use}</div>`);
 					}
