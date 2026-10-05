@@ -111,7 +111,7 @@ main :: proc() {
 		write_html_header(w, fmt.tprintf("%s library - pkg.odin-lang.org", dir),
 		                  description = fmt.tprintf("Package documentation for the Odin %s collection.", dir))
 		write_collection_directory(w, collection)
-		write_html_footer(w, true)
+		write_html_footer(w, "/pkg-data.js")
 		os.make_directory(dir)
 		_ = os.write_entire_file(fmt.tprintf("%s/index.html", dir), b.buf[:])
 
@@ -125,7 +125,7 @@ main :: proc() {
 		write_html_header(w, "Packages - pkg.odin-lang.org",
 		                  description = "Browse API documentation for the Odin base, core, and vendor library collections.")
 		write_home_page(w)
-		write_html_footer(w, true)
+		write_html_footer(w, "/pkg-data.js")
 		_ = os.write_entire_file("index.html", b.buf[:])
 	}
 
@@ -219,7 +219,7 @@ generate_404 :: proc(b: ^strings.Builder) {
 			<p><a href="/">Browse all packages</a> or use the search above.</p>
 		</div>
 	```)
-	write_html_footer(w, true)
+	write_html_footer(w, "/pkg-data.js")
 	_ = os.write_entire_file("404.html", b.buf[:])
 }
 
@@ -521,14 +521,14 @@ write_html_header :: proc(w: io.Writer, title: string, kind := Header_Kind.Norma
 	}
 }
 
+// "/pkg-data.js" holds every package for the global search on the home and collection pages
 generate_json_pkg_data :: proc(b: ^strings.Builder, collections: []^Collection) {
 	w := strings.to_writer(b)
 
 	strings.builder_reset(b)
 	now := build_time()
 	fmt.wprintf(w, "/** Generated with odin version %s (vendor %q) %s_%s @ %v */\n", ODIN_VERSION, ODIN_VENDOR, ODIN_OS, ODIN_ARCH, now)
-	fmt.wprint(w, "var odin_pkg_data = {\n")
-	fmt.wprintln(w, `"packages": {`)
+	pkg_data_begin(w)
 
 
 	base_collection: ^Collection
@@ -541,55 +541,10 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: []^Collection) 
 
 	pkg_idx := 0
 	if base_collection != nil {
-		if pkg_idx != 0 { fmt.wprintln(w, ",") }
-		fmt.wprintf(w, "\t\"%s\": {{\n", "builtin")
-		fmt.wprintf(w, "\t\t\"name\": \"%s\",\n", "builtin")
-		fmt.wprintf(w, "\t\t\"collection\": \"%s\",\n", base_collection.name)
-		fmt.wprintf(w, "\t\t\"path\": \"%s/%s\",\n", base_collection.base_url, "builtin")
-		fmt.wprint(w, "\t\t\"entities\": [\n")
-
-		for b, i in builtins {
-			if i != 0 { fmt.wprint(w, ",\n") }
-			fmt.wprint(w, "\t\t\t{")
-			fmt.wprintf(w, `"kind": %q, `, b.kind)
-			fmt.wprintf(w, `"name": %q, `, b.name)
-			fmt.wprintf(w, `"type": %q, `, b.type)
-			fmt.wprintf(w, `"builtin": %v, `, true)
-			if len(b.comment) != 0 {
-				fmt.wprintf(w, `"comment": %q`, b.comment)
-			}
-			fmt.wprint(w, "}")
-		}
-
-		fmt.wprint(w, "\n\t\t]")
-		fmt.wprint(w, "\n\t}")
-		pkg_idx += 1
-	}
-
-	if base_collection != nil {
-		if pkg_idx != 0 { fmt.wprintln(w, ",") }
-		fmt.wprintf(w, "\t\"%s\": {{\n", "intrinsics")
-		fmt.wprintf(w, "\t\t\"name\": \"%s\",\n", "intrinsics")
-		fmt.wprintf(w, "\t\t\"collection\": \"%s\",\n", base_collection.name)
-		fmt.wprintf(w, "\t\t\"path\": \"%s/%s\",\n", base_collection.base_url, "intrinsics")
-		fmt.wprint(w, "\t\t\"entities\": [\n")
-
-		for b, i in intrinsics_table {
-			if i != 0 { fmt.wprint(w, ",\n") }
-			fmt.wprint(w, "\t\t\t{")
-			fmt.wprintf(w, `"kind": %q, `, b.kind)
-			fmt.wprintf(w, `"name": %q, `, b.name)
-			fmt.wprintf(w, `"type": %q, `, b.type)
-			fmt.wprintf(w, `"intrinsics": %v, `, true)
-			if len(b.comment) != 0 {
-				fmt.wprintf(w, `"comment": %q`, b.comment)
-			}
-			fmt.wprint(w, "}")
-		}
-
-		fmt.wprint(w, "\n\t\t]")
-		fmt.wprint(w, "\n\t}")
-		pkg_idx += 1
+		write_pkg_data_builtins(w, base_collection, "builtin", builtins)
+		fmt.wprintln(w, ",")
+		write_pkg_data_builtins(w, base_collection, "intrinsics", intrinsics_table)
+		pkg_idx += 2
 	}
 
 
@@ -600,62 +555,110 @@ generate_json_pkg_data :: proc(b: ^strings.Builder, collections: []^Collection) 
 		}
 		slice.sort(paths[:])
 		for path in paths {
-			pkg := collection.pkgs[path]
-			init_cfg_from_pkg(pkg)
-			entries := collection.pkg_entries_map[pkg]
 			if pkg_idx != 0 { fmt.wprintln(w, ",") }
-			defer pkg_idx += 1
-
-			fmt.wprintf(w, "\t\"%s\": {{\n", str(pkg.name))
-			fmt.wprintf(w, "\t\t\"name\": \"%s\",\n", str(pkg.name))
-			fmt.wprintf(w, "\t\t\"collection\": \"%s\",\n", collection.name)
-			fmt.wprintf(w, "\t\t\"path\": \"%s/%s\",\n", collection.base_url, path)
-			fmt.wprint(w, "\t\t\"entities\": [\n")
-			for e, i in entries.all {
-				if i != 0 { fmt.wprint(w, ",\n") }
-
-				kind_str := ""
-				switch cfg.entities[e.entity].kind {
-				case .Invalid:      kind_str = ""
-				case .Constant:     kind_str = "c"
-				case .Variable:     kind_str = "v"
-				case .Type_Name:    kind_str = "t"
-				case .Procedure:    kind_str = "p"
-				case .Proc_Group:   kind_str = "g"
-				case .Import_Name:  kind_str = "i"
-				case .Library_Name: kind_str = "l"
-				case .Builtin:      kind_str = "b"
-				}
-
-				fmt.wprint(w, "\t\t\t{")
-				fmt.wprintf(w, `"kind": "%s", `,  kind_str)
-				fmt.wprintf(w, `"name": %q`, str(e.name))
-
-
-				if str(pkg.name) == "runtime" {
-					for attr in array(cfg.entities[e.entity].attributes) {
-						if str(attr.name) == "builtin" {
-							fmt.wprintf(w, `, "builtin": true`)
-							break
-						}
-					}
-				}
-
-				fmt.wprint(w, "}")
-			}
-			fmt.wprint(w, "\n\t\t]")
-			fmt.wprint(w, "\n\t}")
+			write_pkg_data_pkg(w, collection, path, collection.pkgs[path])
+			pkg_idx += 1
 		}
 	}
-	fmt.wprintln(w, "}};")
+	pkg_data_end(w)
 
 	_ = os.write_entire_file("pkg-data.js", b.buf[:])
 }
 
-write_html_footer :: proc(w: io.Writer, include_directory_js: bool) {
+// Package pages only ever search their own package, so each gets a "pkg-data.js"
+// beside its index.html with just that, rather than loading all of "/pkg-data.js"
+pkg_data_url :: proc(collection: ^Collection, path: string) -> string {
+	if path == "" {
+		return fmt.tprintf("%s/pkg-data.js", collection.base_url)
+	}
+	return fmt.tprintf("%s/%s/pkg-data.js", collection.base_url, path)
+}
+
+pkg_data_begin :: proc(w: io.Writer) {
+	fmt.wprint(w, "var odin_pkg_data = {\n")
+	fmt.wprintln(w, `"packages": {`)
+}
+
+pkg_data_end :: proc(w: io.Writer) {
+	fmt.wprintln(w, "}};")
+}
+
+// `name` is "builtin" or "intrinsics", and is also the flag set on each of their entities
+write_pkg_data_builtins :: proc(w: io.Writer, collection: ^Collection, name: string, table: []Builtin) {
+	fmt.wprintf(w, "\t\"%s\": {{\n", name)
+	fmt.wprintf(w, "\t\t\"name\": \"%s\",\n", name)
+	fmt.wprintf(w, "\t\t\"collection\": \"%s\",\n", collection.name)
+	fmt.wprintf(w, "\t\t\"path\": \"%s/%s\",\n", collection.base_url, name)
+	fmt.wprint(w, "\t\t\"entities\": [\n")
+
+	for b, i in table {
+		if i != 0 { fmt.wprint(w, ",\n") }
+		fmt.wprint(w, "\t\t\t{")
+		fmt.wprintf(w, `"kind": %q, `, b.kind)
+		fmt.wprintf(w, `"name": %q, `, b.name)
+		fmt.wprintf(w, `"type": %q, `, b.type)
+		fmt.wprintf(w, `"%s": %v, `, name, true)
+		if len(b.comment) != 0 {
+			fmt.wprintf(w, `"comment": %q`, b.comment)
+		}
+		fmt.wprint(w, "}")
+	}
+
+	fmt.wprint(w, "\n\t\t]")
+	fmt.wprint(w, "\n\t}")
+}
+
+write_pkg_data_pkg :: proc(w: io.Writer, collection: ^Collection, path: string, pkg: ^doc.Pkg) {
+	init_cfg_from_pkg(pkg)
+	entries := collection.pkg_entries_map[pkg]
+
+	fmt.wprintf(w, "\t\"%s\": {{\n", str(pkg.name))
+	fmt.wprintf(w, "\t\t\"name\": \"%s\",\n", str(pkg.name))
+	fmt.wprintf(w, "\t\t\"collection\": \"%s\",\n", collection.name)
+	fmt.wprintf(w, "\t\t\"path\": \"%s/%s\",\n", collection.base_url, path)
+	fmt.wprint(w, "\t\t\"entities\": [\n")
+	for e, i in entries.all {
+		if i != 0 { fmt.wprint(w, ",\n") }
+
+		kind_str := ""
+		switch cfg.entities[e.entity].kind {
+		case .Invalid:      kind_str = ""
+		case .Constant:     kind_str = "c"
+		case .Variable:     kind_str = "v"
+		case .Type_Name:    kind_str = "t"
+		case .Procedure:    kind_str = "p"
+		case .Proc_Group:   kind_str = "g"
+		case .Import_Name:  kind_str = "i"
+		case .Library_Name: kind_str = "l"
+		case .Builtin:      kind_str = "b"
+		}
+
+		fmt.wprint(w, "\t\t\t{")
+		fmt.wprintf(w, `"kind": "%s", `,  kind_str)
+		fmt.wprintf(w, `"name": %q`, str(e.name))
+
+
+		if str(pkg.name) == "runtime" {
+			for attr in array(cfg.entities[e.entity].attributes) {
+				if str(attr.name) == "builtin" {
+					fmt.wprintf(w, `, "builtin": true`)
+					break
+				}
+			}
+		}
+
+		fmt.wprint(w, "}")
+	}
+	fmt.wprint(w, "\n\t\t]")
+	fmt.wprint(w, "\n\t}")
+}
+
+write_html_footer :: proc(w: io.Writer, pkg_data_url: string) {
 	io.write_string(w, "\n")
 
 	io.write(w, #load("resources/footer.txt.html"))
+	fmt.wprintf(w, `<script src="%s"></script>`+"\n", pkg_data_url)
+	io.write_string(w, `<script src="/search.js"></script>`+"\n")
 	fmt.wprintf(w, "</body>\n</html>\n")
 }
 
@@ -697,9 +700,15 @@ generate_package_from_directory_tree :: proc(b: ^strings.Builder, node: ^Dir_Nod
 
 		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width, description = desc)
 		write_pkg(w, dir, path, pkg, collection, collection.pkg_entries_map[pkg])
-		write_html_footer(w, false)
+		write_html_footer(w, pkg_data_url(collection, path))
 		recursive_make_directory(path, dir)
 		_ = os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
+
+		strings.builder_reset(b)
+		pkg_data_begin(w)
+		write_pkg_data_pkg(w, collection, path, pkg)
+		pkg_data_end(w)
+		_ = os.write_entire_file(fmt.tprintf("%s/%s/pkg-data.js", dir, path), b.buf[:])
 	}
 	for child in node.children {
 		res := generate_package_from_directory_tree(b, child)
@@ -730,9 +739,18 @@ generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collec
 		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width,
 		                  description = "Built-in procedures, types, and constants available in every Odin file.")
 		write_builtin_pkg(w, dir, path, runtime_pkg, collection, "builtin", builtin_docs)
-		write_html_footer(w, false)
+		write_html_footer(w, pkg_data_url(collection, path))
 		recursive_make_directory(path, dir)
 		_ = os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
+
+		// the builtin page also searches the @(builtin) procedures of runtime
+		strings.builder_reset(b)
+		pkg_data_begin(w)
+		write_pkg_data_builtins(w, collection, "builtin", builtins)
+		fmt.wprintln(w, ",")
+		write_pkg_data_pkg(w, collection, collection.pkg_to_path[runtime_pkg], runtime_pkg)
+		pkg_data_end(w)
+		_ = os.write_entire_file(fmt.tprintf("%s/%s/pkg-data.js", dir, path), b.buf[:])
 
 
 		path = "intrinsics"
@@ -740,9 +758,15 @@ generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collec
 		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width,
 		                  description = "Compiler intrinsics provided by the Odin compiler.")
 		write_builtin_pkg(w, dir, path, runtime_pkg, collection, "intrinsics", intrinsics_docs)
-		write_html_footer(w, false)
+		write_html_footer(w, pkg_data_url(collection, path))
 		recursive_make_directory(path, dir)
 		_ = os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
+
+		strings.builder_reset(b)
+		pkg_data_begin(w)
+		write_pkg_data_builtins(w, collection, "intrinsics", intrinsics_table)
+		pkg_data_end(w)
+		_ = os.write_entire_file(fmt.tprintf("%s/%s/pkg-data.js", dir, path), b.buf[:])
 	}
 }
 
