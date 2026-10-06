@@ -331,6 +331,7 @@ convert_double_bracket_links :: proc(s: string, ctx: ^Doc_Context, plain := fals
 					out = fmt.tprintf("[%s](<%s>)", text, url) if text != "" else fmt.tprintf("[`%s`](<%s>)", target, url)
 				} else {
 					doc_warnf("%s: unresolved reference [[%s]]", ctx.owner, target)
+					report_add(.Unresolved_Link, fmt.tprintf("[[%s]]", target))
 					out = text if text != "" else fmt.tprintf("`%s`", target)
 				}
 			case:
@@ -426,6 +427,7 @@ auto_link_url :: proc(literal: string, ctx: ^Doc_Context) -> (url: string, ok: b
 	}
 
 	// `strings.Builder`, `NS.String`
+	named_pkg: ^doc.Pkg
 	for k := len(parts)-1; k >= 1; k -= 1 {
 		pkg_ref := strings.join(parts[:k], ".", context.temp_allocator)
 		p := lookup_doc_pkg(pkg_ref, ctx.pkg)
@@ -439,10 +441,17 @@ auto_link_url :: proc(literal: string, ctx: ^Doc_Context) -> (url: string, ok: b
 		if p != nil && parts[k] in cfg.pkg_link_names[p] {
 			return doc_entity_url(p, parts[k]), true
 		}
+		if k == 1 {
+			named_pkg = p
+		}
 	}
 	// `Allocator_Mode.Alloc`
 	if !is_local && parts[0] in names {
 		return doc_entity_url(ctx.pkg, parts[0]), true
+	}
+	// `strings.builder_from_slice`, renamed since
+	if len(parts) == 2 && named_pkg != nil && !is_local && parts[0] != "builtin" && parts[0] != "intrinsics" && !strings.has_prefix(parts[1], "_") {
+		report_add(.Stale_Name, fmt.tprintf("`%s`: %s has no `%s`", text, pkg_import_path(named_pkg), parts[1]))
 	}
 	return
 }

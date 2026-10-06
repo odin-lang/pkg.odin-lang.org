@@ -1,0 +1,405 @@
+package odin_html_docs
+
+import "base:runtime"
+import "core:fmt"
+import "core:io"
+import "core:os"
+import "core:path/slashpath"
+import "core:slice"
+import "core:strings"
+
+import "core:odin/ast"
+import "core:odin/parser"
+import "core:odin/tokenizer"
+import doc "core:odin/doc-format"
+
+// The documentation report at /report/: what the docs are missing or get wrong, package by package,
+// for the people writing them. It isn't linked from anywhere, nor indexed.
+
+Report_Kind :: enum u8 {
+	Unresolved_Link, // `[[name]]` naming nothing
+	Stale_Name,      // `pkg.name` in backticks, where the package has no `name`
+	Unknown_Param,   // Inputs or Returns names something the signature doesn't have
+	Missing_Param,   // Inputs or Returns leaves out something the signature has
+	Bad_Example,     // an Example that doesn't parse
+	Output_Only,     // an Output without an Example
+}
+
+REPORT_KIND_CODES := [Report_Kind]string{
+	.Unresolved_Link = "link",
+	.Stale_Name      = "stale",
+	.Unknown_Param   = "param",
+	.Missing_Param   = "missing",
+	.Bad_Example     = "example",
+	.Output_Only     = "output",
+}
+
+Decl_Kind :: enum u8 {Type, Constant, Variable, Procedure, Proc_Group}
+
+DECL_KIND_CODES := [Decl_Kind]string{
+	.Type       = "t",
+	.Constant   = "c",
+	.Variable   = "v",
+	.Procedure  = "p",
+	.Proc_Group = "g",
+}
+
+Report_Issue :: struct {
+	kind:   Report_Kind,
+	name:   string,
+	detail: string,
+	file:   string,
+	line:   int,
+}
+
+Report_Pkg :: struct {
+	has_overview: bool,
+	declared:     [Decl_Kind]int,
+	undocumented: [Decl_Kind][dynamic]string,
+	issues:       [dynamic]Report_Issue,
+}
+
+report_pkgs: map[^doc.Pkg]^Report_Pkg
+
+// What is being documented, while its problems belong in the report:
+// a declaration on the page of the package declaring it, or the package's overview
+report_pkg:    ^doc.Pkg
+report_entity: ^doc.Entity
+report_name:   string
+
+report_of :: proc(pkg: ^doc.Pkg) -> ^Report_Pkg {
+	// kept to the end, whatever allocator the caller was using
+	context.allocator = runtime.default_allocator()
+	r := report_pkgs[pkg]
+	if r == nil {
+		r = new(Report_Pkg)
+		report_pkgs[pkg] = r
+	}
+	return r
+}
+
+report_begin :: proc(pkg: ^doc.Pkg, e: ^doc.Entity = nil, name := "") {
+	report_pkg, report_entity, report_name = pkg, e, name
+}
+
+report_end :: proc() {
+	report_pkg, report_entity, report_name = nil, nil, ""
+}
+
+report_add :: proc(kind: Report_Kind, detail: string) {
+	if report_pkg == nil {
+		return
+	}
+	context.allocator = runtime.default_allocator()
+	r := report_of(report_pkg)
+	for issue in r.issues {
+		if issue.kind == kind && issue.name == report_name && issue.detail == detail {
+			return
+		}
+	}
+	issue := Report_Issue{kind = kind, name = report_name, detail = strings.clone(detail)}
+	if e := report_entity; e != nil && e.pos.file != 0 {
+		issue.file = slashpath.base(str(cfg.files[e.pos.file].name))
+		issue.line = int(e.pos.line)
+	}
+	append(&r.issues, issue)
+}
+
+decl_kind_of :: proc(e: ^doc.Entity) -> (kind: Decl_Kind, ok: bool) {
+	#partial switch e.kind {
+	case .Type_Name:  return .Type, true
+	case .Constant:   return .Constant, true
+	case .Variable:   return .Variable, true
+	case .Procedure:  return .Procedure, true
+	case .Proc_Group: return .Proc_Group, true
+	}
+	return
+}
+
+report_declaration :: proc(pkg: ^doc.Pkg, e: ^doc.Entity, name: string, documented: bool) {
+	kind, ok := decl_kind_of(e)
+	if !ok {
+		return
+	}
+	context.allocator = runtime.default_allocator()
+	r := report_of(pkg)
+	r.declared[kind] += 1
+	if !documented {
+		append(&r.undocumented[kind], name)
+	}
+}
+
+@(private="file")
+param_list_names :: proc(lines: []string) -> (names: [dynamic]string, ok: bool) {
+	names = make([dynamic]string, context.temp_allocator)
+	// `- name: description` items, as format_param_lists takes them
+	for line in lines {
+		text := strings.trim_space(line)
+		switch {
+		case strings.has_prefix(text, "- "), strings.has_prefix(text, "* "):
+			colon := strings.index_byte(text, ':')
+			if colon < 0 {
+				return
+			}
+			for untrimmed in strings.split(text[2:colon], ",", context.temp_allocator) {
+				name := strings.trim_left(strings.trim_space(untrimmed), "$")
+				if name == "" {
+					return
+				}
+				for r, i in name {
+					if !(r == '_' || 'a' <= r && r <= 'z' || 'A' <= r && r <= 'Z' || i > 0 && '0' <= r && r <= '9') {
+						return
+					}
+				}
+				append(&names, name)
+			}
+		case text == "":
+			return names, len(names) > 0
+		case line[0] == ' ' || line[0] == '\t':
+			// the item before, continued
+		case:
+			return names, len(names) > 0
+		}
+	}
+	return names, len(names) > 0
+}
+
+report_check_params :: proc(docs: string, e: ^doc.Entity) {
+	if report_pkg == nil {
+		return
+	}
+	#partial switch e.kind {
+	case .Procedure, .Type_Name:
+	case:
+		return
+	}
+	t := base_type(cfg.types[e.type])
+	if t.kind != .Proc {
+		return
+	}
+	tuples := array(t.types)
+
+	lines := strings.split_lines(strip_comment_gutter(docs), context.temp_allocator)
+	for line, i in lines {
+		title := strings.trim_space(line)
+		which: int
+		switch title {
+		case "Inputs:":  which = 0
+		case "Returns:": which = 1
+		case:            continue
+		}
+		listed := param_list_names(lines[i+1:]) or_continue
+
+		declared := make([dynamic]string, context.temp_allocator)
+		unnamed_results := false
+		if which < len(tuples) && tuples[which] != 0 {
+			for index in array(cfg.types[tuples[which]].entities) {
+				name := strings.trim_left(str(cfg.entities[index].name), "$")
+				if name == "" || name == "_" {
+					unnamed_results ||= which == 1
+					continue
+				}
+				append(&declared, name)
+			}
+		}
+		if unnamed_results {
+			// described, not named
+			continue
+		}
+
+		for name in listed {
+			if !slice.contains(declared[:], name) {
+				report_add(.Unknown_Param, fmt.tprintf("%s names `%s`, which the signature doesn't have", title, name))
+			}
+		}
+		for name in declared {
+			if !slice.contains(listed[:], name) && !conventionally_unlisted(tuples[which], name) {
+				report_add(.Missing_Param, fmt.tprintf("%s leaves out `%s`", title, name))
+			}
+		}
+	}
+}
+
+// `loc := #caller_location`, `gen := context.random_generator`
+@(private="file")
+conventionally_unlisted :: proc(tuple: doc.Type_Index, name: string) -> bool {
+	for index in array(cfg.types[tuple].entities) {
+		param := &cfg.entities[index]
+		if strings.trim_left(str(param.name), "$") == name {
+			init := str(param.init_string)
+			return init == "#caller_location" || strings.has_prefix(init, "context.")
+		}
+	}
+	return false
+}
+
+@(private="file")
+example_error: struct {
+	line: int,
+	msg:  string,
+}
+@(private="file")
+example_offset: int
+
+@(private="file")
+parses :: proc(src: string) -> bool {
+	p := parser.default_parser()
+	p.err = proc(pos: tokenizer.Pos, msg: string, args: ..any) {
+		if example_error.msg == "" {
+			example_error.line = pos.line - example_offset
+			example_error.msg  = fmt.tprintf(msg, ..args)
+		}
+	}
+	p.warn = proc(pos: tokenizer.Pos, msg: string, args: ..any) {}
+	file := ast.File{src = src, fullpath = "example.odin"}
+	example_error = {}
+	return parser.parse_file(&p, &file) && p.error_count == 0
+}
+
+report_check_example :: proc(lines: []string) {
+	if report_pkg == nil {
+		return
+	}
+	runtime.DEFAULT_TEMP_ALLOCATOR_TEMP_GUARD()
+	context.allocator = context.temp_allocator
+
+	// either a file, as most examples are, or statements, with any imports first
+
+	as_file  := strings.builder_make()
+	as_stmts := strings.builder_make()
+	// some name their own package
+	example_offset = 0
+	for line in lines {
+		text := strings.trim_space(line)
+		if text != "" && !strings.has_prefix(text, "//") {
+			if !strings.has_prefix(text, "package ") {
+				strings.write_string(&as_file,  "package example\n")
+				strings.write_string(&as_stmts, "package example\n")
+				example_offset = 1
+			}
+			break
+		}
+	}
+	opened := false
+	for line in lines {
+		code := strings.trim_prefix(line, "\t")
+		text := strings.trim_space(code)
+		// `...` and `{ ... }` stand for whatever goes there
+		if text == "..." {
+			code, text = "", ""
+		}
+		code, _ = strings.replace_all(code, "{ ... }", "{}")
+		if !opened && text != "" && !strings.has_prefix(text, "import ") && !strings.has_prefix(text, "package ") && !strings.has_prefix(text, "//") {
+			// on the same line, so the line numbers agree
+			strings.write_string(&as_stmts, "example :: proc() {")
+			opened = true
+		}
+		strings.write_string(&as_file, code)
+		strings.write_string(&as_stmts, code)
+		strings.write_byte(&as_file, '\n')
+		strings.write_byte(&as_stmts, '\n')
+	}
+	if opened {
+		strings.write_string(&as_stmts, "}\n")
+	}
+
+	if parses(strings.to_string(as_file)) {
+		return
+	}
+	first := example_error
+	if parses(strings.to_string(as_stmts)) {
+		return
+	}
+	// the attempt that got further is the likelier reading
+	err := first if first.line >= example_error.line else example_error
+	report_add(.Bad_Example, fmt.tprintf("line %d: %s", err.line, err.msg))
+}
+
+generate_report :: proc(b: ^strings.Builder, collections: []^Collection) {
+	w := strings.to_writer(b)
+	os.make_directory("report")
+
+	strings.builder_reset(b)
+	fmt.wprintf(w, `{{"generated": "%s", "packages": [`, build_date())
+	first := true
+	for c in collections {
+		paths := make([dynamic]string, context.temp_allocator)
+		for path in c.pkgs {
+			append(&paths, path)
+		}
+		slice.sort(paths[:])
+
+		for path in paths {
+			pkg := c.pkgs[path]
+			r := report_pkgs[pkg] or_continue
+			if !first {
+				io.write_string(w, ",")
+			}
+			first = false
+
+			tree_path := fmt.tprintf("%s/%s", c.name, path) if path != "" else c.name
+			io.write_string(w, "\n{\"path\": ")
+			write_json_string(w, tree_path)
+			io.write_string(w, ", \"import\": ")
+			write_json_string(w, fmt.tprintf("%s:%s", c.name, path))
+			io.write_string(w, ", \"url\": ")
+			write_json_string(w, fmt.tprintf("%s/%s/", c.base_url, path) if path != "" else fmt.tprintf("%s/", c.base_url))
+			io.write_string(w, ", \"source\": ")
+			write_json_string(w, fmt.tprintf("%s/%s", c.source_url, path))
+			fmt.wprintf(w, `, "overview": %v, "declared": {{`, r.has_overview)
+			for kind, i in Decl_Kind {
+				fmt.wprintf(w, `%s"%s": %d`, ", " if i > 0 else "", DECL_KIND_CODES[kind], r.declared[kind])
+			}
+			io.write_string(w, `}, "undocumented": {`)
+			for kind, i in Decl_Kind {
+				fmt.wprintf(w, `%s"%s": [`, ", " if i > 0 else "", DECL_KIND_CODES[kind])
+				for name, j in r.undocumented[kind] {
+					if j > 0 {
+						io.write_byte(w, ',')
+					}
+					write_json_string(w, name)
+				}
+				io.write_string(w, "]")
+			}
+			io.write_string(w, `}, "issues": [`)
+			for issue, i in r.issues {
+				if i > 0 {
+					io.write_byte(w, ',')
+				}
+				fmt.wprintf(w, `["%s", `, REPORT_KIND_CODES[issue.kind])
+				write_json_string(w, issue.name)
+				io.write_string(w, ", ")
+				write_json_string(w, issue.detail)
+				io.write_string(w, ", ")
+				write_json_string(w, issue.file)
+				fmt.wprintf(w, ", %d]", issue.line)
+			}
+			io.write_string(w, "]}")
+		}
+	}
+	io.write_string(w, "\n]}\n")
+	if nil != os.write_entire_file("report/data.json", b.buf[:]) {
+		errorf("unable to write the report/data.json file")
+	}
+
+	strings.builder_reset(b)
+	write_html_header(w, "Documentation report - pkg.odin-lang.org", .Full_Width,
+	                  extra_head = `<meta name="robots" content="noindex"><link rel="stylesheet" href="/report/report.css">`)
+	io.write_string(w, `<div id="odin-report" class="odin-report">
+<h1>Documentation report</h1>
+<p class="odin-report-lede">What the docs are missing or get wrong, package by package.</p>
+<noscript>The report needs JavaScript; its data is in <a href="/report/data.json">data.json</a>.</noscript>
+</div>
+`)
+	io.write(w, #load("resources/footer.txt.html"))
+	io.write_string(w, `<script src="/report/report.js"></script>`+"\n</body>\n</html>\n")
+	if nil != os.write_entire_file("report/index.html", b.buf[:]) {
+		errorf("unable to write the report/index.html file")
+	}
+	if nil != os.write_entire_file("report/report.js", #load("resources/report.js")) {
+		errorf("unable to write the report/report.js file")
+	}
+	if nil != os.write_entire_file("report/report.css", #load("resources/report.css")) {
+		errorf("unable to write the report/report.css file")
+	}
+}

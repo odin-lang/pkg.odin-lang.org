@@ -146,6 +146,9 @@ main :: proc() {
 	log.infof("generate moved package redirects")
 	generate_moved_redirects(&b)
 
+	log.infof("generate report")
+	generate_report(&b, not_hidden[:])
+
 	log.infof("copy_assets")
 	copy_assets()
 
@@ -555,7 +558,7 @@ Header_Kind :: enum {
 	Full_Width,
 }
 
-write_html_header :: proc(w: io.Writer, title: string, kind := Header_Kind.Normal, description := "") {
+write_html_header :: proc(w: io.Writer, title: string, kind := Header_Kind.Normal, description := "", extra_head := "") {
 	fmt.wprintf(w, string(#load("resources/header.txt.html")), title)
 
 	when #config(ODIN_DOC_DEV, false) {
@@ -567,6 +570,7 @@ write_html_header :: proc(w: io.Writer, title: string, kind := Header_Kind.Norma
 	if description != "" {
 		write_head_meta(w, title, description)
 	}
+	io.write_string(w, extra_head)
 
 
 	io.write(w, #load("resources/header-lower.txt.html"))
@@ -2413,6 +2417,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", doc_ctx: ^Doc_
 
 	if has_any_output && !has_example {
 		doc_warnf("The documentation for %q has an output block but no example", ctx.owner)
+		report_add(.Output_Only, "an Output with no Example")
 	}
 
 	for &block in blocks {
@@ -2464,6 +2469,16 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", doc_ctx: ^Doc_
 			}
 			io.write_string(w, "</pre>\n")
 		case .Example:
+			{
+				raw := block.lines
+				for len(raw) > 0 && (strings.trim_space(raw[0]) == "" || strings.has_prefix(raw[0], "Example:")) {
+					raw = raw[1:]
+				}
+				// the compiler's own pseudo-code for built-ins
+				if len(raw) > 0 && !strings.has_prefix(strings.trim_space(raw[0]), "// Defined internally by the compiler") {
+					report_check_example(raw)
+				}
+			}
 			// Example block starts with `Example:` and a number of white spaces,
 			example_lines := trim_empty_and_subtitle_lines_and_replace_lt(block.lines, "Example:")
 
@@ -3442,6 +3457,10 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	fmt.wprintln(w, `<div>`)
 
 	doc_ctx := Doc_Context{pkg = pkg, owner = fmt.tprintf("%s.%s", str(pkg.name), name), heading_prefix = name, entity = e, self_name = name}
+	if is_declared_here {
+		report_begin(pkg, e, name)
+	}
+	defer report_end()
 
 	if raw, ok := find_entity_attribute(e, "deprecated"); ok {
 		msg, _, unq_ok := strconv.unquote_string(raw, context.temp_allocator)
@@ -3657,6 +3676,10 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	// and `write_docs` does its own trimming as it is.
 	if strings.trim_space(the_docs) == "" {
 		the_docs = str(e.comment)
+	}
+	if is_declared_here {
+		report_declaration(pkg, e, name, strings.trim_space(the_docs) != "")
+		report_check_params(the_docs, e)
 	}
 
 	if the_docs != "" {
@@ -3918,13 +3941,16 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 
 	overview_docs := str(pkg.docs)
 	overview_headings: [dynamic]Doc_Heading
+	report_of(pkg).has_overview = strings.trim_space(overview_docs) != ""
 	if strings.trim_space(overview_docs) != "" {
 		fmt.wprintln(w, "<h2>Overview</h2>")
 		fmt.wprintln(w, "<div id=\"pkg-overview\">")
 		defer fmt.wprintln(w, "</div>")
 
 		ctx := Doc_Context{pkg = pkg, owner = path, heading_prefix = "overview", headings = &overview_headings}
+		report_begin(pkg)
 		write_docs(w, overview_docs, doc_ctx = &ctx)
+		report_end()
 	}
 
 	// e.g. `core:image/png` on `core:image`'s page, which otherwise only the sidebar shows
