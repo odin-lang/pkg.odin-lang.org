@@ -518,7 +518,8 @@ write_example_page :: proc(w: io.Writer, index: int) {
 		source_path = fmt.tprintf("%s/%s", program.path, program.files[page.file].name)
 		source_url = example_github_url(source_path)
 	}
-	fmt.wprintf(w, "<h1>%s", page.path)
+	io.write_string(w, "<h1>")
+	write_breakable_path(w, page.path)
 	write_example_platforms(w, index)
 	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"%s\"><em>Source</em></a></div></h1>\n", source_url)
 
