@@ -21,23 +21,35 @@ EXAMPLE_SHOWN_MAX_LINES :: 100
 // Unless the reader has chosen another, which is kept for every example; style.css has it too
 EXAMPLE_TAB_WIDTH :: 4
 
-// In the head, so the code is never drawn first with the wrong width
-EXAMPLE_TAB_WIDTH_SCRIPT :: `<script>
+// In the head, so the code is never drawn first with the wrong width or wrapping: the reader's choices, kept for every example
+EXAMPLE_CODE_VIEW_SCRIPT :: `<script>
 	(() => {
-		const KEY = "example-tab-width";
-		let width = null;
-		try { width = localStorage.getItem(KEY); } catch (e) {}
+		const read = key => { try { return localStorage.getItem(key); } catch (e) { return null; } };
+		const save = (key, value) => { try { localStorage.setItem(key, value); } catch (e) {} };
+		const root = document.documentElement;
+		let width = read("example-tab-width");
 		if (!/^[1-8]$/.test(width || "")) width = null;
-		const apply = w => document.documentElement.style.setProperty("--example-tab-width", w);
-		if (width) apply(width);
+		const apply_width = w => root.style.setProperty("--example-tab-width", w);
+		if (width) apply_width(width);
+		const wrap = read("example-wrap-lines") === "1";
+		root.classList.toggle("example-wrap-lines", wrap);
 		document.addEventListener("DOMContentLoaded", () => {
 			const selects = document.querySelectorAll(".example-tab-width select");
 			for (const select of selects) {
 				if (width) select.value = width;
 				select.addEventListener("change", () => {
-					apply(select.value);
+					apply_width(select.value);
 					for (const other of selects) other.value = select.value;
-					try { localStorage.setItem(KEY, select.value); } catch (e) {}
+					save("example-tab-width", select.value);
+				});
+			}
+			const boxes = document.querySelectorAll(".example-wrap input");
+			for (const box of boxes) {
+				box.checked = wrap;
+				box.addEventListener("change", () => {
+					root.classList.toggle("example-wrap-lines", box.checked);
+					for (const other of boxes) other.checked = box.checked;
+					save("example-wrap-lines", box.checked ? "1" : "0");
 				});
 			}
 		});
@@ -54,7 +66,7 @@ generate_example_pages :: proc(b: ^strings.Builder) {
 		runtime.DEFAULT_TEMP_ALLOCATOR_TEMP_GUARD()
 		strings.builder_reset(b)
 		write_html_header(w, fmt.tprintf("%s example - pkg.odin-lang.org", page.path), .Full_Width,
-		                  description = example_description(index), extra_head = EXAMPLE_TAB_WIDTH_SCRIPT)
+		                  description = example_description(index), extra_head = EXAMPLE_CODE_VIEW_SCRIPT)
 		write_example_page(w, index)
 		write_html_footer(w, "")
 		dir := fmt.tprintf("%s/%s", EXAMPLES_URL[1:], page.path)
@@ -588,8 +600,9 @@ write_example_page :: proc(w: io.Writer, index: int) {
 		if build != "" {
 			fmt.wprintf(w, ` <span class="doc-badge" title="#+build %s">%s</span>`, build, build)
 		}
-		// the tab width to show it with, which every file here shares
-		io.write_string(w, `</span><div class="doc-source"><label class="example-tab-width">Tab width <select autocomplete="off">`)
+		// whether to wrap its long lines and the tab width to show it with, which every file here shares
+		io.write_string(w, `</span><div class="doc-source"><label class="example-wrap"><input type="checkbox" autocomplete="off">Wrap lines</label>`)
+		io.write_string(w, `<label class="example-tab-width">Tab width <select autocomplete="off">`)
 		for n in 1..=8 {
 			fmt.wprintf(w, `<option%s>%d</option>`, " selected" if n == EXAMPLE_TAB_WIDTH else "", n)
 		}

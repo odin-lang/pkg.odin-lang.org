@@ -60,6 +60,10 @@ build_doc_link_index :: proc() {
 				}
 				names[name] = true
 			}
+			// and what only other targets' copies of it declare
+			for x in pkg_extras[pkg] or_else nil {
+				names[x.name] = true
+			}
 			cfg.pkg_link_names[pkg] = names
 
 			list := cfg.pkgs_by_name[pkg_name]

@@ -69,6 +69,7 @@ main :: proc() {
 		}
 	}
 
+	merge_pkg_copies()
 	build_doc_link_index()
 	index_builtin_names()
 
@@ -407,6 +408,12 @@ generate_from_path :: proc(path: string, all_packages: bool) {
 		for &pkg in cfg.pkgs[1:] {
 			fp := str(pkg.fullpath)
 
+			// each target's copy, for what only some of them declare
+			copies := pkg_copies[fp]
+			append(&copies, &pkg)
+			pkg_copies[fp] = copies
+			cfg.pkg_to_header[&pkg] = cfg.header
+
 			if fp in cfg.handled_packages {
 				if cfg.handled_packages[fp] >= len(array(pkg.entries)) {
 					log.debugf("package already handled: %q", fp)
@@ -719,7 +726,26 @@ write_pkg_data_pkg :: proc(w: io.Writer, collection: ^Collection, path: string, 
 	fmt.wprintf(w, "\t\t\"collection\": \"%s\",\n", collection.name)
 	fmt.wprintf(w, "\t\t\"path\": \"%s/%s\",\n", collection.base_url, path)
 	fmt.wprint(w, "\t\t\"entities\": [\n")
-	for e, i in entries.all {
+
+	// with what only other targets' copies of it declare, each from its own copy
+	Data_Entry :: struct {
+		pkg:   ^doc.Pkg,
+		entry: doc.Scope_Entry,
+	}
+	all := make([dynamic]Data_Entry, 0, len(entries.all), context.temp_allocator)
+	for e in entries.all {
+		append(&all, Data_Entry{pkg, e})
+	}
+	for x in pkg_extras[pkg] or_else nil {
+		append(&all, Data_Entry{x.copy, x.entry})
+	}
+	defer init_cfg_from_pkg(pkg)
+
+	for d, i in all {
+		e, entry_pkg := d.entry, d.pkg
+		if cfg.pkg_to_header[entry_pkg] != cfg.header {
+			init_cfg_from_pkg(entry_pkg)
+		}
 		if i != 0 { fmt.wprint(w, ",\n") }
 
 		kind_str := ""
@@ -749,7 +775,7 @@ write_pkg_data_pkg :: proc(w: io.Writer, collection: ^Collection, path: string, 
 		// and `SDL_CreateWindow` finds `CreateWindow`, as does `vkCreateInstance` `CreateInstance`
 		c_name := entity_c_name(entity, str(e.name))
 		if c_name == "" {
-			if _, _, upstream_name := upstream_doc(pkg, entity, str(e.name)); upstream_name != str(e.name) {
+			if _, _, upstream_name := upstream_doc(entry_pkg, entity, str(e.name)); upstream_name != str(e.name) {
 				c_name = upstream_name
 			}
 		}
@@ -759,7 +785,7 @@ write_pkg_data_pkg :: proc(w: io.Writer, collection: ^Collection, path: string, 
 		if raw, ok := find_entity_attribute(entity, "deprecated"); ok {
 			io.write_string(w, `, "dep": 1`)
 			msg, _, _ := strconv.unquote_string(raw, context.temp_allocator)
-			ctx := Doc_Context{pkg = pkg, entity = entity, self_name = str(e.name)}
+			ctx := Doc_Context{pkg = entry_pkg, entity = entity, self_name = str(e.name)}
 			if _, use, use_url := link_code_names(msg, &ctx); use != "" {
 				fmt.wprintf(w, `, "use": %q, "use_url": %q`, use, use_url)
 			}
@@ -776,7 +802,7 @@ write_pkg_data_pkg :: proc(w: io.Writer, collection: ^Collection, path: string, 
 		}
 
 
-		if str(pkg.name) == "runtime" {
+		if str(entry_pkg.name) == "runtime" {
 			for attr in array(cfg.entities[e.entity].attributes) {
 				if str(attr.name) == "builtin" {
 					fmt.wprintf(w, `, "builtin": true`)
@@ -4232,6 +4258,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		}
 		fmt.wprintln(w, "</section>")
 	}
+	write_pkg_extras(w, pkg)
 
 	fmt.wprintln(w, `<h2 id="pkg-source-files">Source Files</h2>`)
 	fmt.wprintln(w, "<ul>")
@@ -4346,6 +4373,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			fmt.wprintln(w, "</ul>")
 			fmt.wprintln(w, "</li>")
 		}
+		write_pkg_extras_toc(w, pkg)
 		write_link(w, "pkg-source-files", "Source Files")
 		write_link(w, "pkg-generation-information", "Generation Information")
 		fmt.wprintln(w, `</ul>`)
