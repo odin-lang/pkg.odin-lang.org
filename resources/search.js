@@ -815,7 +815,8 @@ window.addEventListener("keydown", ev => {
 	const in_list = link => link.closest("#TableOfContents, #pkg-index");
 	const link_of = ev => {
 		const link = ev.target.closest && ev.target.closest("a[href]");
-		if (!link || link.closest(".odin-type-preview")) {
+		// builtins in examples, like `int` and `nil`, are everywhere, so they're only links
+		if (!link || link.closest(".odin-type-preview") || link.classList.contains("example-builtin")) {
 			return null;
 		}
 		if (link.matches("pre.doc-code a.code-typename")) {

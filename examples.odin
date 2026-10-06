@@ -31,10 +31,16 @@ Example_Use :: struct {
 EXAMPLE_EXCERPT_MAX_LINES :: 24
 EXAMPLES_SHOWN :: 3
 
-example_uses:  map[^doc.Pkg]map[string][dynamic]Example_Use
-example_links: [][]map[int]string       // by program and file: where a name starts, and the page of what it names
-example_lines: [][][]string             // by program and file: each line, highlighted, once needed
-example_files: [][]Example_File_Info    // by program and file
+example_uses:     map[^doc.Pkg]map[string][dynamic]Example_Use
+example_links:    [][]map[int]Example_Link // by program and file: where a name starts, and what it names
+example_lines:    [][][]string             // by program and file: each line, highlighted, once needed
+example_files:    [][]Example_File_Info    // by program and file
+example_builtins: map[string]string        // the predeclared names, like `int`, `nil` and `len`, and their place on the builtin page
+
+Example_Link :: struct {
+	url:     string,
+	builtin: bool, // a link only when hovered, as they're everywhere
+}
 
 Example_File_Info :: struct {
 	main:     bool,                  // it declares `main`
@@ -89,11 +95,34 @@ load_examples :: proc(path: string) -> bool {
 
 index_examples :: proc() {
 	context.allocator = runtime.default_allocator()
-	example_links = make([][]map[int]string, len(examples.programs))
+
+	// those the builtin page documents: its own table's and the runtime's `@builtin` declarations
+	for c in cfg.collections {
+		if c.name != "base" {
+			continue
+		}
+		for b in builtins {
+			example_builtins[b.name] = fmt.aprintf("%s/builtin/#%s", c.base_url, b.name)
+		}
+		if runtime_pkg := lookup_doc_pkg("base:runtime", nil); runtime_pkg != nil {
+			init_cfg_from_pkg(runtime_pkg)
+			for entry in array(runtime_pkg.entries) {
+				for attr in array(cfg.entities[entry.entity].attributes) {
+					if str(attr.name) == "builtin" {
+						name := strings.clone(str(entry.name))
+						example_builtins[name] = fmt.aprintf("%s/builtin/#%s", c.base_url, name)
+						break
+					}
+				}
+			}
+		}
+	}
+
+	example_links = make([][]map[int]Example_Link, len(examples.programs))
 	example_lines = make([][][]string, len(examples.programs))
 	example_files = make([][]Example_File_Info, len(examples.programs))
 	for program, pi in examples.programs {
-		example_links[pi] = make([]map[int]string, len(program.files))
+		example_links[pi] = make([]map[int]Example_Link, len(program.files))
 		example_lines[pi] = make([][]string, len(program.files))
 		example_files[pi] = make([]Example_File_Info, len(program.files))
 		for _, fi in program.files {
@@ -148,13 +177,25 @@ index_example_file :: proc(pi, fi: int) {
 	}
 
 	Index :: struct {
-		pi, fi:   int,
-		lines:    int,
-		info:     ^Example_File_Info,
-		packages: map[string]^doc.Pkg, // by the name the file imports it as
-		procs:    [dynamic][2]int,     // the lines of each procedure declared at file scope
+		pi, fi:     int,
+		lines:      int,
+		info:       ^Example_File_Info,
+		packages:   map[string]^doc.Pkg, // by the name the file imports it as
+		intrinsics: string,              // the name it imports base:intrinsics as
+		procs:      [dynamic][2]int,     // the lines of each procedure declared at file scope
+
+		// the builtins it may name: not where they're a field, like `a.len` or `{len = 1}`,
+		// nor anywhere if it declares something of the same name, like a `max` of its own
+		builtins:    [dynamic]^ast.Ident,
+		not_builtin: map[int]bool,
+		declared:    map[string]bool,
 	}
-	index := Index{pi = pi, fi = fi, lines = strings.count(file.source, "\n") + 1, info = info}
+	index := Index{
+		pi = pi, fi = fi, lines = strings.count(file.source, "\n") + 1, info = info,
+		builtins    = make([dynamic]^ast.Ident, context.temp_allocator),
+		not_builtin = make(map[int]bool, context.temp_allocator),
+		declared    = make(map[string]bool, context.temp_allocator),
+	}
 	for decl in ast_file.decls {
 		if decl == nil {
 			continue
@@ -167,7 +208,9 @@ index_example_file :: proc(pi, fi: int) {
 				continue // the program's own packages
 			}
 			name := d.name.text if d.name.text != "" else slashpath.base(rest)
-			if pkg := lookup_doc_pkg(path, nil); pkg != nil {
+			if path == "base:intrinsics" {
+				index.intrinsics = name
+			} else if pkg := lookup_doc_pkg(path, nil); pkg != nil {
 				index.packages[name] = pkg
 				if !slice.contains(info.packages[:], pkg) {
 					append(&info.packages, pkg)
@@ -192,8 +235,50 @@ index_example_file :: proc(pi, fi: int) {
 			}
 		}
 	}
-	if len(index.packages) == 0 {
-		return
+	link_selector :: proc(index: ^Index, selector: ^ast.Selector_Expr) {
+		if selector.expr == nil || selector.field == nil {
+			return
+		}
+		ident, is_ident := selector.expr.derived.(^ast.Ident)
+		if !is_ident {
+			return
+		}
+		links := &example_links[index.pi][index.fi]
+		name := selector.field.name
+		if index.intrinsics != "" && ident.name == index.intrinsics {
+			if url, ok := builtin_url("intrinsics", name); ok {
+				links[selector.field.pos.offset] = {url = strings.clone(url)}
+			}
+			return
+		}
+		pkg, imported := index.packages[ident.name]
+		if !imported || name not_in cfg.pkg_link_names[pkg] {
+			return
+		}
+
+		links[selector.field.pos.offset] = {url = strings.clone(doc_entity_url(pkg, name))}
+		append(&index.info.used, Example_Name{pkg, name})
+		if !is_about(examples.programs[index.pi], pkg) {
+			return
+		}
+
+		line := selector.field.pos.line
+		use := Example_Use{program = index.pi, file = index.fi, line = line, from = max(1, line-3), to = min(index.lines, line+3)}
+		for r in index.procs {
+			if r[0] <= line && line <= r[1] {
+				if r[1] - r[0] + 1 <= EXAMPLE_EXCERPT_MAX_LINES {
+					use.from, use.to = r[0], r[1]
+				} else {
+					use.from, use.to = max(r[0], line-5), min(r[1], line+5)
+				}
+				break
+			}
+		}
+		by_name := example_uses[pkg]
+		uses := by_name[name]
+		append(&uses, use)
+		by_name[name] = uses
+		example_uses[pkg] = by_name
 	}
 
 	visitor := ast.Visitor{
@@ -202,48 +287,60 @@ index_example_file :: proc(pi, fi: int) {
 			if node == nil {
 				return nil
 			}
-			selector, is_selector := node.derived.(^ast.Selector_Expr)
-			if !is_selector || selector.expr == nil || selector.field == nil {
-				return v
-			}
 			index := (^Index)(v.data)
-			ident, is_ident := selector.expr.derived.(^ast.Ident)
-			if !is_ident {
-				return v
-			}
-			pkg, imported := index.packages[ident.name]
-			if !imported {
-				return v
-			}
-			name := selector.field.name
-			if name not_in cfg.pkg_link_names[pkg] {
-				return v
-			}
-
-			links := &example_links[index.pi][index.fi]
-			links[selector.field.pos.offset] = strings.clone(doc_entity_url(pkg, name))
-			append(&index.info.used, Example_Name{pkg, name})
-			if !is_about(examples.programs[index.pi], pkg) {
-				return v
-			}
-
-			line := selector.field.pos.line
-			use := Example_Use{program = index.pi, file = index.fi, line = line, from = max(1, line-3), to = min(index.lines, line+3)}
-			for r in index.procs {
-				if r[0] <= line && line <= r[1] {
-					if r[1] - r[0] + 1 <= EXAMPLE_EXCERPT_MAX_LINES {
-						use.from, use.to = r[0], r[1]
-					} else {
-						use.from, use.to = max(r[0], line-5), min(r[1], line+5)
+			declare :: proc(index: ^Index, names: []^ast.Expr) {
+				for name in names {
+					if name == nil {
+						continue
 					}
-					break
+					if ident, ok := name.derived.(^ast.Ident); ok {
+						index.declared[ident.name] = true
+					}
 				}
 			}
-			by_name := example_uses[pkg]
-			uses := by_name[name]
-			append(&uses, use)
-			by_name[name] = uses
-			example_uses[pkg] = by_name
+			#partial switch n in node.derived {
+			case ^ast.Ident:
+				if n.name in example_builtins {
+					append(&index.builtins, n)
+				}
+			case ^ast.Selector_Expr:
+				if n.field != nil {
+					index.not_builtin[n.field.pos.offset] = true
+				}
+				link_selector(index, n)
+			case ^ast.Implicit_Selector_Expr:
+				if n.field != nil {
+					index.not_builtin[n.field.pos.offset] = true
+				}
+			case ^ast.Field_Value:
+				if n.field != nil {
+					index.not_builtin[n.field.pos.offset] = true
+				}
+			case ^ast.Enum_Type:
+				for field in n.fields {
+					if field != nil {
+						index.not_builtin[field.pos.offset] = true
+					}
+				}
+			case ^ast.Bit_Field_Field:
+				if n.name != nil {
+					index.not_builtin[n.name.pos.offset] = true
+				}
+			case ^ast.Value_Decl:
+				declare(index, n.names)
+			case ^ast.Field:
+				declare(index, n.names)
+			case ^ast.Range_Stmt:
+				declare(index, n.vals)
+			case ^ast.Unroll_Range_Stmt:
+				declare(index, {n.val0, n.val1})
+			case ^ast.Type_Switch_Stmt:
+				if n.tag != nil {
+					if assign, ok := n.tag.derived.(^ast.Assign_Stmt); ok {
+						declare(index, assign.lhs)
+					}
+				}
+			}
 			return v
 		},
 	}
@@ -251,6 +348,14 @@ index_example_file :: proc(pi, fi: int) {
 		if decl != nil {
 			ast.walk(&visitor, decl)
 		}
+	}
+
+	links := &example_links[pi][fi]
+	for ident in index.builtins {
+		if index.not_builtin[ident.pos.offset] || ident.name in index.declared || ident.pos.offset in links {
+			continue
+		}
+		links[ident.pos.offset] = {url = example_builtins[ident.name], builtin = true}
 	}
 }
 
@@ -585,7 +690,7 @@ example_html_lines :: proc(pi, fi: int) -> []string {
 }
 
 @(private="file")
-highlight_example :: proc(src: string, links: map[int]string) -> []string {
+highlight_example :: proc(src: string, links: map[int]Example_Link) -> []string {
 	// classed as highlight.js classes them, so they look as the docs' own examples do; the names in `links` link to their docs
 	context.allocator = runtime.default_allocator()
 
@@ -596,20 +701,25 @@ highlight_example :: proc(src: string, links: map[int]string) -> []string {
 	out := Lines{b = strings.builder_make()}
 	defer strings.builder_destroy(&out.b)
 
-	write :: proc(out: ^Lines, text: string, class := "", url := "") {
+	write :: proc(out: ^Lines, text: string, class := "", link := Example_Link{}) {
 		rest := text
 		for {
 			nl := strings.index_byte(rest, '\n')
 			piece := rest if nl < 0 else rest[:nl]
 			if piece != "" {
-				switch {
-				case url != "":   fmt.sbprintf(&out.b, `<a href="%s">`, url)
-				case class != "": fmt.sbprintf(&out.b, `<span class="%s">`, class)
+				// a builtin keeps its colour inside its link
+				if link.url != "" {
+					fmt.sbprintf(&out.b, `<a class="example-builtin" href="%s">` if link.builtin else `<a href="%s">`, link.url)
+				}
+				if class != "" {
+					fmt.sbprintf(&out.b, `<span class="%s">`, class)
 				}
 				strings.write_string(&out.b, escape_html_text(piece))
-				switch {
-				case url != "":   strings.write_string(&out.b, "</a>")
-				case class != "": strings.write_string(&out.b, "</span>")
+				if class != "" {
+					strings.write_string(&out.b, "</span>")
+				}
+				if link.url != "" {
+					strings.write_string(&out.b, "</a>")
 				}
 			}
 			if nl < 0 {
@@ -637,7 +747,7 @@ highlight_example :: proc(src: string, links: map[int]string) -> []string {
 		}
 		write(&out, src[last:start])
 
-		class, url := "", ""
+		class, link := "", Example_Link{}
 		#partial switch tok.kind {
 		case .Comment:
 			class = "hljs-comment"
@@ -653,7 +763,10 @@ highlight_example :: proc(src: string, links: map[int]string) -> []string {
 			case directive:
 				class = "hljs-meta"
 			case start in links:
-				url = links[start]
+				link = links[start]
+				if link.builtin {
+					class = builtin_class(tok.text)
+				}
 			case:
 				class = builtin_class(tok.text)
 			}
@@ -665,7 +778,7 @@ highlight_example :: proc(src: string, links: map[int]string) -> []string {
 		if tok.kind != .Hash {
 			directive = false
 		}
-		write(&out, src[start:end], class, url)
+		write(&out, src[start:end], class, link)
 		last = end
 	}
 	write(&out, src[last:])
