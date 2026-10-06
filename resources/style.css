@@ -690,9 +690,6 @@ ul.doc-params > li.doc-param-active {
 	color: var(--odin-sidebar-muted);
 	font-weight: 400;
 }
-.odin-search-collection {
-	color: var(--odin-sidebar-muted);
-}
 #odin-search-results a.odin-search-use {
 	margin-left: 0.375rem;
 	color: var(--odin-sidebar-muted);
@@ -1971,6 +1968,36 @@ h4.pkg-sidebar-title {
 @media (max-width: 991.98px), (hover: none) {
 	#odin-search-results li .summary {
 		display: none;
+	}
+}
+/* the package a result is from, by the path it's imported with, kept to the end of the row out of the way of the names */
+#odin-search-results li .name {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+#odin-search-results li .path {
+	flex: none;
+	margin-left: auto;
+	color: var(--odin-sidebar-muted);
+	font-size: 0.875em;
+	white-space: nowrap;
+}
+/* where there isn't room, only where it tells apart results of the same name, under it */
+@media (max-width: 767.98px) {
+	#odin-search-results li {
+		flex-wrap: wrap;
+		row-gap: 0;
+	}
+	#odin-search-results li .path {
+		display: none;
+	}
+	#odin-search-results li.clash .path {
+		display: block;
+		flex-basis: 100%;
+		margin-left: 0;
+		padding-left: 5.25rem; /* past the kind */
+		white-space: normal;
+		overflow-wrap: anywhere;
 	}
 }
 

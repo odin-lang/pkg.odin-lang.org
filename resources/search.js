@@ -852,7 +852,7 @@ window.addEventListener("keydown", ev => {
 						return null;
 					}
 					const pkg = Object.values(new Function(text + "\nreturn odin_pkg_data;")().packages)[0];
-					return {name: pkg.name, entities: new Map(pkg.entities.map(e => [e.name, e]))};
+					return {name: package_import(pkg).import, entities: new Map(pkg.entities.map(e => [e.name, e]))};
 				})
 				.catch(() => null));
 		}
@@ -1147,6 +1147,18 @@ window.addEventListener("keydown", ev => {
 }
 
 var odin_pkg_name;
+
+function package_import(pkg) {
+	// what code calls a package, `posix` for "core:sys/posix", rather than what it calls itself, `sys_posix`;
+	// a path ending in something that isn't a name, as "vendor:lua/5.4" does, has to be imported as one, so its own is the likeliest
+	if (pkg.import === undefined) {
+		const parts = pkg.path.split("/");
+		const last = parts[parts.length - 1];
+		pkg.import = /^[A-Za-z_]\w*$/.test(last) ? last : pkg.name;
+		pkg.import_path = `${pkg.collection}:${parts.slice(parts.indexOf(pkg.collection) + 1).join("/")}`;
+	}
+	return pkg;
+}
 
 let odin_search = document.getElementById("odin-search");
 if (odin_search) {
@@ -1631,7 +1643,6 @@ if (odin_search) {
 
 	{
 		const IS_PACKAGE_PAGE = odin_search.className == "odin-search-package";
-		const IS_GLOBAL = odin_search.className == "odin-search-all";
 		const IS_PACKAGE_BUILTIN = IS_PACKAGE_PAGE && odin_pkg_name == "builtin";
 
 		let entities = [];
@@ -1640,8 +1651,9 @@ if (odin_search) {
 				e.pkg = "builtin";
 				e.full = e.name;
 			} else {
+				// `queue.push`, as code calls it, rather than `container_queue.push`, as its package calls itself
 				e.pkg = odin_pkg_name;
-				e.full = odin_pkg_name+'.'+e.name; // add full name
+				e.full = package_import(odin_pkg_data.packages[odin_pkg_name]).import+'.'+e.name;
 			}
 			entities.push(e);
 		}
@@ -1678,7 +1690,7 @@ if (odin_search) {
 		if (IS_PACKAGE_PAGE) {
 			let pkg_name = odin_pkg_name;
 			let entities = odin_pkg_data.packages[pkg_name].entities;
-			add_alt_names(pkg_name, entities);
+			add_alt_names(package_import(odin_pkg_data.packages[pkg_name]).import, entities);
 			for (let j = 0; j < entities.length; j++) {
 				add_entity(pkg_name, entities[j]);
 			}
@@ -1697,7 +1709,7 @@ if (odin_search) {
 			for (let i = 0; i < all_packages.length; i++) {
 				let [pkg_name, pkg] = all_packages[i];
 				let entities = pkg.entities;
-				add_alt_names(pkg_name, entities);
+				add_alt_names(package_import(pkg).import, entities);
 				for (let j = 0; j < entities.length; j++) {
 					let e = entities[j];
 					if (e.builtin) {
@@ -1917,20 +1929,33 @@ if (odin_search) {
 				// limit the results (only the displayed results are formatted)
 				results_length = Math.min(results_length, MAX_RESULTS_LENGTH);
 
+				// a name more than one result has, `image.load` say, is told apart by the path, which narrow lists show only then
+				let shown_names = new Map();
+				for (let result_idx = 0; result_idx < results_length; result_idx++) {
+					let entity = results[result_idx].entity;
+					let name = entity.kind === "pkg" ? package_import(odin_pkg_data.packages[entity.pkg]).import : entity.full;
+					shown_names.set(name, (shown_names.get(name) || 0) + 1);
+				}
+
 				let list_contents = [];
 				for (let result_idx = 0; result_idx < results_length; result_idx++) {
 					let result = results[result_idx];
 					let entity = result.entity;
+					let pkg = package_import(odin_pkg_data.packages[entity.pkg]);
+					let idx_set = new Set(result.indices);
 
 					if (entity.kind === "pkg") {
-						list_contents.push(`<li id="odin-search-result-${result_idx}" role="option" aria-selected="false" data-path="${entity.path}">`);
+						let clash = shown_names.get(pkg.import) > 1 ? ` class="clash"` : "";
+						let from = entity.full.length - pkg.import.length;
+						let name = entity.full.endsWith(pkg.import) ? highlight_range(entity.full, idx_set, from, entity.full.length) : pkg.import;
+						list_contents.push(`<li id="odin-search-result-${result_idx}"${clash} role="option" aria-selected="false" data-path="${entity.path}">`);
 						list_contents.push(`<div class="kind kind-pkg" title="package">package</div>`);
-						list_contents.push(`<div><a href="${entity.path}">${highlight_range(entity.full, new Set(result.indices), 0, entity.full.length)}</a></div></li>\n`);
+						list_contents.push(`<div class="name"><a href="${entity.path}">${name}</a></div>`);
+						list_contents.push(`<div class="path">${highlight_range(entity.full, idx_set, 0, entity.full.length)}</div></li>\n`);
 						continue;
 					}
 
 					let full = result.alt ? entity.alt : entity.full;
-					let idx_set = new Set(result.indices);
 					let dot = full.indexOf('.');
 
 					let is_builtin = false;
@@ -1950,10 +1975,12 @@ if (odin_search) {
 						formatted_name = `<s>${formatted_name}</s>`;
 					}
 
-					let pkg_path = odin_pkg_data.packages[entity.pkg].path;
+					let pkg_path = pkg.path;
 					let full_path = `${pkg_path}/#${entity.name}`;
+					let other_pkg = formatted_pkg !== null && (!IS_PACKAGE_PAGE || entity.pkg != odin_pkg_name);
 
-					list_contents.push(`<li id="odin-search-result-${result_idx}" role="option" aria-selected="false" data-path="${full_path}">`);
+					let clash = other_pkg && shown_names.get(entity.full) > 1 ? ` class="clash"` : "";
+					list_contents.push(`<li id="odin-search-result-${result_idx}"${clash} role="option" aria-selected="false" data-path="${full_path}">`);
 					// list_contents.push(`${result.score}&mdash;`);
 
 					const entity_kind_map = {
@@ -1979,16 +2006,18 @@ if (odin_search) {
 					list_contents.push(`<div class="kind ${kind_class}" title="${entity_kind}">${label}</div>`);
 
 					let use = entity.use ? ` <a class="odin-search-use" href="${entity.use_url}">\u2192 ${escape_html(entity.use)}</a>` : "";
-					if (formatted_pkg !== null && (!IS_PACKAGE_PAGE || entity.pkg != odin_pkg_name)) {
-						let collection = IS_GLOBAL ? `<span class="odin-search-collection">${odin_pkg_data.packages[entity.pkg].collection}:</span>` : "";
-						list_contents.push(`<div><a href="${pkg_path}">${collection}${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a>${use}</div>`);
+					if (other_pkg) {
+						list_contents.push(`<div class="name"><a href="${pkg_path}">${formatted_pkg}</a>.<a href="${full_path}">${formatted_name}</a>${use}</div>`);
 					} else {
-						list_contents.push(`<div><a href="${full_path}">${formatted_name}</a>${use}</div>`);
+						list_contents.push(`<div class="name"><a href="${full_path}">${formatted_name}</a>${use}</div>`);
 					}
 
 					// its first sentence, on package pages, and only where there is room for it
 					if (entity.d !== undefined) {
 						list_contents.push(`<div class="summary">${escape_html(entity.d)}</div>`);
+					}
+					if (other_pkg) {
+						list_contents.push(`<div class="path">${pkg.import_path}</div>`);
 					}
 
 					list_contents.push(`</li>\n`);
