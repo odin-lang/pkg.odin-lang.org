@@ -1231,6 +1231,13 @@ parse_integer_literal :: proc(literal: string) -> (value: i128, ok: bool) {
 }
 
 write_config_flag :: proc(w: io.Writer, init_string: string) {
+	if define, ok := config_define(init_string); ok {
+		fmt.wprintf(w, `<pre class="doc-code doc-code-usage">%s</pre>`+"\n", define)
+	}
+}
+
+config_define :: proc(init_string: string) -> (html: string, ok: bool) {
+	// `-define:NAME=value`, to set a `#config` value with
 	inner := strings.trim_space(init_string)
 	if !strings.has_prefix(inner, "#config(") || !strings.has_suffix(inner, ")") {
 		return
@@ -1242,23 +1249,37 @@ write_config_flag :: proc(w: io.Writer, init_string: string) {
 		return
 	}
 
-	io.write_string(w, `<pre class="doc-code doc-code-usage">-define:`)
-	io.write_string(w, name)
-	io.write_byte(w, '=')
+	b := strings.builder_make(context.temp_allocator)
+	fmt.sbprintf(&b, "-define:%s=", name)
 	// only a literal can be given to -define, so anything else is left for you to fill in
 	switch {
 	case default == "true" || default == "false":
-		fmt.wprintf(w, `<span class="keyword">%s</span>`, default)
+		fmt.sbprintf(&b, `<span class="keyword">%s</span>`, default)
 	case strings.has_prefix(default, `"`) && strings.has_suffix(default, `"`) && len(default) >= 2:
-		fmt.wprintf(w, `<span class="string">%s</span>`, escape_html_string(default, context.temp_allocator))
+		fmt.sbprintf(&b, `<span class="string">%s</span>`, escape_html_string(default, context.temp_allocator))
 	case:
-		if _, ok := parse_integer_literal(default); ok {
-			fmt.wprintf(w, `<span class="number">%s</span>`, default)
+		if _, is_integer := parse_integer_literal(default); is_integer {
+			fmt.sbprintf(&b, `<span class="number">%s</span>`, default)
 		} else {
-			io.write_string(w, "&lt;value&gt;")
+			strings.write_string(&b, "&lt;value&gt;")
 		}
 	}
-	io.write_string(w, "</pre>\n")
+	return strings.to_string(b), true
+}
+
+write_config_list :: proc(w: io.Writer, title: string, entries: []doc.Scope_Entry) {
+	// each already documented with the constants or variables, so only its name, linking there, and how to set it
+	fmt.wprintf(w, "<h2 id=\"pkg-{0:s}\" class=\"pkg-header\">{1:s}</h2>\n", slugify(title, context.temp_allocator), title)
+	io.write_string(w, `<ul class="doc-config-list">`+"\n")
+	for entry in entries {
+		name := str(entry.name)
+		fmt.wprintf(w, `<li><a href="#%s">%s</a>`, name, name)
+		if define, ok := config_define(str(cfg.entities[entry.entity].init_string)); ok {
+			fmt.wprintf(w, ` <code class="doc-config-define">%s</code>`, define)
+		}
+		io.write_string(w, "</li>\n")
+	}
+	io.write_string(w, "</ul>\n")
 }
 
 pkg_line_doc :: proc(pkg: ^doc.Pkg) -> (line_doc: string, ok: bool) {
@@ -1375,7 +1396,8 @@ write_collection_directory :: proc(w: io.Writer, collection: ^Collection) {
 				continue
 			}
 
-			fmt.wprintf(w, `<tr id="pkg-%s" class="pkg-child"><td class="pkg-name">`, child.name)
+			// by its path, as names repeat, like `crypto/hash` and `hash`
+			fmt.wprintf(w, `<tr id="pkg-%s" class="pkg-child"><td class="pkg-name">`, child.path)
 			fmt.wprintf(w, `<a href="%s/%s/">%s</a>`, collection.base_url, child.path, child.name)
 			io.write_string(w, `</td>`)
 
@@ -4237,6 +4259,8 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 				continue
 			}
 			switch {
+			case eo.name == "`#config` values":
+				write_config_list(w, eo.name, eo.entries)
 			case !is_dense_section(dense, eo.name):
 				write_entries(w, pkg, eo.name, eo.entries)
 			case eo.name == "Procedures":

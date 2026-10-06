@@ -297,7 +297,6 @@ page_packages :: proc(index: int) -> []^doc.Pkg {
 	return packages[:]
 }
 
-@(private="file")
 pkg_page_url :: proc(pkg: ^doc.Pkg) -> string {
 	collection := cfg.pkg_to_collection[pkg]
 	if path := collection.pkg_to_path[pkg]; path != "" {

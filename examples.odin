@@ -185,13 +185,24 @@ index_example_file :: proc(pi, fi: int) {
 				continue // the program's own packages
 			}
 			name := d.name.text if d.name.text != "" else slashpath.base(rest)
-			if path == "base:intrinsics" {
-				index.intrinsics = name
+			// its path links to the package's page
+			links := &example_links[pi][fi]
+			if path == "base:intrinsics" || path == "base:builtin" {
+				// pages of their own, rather than packages' pages
+				if path == "base:intrinsics" {
+					index.intrinsics = name
+				}
+				for c in cfg.collections {
+					if c.name == "base" {
+						links[d.relpath.pos.offset] = {url = fmt.aprintf("%s/%s/", c.base_url, rest)}
+					}
+				}
 			} else if pkg := lookup_doc_pkg(path, nil); pkg != nil {
 				index.packages[name] = pkg
 				if !slice.contains(info.packages[:], pkg) {
 					append(&info.packages, pkg)
 				}
+				links[d.relpath.pos.offset] = {url = strings.clone(pkg_page_url(pkg))}
 			}
 		case ^ast.Value_Decl:
 			for value, i in d.values {
@@ -735,6 +746,10 @@ highlight_example :: proc(src: string, links: map[int]Example_Link) -> []string 
 			class = "hljs-comment"
 		case .String, .Rune:
 			class = "hljs-string"
+			// an import's path, to the package's page
+			if start in links {
+				link = links[start]
+			}
 		case .Integer, .Float, .Imag:
 			class = "hljs-number"
 		case .Hash, .At, .File_Tag:
