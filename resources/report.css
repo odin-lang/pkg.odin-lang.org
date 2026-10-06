@@ -25,14 +25,15 @@
 	font-size: 0.875rem;
 }
 
-/* like the search results' kind badges, and coloured the same way */
+/* a problem category: its colour, and filled in while it's the one listed */
 .odin-report-badge {
+	--c: #475569;
 	display: inline-block;
 	padding: 0.125rem 0.5rem;
-	border: 1px solid rgba(var(--kind-rgb), 0.55);
-	border-radius: 1rem;
-	background-color: rgba(var(--kind-rgb), 0.1);
-	color: var(--kind-color);
+	border: 1px solid var(--c);
+	border-radius: 0.2rem;
+	background-color: color-mix(in srgb, var(--c) 14%, transparent);
+	color: var(--c);
 	font-size: 0.75rem;
 	font-weight: 500;
 	line-height: 1.2;
@@ -44,7 +45,42 @@ a.odin-report-badge {
 	text-decoration: none;
 }
 a.odin-report-badge:hover {
-	background-color: rgba(var(--kind-rgb), 0.2);
+	background-color: color-mix(in srgb, var(--c) 26%, transparent);
+}
+a.odin-report-badge[aria-pressed="true"] {
+	background-color: var(--c);
+	color: #fff;
+}
+.dark-mode a.odin-report-badge[aria-pressed="true"] {
+	color: #0b0e14;
+}
+.cat-links        { --c: #2563eb; }
+.cat-params       { --c: #7c3aed; }
+.cat-examples     { --c: #c2410c; }
+.cat-spelling     { --c: #0f766e; }
+.cat-names        { --c: #db2777; }
+.cat-deprecations { --c: #b45309; }
+.cat-overview     { --c: #475569; }
+.dark-mode .cat-links        { --c: #60a5fa; }
+.dark-mode .cat-params       { --c: #a78bfa; }
+.dark-mode .cat-examples     { --c: #fb923c; }
+.dark-mode .cat-spelling     { --c: #2dd4bf; }
+.dark-mode .cat-names        { --c: #f472b6; }
+.dark-mode .cat-deprecations { --c: #fbbf24; }
+.dark-mode .cat-overview     { --c: #94a3b8; }
+/* as the map draws a box's problems */
+.odin-report-pip {
+	margin-left: 1rem;
+	padding: 0 0.375rem;
+	border-radius: 0.2rem;
+	background-color: rgba(234, 88, 12, 0.18);
+	color: #c2410c;
+	font-size: 0.6875rem;
+	font-weight: 600;
+}
+.dark-mode .odin-report-pip {
+	background-color: rgba(251, 146, 60, 0.3);
+	color: #fdba74;
 }
 
 .odin-report-toolbar {
@@ -99,7 +135,7 @@ a.odin-report-badge:hover {
 .odin-report-size button {
 	padding: 0.125rem 0.625rem;
 	border: 1px solid var(--odin-card-border);
-	border-radius: 1rem;
+	border-radius: 0.2rem;
 	background: none;
 	color: inherit;
 	font-size: 0.8125rem;
@@ -255,7 +291,7 @@ a.odin-report-badge:hover {
 .odin-report-more {
 	padding: 0 0.5rem;
 	border: 1px solid var(--odin-card-border);
-	border-radius: 1rem;
+	border-radius: 0.2rem;
 	background: none;
 	color: var(--odin-sidebar-muted);
 	font-size: 0.75rem;
@@ -303,10 +339,7 @@ a.odin-report-badge:hover {
 	display: inline-block;
 	width: 8rem;
 	height: 0.625rem;
-	border-radius: 0.3125rem;
-}
-.odin-report-legend .odin-report-badge {
-	margin-left: 1rem;
+	border-radius: 0.2rem;
 }
 .odin-report-hint {
 	margin-left: auto;
@@ -342,12 +375,12 @@ a.odin-report-badge:hover {
 	width: 1.25rem;
 	height: 0.625rem;
 	margin-left: 1rem;
-	border-radius: 0.3125rem;
+	border-radius: 0.2rem;
 }
 .odin-report-copy {
 	padding: 0.125rem 0.75rem;
 	border: 1px solid var(--odin-card-border);
-	border-radius: 1rem;
+	border-radius: 0.2rem;
 	background: none;
 	color: inherit;
 	font-size: 0.8125rem;
@@ -359,9 +392,9 @@ a.odin-report-badge:hover {
 .odin-report-external {
 	display: inline-block;
 	padding: 0 0.625em;
-	border: 1px solid rgba(56, 130, 210, 0.5);
-	border-radius: 1em;
-	background-color: rgba(56, 130, 210, 0.08);
+	border: 1px solid var(--odin-sidebar-link);
+	border-radius: 0.2rem;
+	background-color: rgba(56, 130, 210, 0.12);
 	text-decoration: none;
 }
 .odin-report-external::after {

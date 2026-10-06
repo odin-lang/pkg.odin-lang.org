@@ -2485,6 +2485,7 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", doc_ctx: ^Doc_
 
 		switch block.kind {
 		case .Paragraph:
+			report_check_spelling(block_lines)
 			write_markdown(w, block_lines, ctx)
 		case .Code:
 			all_blank := len(block_lines) > 0

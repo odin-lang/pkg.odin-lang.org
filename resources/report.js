@@ -16,12 +16,13 @@
 	}
 
 	const CATEGORIES = [
-		{key: "links",        label: "Links",        kinds: ["link", "stale"],          badge: "kind-t",   none: "Every link and name resolves."},
-		{key: "params",       label: "Parameters",   kinds: ["param", "missing"],       badge: "kind-p",   none: "Every Inputs and Returns list matches its signature."},
-		{key: "examples",     label: "Examples",     kinds: ["example", "output"],      badge: "kind-c",   none: "Every example parses."},
-		{key: "names",        label: "Names",        kinds: ["name"],                   badge: "kind-b",   none: "No docs begin with another declaration's name."},
-		{key: "deprecations", label: "Deprecations", kinds: ["deprecated", "unmarked"], badge: "kind-v",   none: "Every deprecation is marked, and says what to use instead."},
-		{key: "overview",     label: "Overviews",    kinds: [],                         badge: "kind-pkg", none: "Every package has an overview."},
+		{key: "links",        label: "Links",        kinds: ["link", "stale"],                none: "Every link and name resolves."},
+		{key: "params",       label: "Parameters",   kinds: ["param", "missing"],             none: "Every Inputs and Returns list matches its signature."},
+		{key: "examples",     label: "Examples",     kinds: ["example", "output", "import"],  none: "Every example parses, and imports what it uses."},
+		{key: "spelling",     label: "Spelling",     kinds: ["spelling"],                     none: "No misspellings found."},
+		{key: "names",        label: "Names",        kinds: ["name"],                         none: "No docs begin with another declaration's name."},
+		{key: "deprecations", label: "Deprecations", kinds: ["deprecated", "unmarked"],       none: "Every deprecation is marked, and says what to use instead."},
+		{key: "overview",     label: "Overviews",    kinds: [],                               none: "Every package has an overview."},
 	];
 	const DECL_KINDS = {t: "Types", c: "Constants", v: "Variables", p: "Procedures", g: "Procedure groups"};
 	const SIZES = {
@@ -171,7 +172,7 @@
 		<div class="odin-report-legend">
 			<span>0%</span><span class="odin-report-scale"></span><span>100% documented</span>
 			<span class="odin-report-swatch"></span><span class="odin-report-swatch-label">documented elsewhere</span>
-			<span class="odin-report-badge kind-c">3</span><span>problems</span>
+			<span class="odin-report-pip">3</span><span>problems</span>
 			<span class="odin-report-hint">Click a package for its details, a directory to zoom in · arrow keys move · Esc goes up a level</span>
 		</div>
 	`);
@@ -193,7 +194,11 @@
 			<div><b>${count(root.decls)}</b> declarations</div>
 			<div><b>${percent(coverage_of(root))}</b> documented${root.total !== root.decls ? ` <span class="odin-report-note">of ${count(root.total)}; the other ${count(root.decls - root.total)} are documented elsewhere</span>` : ""}</div>
 			<div><b>${count(problems)}</b> problems:
-				${CATEGORIES.map(c => `<a class="odin-report-badge ${c.badge}" href="#=${c.key}">${c.label} ${count(root.counts[c.key])}</a>`).join(" ")}
+				${CATEGORIES.map(c => {
+					const selected = state.view === "category" && state.category === c;
+					const back = state.zoom === root ? "#" : `#${escape(state.zoom.path)}`;
+					return `<a class="odin-report-badge cat-${c.key}" href="${selected ? back : `#=${c.key}`}" aria-pressed="${selected}" title="${selected ? "Show the packages again" : `List every ${c.label.toLowerCase()} problem`}">${c.label} ${count(root.counts[c.key])}</a>`;
+				}).join(" ")}
 			</div>
 			<div class="odin-report-generated">Generated ${escape(data.generated)}</div>`;
 		report.querySelector("#odin-report-find-list").innerHTML = [...pkg_by_import.keys()].sort().map(i => `<option value="${escape(i)}">`).join("");
@@ -225,9 +230,9 @@
 			link:   variable("--odin-sidebar-link") || "#3882d2",
 			font:   body.fontFamily,
 			frame:  dark ? "rgba(255, 255, 255, 0.035)" : "rgba(0, 0, 0, 0.03)",
-			badge_bg:   dark ? "rgba(243, 154, 94, 0.18)" : "rgba(184, 83, 14, 0.12)",
-			badge_text: dark ? "#f39a5e" : "#b8530e",
-			elsewhere:  dark ? "rgba(122, 173, 229, 0.2)" : "rgba(56, 130, 210, 0.14)",
+			badge_bg:   dark ? "rgba(251, 146, 60, 0.3)" : "rgba(234, 88, 12, 0.18)",
+			badge_text: dark ? "#fdba74" : "#c2410c",
+			elsewhere:  has_oklch ? (dark ? "oklch(0.46 0.11 245)" : "oklch(0.84 0.09 240)") : (dark ? "#2f5d8a" : "#a9d0f5"),
 		};
 		report.querySelector(".odin-report-swatch").style.background = theme.elsewhere;
 		report.querySelector(".odin-report-scale").style.background =
@@ -247,12 +252,13 @@
 		if (coverage === null) {
 			return theme.dark ? "rgba(127, 127, 127, 0.2)" : "rgba(127, 127, 127, 0.14)";
 		}
+		// red, through amber, to green
 		if (has_oklch) {
 			const hue = 25 + 120 * coverage;
-			return theme.dark ? `oklch(0.42 0.09 ${hue})` : `oklch(0.87 0.08 ${hue})`;
+			return theme.dark ? `oklch(0.5 0.15 ${hue})` : `oklch(0.8 0.15 ${hue})`;
 		}
 		const hue = 120 * coverage;
-		return theme.dark ? `hsl(${hue} 35% 28%)` : `hsl(${hue} 60% 84%)`;
+		return theme.dark ? `hsl(${hue} 65% 34%)` : `hsl(${hue} 85% 72%)`;
 	};
 
 	// Layout: squarified treemaps, nested by directory
@@ -438,7 +444,7 @@
 	const draw_badge = (text, right, top) => {
 		ctx.font = `600 10px ${theme.font}`;
 		const w = ctx.measureText(text).width + 10;
-		round_rect(right - w, top, w, 15, 7.5);
+		round_rect(right - w, top, w, 15, 3);
 		ctx.fillStyle = theme.badge_bg;
 		ctx.fill();
 		ctx.fillStyle = theme.badge_text;
@@ -769,6 +775,7 @@
 			}
 		}
 		render_crumbs();
+		render_stats();
 		render_panel();
 		relayout(state.zoom !== zoom_before);
 		if (state.selected) {

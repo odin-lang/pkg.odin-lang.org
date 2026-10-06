@@ -26,6 +26,8 @@ Report_Kind :: enum u8 {
 	Deprecated_Bare,     // `@(deprecated)` without saying what to use instead
 	Deprecated_Unmarked, // docs calling it deprecated, without `@(deprecated)`
 	Other_Name,          // docs beginning with another declaration's name, as if copied from its
+	Missing_Import,      // an example using a package it doesn't import
+	Misspelled,          // a word in resources/misspellings.txt, outside code
 }
 
 REPORT_KIND_CODES := [Report_Kind]string{
@@ -38,6 +40,8 @@ REPORT_KIND_CODES := [Report_Kind]string{
 	.Deprecated_Bare     = "deprecated",
 	.Deprecated_Unmarked = "unmarked",
 	.Other_Name          = "name",
+	.Missing_Import      = "import",
+	.Misspelled          = "spelling",
 }
 
 Decl_Kind :: enum u8 {Type, Constant, Variable, Procedure, Proc_Group}
@@ -305,6 +309,8 @@ example_error: struct {
 }
 @(private="file")
 example_offset: int
+@(private="file")
+example_file: ^ast.File
 
 @(private="file")
 parses :: proc(src: string) -> bool {
@@ -316,10 +322,214 @@ parses :: proc(src: string) -> bool {
 		}
 	}
 	p.warn = proc(pos: tokenizer.Pos, msg: string, args: ..any) {}
-	file := ast.File{src = src, fullpath = "example.odin"}
+	example_file = new(ast.File)
+	example_file^ = {src = src, fullpath = "example.odin"}
 	example_error = {}
-	return parser.parse_file(&p, &file) && p.error_count == 0
+	return parser.parse_file(&p, example_file) && p.error_count == 0
 }
+
+@(private="file")
+package_names :: proc() -> map[string]bool {
+	// what examples may write `name.` for: every package's directory and declared name, and the conventional aliases
+	@(static) names: map[string]bool
+	if len(names) == 0 {
+		context.allocator = runtime.default_allocator()
+		for c in cfg.collections {
+			for path, pkg in c.pkgs {
+				if path != "" {
+					names[strings.clone(slashpath.base(path))] = true
+				}
+				// merged packages' strings are in their own doc files
+				names[strings.clone(doc.from_string(cfg.pkg_to_header[pkg], pkg.name))] = true
+			}
+		}
+		for _, alias in cfg.import_aliases {
+			names[alias] = true
+		}
+		delete_key(&names, "builtin")
+	}
+	return names
+}
+
+@(private="file")
+has_imports :: proc(file: ^ast.File) -> bool {
+	for decl in file.decls {
+		if decl != nil {
+			if _, ok := decl.derived.(^ast.Import_Decl); ok {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+@(private="file")
+declares_procedure :: proc(file: ^ast.File) -> bool {
+	for decl in file.decls {
+		if decl == nil {
+			continue
+		}
+		value_decl := decl.derived.(^ast.Value_Decl) or_continue
+		for value in value_decl.values {
+			if value != nil {
+				if _, ok := value.derived.(^ast.Proc_Lit); ok {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+@(private="file")
+check_example_imports :: proc(file: ^ast.File) {
+	imported := make(map[string]bool, 8)
+	for decl in file.decls {
+		if decl == nil {
+			continue
+		}
+		imp := decl.derived.(^ast.Import_Decl) or_continue
+		name := imp.name.text
+		if name == "" {
+			path := strings.trim(imp.relpath.text, "\"`")
+			if _, colon, rest := strings.partition(path, ":"); colon != "" {
+				path = rest
+			}
+			name = slashpath.base(path)
+		}
+		imported[name] = true
+	}
+
+	Names :: struct {
+		declared, used: map[string]bool,
+	}
+	names := Names{make(map[string]bool, 16), make(map[string]bool, 16)}
+	visitor := ast.Visitor{
+		data  = &names,
+		visit = proc(v: ^ast.Visitor, node: ^ast.Node) -> ^ast.Visitor {
+			if node == nil {
+				return nil
+			}
+			names := (^Names)(v.data)
+			declare :: proc(names: ^Names, exprs: []^ast.Expr) {
+				for e in exprs {
+					if e == nil {
+						continue
+					}
+					#partial switch x in e.derived {
+					case ^ast.Ident:
+						names.declared[x.name] = true
+					case ^ast.Poly_Type:
+						if x.type != nil {
+							names.declared[x.type.name] = true
+						}
+					}
+				}
+			}
+			#partial switch n in node.derived {
+			case ^ast.Value_Decl:  declare(names, n.names)
+			case ^ast.Field:       declare(names, n.names)
+			case ^ast.Range_Stmt:  declare(names, n.vals)
+			case ^ast.Assign_Stmt: declare(names, n.lhs)
+			case ^ast.Selector_Expr:
+				if n.expr == nil {
+					break
+				}
+				if id, ok := n.expr.derived.(^ast.Ident); ok {
+					names.used[id.name] = true
+				}
+			}
+			return v
+		},
+	}
+	for decl in file.decls {
+		if decl != nil {
+			ast.walk(&visitor, decl)
+		}
+	}
+
+	missing := make([dynamic]string, 0, 4)
+	known := package_names()
+	for name in names.used {
+		if !imported[name] && !names.declared[name] && name in known {
+			append(&missing, name)
+		}
+	}
+	slice.sort(missing[:])
+	for name in missing {
+		report_add(.Missing_Import, fmt.tprintf("the example uses `%s` without importing it", name))
+	}
+}
+
+@(private="file")
+misspellings :: proc() -> map[string]string {
+	@(static) words: map[string]string
+	if len(words) == 0 {
+		context.allocator = runtime.default_allocator()
+		text := string(#load("resources/misspellings.txt"))
+		for raw in strings.split_lines_iterator(&text) {
+			line := strings.trim_space(raw)
+			if line == "" || line[0] == '#' {
+				continue
+			}
+			wrong, _, right := strings.partition(line, " ")
+			words[wrong] = strings.trim_space(right)
+		}
+	}
+	return words
+}
+
+report_check_spelling :: proc(lines: []string) {
+	// prose only: not in `code`, links, URLs, or names like `foo_bar` and `pkg.name`
+	if report_pkg == nil {
+		return
+	}
+	words := misspellings()
+	is_letter :: proc(c: byte) -> bool {
+		return 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z'
+	}
+	is_name_part :: proc(c: byte) -> bool {
+		return c == '_' || c == '.' || '0' <= c && c <= '9'
+	}
+	for line in lines {
+		for i := 0; i < len(line); /**/ {
+			c := line[i]
+			switch {
+			case c == '`':
+				end := strings.index_byte(line[i+1:], '`')
+				i = len(line) if end < 0 else i + 1 + end + 1
+			case c == '[' && strings.has_prefix(line[i:], "[["):
+				end := strings.index(line[i:], "]]")
+				i = len(line) if end < 0 else i + end + 2
+			case c == ']' && strings.has_prefix(line[i:], "]("):
+				end := strings.index_byte(line[i:], ')')
+				i = len(line) if end < 0 else i + end + 1
+			case strings.has_prefix(line[i:], "http://") || strings.has_prefix(line[i:], "https://"):
+				for i < len(line) && line[i] != ' ' && line[i] != '\t' {
+					i += 1
+				}
+			case is_letter(c):
+				start := i
+				for i < len(line) && is_letter(line[i]) {
+					i += 1
+				}
+				word := line[start:i]
+				if start > 0 && is_name_part(line[start-1]) || i < len(line) && (is_name_part(line[i]) && !(line[i] == '.' && (i+1 == len(line) || line[i+1] == ' '))) {
+					for i < len(line) && (is_letter(line[i]) || is_name_part(line[i])) {
+						i += 1
+					}
+					continue
+				}
+				if right, ok := words[strings.to_lower(word, context.temp_allocator)]; ok {
+					report_add(.Misspelled, fmt.tprintf("`%s` should be `%s`", word, right))
+				}
+			case:
+				i += 1
+			}
+		}
+	}
+}
+
 
 report_check_example :: proc(lines: []string) {
 	if report_pkg == nil {
@@ -369,10 +579,17 @@ report_check_example :: proc(lines: []string) {
 	}
 
 	if parses(strings.to_string(as_file)) {
+		if has_imports(example_file) || declares_procedure(example_file) {
+			check_example_imports(example_file)
+		}
 		return
 	}
 	first := example_error
 	if parses(strings.to_string(as_stmts)) {
+		// statements alone, with no imports, are a sketch of the calls rather than a program
+		if has_imports(example_file) {
+			check_example_imports(example_file)
+		}
 		return
 	}
 	// the attempt that got further is the likelier reading
