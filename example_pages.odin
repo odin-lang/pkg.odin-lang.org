@@ -18,6 +18,31 @@ import be "bundle_examples"
 // Other text longer than this is only linked to
 EXAMPLE_SHOWN_MAX_LINES :: 100
 
+// Unless the reader has chosen another, which is kept for every example; style.css has it too
+EXAMPLE_TAB_WIDTH :: 4
+
+// In the head, so the code is never drawn first with the wrong width
+EXAMPLE_TAB_WIDTH_SCRIPT :: `<script>
+	(() => {
+		const KEY = "example-tab-width";
+		let width = null;
+		try { width = localStorage.getItem(KEY); } catch (e) {}
+		if (!/^[1-8]$/.test(width || "")) width = null;
+		const apply = w => document.documentElement.style.setProperty("--example-tab-width", w);
+		if (width) apply(width);
+		document.addEventListener("DOMContentLoaded", () => {
+			for (const select of document.querySelectorAll(".example-tab-width select")) {
+				if (width) select.value = width;
+				select.addEventListener("change", () => {
+					apply(select.value);
+					try { localStorage.setItem(KEY, select.value); } catch (e) {}
+				});
+			}
+		});
+	})();
+</script>
+`
+
 generate_example_pages :: proc(b: ^strings.Builder) {
 	if len(example_pages) == 0 {
 		return
@@ -26,7 +51,8 @@ generate_example_pages :: proc(b: ^strings.Builder) {
 	for page, index in example_pages {
 		runtime.DEFAULT_TEMP_ALLOCATOR_TEMP_GUARD()
 		strings.builder_reset(b)
-		write_html_header(w, fmt.tprintf("%s example - pkg.odin-lang.org", page.path), .Full_Width, description = example_description(index))
+		write_html_header(w, fmt.tprintf("%s example - pkg.odin-lang.org", page.path), .Full_Width,
+		                  description = example_description(index), extra_head = EXAMPLE_TAB_WIDTH_SCRIPT)
 		write_example_page(w, index)
 		write_html_footer(w, "")
 		dir := fmt.tprintf("%s/%s", EXAMPLES_URL[1:], page.path)
@@ -371,6 +397,11 @@ write_example_page :: proc(w: io.Writer, index: int) {
 	}
 	fmt.wprintf(w, "<h1>%s<div class=\"doc-source\"><a href=\"%s\"><em>Source</em></a></div></h1>\n", page.path, source_url)
 
+	// before anything else, as it isn't under Odin's licence
+	if program.license.path != "" {
+		write_example_licence(w, program.license)
+	}
+
 	repo_name := strings.trim_prefix(strings.trim_prefix(examples.repo, "https://"), "github.com/")
 	fmt.wprintln(w, `<ul class="odin-collection-meta odin-pkg-meta">`)
 	fmt.wprintf(w, `<li><span>Source</span> <a href="%s">%s/%s</a></li>`+"\n", source_url, repo_name, escape_html_text(source_path))
@@ -391,7 +422,7 @@ write_example_page :: proc(w: io.Writer, index: int) {
 	if len(page.members) > 0 {
 		fmt.wprintf(w, `<li><span>Examples</span> %d</li>`+"\n", len(page.members))
 	}
-	if page.file < 0 && len(files.odin) > 0 && !program.link_only {
+	if page.file < 0 && len(files.odin) > 0 {
 		io.write_string(w, `<li><span>Files</span> `)
 		for fi, i in files.odin {
 			if i > 0 {
@@ -401,9 +432,6 @@ write_example_page :: proc(w: io.Writer, index: int) {
 			fmt.wprintf(w, `<a href="#%s">%s</a>`, name, name)
 		}
 		io.write_string(w, "</li>\n")
-	}
-	if program.license.path != "" {
-		fmt.wprintf(w, `<li><span>Licence</span> <a href="%s">%s</a></li>`+"\n", example_github_url(program.license.path), escape_html_text(license_line(program.license.text)))
 	}
 	fmt.wprintln(w, `</ul>`)
 
@@ -416,7 +444,7 @@ write_example_page :: proc(w: io.Writer, index: int) {
 
 	fmt.wprintln(w, `<section class="documentation">`)
 
-	if page.file < 0 && program.readme != "" && !program.link_only {
+	if page.file < 0 && program.readme != "" {
 		fmt.wprintln(w, "<h2>Overview</h2>")
 		fmt.wprintln(w, `<div id="pkg-overview">`)
 		ctx := Doc_Context{owner = page.path, readme_base = example_github_url(fmt.tprintf("%s/", program.path))}
@@ -474,56 +502,50 @@ write_example_page :: proc(w: io.Writer, index: int) {
 		}
 	}
 
-	if len(files.odin) > 0 {
-		fmt.wprintln(w, `<h2 id="example-code">Code</h2>`)
-		append(&toc, Toc_Item{id = "example-code", text = "Code"})
-		if program.link_only {
-			fmt.wprintf(w, `<p class="example-note">Its code is only linked to here, as <a href="%s">its licence</a> asks.</p>`+"\n", example_github_url(program.license.path))
-			fmt.wprintln(w, `<ul class="example-links">`)
-			for fi in files.odin {
-				file := program.files[fi]
-				lines := line_count(file.source)
-				fmt.wprintf(w, `<li><a href="%s">%s</a> <span class="example-lines">%s line%s</span></li>`+"\n", file_url(program, file.name), file.name, thousands(lines), "" if lines == 1 else "s")
-			}
-			fmt.wprintln(w, `</ul>`)
-		} else {
-			for fi in files.odin {
-				file := program.files[fi]
-				info := example_files[page.program][fi]
-				fmt.wprintln(w, `<div class="example-file">`)
-				file_heading(w, file.name, info.build, line_count(file.source), file_url(program, file.name))
-				io.write_string(w, `<pre class="doc-example-code example-code"><code class="hljs nohighlight">`)
-				for line, i in example_html_lines(page.program, fi) {
-					fmt.wprintf(w, `<span class="line" id="{0:s}-L{1:d}"><a class="ln" href="#{0:s}-L{1:d}">{1:d}</a>{2:s}</span>`+"\n", file.name, i+1, line)
-				}
-				io.write_string(w, "</code></pre>\n")
-				fmt.wprintln(w, `</div>`)
-				append(&toc, Toc_Item{id = file.name, text = file.name, level = 1})
-				for p in info.procs {
-					append(&toc, Toc_Item{id = fmt.tprintf("%s-L%d", file.name, p.line), text = p.name, level = 2})
-				}
-			}
+	// the first heading over code shown here has the tab width to show it with
+	tab_width_shown := false
+	code_heading :: proc(w: io.Writer, id, title: string, shows_code: bool, tab_width_shown: ^bool) {
+		if !shows_code || tab_width_shown^ {
+			fmt.wprintf(w, `<h2 id="%s">%s</h2>`+"\n", id, title)
+			return
 		}
+		tab_width_shown^ = true
+		fmt.wprintf(w, `<h2 id="%s" class="example-code-heading">%s<label class="example-tab-width">Tab width <select autocomplete="off">`, id, title)
+		for n in 1..=8 {
+			fmt.wprintf(w, `<option%s>%d</option>`, " selected" if n == EXAMPLE_TAB_WIDTH else "", n)
+		}
+		io.write_string(w, "</select></label></h2>\n")
 	}
 
-	// a program whose code is only linked to has the rest only linked to as well
-	if program.link_only {
-		append(&files.long, ..files.shown[:])
-		clear(&files.shown)
+	if len(files.odin) > 0 {
+		code_heading(w, "example-code", "Code", true, &tab_width_shown)
+		append(&toc, Toc_Item{id = "example-code", text = "Code"})
+		for fi in files.odin {
+			file := program.files[fi]
+			info := example_files[page.program][fi]
+			fmt.wprintln(w, `<div class="example-file">`)
+			file_heading(w, file.name, info.build, line_count(file.source), file_url(program, file.name))
+			io.write_string(w, `<pre class="doc-example-code example-code"><code class="hljs nohighlight">`)
+			for line, i in example_html_lines(page.program, fi) {
+				fmt.wprintf(w, `<span class="line" id="{0:s}-L{1:d}"><a class="ln" href="#{0:s}-L{1:d}">{1:d}</a>{2:s}</span>`+"\n", file.name, i+1, line)
+			}
+			io.write_string(w, "</code></pre>\n")
+			fmt.wprintln(w, `</div>`)
+			append(&toc, Toc_Item{id = file.name, text = file.name, level = 1})
+			for p in info.procs {
+				append(&toc, Toc_Item{id = fmt.tprintf("%s-L%d", file.name, p.line), text = p.name, level = 2})
+			}
+		}
 	}
 
 	if len(files.shaders) > 0 {
-		fmt.wprintln(w, `<h2 id="example-shaders">Shaders</h2>`)
+		code_heading(w, "example-shaders", "Shaders", true, &tab_width_shown)
 		append(&toc, Toc_Item{id = "example-shaders", text = "Shaders"})
-		if program.link_only {
-			write_links(w, program, files.shaders[:])
-		} else {
-			write_text(w, program, files.shaders[:], &toc)
-		}
+		write_text(w, program, files.shaders[:], &toc)
 	}
 
 	if len(files.shown) + len(files.long) > 0 {
-		fmt.wprintln(w, `<h2 id="example-other-files">Other Files</h2>`)
+		code_heading(w, "example-other-files", "Other Files", len(files.shown) > 0, &tab_width_shown)
 		append(&toc, Toc_Item{id = "example-other-files", text = "Other Files"})
 		write_text(w, program, files.shown[:], &toc)
 		if len(files.long) > 0 {
@@ -625,6 +647,65 @@ write_example_page :: proc(w: io.Writer, index: int) {
 	fmt.wprintln(w, `</ul>`)
 	fmt.wprintln(w, `</nav>`)
 	fmt.wprintln(w, `</div></div>`)
+}
+
+@(private="file")
+write_example_licence :: proc(w: io.Writer, license: be.Example_License) {
+	// all of a short one; of a long one, up to its copyright line, then the rest when asked for, but always on the page
+	MAX_SHOWN_LINES :: 6
+	lines := strings.split_lines(strings.trim_space(license.text), context.temp_allocator)
+	shown := len(lines)
+	if shown > MAX_SHOWN_LINES {
+		// or else its first paragraph
+		shown = 0
+		for line, i in lines[:MAX_SHOWN_LINES] {
+			if strings.contains(strings.to_lower(line, context.temp_allocator), "copyright") || strings.contains(line, "©") {
+				shown = i + 1
+				break
+			}
+		}
+		if shown == 0 {
+			for shown < MAX_SHOWN_LINES && strings.trim_space(lines[shown]) != "" {
+				shown += 1
+			}
+		}
+	}
+
+	write_text :: proc(w: io.Writer, lines: []string) {
+		// its addresses linked
+		text := strings.trim_space(strings.join(lines, "\n", context.temp_allocator))
+		for text != "" {
+			start := strings.index(text, "https://")
+			if http := strings.index(text, "http://"); http >= 0 && (start < 0 || http < start) {
+				start = http
+			}
+			if start < 0 {
+				io.write_string(w, escape_html_text(text))
+				break
+			}
+			io.write_string(w, escape_html_text(text[:start]))
+			end := start
+			for end < len(text) && !strings.is_space(rune(text[end])) {
+				end += 1
+			}
+			url := strings.trim_right(text[start:end], ".,;:)")
+			fmt.wprintf(w, `<a href="{0:s}">{0:s}</a>`, escape_html_text(url))
+			text = text[start+len(url):]
+		}
+	}
+
+	fmt.wprintln(w, `<div class="example-licence" id="example-licence">`)
+	fmt.wprintf(w, `<div class="example-licence-head"><span>Licence</span> This example has its own licence, rather than Odin's: <a href="%s">%s</a></div>`+"\n",
+	            example_github_url(license.path), escape_html_text(license.path))
+	io.write_string(w, `<div class="example-licence-text">`)
+	write_text(w, lines[:shown])
+	io.write_string(w, "</div>\n")
+	if shown < len(lines) {
+		io.write_string(w, `<details class="example-licence-rest"><summary>The rest of the licence</summary><div class="example-licence-text">`)
+		write_text(w, lines[shown:])
+		io.write_string(w, "</div></details>\n")
+	}
+	fmt.wprintln(w, `</div>`)
 }
 
 @(private="file")

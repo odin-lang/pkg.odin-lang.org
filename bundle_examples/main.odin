@@ -21,7 +21,6 @@ Example_Program :: struct {
 	path:      string,
 	readme:    string,
 	license:   Example_License,
-	link_only: bool,   // its code is only linked to, not shown, as its licence may ask
 	files:     []Example_File,
 	other:     []Example_File,  // its other text, like shaders, scripts and data, by their paths in its folder
 	assets:    []Example_Asset, // and the rest, like images and fonts, only by name
@@ -48,13 +47,10 @@ MAX_TEXT :: 32 * 1024
 
 
 USAGE :: ```
-usage: bundle_examples <examples checkout> <bundle.json> [-link-only:<program>]...
+usage: bundle_examples <examples checkout> <bundle.json>
 
 Bundles the sources of a checkout of https://github.com/odin-lang/examples for the docs generator,
 which takes it with -examples:<bundle.json>.
-
-	-link-only:<program>   only link to the program, or the programs under it, rather than show their code,
-	                       e.g. -link-only:opengl/learn_opengl for a licence that asks for that
 ```
 
 main :: proc() {
@@ -111,11 +107,8 @@ main :: proc() {
 	}
 
 	checkout, out: string
-	link_only: [dynamic]string
 	for arg in os.args[1:] {
 		switch {
-		case strings.has_prefix(arg, "-link-only:"):
-			append(&link_only, strings.trim_right(arg[len("-link-only:"):], "/"))
 		case checkout == "":
 			checkout = arg
 		case out == "":
@@ -132,7 +125,7 @@ main :: proc() {
 	checkout = strings.trim_right(checkout, "/\\")
 
 	programs: [dynamic]Example_Program
-	collect(checkout, "", &programs, link_only[:])
+	collect(checkout, "", &programs)
 	slice.sort_by(programs[:], proc(a, b: Example_Program) -> bool {
 		return a.path < b.path
 	})
@@ -162,7 +155,7 @@ main :: proc() {
 	fmt.printfln("%d programs, %d .odin files, %d other files, %d assets, from %s at %s", len(programs), files, other, assets, bundle.repo, bundle.commit)
 }
 
-collect :: proc(checkout, rel: string, programs: ^[dynamic]Example_Program, link_only: []string) {
+collect :: proc(checkout, rel: string, programs: ^[dynamic]Example_Program) {
 	own_license :: proc(checkout, rel: string) -> (license: Example_License) {
 		// the nearest in the program's folder or one above it, but not one for some of its assets,
 		// like `LICENSE.SDL2.txt`, nor the repo's own
@@ -238,7 +231,7 @@ collect :: proc(checkout, rel: string, programs: ^[dynamic]Example_Program, link
 		switch {
 		case entry.type == .Directory:
 			if !strings.has_prefix(entry.name, ".") {
-				collect(checkout, slashpath.join({rel, entry.name}) if rel != "" else entry.name, programs, link_only)
+				collect(checkout, slashpath.join({rel, entry.name}) if rel != "" else entry.name, programs)
 			}
 		case strings.has_suffix(entry.name, ".odin"):
 			if source, ok := read_text(entry.fullpath); ok {
@@ -259,11 +252,6 @@ collect :: proc(checkout, rel: string, programs: ^[dynamic]Example_Program, link
 	gather(checkout, rel, "", program.license.path, &other, &assets)
 	program.other = other[:]
 	program.assets = assets[:]
-	for path in link_only {
-		if rel == path || strings.has_prefix(rel, path) && strings.has_prefix(rel[len(path):], "/") {
-			program.link_only = true
-		}
-	}
 	append(programs, program)
 }
 

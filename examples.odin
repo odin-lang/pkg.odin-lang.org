@@ -302,16 +302,11 @@ example_github_url :: proc(path: string, kind := "blob") -> string {
 }
 
 example_line_url :: proc(pi, fi, line: int) -> string {
-	program := examples.programs[pi]
-	name := program.files[fi].name
-	if program.link_only {
-		return fmt.tprintf("%s#L%d", example_github_url(fmt.tprintf("%s/%s", program.path, name)), line)
-	}
-	return fmt.tprintf("%s#%s-L%d", example_url(example_page_of[pi][fi]), name, line)
+	return fmt.tprintf("%s#%s-L%d", example_url(example_page_of[pi][fi]), examples.programs[pi].files[fi].name, line)
 }
 
 ranked_example_uses :: proc(pkg: ^doc.Pkg, name: string) -> []Example_Use {
-	// one use on each page, the shortest excerpt of it, any whose code can be shown first
+	// one use on each page, the shortest excerpt of it first
 	uses := (example_uses[pkg] or_else nil)[name] or_else nil
 	if len(uses) == 0 {
 		return nil
@@ -328,11 +323,6 @@ ranked_example_uses :: proc(pkg: ^doc.Pkg, name: string) -> []Example_Use {
 		append(&ranked, use)
 	}
 	slice.sort_by(ranked[:], proc(a, b: Example_Use) -> bool {
-		pa, pb := examples.programs[a.program], examples.programs[b.program]
-		// what the folded line names is what opening it shows
-		if pa.link_only != pb.link_only {
-			return !pa.link_only
-		}
 		if a.to - a.from != b.to - b.from {
 			return a.to - a.from < b.to - b.from
 		}
@@ -510,7 +500,6 @@ write_examples_json :: proc(w: io.Writer, pkg: ^doc.Pkg) -> bool {
 		io.write_string(w, "\n")
 		write_json_string(w, name)
 		io.write_string(w, ": [")
-		shown := 0
 		for use, j in ranked_example_uses(pkg, name) {
 			program := examples.programs[use.program]
 			page := example_page_of[use.program][use.file]
@@ -520,8 +509,7 @@ write_examples_json :: proc(w: io.Writer, pkg: ^doc.Pkg) -> bool {
 			fmt.wprintf(w, `{{"p": %q, "u": %q, "f": %q, "l": %d, "at": %q, "from": %d, "to": %d`,
 			            example_pages[page].path, example_url(page), program.files[use.file].name, use.line,
 			            example_line_url(use.program, use.file, use.line), use.from, use.to)
-			if !program.link_only && shown < EXAMPLES_SHOWN {
-				shown += 1
+			if j < EXAMPLES_SHOWN {
 				io.write_string(w, `, "html": `)
 				write_json_string(w, example_excerpt(use))
 			}
