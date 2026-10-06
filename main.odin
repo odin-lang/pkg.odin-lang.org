@@ -799,7 +799,14 @@ generate_package_from_directory_tree :: proc(b: ^strings.Builder, node: ^Dir_Nod
 		write_pkg(w, dir, path, pkg, collection, collection.pkg_entries_map[pkg])
 		write_html_footer(w, pkg_data_url(collection, path))
 		recursive_make_directory(path, dir)
-		_ = os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
+
+		// links to the page's own declarations, of which there can be tens of thousands, as just `#name`
+		own := fmt.tprintf(`href="%s/%s/#`, collection.base_url, path) if path != "" else fmt.tprintf(`href="%s/#`, collection.base_url)
+		page, allocated := strings.replace_all(string(b.buf[:]), own, `href="#`)
+		_ = os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), transmute([]byte)page)
+		if allocated {
+			delete(page)
+		}
 
 		strings.builder_reset(b)
 		pkg_data_begin(w)
@@ -2802,6 +2809,8 @@ the_sort_proc :: proc(a, b: ^doc.Entity) -> (cmp: slice.Ordering) {
 }
 
 MAX_PROCS_BEFORE_HIDING :: 24
+// Longer lists keep only their names until opened, as some types relate to thousands of procedures
+MAX_PROCS_BEFORE_LAZY :: 100
 
 print_procs :: proc(w:               io.Writer,
                     pkg:             ^doc.Pkg,
@@ -2812,17 +2821,47 @@ print_procs :: proc(w:               io.Writer,
                     title:           string,
                     ignore_procedure_group_suffix: bool = false) {
 	parent_name := str(parent.name)
-	seen_item := false
-	parameter_loop: for e in related_procs {
-		proc_name := str(e.name)
+	collection := cfg.pkg_to_collection[pkg]
 
-		if proc_names_seen[proc_name] {
-			continue parameter_loop
+	unseen := make([dynamic]^doc.Entity, 0, len(related_procs), context.temp_allocator)
+	for e in related_procs {
+		if !proc_names_seen[str(e.name)] {
+			proc_names_seen[str(e.name)] = true
+			append(&unseen, e)
 		}
+	}
+	marks_group :: proc(e: ^doc.Entity, ignore_suffix: bool) -> bool {
+		return e.kind == .Proc_Group && !ignore_suffix
+	}
+	switch {
+	case is_inherited || len(unseen) == 0:
+	case len(unseen) == 1:
+		e := unseen[0]
+		fmt.wprintf(w, `<div class="doc-related-one"><h4>%s</h4> <a href="%s/%s/#%s">%s</a>`, title, collection.base_url, collection.pkg_to_path[pkg], str(e.name), str(e.name))
+		if marks_group(e, ignore_procedure_group_suffix) {
+			io.write_string(w, `&nbsp;<em>(procedure group)</em>`)
+		}
+		io.write_string(w, "</div>\n")
+		return
+	case len(unseen) > MAX_PROCS_BEFORE_LAZY:
+		io.write_string(w, `<details class="odin-doc-toggle doc-related-lazy" data-names="`)
+		for e, i in unseen {
+			if i > 0 {
+				io.write_byte(w, ' ')
+			}
+			io.write_string(w, str(e.name))
+			if marks_group(e, ignore_procedure_group_suffix) {
+				io.write_string(w, ":g")
+			}
+		}
+		fmt.wprintf(w, `">`+"\n"+`<summary class="hideme"><h4 style="display:inline-block">%s <span class="doc-related-count">%s</span></h4></summary>`+"\n", title, thousands(len(unseen)))
+		io.write_string(w, "<ul></ul>\n</details>\n")
+		return
+	}
 
-		collection := cfg.pkg_to_collection[pkg]
-
-		proc_names_seen[proc_name] = true
+	seen_item := false
+	parameter_loop: for e in unseen {
+		proc_name := str(e.name)
 		if !seen_item {
 			if len(related_procs) < MAX_PROCS_BEFORE_HIDING {
 				fmt.wprintln(w, "<details class=\"odin-doc-toggle\" open>")
@@ -2858,7 +2897,7 @@ print_procs :: proc(w:               io.Writer,
 			proc_name,
 		)
 
-		if e.kind == .Proc_Group && !ignore_procedure_group_suffix {
+		if marks_group(e, ignore_procedure_group_suffix) {
 			fmt.wprintf(w, `&nbsp;<em>(procedure groups)</em>`)
 		}
 
@@ -3994,7 +4033,12 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	}
 
 
-	write_index :: proc(w: io.Writer, name: string, entries: []doc.Scope_Entry) {
+	dense := is_dense_pkg(pkg)
+	is_dense_section :: proc(dense: bool, name: string) -> bool {
+		return dense && (name == "Procedures" || name == "Procedure Groups")
+	}
+
+	write_index :: proc(w: io.Writer, name: string, entries: []doc.Scope_Entry, listed_as_rows := false) {
 		fmt.wprintln(w, `<div>`)
 		defer fmt.wprintln(w, `</div>`)
 
@@ -4011,6 +4055,8 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 
 		if len(entries) == 0 {
 			io.write_string(w, "<p class=\"pkg-empty-section\">This section is empty.</p>\n")
+		} else if listed_as_rows {
+			io.write_string(w, "<p class=\"pkg-empty-section\">Listed one per row under <a href=\"#pkg-procedures\">Procedures</a>.</p>\n")
 		} else {
 			write_index_body(w, entries)
 		}
@@ -4021,7 +4067,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			if eo.ignore {
 				continue
 			}
-			write_index(w, eo.name, eo.entries)
+			write_index(w, eo.name, eo.entries, is_dense_section(dense, eo.name))
 		}
 		fmt.wprintln(w, "</div>")
 	}
@@ -4048,7 +4094,22 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			if eo.ignore {
 				continue
 			}
-			write_entries(w, pkg, eo.name, eo.entries)
+			switch {
+			case !is_dense_section(dense, eo.name):
+				write_entries(w, pkg, eo.name, eo.entries)
+			case eo.name == "Procedures":
+				if len(pkg_entries.procs) + len(pkg_entries.proc_groups) == 0 {
+					write_entries(w, pkg, eo.name, eo.entries)
+				} else {
+					fmt.wprintln(w, `<h2 id="pkg-procedures" class="pkg-header">Procedures</h2>`)
+					write_dense_procedures(w, pkg, pkg_entries.procs[:], pkg_entries.proc_groups[:])
+				}
+			case len(eo.entries) == 0:
+				write_entries(w, pkg, eo.name, eo.entries)
+			case:
+				fmt.wprintln(w, `<h2 id="pkg-procedure-groups" class="pkg-header">Procedure Groups</h2>`)
+				fmt.wprintln(w, `<p class="pkg-empty-section">Listed with their procedures under <a href="#pkg-procedures">Procedures</a>.</p>`)
+			}
 		}
 		fmt.wprintln(w, "</section>")
 	}
@@ -4128,6 +4189,12 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			if len(eo.entries) == 0 {
 				// listed like the Index lists it, and odin-lang.org's script.js needs a link for each heading
 				fmt.wprintf(w, `<li class="toc-empty"><a href="#pkg-{0:s}">{1:s}<span class="toc-count">0</span></a></li>`+"\n", slug, eo.name)
+				continue
+			}
+
+			if is_dense_section(dense, eo.name) {
+				// the table is its own index
+				fmt.wprintf(w, `<li><a href="#pkg-{0:s}">{1:s}<span class="toc-count">{2:d}</span></a></li>`+"\n", slug, eo.name, len(eo.entries))
 				continue
 			}
 

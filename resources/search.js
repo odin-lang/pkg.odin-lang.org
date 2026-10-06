@@ -102,13 +102,17 @@ function flash_copied(btn) {
 const READING_LINE = 100;
 
 // the declaration across that line, else the first in view below it
+// a declaration with a block of its own, or a row in a package listing its procedures one per row
+const DECLARATIONS = ".documentation .pkg-entity, .documentation .doc-dense tr[id]";
+
 function declaration_being_read() {
-	for (const entity of document.querySelectorAll(".documentation .pkg-entity")) {
+	for (const entity of document.querySelectorAll(DECLARATIONS)) {
 		if (entity.offsetParent === null) {
 			continue;
 		}
 		const r = entity.getBoundingClientRect();
-		if (r.bottom > READING_LINE) {
+		// rows touch, so the one above ends a fraction past the line
+		if (r.bottom > READING_LINE + 2) {
 			return r.top < window.innerHeight ? entity : null;
 		}
 	}
@@ -186,6 +190,13 @@ document.addEventListener("click", async (ev) => {
 			return;
 		}
 		const entity = declaration_being_read();
+		if (entity && entity.matches("tr")) {
+			ev.preventDefault();
+			await copy_text(location.origin + location.pathname + "#" + entity.id);
+			entity.classList.add("doc-dense-copied");
+			setTimeout(() => entity.classList.remove("doc-dense-copied"), 1200);
+			return;
+		}
 		const h3 = entity && entity.querySelector(":scope > h3");
 		if (!h3) {
 			return;
@@ -196,6 +207,35 @@ document.addEventListener("click", async (ev) => {
 		flash_copied(btn);
 	});
 }
+
+// A dense row's Source link shows when it's hovered, built from the table's source directory and the row's file and line
+{
+	const link = document.createElement("a");
+	link.className = "doc-dense-source";
+	link.textContent = "Source";
+	document.addEventListener("mouseover", ev => {
+		const row = ev.target.closest && ev.target.closest(".doc-dense tr[data-src]");
+		if (row && link.parentElement !== row.lastElementChild) {
+			link.href = row.closest(".doc-dense").dataset.source + row.dataset.src;
+			row.lastElementChild.prepend(link);
+		}
+	});
+}
+
+// Long Related lists arrive as names, and become links when first opened
+document.addEventListener("toggle", ev => {
+	const details = ev.target;
+	if (!details.open || !details.classList || !details.classList.contains("doc-related-lazy")) {
+		return;
+	}
+	const ul = details.querySelector(":scope > ul");
+	if (ul && ul.childElementCount === 0) {
+		ul.innerHTML = details.dataset.names.split(" ").map(token => {
+			const [name, kind] = token.split(":");
+			return `<li><a href="#${name}">${name}</a>${kind === "g" ? "&nbsp;<em>(procedure groups)</em>" : ""}</li>`;
+		}).join("");
+	}
+}, true);
 
 document.addEventListener("click", ev => {
 	const btn = ev.target.closest(".doc-code-expand");
@@ -304,7 +344,7 @@ window.addEventListener("keydown", ev => {
 	if (ev.target.closest && ev.target.closest("input, textarea, select, [contenteditable]")) {
 		return;
 	}
-	const entities = [...document.querySelectorAll(".documentation .pkg-entity")]
+	const entities = [...document.querySelectorAll(DECLARATIONS)]
 		.filter(e => e.offsetParent !== null)
 		.map(e => e.getBoundingClientRect().top)
 		.sort((a, b) => a - b);
@@ -325,6 +365,11 @@ window.addEventListener("keydown", ev => {
 	}
 	if (ev.key === "s") {
 		const entity = declaration_being_read();
+		if (entity && entity.matches("tr") && entity.dataset.src) {
+			ev.preventDefault();
+			location.href = entity.closest(".doc-dense").dataset.source + entity.dataset.src;
+			return;
+		}
 		const links = entity ? [...entity.querySelectorAll(":scope > h3 .doc-source > a")] : [];
 		const source = links.find(a => a.textContent.startsWith("Source"));
 		if (source) {
@@ -573,12 +618,37 @@ window.addEventListener("keydown", ev => {
 	let current = null;
 	let timer   = 0;
 
+	const dense_definition = row => {
+		const table = row.closest(".doc-dense");
+		if (row.classList.contains("doc-dense-group")) {
+			const members = [...row.parentElement.querySelectorAll(":scope > tr:not(.doc-dense-group) > td:first-child > a")].map(a => a.textContent);
+			const shown = members.slice(0, 24).map(name => `\t${name},`);
+			if (members.length > shown.length) {
+				shown.push(`\t<span class="comment">// and ${members.length - shown.length} more</span>`);
+			}
+			return `${row.id} :: <span class="keyword-type">proc</span>{\n${shown.join("\n")}\n}`;
+		}
+		const code = row.querySelector("td > code");
+		if (!code) {
+			return null;
+		}
+		let head = `<span class="keyword-type">proc</span>`;
+		if (table.dataset.cc) {
+			head += ` <span class="string">"${table.dataset.cc}"</span>`;
+		}
+		const sig = code.innerHTML;
+		return `${row.id} :: ${sig.startsWith('<span class="keyword-type">proc') ? sig : `${head} ${sig}`}`;
+	};
+
 	const definition_of = async (href) => {
 		const url = new URL(href, location.href);
 		const id = decodeURIComponent(url.hash.slice(1));
 		const dir = url.pathname.replace(/\/?$/, "/");
 		if (dir === location.pathname.replace(/\/?$/, "/")) {
 			const h3 = document.getElementById(id);
+			if (h3 && h3.matches(".doc-dense tr")) {
+				return dense_definition(h3);
+			}
 			const preview = h3 && h3.parentElement.querySelector(":scope > div > template.doc-type-preview");
 			if (preview) {
 				return preview.innerHTML;
@@ -714,8 +784,11 @@ window.addEventListener("keydown", ev => {
 			// a package's page, not a collection's or the home page
 			return url.origin === location.origin && dir.split("/").length > 3 ? link : null;
 		}
-		const h3 = document.getElementById(decodeURIComponent(url.hash.slice(1)));
-		if (!h3 || !h3.matches(".pkg-entity > h3") || link.closest(".pkg-entity") === h3.parentElement) {
+		const target = document.getElementById(decodeURIComponent(url.hash.slice(1)));
+		if (target && target.matches(".doc-dense tr")) {
+			return link.closest("tr") === target ? null : link;
+		}
+		if (!target || !target.matches(".pkg-entity > h3") || link.closest(".pkg-entity") === target.parentElement) {
 			return null;
 		}
 		return link;
@@ -1479,6 +1552,7 @@ if (odin_search) {
 		let curr_search_value   = "";
 
 		let pkg_entities = getElementsByClassNameArray("pkg-entity");
+		let dense_rows = [...document.querySelectorAll(".doc-dense tbody > tr")];
 		let pkg_headers = getElementsByClassNameArray("pkg-header");
 		let pkg_top = document.getElementById("pkg-top");
 
@@ -1556,6 +1630,9 @@ if (odin_search) {
 					pkg_header.style.display = null;
 				}
 			}
+			for (let row of dense_rows) {
+				row.style.display = null;
+			}
 			if (pkg_top) {
 				pkg_top.style.display = null;
 			}
@@ -1583,6 +1660,12 @@ if (odin_search) {
 						}
 					}
 					signatures.push([h3.id, text]);
+				}
+				for (let row of dense_rows) {
+					let code = row.id && row.querySelector("td > code");
+					if (code) {
+						signatures.push([row.id, code.textContent]);
+					}
 				}
 			}
 			let any_case = !/[A-Z]/.test(type);
@@ -1653,6 +1736,9 @@ if (odin_search) {
 						pkg_entity.style.order = null;
 					}
 
+				}
+				for (let row of dense_rows) {
+					row.style.display = row.id && result_map[row.id] ? null : 'none';
 				}
 			} else {
 				// limit the results (only the displayed results are formatted)

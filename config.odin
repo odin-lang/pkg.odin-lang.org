@@ -50,6 +50,9 @@ Config :: struct {
 
 	moved_packages: map[string]string,
 	upstream_docs:  map[string]Upstream_Docs,
+	// Packages of generated declarations, e.g. "core:rexcode/isa/*": their procedures are listed one per row,
+	// under their procedure groups, rather than each with a heading and a block of its own
+	dense_packages: []string,
 }
 
 Collection :: struct {
