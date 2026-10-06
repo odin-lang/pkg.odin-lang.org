@@ -32,7 +32,7 @@ main :: proc() {
 
 		if len(os.args) > 2 {
 			last_arg := os.args[len(os.args)-1]
-			if strings.has_suffix(last_arg, ".json") {
+			if strings.has_suffix(last_arg, ".json") && !strings.has_prefix(last_arg, "-") {
 				file_ok, json_err := config_merge_from_file(&cfg, last_arg)
 				if !file_ok {
 					errorf("unable to read config file at: %s", last_arg)
@@ -70,6 +70,14 @@ main :: proc() {
 	}
 
 	build_doc_link_index()
+
+	// -examples:examples.json, as bundle_examples makes it
+	for arg in os.args[1:] {
+		if strings.has_prefix(arg, "-examples:") && load_examples(arg[len("-examples:"):]) {
+			log.infof("index %d example programs", len(examples.programs))
+			index_examples()
+		}
+	}
 
 
 	b := strings.builder_make()
@@ -813,6 +821,11 @@ generate_package_from_directory_tree :: proc(b: ^strings.Builder, node: ^Dir_Nod
 		write_pkg_data_pkg(w, collection, path, pkg, summaries = true)
 		pkg_data_end(w)
 		_ = os.write_entire_file(fmt.tprintf("%s/%s/pkg-data.js", dir, path), b.buf[:])
+
+		strings.builder_reset(b)
+		if write_examples_json(w, pkg) {
+			_ = os.write_entire_file(fmt.tprintf("%s/%s/examples.json", dir, path), b.buf[:])
+		}
 
 		strings.builder_reset(b)
 		write_type_previews(w)
@@ -3714,6 +3727,9 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		write_docs(w, the_docs, doc_ctx = &doc_ctx)
 		fmt.wprintln(w, `</details>`)
 	}
+	if is_declared_here {
+		write_entry_examples(w, pkg, name)
+	}
 
 
 	if _, ok := find_entity_attribute(e, "objc_class"); ok {
@@ -4067,6 +4083,8 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		}
 	}
 
+	examples_count := write_pkg_examples(w, pkg)
+
 	// Packages may only hold documentation
 	has_entries := len(pkg_entries.all) > 0
 
@@ -4219,6 +4237,9 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		}
 		if len(subpackages) > 0 {
 			fmt.wprintf(w, `<li><a href="#pkg-packages">Packages<span class="toc-count">%d</span></a></li>`+"\n", len(subpackages))
+		}
+		if examples_count > 0 {
+			fmt.wprintf(w, `<li><a href="#pkg-examples">Examples<span class="toc-count">%d</span></a></li>`+"\n", examples_count)
 		}
 		// Objective-C methods are listed under their classes rather than with the other procedures
 		toc_pkg = pkg

@@ -26,6 +26,10 @@ jobs:
         shell: cmd
         run: |
           git clone https://github.com/odin-lang/Odin.git --depth 1
+      - name: Clone examples repo
+        shell: cmd
+        run: |
+          git clone https://github.com/odin-lang/examples.git --depth 1 odin-examples
       - name: build Odin
         shell: cmd
         run: |
@@ -57,6 +61,13 @@ jobs:
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2025\Enterprise\VC\Auxiliary\Build\vcvars64.bat
           Odin\odin build . -debug -out:odin-html-docs.exe
+      - name: Bundle examples
+        shell: cmd
+        # learn_opengl is CC BY-NC 4.0, so its code is only linked to, not shown
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2025\Enterprise\VC\Auxiliary\Build\vcvars64.bat
+          Odin\odin build bundle_examples -out:bundle_examples.exe
+          bundle_examples.exe odin-examples website\examples.json -link-only:opengl/learn_opengl
       - name: Generate Website
         shell: cmd
         run: |
@@ -65,7 +76,7 @@ jobs:
           copy resources\CNAME       website\static\CNAME
           copy resources\favicon.svg website\static\favicon.svg
           pushd website\static
-          ..\odin-html-docs.exe ..\all.odin-doc --merge ..\darwin.odin-doc ..\all_posix.odin-doc ..\freebsd.odin-doc ..\all_linux.odin-doc ..\unix.odin-doc ..\sdl3.odin-doc ..\all_js.odin-doc
+          ..\odin-html-docs.exe ..\all.odin-doc --merge ..\darwin.odin-doc ..\all_posix.odin-doc ..\freebsd.odin-doc ..\all_linux.odin-doc ..\unix.odin-doc ..\sdl3.odin-doc ..\all_js.odin-doc -examples:..\examples.json
           popd
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4

@@ -233,6 +233,44 @@ document.addEventListener("click", async (ev) => {
 	});
 }
 
+// A declaration's examples from odin-lang/examples: excerpts of the first few, and links to the rest,
+// from the package's examples.json, fetched when the first of them is opened
+{
+	let loading = null;
+	const escape = text => String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+	document.addEventListener("toggle", async ev => {
+		const details = ev.target;
+		if (!details.open || !details.classList || !details.classList.contains("doc-examples") || details.dataset.loaded) {
+			return;
+		}
+		details.dataset.loaded = "1";
+		const body = details.querySelector(".doc-examples-body");
+		body.textContent = "Loading…";
+		loading = loading || fetch("examples.json").then(r => r.ok ? r.json() : null).catch(() => null);
+		const examples = await loading;
+		const uses = examples && examples.decls[details.dataset.name];
+		if (!uses) {
+			body.textContent = "The examples couldn't be loaded.";
+			delete details.dataset.loaded;
+			return;
+		}
+		const at = path => `${examples.repo}/blob/${examples.commit}/${path}`;
+		const lines = u => `${at(`${u.p}/${u.f}`)}#L${u.from}-L${u.to}`;
+		const shown = uses.filter(u => u.html);
+		const rest = uses.filter(u => !u.html);
+		body.innerHTML = shown.map(u => `
+			<div class="doc-example">
+				<div class="doc-example-head">
+					<a href="${escape(`${examples.repo}/tree/${examples.commit}/${u.p}`)}">${escape(u.p)}</a>
+					<span class="doc-example-at">· <a href="${escape(lines(u))}">${escape(u.f)}:${u.l}</a></span>
+					${u.license ? `<span class="doc-example-license">· <a href="${escape(at(u.license_path))}" title="${escape(u.license)}">its own licence</a></span>` : ""}
+				</div>
+				<pre class="doc-example-code"><code class="hljs nohighlight">${u.html}</code></pre>
+			</div>`).join("") +
+			(rest.length ? `<p class="doc-example-more">${shown.length ? "Also in" : "In"} ${rest.map(u => `<a href="${escape(lines(u))}">${escape(u.p)}</a>`).join(", ")}</p>` : "");
+	}, true);
+}
+
 // Long Related lists arrive as names, and become links when first opened
 document.addEventListener("toggle", ev => {
 	const details = ev.target;
