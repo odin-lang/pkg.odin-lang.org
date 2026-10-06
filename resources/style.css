@@ -891,13 +891,17 @@ pre.doc-example-code .doc-example-hit {
 .dark-mode pre.doc-example-code .doc-example-hit {
 	background-color: rgba(122, 173, 229, 0.16);
 }
+/* a link in code is a faint line under the name, so a block of them stays readable, and a clear one when hovered */
 pre.doc-example-code a {
 	color: inherit;
-	text-decoration: underline dotted;
-	text-underline-offset: 0.2em;
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-decoration-color: rgba(127, 127, 127, 0.4);
+	text-decoration-color: color-mix(in srgb, currentColor 30%, transparent);
+	text-underline-offset: 0.25em;
 }
 pre.doc-example-code a:hover {
-	text-decoration-style: solid;
+	text-decoration-color: currentColor;
 }
 /* builtins, like `int`, `nil` and `len`, are everywhere, so they show they're links only when hovered */
 pre.doc-example-code a.example-builtin {
