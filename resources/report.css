@@ -230,6 +230,28 @@ a.odin-report-badge[aria-pressed="true"] {
 	padding: 0.25rem 0.25rem 1rem;
 	font-size: 0.9375rem;
 }
+/* its scrollbar is thin and in the page's colours, as the sidebars' are, rather than the browser's light one in dark mode;
+   the standard properties make Chrome on Windows draw arrow buttons, so only Firefox gets them */
+.odin-report-panel:hover {
+	--odin-sidebar-thumb: rgba(127, 127, 127, 0.6);
+}
+@supports not selector(::-webkit-scrollbar) {
+	.odin-report-panel {
+		scrollbar-width: thin;
+		scrollbar-color: var(--odin-sidebar-thumb) transparent;
+	}
+}
+.odin-report-panel::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+.odin-report-panel::-webkit-scrollbar-track {
+	background: transparent;
+}
+.odin-report-panel::-webkit-scrollbar-thumb {
+	background-color: var(--odin-sidebar-thumb);
+	border-radius: 3px;
+}
 .odin-report-panel h2 {
 	margin: 0 0 0.25rem;
 	font-size: 1.375rem;
