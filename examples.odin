@@ -141,6 +141,9 @@ index_example_file :: proc(pi, fi: int) {
 
 			links := &example_links[index.pi][index.fi]
 			links[selector.field.pos.offset] = strings.clone(doc_entity_url(pkg, name))
+			if !is_about(examples.programs[index.pi], pkg) {
+				return v
+			}
 
 			line := selector.field.pos.line
 			use := Example_Use{program = index.pi, file = index.fi, line = line, from = max(1, line-3), to = min(index.lines, line+3)}
@@ -171,7 +174,7 @@ index_example_file :: proc(pi, fi: int) {
 
 @(private="file")
 is_about :: proc(program: be.Example_Program, pkg: ^doc.Pkg) -> bool {
-	// by its folder's name, e.g. `nbio/tcp-echo` for `core:nbio`
+	// in a folder named after it, e.g. `nbio/tcp-echo` for `core:nbio`, or one the config names for it
 	collection := cfg.pkg_to_collection[pkg]
 	dir := strings.to_lower(slashpath.base(collection.pkg_to_path[pkg]), context.temp_allocator)
 	for part in strings.split(strings.to_lower(program.path, context.temp_allocator), "/", context.temp_allocator) {
@@ -179,11 +182,16 @@ is_about :: proc(program: be.Example_Program, pkg: ^doc.Pkg) -> bool {
 			return true
 		}
 	}
+	for folder in cfg.example_folders[pkg_import_path(pkg)] or_else nil {
+		if program.path == folder || strings.has_prefix(program.path, folder) && strings.has_prefix(program.path[len(folder):], "/") {
+			return true
+		}
+	}
 	return false
 }
 
 ranked_example_uses :: proc(pkg: ^doc.Pkg, name: string) -> []Example_Use {
-	// one use in each program, the shortest excerpt of it, the programs about the package first, after any whose code can be shown
+	// one use in each program, the shortest excerpt of it, any whose code can be shown first
 	uses := (example_uses[pkg] or_else nil)[name] or_else nil
 	if len(uses) == 0 {
 		return nil
@@ -198,19 +206,11 @@ ranked_example_uses :: proc(pkg: ^doc.Pkg, name: string) -> []Example_Use {
 	for _, use in best {
 		append(&ranked, use)
 	}
-	Ranking :: struct {
-		pkg: ^doc.Pkg,
-	}
-	@(static) ranking: Ranking
-	ranking.pkg = pkg
 	slice.sort_by(ranked[:], proc(a, b: Example_Use) -> bool {
 		pa, pb := examples.programs[a.program], examples.programs[b.program]
 		// what the folded line names is what opening it shows
 		if pa.link_only != pb.link_only {
 			return !pa.link_only
-		}
-		if about_a, about_b := is_about(pa, ranking.pkg), is_about(pb, ranking.pkg); about_a != about_b {
-			return about_a
 		}
 		if a.to - a.from != b.to - b.from {
 			return a.to - a.from < b.to - b.from
@@ -225,7 +225,7 @@ write_entry_examples :: proc(w: io.Writer, pkg: ^doc.Pkg, name: string) {
 	if len(ranked) == 0 {
 		return
 	}
-	fmt.wprintf(w, `<details class="doc-examples" data-name="%s"><summary>Examples <span class="doc-examples-names">`, name)
+	fmt.wprintf(w, `<details class="doc-examples" data-name="%s"><summary>External examples <span class="doc-examples-names">`, name)
 	for use, i in ranked[:min(len(ranked), EXAMPLES_SHOWN)] {
 		if i > 0 {
 			io.write_string(w, " · ")
@@ -239,11 +239,11 @@ write_entry_examples :: proc(w: io.Writer, pkg: ^doc.Pkg, name: string) {
 }
 
 write_pkg_examples :: proc(w: io.Writer, pkg: ^doc.Pkg) -> (count: int) {
-	// those about it first, then those using the most of it
 	by_name := example_uses[pkg] or_else nil
 	if len(by_name) == 0 {
 		return
 	}
+	// how many of the package's declarations each program uses
 	used := make(map[int]int, 16, context.temp_allocator)
 	for _, uses in by_name {
 		seen := make(map[int]bool, 4, context.temp_allocator)
@@ -254,47 +254,86 @@ write_pkg_examples :: proc(w: io.Writer, pkg: ^doc.Pkg) -> (count: int) {
 			}
 		}
 	}
-	Program :: struct {
-		index, used: int,
-		about:       bool,
-	}
-	programs := make([dynamic]Program, 0, len(used), context.temp_allocator)
-	for index, n in used {
-		append(&programs, Program{index, n, is_about(examples.programs[index], pkg)})
-	}
-	slice.sort_by(programs[:], proc(a, b: Program) -> bool {
-		if a.about != b.about {
-			return a.about
-		}
-		if a.used != b.used {
-			return a.used > b.used
-		}
-		return examples.programs[a.index].path < examples.programs[b.index].path
-	})
 
-	write_rows :: proc(w: io.Writer, programs: []Program) {
-		for p in programs {
-			program := examples.programs[p.index]
-			fmt.wprintf(w, `<tr><td class="pkg-name"><a href="%s/tree/%s/%s">%s</a></td><td class="pkg-desc">`, examples.repo, examples.commit, program.path, program.path)
-			if summary := doc_summary(program.readme); summary != "" {
-				io.write_string(w, escape_html_string(summary, context.temp_allocator))
+	// the folders the programs are in, as the repo has them
+	Node :: struct {
+		name:     string,
+		program:  int, // -1 for a folder that isn't a program itself
+		children: [dynamic]^Node,
+		programs: int, // in it and under it
+	}
+	new_node :: proc(name: string) -> ^Node {
+		node := new(Node, context.temp_allocator)
+		node^ = {name = name, program = -1, children = make([dynamic]^Node, context.temp_allocator)}
+		return node
+	}
+	root := new_node("")
+	for index in used {
+		node := root
+		node.programs += 1
+		for part in strings.split(examples.programs[index].path, "/", context.temp_allocator) {
+			child: ^Node
+			for c in node.children {
+				if c.name == part {
+					child = c
+					break
+				}
 			}
-			fmt.wprintf(w, `</td><td class="pkg-examples-used">%d used</td></tr>`+"\n", p.used)
+			if child == nil {
+				child = new_node(part)
+				append(&node.children, child)
+			}
+			node = child
+			node.programs += 1
+		}
+		node.program = index
+	}
+
+	write_node :: proc(w: io.Writer, node: ^Node, used: map[int]int) {
+		slice.sort_by(node.children[:], proc(a, b: ^Node) -> bool {
+			return strings.to_lower(a.name, context.temp_allocator) < strings.to_lower(b.name, context.temp_allocator)
+		})
+		for child in node.children {
+			// a folder holding only a folder is one label, e.g. `learn_opengl/1_getting_started/`
+			label := child.name
+			n := child
+			for n.program < 0 && len(n.children) == 1 && n.children[0].program < 0 {
+				n = n.children[0]
+				label = fmt.tprintf("%s/%s", label, n.name)
+			}
+			io.write_string(w, "<li>")
+			if n.program >= 0 {
+				program := examples.programs[n.program]
+				fmt.wprintf(w, `<a href="%s/tree/%s/%s"`, examples.repo, examples.commit, program.path)
+				if summary := doc_summary(program.readme); summary != "" {
+					fmt.wprintf(w, ` title="%s"`, escape_html_string(summary, context.temp_allocator))
+				}
+				fmt.wprintf(w, `>%s</a><span class="pkg-examples-used" title="uses %d of the package's declarations">%d</span>`, label, used[n.program], used[n.program])
+			} else {
+				fmt.wprintf(w, `<span class="pkg-examples-folder">%s/</span>`, label)
+			}
+			if len(n.children) > 0 {
+				io.write_string(w, "<ul>")
+				write_node(w, n, used)
+				io.write_string(w, "</ul>")
+			}
+			io.write_string(w, "</li>\n")
 		}
 	}
-	SHOWN :: 6
-	fmt.wprintf(w, `<h2 id="pkg-examples">Examples <span class="pkg-count">%d</span></h2>`+"\n", len(programs))
-	fmt.wprintf(w, `<p class="pkg-examples-note">Programs in <a href="%s">odin-lang/examples</a> using this package, and how many of its declarations they use.</p>`+"\n", examples.repo)
-	fmt.wprintln(w, `<table class="odin-pkg-table pkg-examples-table">`)
-	write_rows(w, programs[:min(len(programs), SHOWN)])
-	fmt.wprintln(w, `</table>`)
-	if len(programs) > SHOWN {
-		fmt.wprintf(w, `<details class="pkg-examples-more"><summary>%d more</summary>`+"\n", len(programs) - SHOWN)
-		fmt.wprintln(w, `<table class="odin-pkg-table pkg-examples-table">`)
-		write_rows(w, programs[SHOWN:])
-		fmt.wprintln(w, `</table></details>`)
-	}
-	return len(programs)
+
+	tree := strings.builder_make(context.temp_allocator)
+	write_node(strings.to_writer(&tree), root, used)
+
+	// a long tree is its top folders side by side, each whole, rather than a page of one column
+	LINES_FOR_COLUMNS :: 30
+	columns := strings.count(strings.to_string(tree), "<li>") > LINES_FOR_COLUMNS
+
+	fmt.wprintf(w, `<h2 id="pkg-external-examples"><a class="pkg-section-link" href="#pkg-external-examples">External Examples <span class="pkg-count">%d</span><span class="a-hidden">&nbsp;¶</span></a></h2>`+"\n", len(used))
+	fmt.wprintf(w, `<p class="pkg-examples-note">The programs in <a href="%s">odin-lang/examples</a> about this package, and how many of its declarations each uses.</p>`+"\n", examples.repo)
+	fmt.wprintf(w, `<ul class="pkg-examples-tree%s">`, " pkg-examples-columns" if columns else "")
+	io.write_string(w, strings.to_string(tree))
+	io.write_string(w, "</ul>\n")
+	return len(used)
 }
 
 write_examples_json :: proc(w: io.Writer, pkg: ^doc.Pkg) -> bool {

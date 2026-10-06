@@ -56,6 +56,9 @@ Config :: struct {
 	// Where packages whose declarations are documented elsewhere have their documentation, keyed by import path
 	// ("vendor:stb/*" for every package under it); those with upstream_docs or objc_docs needn't be listed
 	external_docs:  map[string]External_Docs,
+	// The odin-lang/examples programs about a package, beyond those in a folder named after it, keyed by import path:
+	// their paths, or the folders holding them, e.g. "core:os": ["command_line_arguments", "console", "dir_info"]
+	example_folders: map[string][]string,
 }
 
 External_Docs :: struct {

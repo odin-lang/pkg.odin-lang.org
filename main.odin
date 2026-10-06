@@ -3727,9 +3727,8 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		write_docs(w, the_docs, doc_ctx = &doc_ctx)
 		fmt.wprintln(w, `</details>`)
 	}
-	if is_declared_here {
-		write_entry_examples(w, pkg, name)
-	}
+	// by the name examples use, so aliases, like `simd.add` for `intrinsics.simd_add`, have theirs too
+	write_entry_examples(w, pkg, name)
 
 
 	if _, ok := find_entity_attribute(e, "objc_class"); ok {
@@ -4239,7 +4238,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 			fmt.wprintf(w, `<li><a href="#pkg-packages">Packages<span class="toc-count">%d</span></a></li>`+"\n", len(subpackages))
 		}
 		if examples_count > 0 {
-			fmt.wprintf(w, `<li><a href="#pkg-examples">Examples<span class="toc-count">%d</span></a></li>`+"\n", examples_count)
+			fmt.wprintf(w, `<li><a href="#pkg-external-examples">External Examples<span class="toc-count">%d</span></a></li>`+"\n", examples_count)
 		}
 		// Objective-C methods are listed under their classes rather than with the other procedures
 		toc_pkg = pkg
