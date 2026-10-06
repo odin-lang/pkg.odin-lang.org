@@ -20,6 +20,8 @@
 		{key: "params",       label: "Parameters",   kinds: ["param", "missing"],             none: "Every Inputs and Returns list matches its signature."},
 		{key: "examples",     label: "Examples",     kinds: ["example", "output", "import"],  none: "Every example parses, and imports what it uses."},
 		{key: "spelling",     label: "Spelling",     kinds: ["spelling"],                     none: "No misspellings found."},
+		{key: "summaries",    label: "Summaries",    kinds: ["summary-long", "summary-none"], none: "Every summary fits search results and previews."},
+		{key: "duplicates",   label: "Duplicates",   kinds: ["duplicate"],                    none: "No declarations share the same docs."},
 		{key: "names",        label: "Names",        kinds: ["name"],                         none: "No docs begin with another declaration's name."},
 		{key: "deprecations", label: "Deprecations", kinds: ["deprecated", "unmarked"],       none: "Every deprecation is marked, and says what to use instead."},
 		{key: "overview",     label: "Overviews",    kinds: [],                               none: "Every package has an overview."},

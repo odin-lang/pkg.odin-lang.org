@@ -3703,7 +3703,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		the_docs = str(e.comment)
 	}
 	if is_declared_here {
-		report_declaration(pkg, e, name, strings.trim_space(the_docs) != "")
+		report_declaration(pkg, e, name, the_docs)
 		report_check_params(the_docs, e)
 		report_check_naming(the_docs, pkg, e, name)
 	}

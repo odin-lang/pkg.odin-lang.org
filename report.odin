@@ -28,6 +28,9 @@ Report_Kind :: enum u8 {
 	Other_Name,          // docs beginning with another declaration's name, as if copied from its
 	Missing_Import,      // an example using a package it doesn't import
 	Misspelled,          // a word in resources/misspellings.txt, outside code
+	Summary_Long,        // a first sentence too long for search results and previews
+	Summary_None,        // docs beginning with something that isn't a sentence, so with no summary
+	Duplicate,           // the same docs as another declaration's, as if copied and not changed
 }
 
 REPORT_KIND_CODES := [Report_Kind]string{
@@ -42,6 +45,9 @@ REPORT_KIND_CODES := [Report_Kind]string{
 	.Other_Name          = "name",
 	.Missing_Import      = "import",
 	.Misspelled          = "spelling",
+	.Summary_Long        = "summary-long",
+	.Summary_None        = "summary-none",
+	.Duplicate           = "duplicate",
 }
 
 Decl_Kind :: enum u8 {Type, Constant, Variable, Procedure, Proc_Group}
@@ -67,7 +73,20 @@ Report_Pkg :: struct {
 	declared:     [Decl_Kind]int,
 	undocumented: [Decl_Kind][dynamic]string,
 	issues:       [dynamic]Report_Issue,
+	// declarations by their docs, with whitespace evened out, to find the same docs twice
+	by_docs:      map[string][dynamic]Docs_Owner,
 }
+
+Docs_Owner :: struct {
+	entity: ^doc.Entity,
+	name:   string,
+	file:   string,
+	line:   int,
+	groups: []^doc.Entity, // the procedure groups it's a form of
+}
+
+// Shorter docs, like "Deprecated." or "See `foo`.", are alike without having been copied
+DUPLICATE_MIN_LENGTH :: 50
 
 report_pkgs: map[^doc.Pkg]^Report_Pkg
 
@@ -126,7 +145,7 @@ decl_kind_of :: proc(e: ^doc.Entity) -> (kind: Decl_Kind, ok: bool) {
 	return
 }
 
-report_declaration :: proc(pkg: ^doc.Pkg, e: ^doc.Entity, name: string, documented: bool) {
+report_declaration :: proc(pkg: ^doc.Pkg, e: ^doc.Entity, name: string, docs: string) {
 	kind, ok := decl_kind_of(e)
 	if !ok {
 		return
@@ -134,9 +153,134 @@ report_declaration :: proc(pkg: ^doc.Pkg, e: ^doc.Entity, name: string, document
 	context.allocator = runtime.default_allocator()
 	r := report_of(pkg)
 	r.declared[kind] += 1
-	if !documented {
+	if strings.trim_space(docs) == "" {
 		append(&r.undocumented[kind], name)
+		return
 	}
+
+	// what search results and previews show of it
+	summary := doc_summary(docs)
+	switch {
+	case summary == "":
+		first := strings.trim_space(strip_comment_gutter(docs))
+		if end := strings.index_byte(first, '\n'); end >= 0 {
+			first = strings.trim_space(first[:end])
+		}
+		if len(first) > 30 {
+			first = fmt.tprintf("%s…", first[:30])
+		}
+		begins := "a code block" if strings.has_prefix(first, "```") || strings.has_prefix(first, "\t") else fmt.tprintf("`%s`", first)
+		report_add(.Summary_None, fmt.tprintf("the docs begin with %s, so search and previews have no summary", begins))
+	case strings.has_suffix(summary, "…"):
+		report_add(.Summary_Long, "the first sentence runs past 160 characters, so search and previews cut it short")
+	}
+
+	words := strings.fields(strip_comment_gutter(docs), context.temp_allocator)
+	text := strings.join(words, " ", context.temp_allocator)
+	if len(text) >= DUPLICATE_MIN_LENGTH {
+		owner := Docs_Owner{entity = e, name = name, groups = relation_list(pkg_relations_get(pkg).groups_by_member, e)}
+		if e.pos.file != 0 {
+			owner.file = slashpath.base(str(cfg.files[e.pos.file].name))
+			owner.line = int(e.pos.line)
+		}
+		key := text if text in r.by_docs else strings.clone(text)
+		owners := r.by_docs[key]
+		append(&owners, owner)
+		r.by_docs[key] = owners
+	}
+}
+
+@(private="file")
+report_duplicates :: proc(r: ^Report_Pkg) {
+	// each declaration whose docs are another's, other than forms of the same procedure group
+	shares_group :: proc(a, b: Docs_Owner) -> bool {
+		if slice.contains(a.groups, b.entity) || slice.contains(b.groups, a.entity) {
+			return true
+		}
+		for g in a.groups {
+			if slice.contains(b.groups, g) {
+				return true
+			}
+		}
+		return false
+	}
+	// `sched_get_priority_max` → "sched", "get", "priority", "max"; `GetCodepointNext` → "get", "codepoint", "next"; `left16` → "left", "16"
+	name_words :: proc(name: string) -> []string {
+		words := make([dynamic]string, context.temp_allocator)
+		start := 0
+		for i in 0..=len(name) {
+			is_digit :: proc(c: byte) -> bool { return '0' <= c && c <= '9' }
+			boundary := i == len(name) || name[i] == '_' ||
+			            i > start && 'A' <= name[i] && name[i] <= 'Z' && 'a' <= name[i-1] && name[i-1] <= 'z' ||
+			            i > start && is_digit(name[i]) != is_digit(name[i-1])
+			if boundary {
+				if i > start {
+					append(&words, strings.to_lower(name[start:i], context.temp_allocator))
+				}
+				start = i + 1 if i < len(name) && name[i] == '_' else i
+			}
+		}
+		return words[:]
+	}
+	// as a word, or the start of one: "min" in "minimum"; but not words any docs might use, like "with"
+	mentions :: proc(doc_words: []string, word: string) -> bool {
+		switch word {
+		case "with", "from", "and", "for", "the", "into", "onto", "has", "not", "all", "any", "new", "get", "set", "use":
+			return false
+		}
+		if len(word) < 3 {
+			return false
+		}
+		for w in doc_words {
+			if strings.has_prefix(w, word) {
+				return true
+			}
+		}
+		return false
+	}
+
+	first := len(r.issues)
+	for text, owners in r.by_docs {
+		if len(owners) < 2 {
+			continue
+		}
+		doc_words := strings.fields(strings.to_lower(text, context.temp_allocator), context.temp_allocator)
+		for &w in doc_words {
+			w = strings.trim(w, "`.,;:()[]*\"'")
+		}
+		slice.sort_by(owners[:], proc(a, b: Docs_Owner) -> bool { return a.name < b.name })
+		// docs shared on purpose say nothing of either name's difference; copied ones describe the other declaration
+		for a in owners {
+			for b in owners {
+				if a.entity == b.entity || a.name == b.name || shares_group(a, b) {
+					continue
+				}
+				own, other := name_words(a.name), name_words(b.name)
+				describes_self, describes_other := false, false
+				for w in own {
+					if !slice.contains(other, w) && mentions(doc_words, w) {
+						describes_self = true
+					}
+				}
+				for w in other {
+					if !slice.contains(own, w) && mentions(doc_words, w) {
+						describes_other = true
+					}
+				}
+				if describes_other && !describes_self {
+					append(&r.issues, Report_Issue{
+						kind   = .Duplicate,
+						name   = a.name,
+						detail = fmt.aprintf("the docs are the same as `%s`'s, and describe it rather than this", b.name, allocator = runtime.default_allocator()),
+						file   = a.file,
+						line   = a.line,
+					})
+					break
+				}
+			}
+		}
+	}
+	slice.sort_by(r.issues[first:], proc(a, b: Report_Issue) -> bool { return a.name < b.name })
 }
 
 @(private="file")
@@ -614,6 +758,7 @@ generate_report :: proc(b: ^strings.Builder, collections: []^Collection) {
 		for path in paths {
 			pkg := c.pkgs[path]
 			r := report_pkgs[pkg] or_continue
+			report_duplicates(r)
 			if !first {
 				io.write_string(w, ",")
 			}

@@ -206,7 +206,7 @@ write_dense_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, procs, groups: []doc
 		docs := entry_docs(e)
 		if declared_here {
 			report_begin(pkg, e, name)
-			report_declaration(pkg, e, name, strings.trim_space(docs) != "")
+			report_declaration(pkg, e, name, docs)
 			report_check_params(docs, e)
 		}
 		write_dense_docs(w, pkg, e, name, docs)
@@ -241,7 +241,7 @@ write_dense_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, procs, groups: []doc
 		docs := entry_docs(e)
 		if name == str(e.name) && &cfg.pkgs[cfg.files[e.pos.file].pkg] == pkg {
 			report_begin(pkg, e, name)
-			report_declaration(pkg, e, name, strings.trim_space(docs) != "")
+			report_declaration(pkg, e, name, docs)
 		}
 		write_dense_docs(w, pkg, e, name, docs)
 		report_end()
@@ -289,7 +289,7 @@ write_dense_constants :: proc(w: io.Writer, pkg: ^doc.Pkg, consts: []doc.Scope_E
 		docs := entry_docs(e)
 		if name == str(e.name) && &cfg.pkgs[cfg.files[e.pos.file].pkg] == pkg {
 			report_begin(pkg, e, name)
-			report_declaration(pkg, e, name, strings.trim_space(docs) != "")
+			report_declaration(pkg, e, name, docs)
 		}
 		write_dense_docs(w, pkg, e, name, docs)
 		report_end()
