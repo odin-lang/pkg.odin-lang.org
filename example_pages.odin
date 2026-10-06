@@ -31,10 +31,12 @@ EXAMPLE_TAB_WIDTH_SCRIPT :: `<script>
 		const apply = w => document.documentElement.style.setProperty("--example-tab-width", w);
 		if (width) apply(width);
 		document.addEventListener("DOMContentLoaded", () => {
-			for (const select of document.querySelectorAll(".example-tab-width select")) {
+			const selects = document.querySelectorAll(".example-tab-width select");
+			for (const select of selects) {
 				if (width) select.value = width;
 				select.addEventListener("change", () => {
 					apply(select.value);
+					for (const other of selects) other.value = select.value;
 					try { localStorage.setItem(KEY, select.value); } catch (e) {}
 				});
 			}
@@ -471,7 +473,12 @@ write_example_page :: proc(w: io.Writer, index: int) {
 		if build != "" {
 			fmt.wprintf(w, ` <span class="doc-badge" title="#+build %s">%s</span>`, build, build)
 		}
-		fmt.wprintf(w, `</span><div class="doc-source"><span class="example-lines">%s line%s</span><a href="%s"><em>Source</em></a></div></h3>`+"\n",
+		// the tab width to show it with, which every file here shares
+		io.write_string(w, `</span><div class="doc-source"><label class="example-tab-width">Tab width <select autocomplete="off">`)
+		for n in 1..=8 {
+			fmt.wprintf(w, `<option%s>%d</option>`, " selected" if n == EXAMPLE_TAB_WIDTH else "", n)
+		}
+		fmt.wprintf(w, `</select></label><span class="example-lines">%s line%s</span><a href="%s"><em>Source</em></a></div></h3>`+"\n",
 		            thousands(lines), "" if lines == 1 else "s", url)
 	}
 	file_url :: proc(program: be.Example_Program, name: string) -> string {
@@ -502,23 +509,8 @@ write_example_page :: proc(w: io.Writer, index: int) {
 		}
 	}
 
-	// the first heading over code shown here has the tab width to show it with
-	tab_width_shown := false
-	code_heading :: proc(w: io.Writer, id, title: string, shows_code: bool, tab_width_shown: ^bool) {
-		if !shows_code || tab_width_shown^ {
-			fmt.wprintf(w, `<h2 id="%s">%s</h2>`+"\n", id, title)
-			return
-		}
-		tab_width_shown^ = true
-		fmt.wprintf(w, `<h2 id="%s" class="example-code-heading">%s<label class="example-tab-width">Tab width <select autocomplete="off">`, id, title)
-		for n in 1..=8 {
-			fmt.wprintf(w, `<option%s>%d</option>`, " selected" if n == EXAMPLE_TAB_WIDTH else "", n)
-		}
-		io.write_string(w, "</select></label></h2>\n")
-	}
-
 	if len(files.odin) > 0 {
-		code_heading(w, "example-code", "Code", true, &tab_width_shown)
+		fmt.wprintln(w, `<h2 id="example-code">Code</h2>`)
 		append(&toc, Toc_Item{id = "example-code", text = "Code"})
 		for fi in files.odin {
 			file := program.files[fi]
@@ -539,13 +531,13 @@ write_example_page :: proc(w: io.Writer, index: int) {
 	}
 
 	if len(files.shaders) > 0 {
-		code_heading(w, "example-shaders", "Shaders", true, &tab_width_shown)
+		fmt.wprintln(w, `<h2 id="example-shaders">Shaders</h2>`)
 		append(&toc, Toc_Item{id = "example-shaders", text = "Shaders"})
 		write_text(w, program, files.shaders[:], &toc)
 	}
 
 	if len(files.shown) + len(files.long) > 0 {
-		code_heading(w, "example-other-files", "Other Files", len(files.shown) > 0, &tab_width_shown)
+		fmt.wprintln(w, `<h2 id="example-other-files">Other Files</h2>`)
 		append(&toc, Toc_Item{id = "example-other-files", text = "Other Files"})
 		write_text(w, program, files.shown[:], &toc)
 		if len(files.long) > 0 {

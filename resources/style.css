@@ -936,35 +936,29 @@ pre.doc-example-code a:hover {
 	margin-bottom: 0.5rem;
 	tab-size: var(--example-tab-width, 4);
 }
-/* the reader's tab width for it, at the end of the heading over the code */
-section.documentation h2.example-code-heading {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: baseline;
-	column-gap: 1rem;
-}
-.example-tab-width {
-	margin-left: auto;
-	font-size: 0.75rem;
-	font-weight: 600;
-	letter-spacing: 0.05em;
-	text-transform: uppercase;
+/* the reader's tab width, beside each file's line count and Source link and looking like them;
+   its list's colours are set too, as browsers draw it apart from the page */
+.doc-source .example-tab-width {
 	color: var(--odin-sidebar-muted);
+	font-size: 0.75em;
 }
 .example-tab-width select {
 	margin-left: 0.25rem;
-	padding: 0.0625rem 0.25rem;
+	padding: 0 0.125rem;
 	border: 1px solid var(--odin-card-border);
 	border-radius: 0.2rem;
-	background-color: transparent;
-	color: var(--bs-body-color);
-	font-size: 0.875rem;
-	font-weight: 400;
-	letter-spacing: normal;
+	font: inherit;
 	cursor: pointer;
 }
+.example-tab-width select, .example-tab-width option {
+	background-color: #fff;
+	color: #212529;
+}
+.dark-mode .example-tab-width select, .dark-mode .example-tab-width option {
+	background-color: var(--dark-background, #0d1117);
+	color: var(--bs-light, #f8f9fa);
+}
 .dark-mode .example-tab-width select {
-	color: var(--bs-light);
 	color-scheme: dark;
 }
 pre.example-code a.ln {
@@ -993,7 +987,6 @@ pre.example-code .line:target {
 	margin: 0.5rem 0 1rem;
 	padding: 0.625rem 0.875rem;
 	border: 1px solid rgba(var(--bs-secondary-rgb), 0.55);
-	border-left-width: 0.25rem;
 	border-radius: 0.2rem;
 	background-color: rgba(var(--bs-secondary-rgb), 0.07);
 	font-size: 0.875rem;
