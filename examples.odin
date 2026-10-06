@@ -35,12 +35,6 @@ example_uses:     map[^doc.Pkg]map[string][dynamic]Example_Use
 example_links:    [][]map[int]Example_Link // by program and file: where a name starts, and what it names
 example_lines:    [][][]string             // by program and file: each line, highlighted, once needed
 example_files:    [][]Example_File_Info    // by program and file
-example_builtins: map[string]Example_Builtin // the predeclared names, like `int`, `nil` and `len`
-
-Example_Builtin :: struct {
-	url:   string, // its place on the builtin page
-	class: string, // highlight.js's class for what it is: a procedure, type or constant
-}
 
 Example_Link :: struct {
 	url:     string,
@@ -100,42 +94,6 @@ load_examples :: proc(path: string) -> bool {
 
 index_examples :: proc() {
 	context.allocator = runtime.default_allocator()
-
-	// those the builtin page documents: its own table's and the runtime's `@builtin` declarations
-	for c in cfg.collections {
-		if c.name != "base" {
-			continue
-		}
-		for b in builtins {
-			class: string
-			switch b.kind {
-			case "b": class = "hljs-built_in"
-			case "t": class = "hljs-type"
-			case "c": class = "hljs-literal"
-			}
-			example_builtins[b.name] = {fmt.aprintf("%s/builtin/#%s", c.base_url, b.name), class}
-		}
-		if runtime_pkg := lookup_doc_pkg("base:runtime", nil); runtime_pkg != nil {
-			init_cfg_from_pkg(runtime_pkg)
-			for entry in array(runtime_pkg.entries) {
-				e := &cfg.entities[entry.entity]
-				for attr in array(e.attributes) {
-					if str(attr.name) != "builtin" {
-						continue
-					}
-					class: string
-					#partial switch e.kind {
-					case .Procedure, .Proc_Group: class = "hljs-built_in"
-					case .Type_Name:              class = "hljs-type"
-					case .Constant:               class = "hljs-literal"
-					}
-					name := strings.clone(str(entry.name))
-					example_builtins[name] = {fmt.aprintf("%s/builtin/#%s", c.base_url, name), class}
-					break
-				}
-			}
-		}
-	}
 
 	example_links = make([][]map[int]Example_Link, len(examples.programs))
 	example_lines = make([][][]string, len(examples.programs))
@@ -319,7 +277,7 @@ index_example_file :: proc(pi, fi: int) {
 			}
 			#partial switch n in node.derived {
 			case ^ast.Ident:
-				if n.name in example_builtins {
+				if n.name in builtin_names {
 					append(&index.builtins, n)
 				}
 			case ^ast.Selector_Expr:
@@ -374,7 +332,7 @@ index_example_file :: proc(pi, fi: int) {
 		if index.not_builtin[ident.pos.offset] || ident.name in index.declared || ident.pos.offset in links {
 			continue
 		}
-		links[ident.pos.offset] = {url = example_builtins[ident.name].url, builtin = true}
+		links[ident.pos.offset] = {url = builtin_names[ident.name].url, builtin = true}
 	}
 }
 
@@ -791,7 +749,7 @@ highlight_example :: proc(src: string, links: map[int]Example_Link) -> []string 
 				// coloured as what the builtin page says it is, like `ensure` as a procedure
 				if link.builtin {
 					class = builtin_class(tok.text)
-					if b, ok := example_builtins[tok.text]; ok && b.class != "" {
+					if b, ok := builtin_names[tok.text]; ok && b.class != "" {
 						class = b.class
 					}
 				}

@@ -70,6 +70,7 @@ main :: proc() {
 	}
 
 	build_doc_link_index()
+	index_builtin_names()
 
 	// -examples:examples.json, as bundle_examples makes it
 	for arg in os.args[1:] {
@@ -575,6 +576,29 @@ Header_Kind :: enum {
 	Full_Width,
 }
 
+header_lower :: proc() -> string {
+	// with every builtin in its Odin grammar for highlight.js, like `int` and `ensure`, so the docs' own examples
+	// colour them as the examples' code does, rather than only the few the grammar lists itself
+	@(static) header: string
+	if header == "" {
+		context.allocator = runtime.default_allocator()
+		lists: [3][dynamic]string
+		for name, b in builtin_names {
+			switch b.class {
+			case "hljs-built_in": append(&lists[0], name)
+			case "hljs-type":     append(&lists[1], name)
+			case "hljs-literal":  append(&lists[2], name)
+			}
+		}
+		header = string(#load("resources/header-lower.txt.html"))
+		for marker, i in ([]string{"ODIN_DOC_BUILT_INS", "ODIN_DOC_TYPES", "ODIN_DOC_LITERALS"}) {
+			slice.sort(lists[i][:])
+			header, _ = strings.replace_all(header, marker, strings.join(lists[i][:], " "))
+		}
+	}
+	return header
+}
+
 write_html_header :: proc(w: io.Writer, title: string, kind := Header_Kind.Normal, description := "", extra_head := "") {
 	fmt.wprintf(w, string(#load("resources/header.txt.html")), title)
 
@@ -590,7 +614,7 @@ write_html_header :: proc(w: io.Writer, title: string, kind := Header_Kind.Norma
 	io.write_string(w, extra_head)
 
 
-	io.write(w, #load("resources/header-lower.txt.html"))
+	io.write_string(w, header_lower())
 	switch kind {
 	case .Normal:
 		io.write_string(w, `<div class="container">`+"\n")

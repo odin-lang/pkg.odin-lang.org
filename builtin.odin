@@ -1,5 +1,6 @@
 package odin_html_docs
 
+import "base:runtime"
 import "core:fmt"
 import "core:io"
 import "core:slice"
@@ -8,6 +9,53 @@ import "core:text/scanner"
 import "core:unicode"
 
 import doc "core:odin/doc-format"
+
+// The predeclared names, like `int`, `nil` and `len`: those the builtin page documents
+builtin_names: map[string]Builtin_Name
+
+Builtin_Name :: struct {
+	url:   string, // its place on the builtin page
+	class: string, // highlight.js's class for what it is: a procedure, type or constant
+}
+
+index_builtin_names :: proc() {
+	// the builtin page's own table's, and the runtime's `@builtin` declarations
+	context.allocator = runtime.default_allocator()
+	for c in cfg.collections {
+		if c.name != "base" {
+			continue
+		}
+		for b in builtins {
+			class: string
+			switch b.kind {
+			case "b": class = "hljs-built_in"
+			case "t": class = "hljs-type"
+			case "c": class = "hljs-literal"
+			}
+			builtin_names[b.name] = {fmt.aprintf("%s/builtin/#%s", c.base_url, b.name), class}
+		}
+		if runtime_pkg := lookup_doc_pkg("base:runtime", nil); runtime_pkg != nil {
+			init_cfg_from_pkg(runtime_pkg)
+			for entry in array(runtime_pkg.entries) {
+				e := &cfg.entities[entry.entity]
+				for attr in array(e.attributes) {
+					if str(attr.name) != "builtin" {
+						continue
+					}
+					class: string
+					#partial switch e.kind {
+					case .Procedure, .Proc_Group: class = "hljs-built_in"
+					case .Type_Name:              class = "hljs-type"
+					case .Constant:               class = "hljs-literal"
+					}
+					name := strings.clone(str(entry.name))
+					builtin_names[name] = {fmt.aprintf("%s/builtin/#%s", c.base_url, name), class}
+					break
+				}
+			}
+		}
+	}
+}
 
 Builtin :: struct {
 	name:    string,
