@@ -3922,6 +3922,19 @@ write_breakable_name :: proc(w: io.Writer, name: string) {
 	}
 }
 
+write_breakable_path :: proc(w: io.Writer, path: string) {
+	// each part, with its `/`, goes onto the next line whole, and only a part too long for a line by itself breaks at its `_`s
+	rest := path
+	for rest != "" {
+		slash := strings.index_byte(rest, '/')
+		part := rest if slash < 0 else rest[:slash+1]
+		io.write_string(w, `<span class="path-part">`)
+		write_breakable_name(w, part)
+		io.write_string(w, `</span>`)
+		rest = rest[len(part):]
+	}
+}
+
 
 walk_index_groups :: proc(
 	w:           io.Writer,

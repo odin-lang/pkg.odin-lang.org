@@ -460,7 +460,7 @@ write_example_page :: proc(w: io.Writer, index: int) {
 		fmt.wprintln(w, `<table class="odin-pkg-table example-members">`)
 		for member in page.members {
 			fmt.wprintf(w, `<tbody><tr><td class="pkg-name"><a href="%s">`, example_url(member))
-			write_breakable_name(w, slashpath.base(example_pages[member].path))
+			write_breakable_path(w, slashpath.base(example_pages[member].path))
 			fmt.wprintf(w, "</a></td><td class=\"pkg-desc\">%s</td></tr></tbody>\n", escape_html_text(example_summary(member)))
 		}
 		fmt.wprintln(w, `</table>`)
@@ -718,11 +718,11 @@ write_examples_sidebar :: proc(w: io.Writer, current: int) {
 		}
 		if n.page >= 0 {
 			fmt.wprintf(w, `<a%s href="%s">`, ` class="active"` if n.page == current else "", example_url(n.page))
-			write_breakable_name(w, label)
+			write_breakable_path(w, label)
 			io.write_string(w, `</a>`)
 		} else {
 			io.write_string(w, `<span class="pkg-sidebar-label">`)
-			write_breakable_name(w, label)
+			write_breakable_path(w, label)
 			io.write_string(w, `</span>`)
 		}
 		if len(n.children) > 0 {
@@ -836,7 +836,7 @@ write_examples_index :: proc(w: io.Writer) {
 		io.write_string(w, "</tr>\n")
 		for page in below {
 			fmt.wprintf(w, `<tr class="pkg-child"><td class="pkg-name"><a href="%s">`, example_url(page))
-			write_breakable_name(w, example_pages[page].path[len(top.name)+1:])
+			write_breakable_path(w, example_pages[page].path[len(top.name)+1:])
 			io.write_string(w, `</a></td>`)
 			write_desc(w, page, about)
 			io.write_string(w, "</tr>\n")
