@@ -2254,13 +2254,15 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		}
 		params := array(type.types)[0]
 		results := array(type.types)[1]
+		// where this type is used, as a result or a variadic parameter, says nothing of its own parameters
+		inner := flags - {.Is_Results, .Ignore_Name, .Variadic}
 		io.write_byte(w, '(')
-		write_type(writer, cfg.types[params], flags)
+		write_type(writer, cfg.types[params], inner)
 		io.write_byte(w, ')')
 		if results != 0 {
 			assert(.Diverging not_in type_flags)
 			io.write_string(w, " -> ")
-			write_type(writer, cfg.types[results], flags+{.Is_Results})
+			write_type(writer, cfg.types[results], inner+{.Is_Results})
 		}
 		if .Diverging in type_flags {
 			io.write_string(w, " -> !")
