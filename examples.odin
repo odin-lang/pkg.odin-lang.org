@@ -35,7 +35,12 @@ example_uses:     map[^doc.Pkg]map[string][dynamic]Example_Use
 example_links:    [][]map[int]Example_Link // by program and file: where a name starts, and what it names
 example_lines:    [][][]string             // by program and file: each line, highlighted, once needed
 example_files:    [][]Example_File_Info    // by program and file
-example_builtins: map[string]string        // the predeclared names, like `int`, `nil` and `len`, and their place on the builtin page
+example_builtins: map[string]Example_Builtin // the predeclared names, like `int`, `nil` and `len`
+
+Example_Builtin :: struct {
+	url:   string, // its place on the builtin page
+	class: string, // highlight.js's class for what it is: a procedure, type or constant
+}
 
 Example_Link :: struct {
 	url:     string,
@@ -102,17 +107,31 @@ index_examples :: proc() {
 			continue
 		}
 		for b in builtins {
-			example_builtins[b.name] = fmt.aprintf("%s/builtin/#%s", c.base_url, b.name)
+			class: string
+			switch b.kind {
+			case "b": class = "hljs-built_in"
+			case "t": class = "hljs-type"
+			case "c": class = "hljs-literal"
+			}
+			example_builtins[b.name] = {fmt.aprintf("%s/builtin/#%s", c.base_url, b.name), class}
 		}
 		if runtime_pkg := lookup_doc_pkg("base:runtime", nil); runtime_pkg != nil {
 			init_cfg_from_pkg(runtime_pkg)
 			for entry in array(runtime_pkg.entries) {
-				for attr in array(cfg.entities[entry.entity].attributes) {
-					if str(attr.name) == "builtin" {
-						name := strings.clone(str(entry.name))
-						example_builtins[name] = fmt.aprintf("%s/builtin/#%s", c.base_url, name)
-						break
+				e := &cfg.entities[entry.entity]
+				for attr in array(e.attributes) {
+					if str(attr.name) != "builtin" {
+						continue
 					}
+					class: string
+					#partial switch e.kind {
+					case .Procedure, .Proc_Group: class = "hljs-built_in"
+					case .Type_Name:              class = "hljs-type"
+					case .Constant:               class = "hljs-literal"
+					}
+					name := strings.clone(str(entry.name))
+					example_builtins[name] = {fmt.aprintf("%s/builtin/#%s", c.base_url, name), class}
+					break
 				}
 			}
 		}
@@ -355,7 +374,7 @@ index_example_file :: proc(pi, fi: int) {
 		if index.not_builtin[ident.pos.offset] || ident.name in index.declared || ident.pos.offset in links {
 			continue
 		}
-		links[ident.pos.offset] = {url = example_builtins[ident.name], builtin = true}
+		links[ident.pos.offset] = {url = example_builtins[ident.name].url, builtin = true}
 	}
 }
 
@@ -769,8 +788,12 @@ highlight_example :: proc(src: string, links: map[int]Example_Link) -> []string 
 				class = "hljs-meta"
 			case start in links:
 				link = links[start]
+				// coloured as what the builtin page says it is, like `ensure` as a procedure
 				if link.builtin {
 					class = builtin_class(tok.text)
+					if b, ok := example_builtins[tok.text]; ok && b.class != "" {
+						class = b.class
+					}
 				}
 			case:
 				class = builtin_class(tok.text)
