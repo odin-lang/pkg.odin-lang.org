@@ -53,6 +53,9 @@ Config :: struct {
 	// Packages of generated declarations, e.g. "core:rexcode/isa/*": their procedures are listed one per row,
 	// under their procedure groups, rather than each with a heading and a block of its own
 	dense_packages: []string,
+	// Packages whose page is the first doc file's build, e.g. "base:runtime" from Windows's, even when a later file's
+	// copy declares more; what only the later ones declare is still shown, under the targets that declare it
+	first_build_packages: []string,
 	// Where packages whose declarations are documented elsewhere have their documentation, keyed by import path
 	// ("vendor:stb/*" for every package under it); those with upstream_docs or objc_docs needn't be listed
 	external_docs:  map[string]External_Docs,

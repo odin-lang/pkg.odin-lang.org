@@ -415,7 +415,7 @@ generate_from_path :: proc(path: string, all_packages: bool) {
 			cfg.pkg_to_header[&pkg] = cfg.header
 
 			if fp in cfg.handled_packages {
-				if cfg.handled_packages[fp] >= len(array(pkg.entries)) {
+				if cfg.handled_packages[fp] >= len(array(pkg.entries)) || !all_packages && is_first_build_pkg(fp) {
 					log.debugf("package already handled: %q", fp)
 					continue
 				} else {
