@@ -32,8 +32,42 @@ EXAMPLE_EXCERPT_MAX_LINES :: 24
 EXAMPLES_SHOWN :: 3
 
 example_uses:  map[^doc.Pkg]map[string][dynamic]Example_Use
-example_links: [][]map[int]string // by program and file: where a name starts, and the page of what it names
-example_lines: [][][]string       // by program and file: each line, highlighted, once needed
+example_links: [][]map[int]string       // by program and file: where a name starts, and the page of what it names
+example_lines: [][][]string             // by program and file: each line, highlighted, once needed
+example_files: [][]Example_File_Info    // by program and file
+
+Example_File_Info :: struct {
+	main:     bool,                  // it declares `main`
+	build:    string,                // its `#+build` constraint, e.g. "windows" or "!js"
+	procs:    [dynamic]Example_Proc, // declared at file scope
+	packages: [dynamic]^doc.Pkg,     // the documented packages it imports
+	used:     [dynamic]Example_Name, // the documented declarations it names, as often as it does
+}
+
+Example_Proc :: struct {
+	name: string,
+	line: int,
+}
+
+Example_Name :: struct {
+	pkg:  ^doc.Pkg,
+	name: string,
+}
+
+// Each program is a page, except that a folder of programs that are each a file, like `raylib/ports/core`,
+// is a page for each of those files as well as one for the folder
+Example_Page :: struct {
+	path:    string,       // in the repo, and on the site under EXAMPLES_URL
+	program: int,
+	file:    int,          // the file it is, or -1 for the program
+	members: [dynamic]int, // the pages of its files that are programs
+}
+
+EXAMPLES_URL :: "/examples"
+
+example_pages:   [dynamic]Example_Page
+example_page_of: [][]int        // by program and file: the page showing it
+example_page_at: map[string]int // by path
 
 load_examples :: proc(path: string) -> bool {
 	data, err := os.read_entire_file_from_path(path, context.allocator)
@@ -57,11 +91,42 @@ index_examples :: proc() {
 	context.allocator = runtime.default_allocator()
 	example_links = make([][]map[int]string, len(examples.programs))
 	example_lines = make([][][]string, len(examples.programs))
+	example_files = make([][]Example_File_Info, len(examples.programs))
 	for program, pi in examples.programs {
 		example_links[pi] = make([]map[int]string, len(program.files))
 		example_lines[pi] = make([][]string, len(program.files))
+		example_files[pi] = make([]Example_File_Info, len(program.files))
 		for _, fi in program.files {
 			index_example_file(pi, fi)
+		}
+	}
+
+	example_page_of = make([][]int, len(examples.programs))
+	for program, pi in examples.programs {
+		example_page_at[program.path] = len(example_pages)
+		example_page_of[pi] = make([]int, len(program.files))
+		slice.fill(example_page_of[pi], len(example_pages))
+		append(&example_pages, Example_Page{path = program.path, program = pi, file = -1})
+	}
+	for program, pi in examples.programs {
+		mains := 0
+		for info in example_files[pi] {
+			mains += int(info.main)
+		}
+		if mains < 2 {
+			continue
+		}
+		folder := example_page_at[program.path]
+		for file, fi in program.files {
+			path := fmt.aprintf("%s/%s", program.path, strings.trim_suffix(file.name, ".odin"))
+			if !example_files[pi][fi].main || path in example_page_at {
+				continue
+			}
+			page := len(example_pages)
+			append(&example_pages, Example_Page{path = path, program = pi, file = fi})
+			append(&example_pages[folder].members, page)
+			example_page_at[path] = page
+			example_page_of[pi][fi] = page
 		}
 	}
 }
@@ -69,6 +134,9 @@ index_examples :: proc() {
 @(private="file")
 index_example_file :: proc(pi, fi: int) {
 	file := examples.programs[pi].files[fi]
+	info := &example_files[pi][fi]
+	info.build = build_constraint(file.source)
+
 	p := parser.default_parser()
 	p.err  = proc(pos: tokenizer.Pos, msg: string, args: ..any) {}
 	p.warn = proc(pos: tokenizer.Pos, msg: string, args: ..any) {}
@@ -82,10 +150,11 @@ index_example_file :: proc(pi, fi: int) {
 	Index :: struct {
 		pi, fi:   int,
 		lines:    int,
+		info:     ^Example_File_Info,
 		packages: map[string]^doc.Pkg, // by the name the file imports it as
 		procs:    [dynamic][2]int,     // the lines of each procedure declared at file scope
 	}
-	index := Index{pi = pi, fi = fi, lines = strings.count(file.source, "\n") + 1}
+	index := Index{pi = pi, fi = fi, lines = strings.count(file.source, "\n") + 1, info = info}
 	for decl in ast_file.decls {
 		if decl == nil {
 			continue
@@ -100,12 +169,24 @@ index_example_file :: proc(pi, fi: int) {
 			name := d.name.text if d.name.text != "" else slashpath.base(rest)
 			if pkg := lookup_doc_pkg(path, nil); pkg != nil {
 				index.packages[name] = pkg
+				if !slice.contains(info.packages[:], pkg) {
+					append(&info.packages, pkg)
+				}
 			}
 		case ^ast.Value_Decl:
-			for value in d.values {
-				if value != nil {
-					if _, ok := value.derived.(^ast.Proc_Lit); ok {
-						append(&index.procs, [2]int{d.pos.line, d.end.line})
+			for value, i in d.values {
+				if value == nil {
+					continue
+				}
+				if _, ok := value.derived.(^ast.Proc_Lit); ok {
+					append(&index.procs, [2]int{d.pos.line, d.end.line})
+					if i < len(d.names) {
+						if ident, is_ident := d.names[i].derived.(^ast.Ident); is_ident {
+							append(&info.procs, Example_Proc{ident.name, d.pos.line})
+							if ident.name == "main" {
+								info.main = true
+							}
+						}
 					}
 				}
 			}
@@ -141,6 +222,7 @@ index_example_file :: proc(pi, fi: int) {
 
 			links := &example_links[index.pi][index.fi]
 			links[selector.field.pos.offset] = strings.clone(doc_entity_url(pkg, name))
+			append(&index.info.used, Example_Name{pkg, name})
 			if !is_about(examples.programs[index.pi], pkg) {
 				return v
 			}
@@ -173,6 +255,25 @@ index_example_file :: proc(pi, fi: int) {
 }
 
 @(private="file")
+build_constraint :: proc(src: string) -> string {
+	// `#+build windows`, or the older `//+build windows`, before the package clause
+	rest := src
+	for line in strings.split_lines_iterator(&rest) {
+		t := strings.trim_space(line)
+		if strings.has_prefix(t, "#+build ") {
+			return strings.trim_space(t[len("#+build "):])
+		}
+		if strings.has_prefix(t, "//+build ") {
+			return strings.trim_space(t[len("//+build "):])
+		}
+		if strings.has_prefix(t, "package ") {
+			break
+		}
+	}
+	return ""
+}
+
+@(private="file")
 is_about :: proc(program: be.Example_Program, pkg: ^doc.Pkg) -> bool {
 	// in a folder named after it, e.g. `nbio/tcp-echo` for `core:nbio`, or one the config names for it
 	collection := cfg.pkg_to_collection[pkg]
@@ -190,16 +291,36 @@ is_about :: proc(program: be.Example_Program, pkg: ^doc.Pkg) -> bool {
 	return false
 }
 
+example_url :: proc(page: int) -> string {
+	return fmt.tprintf("%s/%s/", EXAMPLES_URL, example_pages[page].path)
+}
+
+// On GitHub at the bundle's commit: `kind` is "tree" for a folder, "blob" for a file
+example_github_url :: proc(path: string, kind := "blob") -> string {
+	escaped, _ := strings.replace_all(path, " ", "%20", context.temp_allocator)
+	return fmt.tprintf("%s/%s/%s/%s", examples.repo, kind, examples.commit, escaped)
+}
+
+example_line_url :: proc(pi, fi, line: int) -> string {
+	program := examples.programs[pi]
+	name := program.files[fi].name
+	if program.link_only {
+		return fmt.tprintf("%s#L%d", example_github_url(fmt.tprintf("%s/%s", program.path, name)), line)
+	}
+	return fmt.tprintf("%s#%s-L%d", example_url(example_page_of[pi][fi]), name, line)
+}
+
 ranked_example_uses :: proc(pkg: ^doc.Pkg, name: string) -> []Example_Use {
-	// one use in each program, the shortest excerpt of it, any whose code can be shown first
+	// one use on each page, the shortest excerpt of it, any whose code can be shown first
 	uses := (example_uses[pkg] or_else nil)[name] or_else nil
 	if len(uses) == 0 {
 		return nil
 	}
 	best := make(map[int]Example_Use, len(uses), context.temp_allocator)
 	for use in uses {
-		if prev, ok := best[use.program]; !ok || use.to - use.from < prev.to - prev.from {
-			best[use.program] = use
+		page := example_page_of[use.program][use.file]
+		if prev, ok := best[page]; !ok || use.to - use.from < prev.to - prev.from {
+			best[page] = use
 		}
 	}
 	ranked := make([dynamic]Example_Use, 0, len(best), context.temp_allocator)
@@ -215,7 +336,7 @@ ranked_example_uses :: proc(pkg: ^doc.Pkg, name: string) -> []Example_Use {
 		if a.to - a.from != b.to - b.from {
 			return a.to - a.from < b.to - b.from
 		}
-		return pa.path < pb.path
+		return example_pages[example_page_of[a.program][a.file]].path < example_pages[example_page_of[b.program][b.file]].path
 	})
 	return ranked[:]
 }
@@ -230,7 +351,7 @@ write_entry_examples :: proc(w: io.Writer, pkg: ^doc.Pkg, name: string) {
 		if i > 0 {
 			io.write_string(w, " · ")
 		}
-		io.write_string(w, escape_html_string(examples.programs[use.program].path, context.temp_allocator))
+		io.write_string(w, escape_html_text(example_pages[example_page_of[use.program][use.file]].path))
 	}
 	if len(ranked) > EXAMPLES_SHOWN {
 		fmt.wprintf(w, " +%d", len(ranked) - EXAMPLES_SHOWN)
@@ -238,41 +359,34 @@ write_entry_examples :: proc(w: io.Writer, pkg: ^doc.Pkg, name: string) {
 	io.write_string(w, "</span></summary><div class=\"doc-examples-body\"></div></details>\n")
 }
 
-write_pkg_examples :: proc(w: io.Writer, pkg: ^doc.Pkg) -> (count: int) {
-	by_name := example_uses[pkg] or_else nil
-	if len(by_name) == 0 {
-		return
+// The pages under a folder, as the repo has them
+Example_Node :: struct {
+	name, path: string,
+	page:       int, // -1 for a folder without a page
+	children:   [dynamic]^Example_Node,
+}
+
+// `groups` gives a folder of programs that are each a file its page, though it isn't one of `pages`
+example_tree :: proc(pages: []int, groups := false) -> ^Example_Node {
+	new_node :: proc(name, path: string) -> ^Example_Node {
+		node := new(Example_Node, context.temp_allocator)
+		node^ = {name = name, path = path, page = -1, children = make([dynamic]^Example_Node, context.temp_allocator)}
+		return node
 	}
-	// how many of the package's declarations each program uses
-	used := make(map[int]int, 16, context.temp_allocator)
-	for _, uses in by_name {
-		seen := make(map[int]bool, 4, context.temp_allocator)
-		for use in uses {
-			if !seen[use.program] {
-				seen[use.program] = true
-				used[use.program] += 1
-			}
+	sort_nodes :: proc(node: ^Example_Node) {
+		slice.sort_by(node.children[:], proc(a, b: ^Example_Node) -> bool {
+			return strings.to_lower(a.name, context.temp_allocator) < strings.to_lower(b.name, context.temp_allocator)
+		})
+		for child in node.children {
+			sort_nodes(child)
 		}
 	}
 
-	// the folders the programs are in, as the repo has them
-	Node :: struct {
-		name:     string,
-		program:  int, // -1 for a folder that isn't a program itself
-		children: [dynamic]^Node,
-		programs: int, // in it and under it
-	}
-	new_node :: proc(name: string) -> ^Node {
-		node := new(Node, context.temp_allocator)
-		node^ = {name = name, program = -1, children = make([dynamic]^Node, context.temp_allocator)}
-		return node
-	}
-	root := new_node("")
-	for index in used {
+	root := new_node("", "")
+	for page in pages {
 		node := root
-		node.programs += 1
-		for part in strings.split(examples.programs[index].path, "/", context.temp_allocator) {
-			child: ^Node
+		for part in strings.split(example_pages[page].path, "/", context.temp_allocator) {
+			child: ^Example_Node
 			for c in node.children {
 				if c.name == part {
 					child = c
@@ -280,41 +394,76 @@ write_pkg_examples :: proc(w: io.Writer, pkg: ^doc.Pkg) -> (count: int) {
 				}
 			}
 			if child == nil {
-				child = new_node(part)
+				child = new_node(part, part if node == root else fmt.tprintf("%s/%s", node.path, part))
+				if folder, ok := example_page_at[child.path]; ok && groups && len(example_pages[folder].members) > 0 {
+					child.page = folder
+				}
 				append(&node.children, child)
 			}
 			node = child
-			node.programs += 1
 		}
-		node.program = index
+		node.page = page
+	}
+	sort_nodes(root)
+	return root
+}
+
+// A folder holding only a folder is one label, e.g. `learn_opengl/1_getting_started`
+example_node_label :: proc(node: ^Example_Node) -> (label: string, last: ^Example_Node) {
+	label, last = node.name, node
+	for last.page < 0 && len(last.children) == 1 && last.children[0].page < 0 {
+		last = last.children[0]
+		label = fmt.tprintf("%s/%s", label, last.name)
+	}
+	return
+}
+
+write_pkg_examples :: proc(w: io.Writer, pkg: ^doc.Pkg) -> (count: int) {
+	by_name := example_uses[pkg] or_else nil
+	if len(by_name) == 0 {
+		return
+	}
+	// how many of the package's declarations each page uses
+	used := make(map[int]int, 16, context.temp_allocator)
+	for _, uses in by_name {
+		seen := make(map[int]bool, 4, context.temp_allocator)
+		for use in uses {
+			page := example_page_of[use.program][use.file]
+			if !seen[page] {
+				seen[page] = true
+				used[page] += 1
+			}
+		}
+	}
+	pages := make([dynamic]int, 0, len(used), context.temp_allocator)
+	for page in used {
+		append(&pages, page)
 	}
 
-	write_node :: proc(w: io.Writer, node: ^Node, used: map[int]int) {
-		slice.sort_by(node.children[:], proc(a, b: ^Node) -> bool {
-			return strings.to_lower(a.name, context.temp_allocator) < strings.to_lower(b.name, context.temp_allocator)
-		})
+	write_node :: proc(w: io.Writer, node: ^Example_Node, used: map[int]int, inline := false) {
 		for child in node.children {
-			// a folder holding only a folder is one label, e.g. `learn_opengl/1_getting_started/`
-			label := child.name
-			n := child
-			for n.program < 0 && len(n.children) == 1 && n.children[0].program < 0 {
-				n = n.children[0]
-				label = fmt.tprintf("%s/%s", label, n.name)
-			}
-			io.write_string(w, "<li>")
-			if n.program >= 0 {
-				program := examples.programs[n.program]
-				fmt.wprintf(w, `<a href="%s/tree/%s/%s"`, examples.repo, examples.commit, program.path)
-				if summary := doc_summary(program.readme); summary != "" {
-					fmt.wprintf(w, ` title="%s"`, escape_html_string(summary, context.temp_allocator))
+			label, n := example_node_label(child)
+			io.write_string(w, `<li class="pkg-examples-member">` if inline else "<li>")
+			if n.page >= 0 {
+				fmt.wprintf(w, `<a href="%s"`, example_url(n.page))
+				if summary := example_summary(n.page); summary != "" {
+					fmt.wprintf(w, ` title="%s"`, escape_html_text(summary))
 				}
-				fmt.wprintf(w, `>%s</a><span class="pkg-examples-used" title="uses %d of the package's declarations">%d</span>`, label, used[n.program], used[n.program])
+				fmt.wprintf(w, `>%s</a>`, label)
+				if count, ok := used[n.page]; ok {
+					fmt.wprintf(w, `<span class="pkg-examples-used" title="uses %d of the package's declarations">%d</span>`, count, count)
+				}
 			} else {
 				fmt.wprintf(w, `<span class="pkg-examples-folder">%s/</span>`, label)
 			}
 			if len(n.children) > 0 {
-				io.write_string(w, "<ul>")
-				write_node(w, n, used)
+				// a folder of programs that are each a file has them run on from one to the next, as they're alike
+				members := n.page >= 0 && len(example_pages[n.page].members) > 0
+				for c in n.children {
+					members &&= len(c.children) == 0
+				}
+				io.write_string(w, `<ul class="pkg-examples-inline">` if members else "<ul>")
+				write_node(w, n, used, members)
 				io.write_string(w, "</ul>")
 			}
 			io.write_string(w, "</li>\n")
@@ -322,11 +471,12 @@ write_pkg_examples :: proc(w: io.Writer, pkg: ^doc.Pkg) -> (count: int) {
 	}
 
 	tree := strings.builder_make(context.temp_allocator)
+	root := example_tree(pages[:], groups = true)
 	write_node(strings.to_writer(&tree), root, used)
 
 	// a long tree is its top folders side by side, each whole, rather than a page of one column
 	LINES_FOR_COLUMNS :: 30
-	columns := strings.count(strings.to_string(tree), "<li>") > LINES_FOR_COLUMNS
+	columns := len(root.children) > 1 && strings.count(strings.to_string(tree), "<li>") > LINES_FOR_COLUMNS
 
 	fmt.wprintf(w, `<h2 id="pkg-external-examples"><a class="pkg-section-link" href="#pkg-external-examples">External Examples <span class="pkg-count">%d</span><span class="a-hidden">&nbsp;¶</span></a></h2>`+"\n", len(used))
 	fmt.wprintf(w, `<p class="pkg-examples-note">The programs in <a href="%s">odin-lang/examples</a> about this package, and how many of its declarations each uses.</p>`+"\n", examples.repo)
@@ -363,10 +513,13 @@ write_examples_json :: proc(w: io.Writer, pkg: ^doc.Pkg) -> bool {
 		shown := 0
 		for use, j in ranked_example_uses(pkg, name) {
 			program := examples.programs[use.program]
+			page := example_page_of[use.program][use.file]
 			if j > 0 {
 				io.write_string(w, ", ")
 			}
-			fmt.wprintf(w, `{{"p": %q, "f": %q, "l": %d, "from": %d, "to": %d`, program.path, program.files[use.file].name, use.line, use.from, use.to)
+			fmt.wprintf(w, `{{"p": %q, "u": %q, "f": %q, "l": %d, "at": %q, "from": %d, "to": %d`,
+			            example_pages[page].path, example_url(page), program.files[use.file].name, use.line,
+			            example_line_url(use.program, use.file, use.line), use.from, use.to)
 			if !program.link_only && shown < EXAMPLES_SHOWN {
 				shown += 1
 				io.write_string(w, `, "html": `)
@@ -386,7 +539,6 @@ write_examples_json :: proc(w: io.Writer, pkg: ^doc.Pkg) -> bool {
 	return true
 }
 
-@(private="file")
 license_line :: proc(text: string) -> string {
 	// "LearnOpenGL.com © 2025 by Joey de Vries is licensed under CC BY-NC 4.0…", for a short note
 	text := text
@@ -396,6 +548,24 @@ license_line :: proc(text: string) -> string {
 		}
 	}
 	return "its own licence"
+}
+
+// For text and attributes alike
+escape_html_text :: proc(s: string, allocator := context.temp_allocator) -> string {
+	if strings.index_any(s, `&<>"`) < 0 {
+		return s
+	}
+	b := strings.builder_make(allocator)
+	for i in 0..<len(s) {
+		switch s[i] {
+		case '&': strings.write_string(&b, "&amp;")
+		case '<': strings.write_string(&b, "&lt;")
+		case '>': strings.write_string(&b, "&gt;")
+		case '"': strings.write_string(&b, "&quot;")
+		case:     strings.write_byte(&b, s[i])
+		}
+	}
+	return strings.to_string(b)
 }
 
 @(private="file")
@@ -448,7 +618,7 @@ highlight_example :: proc(src: string, links: map[int]string) -> []string {
 				case url != "":   fmt.sbprintf(&out.b, `<a href="%s">`, url)
 				case class != "": fmt.sbprintf(&out.b, `<span class="%s">`, class)
 				}
-				strings.write_string(&out.b, escape_html_string(piece, context.temp_allocator))
+				strings.write_string(&out.b, escape_html_text(piece))
 				switch {
 				case url != "":   strings.write_string(&out.b, "</a>")
 				case class != "": strings.write_string(&out.b, "</span>")
@@ -487,7 +657,7 @@ highlight_example :: proc(src: string, links: map[int]string) -> []string {
 			class = "hljs-string"
 		case .Integer, .Float, .Imag:
 			class = "hljs-number"
-		case .Hash, .At:
+		case .Hash, .At, .File_Tag:
 			class = "hljs-meta"
 			directive = tok.kind == .Hash
 		case .Ident:

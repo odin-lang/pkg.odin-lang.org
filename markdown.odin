@@ -21,6 +21,10 @@ Doc_Context :: struct {
 	// The declaration being documented: its own name and its parameters and fields in backticks aren't linked
 	entity:         ^doc.Entity,
 	self_name:      string,
+
+	// A README's folder on GitHub, e.g. "https://github.com/odin-lang/examples/blob/<commit>/nbio/tcp-echo/":
+	// its relative links are to there, and only its images on GitHub are shown, the rest being links
+	readme_base:    string,
 }
 
 Doc_Heading :: struct {
@@ -629,7 +633,7 @@ render_markdown :: proc(src: string, ctx: ^Doc_Context, allocator := context.all
 		iter := cm.iter_new(root)
 		defer cm.iter_free(iter)
 
-		in_link := 0
+		in_link, in_image := 0, 0
 		for {
 			ev := cm.iter_next(iter)
 			if ev == .Done {
@@ -640,7 +644,15 @@ render_markdown :: proc(src: string, ctx: ^Doc_Context, allocator := context.all
 			if type == .Link || type == .Heading {
 				in_link += 1 if ev == .Enter else -1
 			}
-			if ev != .Enter {
+			if type == .Image && ctx.readme_base != "" {
+				// replaced with what's inside it
+				if ev == .Enter {
+					append(&nodes, node)
+				}
+				in_image += 1 if ev == .Enter else -1
+				continue
+			}
+			if ev != .Enter || in_image > 0 {
 				continue
 			}
 			#partial switch type {
@@ -703,8 +715,20 @@ render_markdown :: proc(src: string, ctx: ^Doc_Context, allocator := context.all
 			cm.node_append_child(para, new_text(strings.trim_right_space(string(cm.node_get_literal(node)))))
 			cm.node_replace(node, para)
 			cm.node_free(node)
+		case .Image:
+			url := readme_url(string(cm.node_get_url(node)), ctx.readme_base)
+			alt, _ := inline_text(node)
+			inline: ^cm.Node
+			if image, shown := github_image_url(url); shown {
+				inline = new_custom(.Custom_Inline, fmt.tprintf(`<img src="%s" alt="%s" loading="lazy">`, escape_html_text(image), escape_html_text(alt)), "")
+			} else {
+				inline = new_custom(.Custom_Inline, doc_link_open_tag(url), "</a>")
+				cm.node_append_child(inline, new_text(alt if alt != "" else url))
+			}
+			cm.node_replace(node, inline)
+			cm.node_free(node)
 		case .Link:
-			url := string(cm.node_get_url(node))
+			url := readme_url(string(cm.node_get_url(node)), ctx.readme_base)
 			scheme, _, _ := strings.partition(strings.to_lower(url, context.temp_allocator), ":")
 			anchor: ^cm.Node
 			switch scheme {
@@ -745,6 +769,40 @@ render_markdown :: proc(src: string, ctx: ^Doc_Context, allocator := context.all
 	html := cm.render_html(root, cm.DEFAULT_OPTIONS)
 	defer cm.free(html)
 	return strings.clone(string(html), allocator)
+}
+
+@(private="file")
+readme_url :: proc(url, base: string) -> string {
+	// relative to the README's folder, unless it has a scheme, like "https:", or is only a fragment
+	if base == "" || url == "" || url[0] == '#' || url[0] == '/' {
+		return url
+	}
+	if colon := strings.index_byte(url, ':'); colon >= 0 && strings.index_byte(url[:colon], '/') < 0 {
+		return url
+	}
+	return fmt.tprintf("%s%s", base, strings.trim_prefix(url, "./"))
+}
+
+// An image on GitHub as an <img> can load it, or not shown if it isn't on GitHub
+github_image_url :: proc(url: string) -> (src: string, shown: bool) {
+	GITHUB :: "https://github.com/"
+	if strings.has_prefix(url, GITHUB) {
+		// a file's page, github.com/<owner>/<repo>/blob/<ref>/<path>, is raw.githubusercontent.com/<owner>/<repo>/<ref>/<path>
+		parts := strings.split_n(url[len(GITHUB):], "/", 4, context.temp_allocator)
+		if len(parts) == 4 && (parts[2] == "blob" || parts[2] == "raw") {
+			path, _, _ := strings.partition(parts[3], "?")
+			return fmt.tprintf("https://raw.githubusercontent.com/%s/%s/%s", parts[0], parts[1], path), true
+		}
+		// like github.com/user-attachments/assets/<id>
+		return url, true
+	}
+	if strings.has_prefix(url, "https://") {
+		host, _, _ := strings.partition(url[len("https://"):], "/")
+		if strings.has_suffix(host, ".githubusercontent.com") {
+			return url, true
+		}
+	}
+	return url, false
 }
 
 write_markdown :: proc(w: io.Writer, lines: []string, ctx: ^Doc_Context) {

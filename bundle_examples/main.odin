@@ -6,8 +6,9 @@ import "core:os"
 import "core:path/slashpath"
 import "core:slice"
 import "core:strings"
+import "core:unicode/utf8"
 
-FORMAT_VERSION :: 1
+FORMAT_VERSION :: 2
 
 Examples_Bundle :: struct {
 	format:   int,
@@ -22,6 +23,8 @@ Example_Program :: struct {
 	license:   Example_License,
 	link_only: bool,   // its code is only linked to, not shown, as its licence may ask
 	files:     []Example_File,
+	other:     []Example_File,  // its other text, like shaders, scripts and data, by their paths in its folder
+	assets:    []Example_Asset, // and the rest, like images and fonts, only by name
 }
 
 Example_License :: struct {
@@ -30,9 +33,18 @@ Example_License :: struct {
 }
 
 Example_File :: struct {
-	name:   string, // "main.odin"
-	source: string,
+	name:      string, // "main.odin"
+	source:    string,
+	truncated: bool,   // only the start of it, as it's long
 }
+
+Example_Asset :: struct {
+	name: string, // "res/font.png"
+	size: i64,
+}
+
+// Text longer than this is only its start
+MAX_TEXT :: 32 * 1024
 
 
 USAGE :: ```
@@ -141,11 +153,13 @@ main :: proc() {
 		os.exit(1)
 	}
 
-	files := 0
+	files, other, assets := 0, 0, 0
 	for p in programs {
-		files += len(p.files)
+		files  += len(p.files)
+		other  += len(p.other)
+		assets += len(p.assets)
 	}
-	fmt.printfln("%d programs, %d files, from %s at %s", len(programs), files, bundle.repo, bundle.commit)
+	fmt.printfln("%d programs, %d .odin files, %d other files, %d assets, from %s at %s", len(programs), files, other, assets, bundle.repo, bundle.commit)
 }
 
 collect :: proc(checkout, rel: string, programs: ^[dynamic]Example_Program, link_only: []string) {
@@ -176,6 +190,48 @@ collect :: proc(checkout, rel: string, programs: ^[dynamic]Example_Program, link
 		return a.name < b.name
 	})
 
+	gather :: proc(checkout, program, sub, skip: string, other: ^[dynamic]Example_File, assets: ^[dynamic]Example_Asset) {
+		entries, err := os.read_all_directory_by_path(slashpath.join({checkout, program, sub}), context.allocator)
+		if err != nil {
+			return
+		}
+		slice.sort_by(entries, proc(a, b: os.File_Info) -> bool {
+			return a.name < b.name
+		})
+		for entry in entries {
+			// a folder with .odin files is a program of its own
+			if sub != "" && strings.has_suffix(entry.name, ".odin") {
+				return
+			}
+		}
+		for entry in entries {
+			name := slashpath.join({sub, entry.name}) if sub != "" else entry.name
+			switch {
+			case strings.has_prefix(entry.name, "."):
+			case entry.type == .Directory:
+				gather(checkout, program, name, skip, other, assets)
+			case sub == "" && (strings.has_suffix(entry.name, ".odin") || strings.to_lower(entry.name) == "readme.md"):
+			case slashpath.join({program, name}) == skip:
+			case:
+				data, read_err := os.read_entire_file_from_path(entry.fullpath, context.allocator)
+				if read_err != nil {
+					continue
+				}
+				if slice.contains(data, 0) || !utf8.valid_string(string(data)) {
+					append(assets, Example_Asset{name = name, size = i64(len(data))})
+					continue
+				}
+				text, _ := strings.replace_all(string(data), "\r\n", "\n")
+				truncated := len(text) > MAX_TEXT
+				if truncated {
+					cut := strings.last_index_byte(text[:MAX_TEXT], '\n')
+					text = text[:cut + 1 if cut > 0 else MAX_TEXT]
+				}
+				append(other, Example_File{name = name, source = text, truncated = truncated})
+			}
+		}
+	}
+
 	program := Example_Program{path = rel}
 	files: [dynamic]Example_File
 	for entry in entries {
@@ -197,6 +253,12 @@ collect :: proc(checkout, rel: string, programs: ^[dynamic]Example_Program, link
 	}
 	program.files = files[:]
 	program.license = own_license(checkout, rel)
+
+	other: [dynamic]Example_File
+	assets: [dynamic]Example_Asset
+	gather(checkout, rel, "", program.license.path, &other, &assets)
+	program.other = other[:]
+	program.assets = assets[:]
 	for path in link_only {
 		if rel == path || strings.has_prefix(rel, path) && strings.has_prefix(rel[len(path):], "/") {
 			program.link_only = true

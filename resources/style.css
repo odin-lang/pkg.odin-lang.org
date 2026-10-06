@@ -854,7 +854,7 @@ details.doc-examples > summary:hover {
 }
 .doc-examples-names {
 	margin-left: 0.25rem;
-	font-family: Consolas, Liberation Mono, Menlo, monospace;
+	font-family: var(--bs-font-monospace);
 	font-size: 0.8125rem;
 }
 .doc-example {
@@ -866,7 +866,7 @@ details.doc-examples > summary:hover {
 	color: var(--odin-sidebar-muted);
 }
 .doc-example-head a {
-	font-family: Consolas, Liberation Mono, Menlo, monospace;
+	font-family: var(--bs-font-monospace);
 }
 .doc-example-license a {
 	font-family: inherit;
@@ -876,7 +876,6 @@ details.doc-examples > summary:hover {
 	margin: 0;
 	overflow: auto;
 	tab-size: 4;
-	font-size: 0.8125rem;
 }
 pre.doc-example-code .ln {
 	display: inline-block;
@@ -908,8 +907,82 @@ pre.doc-example-code a:hover {
 	color: var(--odin-sidebar-muted);
 }
 .doc-example-more a {
-	font-family: Consolas, Liberation Mono, Menlo, monospace;
+	font-family: var(--bs-font-monospace);
 	font-size: 0.8125rem;
+}
+
+/* an example's page: its files in full, each line linkable */
+.example-file > h3 {
+	display: flow-root;
+}
+.doc-source .example-lines {
+	color: var(--odin-sidebar-muted);
+	font-size: 0.75em;
+}
+.documentation pre.example-code {
+	max-height: none;
+	margin-bottom: 0.5rem;
+}
+pre.example-code a.ln {
+	color: var(--odin-sidebar-muted);
+	text-decoration: none;
+}
+pre.example-code a.ln:hover {
+	color: inherit;
+}
+pre.example-code .line:target {
+	display: inline-block;
+	min-width: 100%;
+	background-color: rgba(56, 130, 210, 0.14);
+}
+.dark-mode pre.example-code .line:target {
+	background-color: rgba(122, 173, 229, 0.16);
+}
+.example-note {
+	color: var(--odin-sidebar-muted);
+	font-size: 0.875rem;
+}
+.example-screenshot {
+	display: block;
+	max-width: 100%;
+	max-height: 22rem;
+	margin-top: 0.75rem;
+	border: 1px solid var(--odin-card-border);
+	border-radius: 0.25rem;
+}
+#pkg-overview img {
+	max-width: 100%;
+	height: auto;
+}
+ul.example-links, ul.example-assets, ul.example-used {
+	padding-left: 0;
+	list-style: none;
+}
+ul.example-links .example-lines {
+	margin-left: 0.25rem;
+	color: var(--odin-sidebar-muted);
+	font-size: 0.875rem;
+}
+/* names, not things to read, so as many to a row as fit */
+ul.example-assets {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+	gap: 0 1.5rem;
+}
+ul.example-used > li {
+	margin-bottom: 0.375rem;
+}
+a.example-used-pkg {
+	margin-right: 0.25rem;
+	font-weight: 600;
+}
+.example-about {
+	margin-left: 0.25rem;
+	color: var(--odin-sidebar-muted);
+	font-size: 0.875rem;
+}
+.example-about a {
+	color: inherit;
 }
 
 /* the package's examples, in the folders they're in */
@@ -943,6 +1016,11 @@ ul.pkg-examples-columns > li {
 }
 .pkg-examples-folder {
 	color: var(--odin-sidebar-muted);
+}
+ul.pkg-examples-tree ul.pkg-examples-inline {
+	display: flex;
+	flex-wrap: wrap;
+	column-gap: 1.25rem;
 }
 .pkg-examples-used {
 	margin-left: 0.5rem;

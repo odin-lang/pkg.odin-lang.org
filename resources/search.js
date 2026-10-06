@@ -254,20 +254,20 @@ document.addEventListener("click", async (ev) => {
 			delete details.dataset.loaded;
 			return;
 		}
+		// each example's page, and the line using it there
 		const at = path => `${examples.repo}/blob/${examples.commit}/${path}`;
-		const lines = u => `${at(`${u.p}/${u.f}`)}#L${u.from}-L${u.to}`;
 		const shown = uses.filter(u => u.html);
 		const rest = uses.filter(u => !u.html);
 		body.innerHTML = shown.map(u => `
 			<div class="doc-example">
 				<div class="doc-example-head">
-					<a href="${escape(`${examples.repo}/tree/${examples.commit}/${u.p}`)}">${escape(u.p)}</a>
-					<span class="doc-example-at">· <a href="${escape(lines(u))}">${escape(u.f)}:${u.l}</a></span>
+					<a href="${escape(u.u)}">${escape(u.p)}</a>
+					<span class="doc-example-at">· <a href="${escape(u.at)}">${escape(u.f)}:${u.l}</a></span>
 					${u.license ? `<span class="doc-example-license">· <a href="${escape(at(u.license_path))}" title="${escape(u.license)}">its own licence</a></span>` : ""}
 				</div>
 				<pre class="doc-example-code"><code class="hljs nohighlight">${u.html}</code></pre>
 			</div>`).join("") +
-			(rest.length ? `<p class="doc-example-more">${shown.length ? "Also in" : "In"} ${rest.map(u => `<a href="${escape(lines(u))}">${escape(u.p)}</a>`).join(", ")}</p>` : "");
+			(rest.length ? `<p class="doc-example-more">${shown.length ? "Also in" : "In"} ${rest.map(u => `<a href="${escape(u.at)}">${escape(u.p)}</a>`).join(", ")}</p>` : "");
 	}, true);
 }
 

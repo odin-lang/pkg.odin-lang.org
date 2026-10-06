@@ -157,6 +157,9 @@ main :: proc() {
 	log.infof("generate report")
 	generate_report(&b, not_hidden[:])
 
+	log.infof("generate %d example pages", len(example_pages))
+	generate_example_pages(&b)
+
 	log.infof("copy_assets")
 	copy_assets()
 
@@ -208,6 +211,12 @@ generate_sitemap :: proc(b: ^strings.Builder, collections: []^Collection) {
 		slice.sort(paths[:])
 		for path in paths {
 			write_url(w, fmt.tprintf("%s%s/%s/", origin, c.base_url, path), lastmod)
+		}
+	}
+	if len(example_pages) > 0 {
+		write_url(w, fmt.tprintf("%s%s/", origin, EXAMPLES_URL), lastmod)
+		for page in example_pages {
+			write_url(w, fmt.tprintf("%s%s/%s/", origin, EXAMPLES_URL, page.path), lastmod)
 		}
 	}
 
@@ -762,7 +771,9 @@ write_html_footer :: proc(w: io.Writer, pkg_data_url: string) {
 	io.write_string(w, "\n")
 
 	io.write(w, #load("resources/footer.txt.html"))
-	fmt.wprintf(w, `<script src="%s"></script>`+"\n", pkg_data_url)
+	if pkg_data_url != "" {
+		fmt.wprintf(w, `<script src="%s"></script>`+"\n", pkg_data_url)
+	}
 	io.write_string(w, `<script src="/search.js"></script>`+"\n")
 	fmt.wprintf(w, "</body>\n</html>\n")
 }
