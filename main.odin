@@ -978,6 +978,13 @@ write_home_page :: proc(w: io.Writer) {
 		}
 		fmt.wprintln(w, `</div>`)
 	}
+	if len(example_pages) > 0 {
+		fmt.wprintln(w, `<div class="odin-collection-card odin-examples-card">`)
+		fmt.wprintf(w, `<h2><a href="%s/">Examples</a></h2>`+"\n", EXAMPLES_URL)
+		fmt.wprintf(w, `<div class="odin-collection-stats">%d examples</div>`+"\n", len(example_pages))
+		fmt.wprintf(w, `<p>Example programs from <a href="%s">odin-lang/examples</a>, with the names in their code linked to their documentation.</p>`+"\n", examples.repo)
+		fmt.wprintln(w, `</div>`)
+	}
 	fmt.wprintln(w, `</section>`)
 
 	// a readme is too long for a card, so it goes below them
