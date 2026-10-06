@@ -271,6 +271,129 @@ document.addEventListener("click", async (ev) => {
 	}, true);
 }
 
+// A range of an example's lines, like `#main.odin-L12-L20`: shift-click a second line number to make one,
+// as an excerpt's link to its example makes one of the lines it shows
+if (document.querySelector("pre.example-code")) {
+	const RANGE = /^(.+)-L(\d+)-L(\d+)$/;
+	const LINE = /^(.+)-L(\d+)$/;
+	const selected = [];
+	const show_range = scroll => {
+		for (const line of selected) {
+			line.classList.remove("example-line-selected");
+		}
+		selected.length = 0;
+		const m = decodeURIComponent(location.hash.slice(1)).match(RANGE);
+		if (!m) {
+			return;
+		}
+		const [from, to] = [+m[2], +m[3]].sort((a, b) => a - b);
+		for (let n = from; n <= to; n++) {
+			const line = document.getElementById(`${m[1]}-L${n}`);
+			if (line) {
+				line.classList.add("example-line-selected");
+				selected.push(line);
+			}
+		}
+		if (scroll && selected.length) {
+			selected[0].scrollIntoView({block: "start"});
+		}
+	};
+	show_range(true);
+	window.addEventListener("hashchange", () => show_range(true));
+	document.addEventListener("click", ev => {
+		const ln = ev.target.closest && ev.target.closest("pre.example-code a.ln");
+		if (!ln || !ev.shiftKey) {
+			return;
+		}
+		// from the line or range already chosen in the same file; otherwise an ordinary link
+		const here = ln.closest(".line").id.match(LINE);
+		const hash = decodeURIComponent(location.hash.slice(1));
+		const start = hash.match(RANGE) || hash.match(LINE);
+		if (!here || !start || start[1] !== here[1]) {
+			return;
+		}
+		ev.preventDefault();
+		window.getSelection().removeAllRanges();
+		const [from, to] = [+start[2], +here[2]].sort((a, b) => a - b);
+		history.replaceState(null, "", `#${here[1]}-L${from}-L${to}`);
+		show_range(false);
+	});
+}
+
+// An example's screenshot, when its name is hovered in a list of examples
+{
+	let preview = null;
+	let current = null;
+	let timer = 0;
+	const hide = () => {
+		clearTimeout(timer);
+		current = null;
+		if (preview) {
+			preview.hidden = true;
+		}
+	};
+	const show = link => {
+		if (!preview) {
+			preview = document.createElement("div");
+			preview.className = "example-screenshot-preview";
+			preview.setAttribute("role", "tooltip");
+			preview.appendChild(document.createElement("img")).alt = "";
+			preview.appendChild(document.createElement("div"));
+			document.body.appendChild(preview);
+		}
+		const [img, caption] = preview.children;
+		caption.textContent = link.dataset.caption || "";
+		caption.hidden = !link.dataset.caption;
+		// once it's loaded, so it's placed by its real size: beside the name if there's room, otherwise below it
+		const place = () => {
+			if (current !== link) {
+				return;
+			}
+			preview.hidden = false;
+			const r = link.getBoundingClientRect();
+			const width = document.documentElement.clientWidth;
+			const navbar = document.querySelector(".odin-menu");
+			const top = Math.max(0, navbar ? navbar.getBoundingClientRect().bottom : 0) + 8;
+			let x = r.right + 12, y = r.top - 8;
+			if (x + preview.offsetWidth > width - 8) {
+				x = r.left;
+				y = r.bottom + 6;
+			}
+			x = Math.max(8, Math.min(x, width - preview.offsetWidth - 8));
+			y = Math.max(top, Math.min(y, window.innerHeight - preview.offsetHeight - 8));
+			preview.style.left = (window.scrollX + x) + "px";
+			preview.style.top = (window.scrollY + y) + "px";
+		};
+		img.onload = place;
+		if (img.getAttribute("src") === link.dataset.screenshot && img.complete && img.naturalWidth) {
+			place();
+		} else {
+			preview.hidden = true;
+			img.src = link.dataset.screenshot;
+		}
+	};
+	document.addEventListener("mouseover", ev => {
+		const link = ev.target.closest && ev.target.closest("a[data-screenshot]");
+		if (link && link !== current) {
+			current = link;
+			clearTimeout(timer);
+			timer = setTimeout(() => show(link), 250);
+		}
+	});
+	document.addEventListener("mouseout", ev => {
+		const link = ev.target.closest && ev.target.closest("a[data-screenshot]");
+		if (link && !link.contains(ev.relatedTarget)) {
+			hide();
+		}
+	});
+	document.addEventListener("keydown", ev => {
+		if (ev.key === "Escape") {
+			hide();
+		}
+	});
+	document.addEventListener("scroll", hide, {passive: true, capture: true});
+}
+
 // Long Related lists arrive as names, and become links when first opened
 document.addEventListener("toggle", ev => {
 	const details = ev.target;

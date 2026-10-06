@@ -406,8 +406,8 @@ example_github_url :: proc(path: string, kind := "blob") -> string {
 	return fmt.tprintf("%s/%s/%s/%s", examples.repo, kind, examples.commit, escaped)
 }
 
-example_line_url :: proc(pi, fi, line: int) -> string {
-	return fmt.tprintf("%s#%s-L%d", example_url(example_page_of[pi][fi]), examples.programs[pi].files[fi].name, line)
+example_lines_url :: proc(pi, fi, from, to: int) -> string {
+	return fmt.tprintf("%s#%s-L%d-L%d", example_url(example_page_of[pi][fi]), examples.programs[pi].files[fi].name, from, to)
 }
 
 ranked_example_uses :: proc(pkg: ^doc.Pkg, name: string) -> []Example_Use {
@@ -540,9 +540,14 @@ write_pkg_examples :: proc(w: io.Writer, pkg: ^doc.Pkg) -> (count: int) {
 			label, n := example_node_label(child)
 			io.write_string(w, `<li class="pkg-examples-member">` if inline else "<li>")
 			if n.page >= 0 {
+				// a screenshot shows when hovered, with the summary under it rather than as a tooltip over it
 				fmt.wprintf(w, `<a href="%s"`, example_url(n.page))
+				screenshot := example_screenshot(n.page)
+				if screenshot != "" {
+					fmt.wprintf(w, ` data-screenshot="%s"`, escape_html_text(screenshot))
+				}
 				if summary := example_summary(n.page); summary != "" {
-					fmt.wprintf(w, ` title="%s"`, escape_html_text(summary))
+					fmt.wprintf(w, ` %s="%s"`, "data-caption" if screenshot != "" else "title", escape_html_text(summary))
 				}
 				fmt.wprintf(w, `>%s</a>`, label)
 				if count, ok := used[n.page]; ok {
@@ -613,7 +618,7 @@ write_examples_json :: proc(w: io.Writer, pkg: ^doc.Pkg) -> bool {
 			}
 			fmt.wprintf(w, `{{"p": %q, "u": %q, "f": %q, "l": %d, "at": %q, "from": %d, "to": %d`,
 			            example_pages[page].path, example_url(page), program.files[use.file].name, use.line,
-			            example_line_url(use.program, use.file, use.line), use.from, use.to)
+			            example_lines_url(use.program, use.file, use.from, use.to), use.from, use.to)
 			if j < EXAMPLES_SHOWN {
 				io.write_string(w, `, "html": `)
 				write_json_string(w, example_excerpt(use))

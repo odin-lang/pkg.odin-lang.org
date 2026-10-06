@@ -95,6 +95,116 @@ example_summary :: proc(index: int) -> string {
 	return doc_summary(leading_comment(program.files[file].source))
 }
 
+// The screenshot a file of a folder of programs that are each a file has beside it, like raylib's ports have
+example_screenshot :: proc(index: int) -> string {
+	page := example_pages[index]
+	if page.file < 0 {
+		return ""
+	}
+	program := examples.programs[page.program]
+	stem := strings.trim_suffix(program.files[page.file].name, ".odin")
+	for asset in program.assets {
+		if is_image(asset.name) && strings.trim_suffix(slashpath.base(asset.name), slashpath.ext(asset.name)) == stem {
+			if src, shown := github_image_url(example_github_url(fmt.tprintf("%s/%s", program.path, asset.name))); shown {
+				return src
+			}
+		}
+	}
+	return ""
+}
+
+Example_Platform :: struct {
+	name, title: string,
+}
+
+example_platforms :: proc(index: int) -> []Example_Platform {
+	// what the code says: a platform's packages imported by a file that's built for every target, like `core:sys/windows`,
+	// and the web when a file is built for `js` or a script builds it with `-target:js_wasm32`
+	PLATFORM_PACKAGES :: [][2]string{
+		{"core:sys/windows", "Windows"}, {"vendor:directx", "Windows"}, {"vendor:windows", "Windows"},
+		{"core:sys/darwin", "macOS"}, {"vendor:darwin", "macOS"},
+		{"core:sys/linux", "Linux"},
+		{"core:sys/orca", "Orca"},
+		{"core:sys/wasm", "Web"},
+	}
+	page := example_pages[index]
+	program := examples.programs[page.program]
+	only := make([dynamic]string, context.temp_allocator)
+	web := false
+	for file, fi in program.files {
+		if page.file >= 0 && fi != page.file {
+			continue
+		}
+		info := example_files[page.program][fi]
+		if conditional, for_js := file_target(file.name, info.build); conditional {
+			web ||= for_js
+			continue
+		}
+		for pkg in info.packages {
+			path := pkg_import_path(pkg)
+			for p in PLATFORM_PACKAGES {
+				if (path == p[0] || strings.has_prefix(path, p[0]) && strings.has_prefix(path[len(p[0]):], "/")) && !slice.contains(only[:], p[1]) {
+					append(&only, p[1])
+				}
+			}
+		}
+	}
+	for other in program.other {
+		if file_kind(other.name) == .Build && strings.contains(other.source, "-target:js_") {
+			web = true
+		}
+	}
+
+	platforms := make([dynamic]Example_Platform, context.temp_allocator)
+	for name in only {
+		if name != "Web" {
+			append(&platforms, Example_Platform{name, fmt.tprintf("Only builds for %s", name)})
+		}
+	}
+	if web || slice.contains(only[:], "Web") {
+		append(&platforms, Example_Platform{"Web", "Builds for the web, with -target:js_wasm32"})
+	}
+	return platforms[:]
+}
+
+@(private="file")
+file_target :: proc(name, build: string) -> (conditional, for_js: bool) {
+	// by a `#+build` line, or by a name ending in a target, like `os_js.odin` or `raw_windows.odin`
+	if build != "" {
+		for alternative in strings.split(build, ",", context.temp_allocator) {
+			for term in strings.fields(alternative, context.temp_allocator) {
+				for_js ||= term == "js"
+			}
+		}
+		return true, for_js
+	}
+	TARGETS :: []string{
+		"windows", "linux", "darwin", "freebsd", "openbsd", "netbsd", "haiku", "essence", "freestanding", "wasi", "js", "orca",
+		"amd64", "arm64", "i386", "arm32", "wasm32", "wasm64p32", "riscv64",
+	}
+	parts := strings.split(strings.trim_suffix(name, ".odin"), "_", context.temp_allocator)
+	if len(parts) < 2 || !slice.contains(TARGETS, parts[len(parts)-1]) {
+		return false, false
+	}
+	for_js = parts[len(parts)-1] == "js" || len(parts) > 2 && parts[len(parts)-2] == "js"
+	return true, for_js
+}
+
+// With its screenshot, if it has one, to show when the link's hovered
+write_example_link_open :: proc(w: io.Writer, index: int) {
+	fmt.wprintf(w, `<a href="%s"`, example_url(index))
+	if screenshot := example_screenshot(index); screenshot != "" {
+		fmt.wprintf(w, ` data-screenshot="%s"`, escape_html_text(screenshot))
+	}
+	io.write_string(w, ">")
+}
+
+write_example_platforms :: proc(w: io.Writer, index: int) {
+	for p in example_platforms(index) {
+		fmt.wprintf(w, ` <span class="doc-badge" title="%s">%s</span>`, p.title, p.name)
+	}
+}
+
 @(private="file")
 leading_comment :: proc(src: string) -> string {
 	// the text of `// …` lines or a `/* … */` block, without the rows of `*` around it
@@ -397,7 +507,9 @@ write_example_page :: proc(w: io.Writer, index: int) {
 		source_path = fmt.tprintf("%s/%s", program.path, program.files[page.file].name)
 		source_url = example_github_url(source_path)
 	}
-	fmt.wprintf(w, "<h1>%s<div class=\"doc-source\"><a href=\"%s\"><em>Source</em></a></div></h1>\n", page.path, source_url)
+	fmt.wprintf(w, "<h1>%s", page.path)
+	write_example_platforms(w, index)
+	fmt.wprintf(w, "<div class=\"doc-source\"><a href=\"%s\"><em>Source</em></a></div></h1>\n", source_url)
 
 	// before anything else, as it isn't under Odin's licence
 	if program.license.path != "" {
@@ -459,9 +571,12 @@ write_example_page :: proc(w: io.Writer, index: int) {
 		fmt.wprintf(w, `<h2 id="example-examples">Examples <span class="pkg-count">%d</span></h2>`+"\n", len(page.members))
 		fmt.wprintln(w, `<table class="odin-pkg-table example-members">`)
 		for member in page.members {
-			fmt.wprintf(w, `<tbody><tr><td class="pkg-name"><a href="%s">`, example_url(member))
+			io.write_string(w, `<tbody><tr><td class="pkg-name">`)
+			write_example_link_open(w, member)
 			write_breakable_path(w, slashpath.base(example_pages[member].path))
-			fmt.wprintf(w, "</a></td><td class=\"pkg-desc\">%s</td></tr></tbody>\n", escape_html_text(example_summary(member)))
+			io.write_string(w, "</a>")
+			write_example_platforms(w, member)
+			fmt.wprintf(w, "</td><td class=\"pkg-desc\">%s</td></tr></tbody>\n", escape_html_text(example_summary(member)))
 		}
 		fmt.wprintln(w, `</table>`)
 		append(&toc, Toc_Item{id = "example-examples", text = "Examples", count = len(page.members)})
@@ -827,23 +942,33 @@ write_examples_index :: proc(w: io.Writer) {
 		below := make([dynamic]int)
 		under(top, &below)
 		if len(below) == 0 {
-			fmt.wprintf(w, `<tbody><tr><td class="pkg-name"><a href="%s">%s</a></td>`, example_url(top.page), top.name)
+			io.write_string(w, `<tbody><tr><td class="pkg-name">`)
+			write_example_link_open(w, top.page)
+			fmt.wprintf(w, "%s</a>", top.name)
+			write_example_platforms(w, top.page)
+			io.write_string(w, "</td>")
 			write_desc(w, top.page, about)
 			io.write_string(w, "</tr></tbody>\n")
 			continue
 		}
 		io.write_string(w, `<tbody class="pkg-group"><tr class="pkg-group-head"><td class="pkg-name">`)
 		if top.page >= 0 {
-			fmt.wprintf(w, `<a href="%s">%s</a></td>`, example_url(top.page), top.name)
+			write_example_link_open(w, top.page)
+			fmt.wprintf(w, "%s</a>", top.name)
+			write_example_platforms(w, top.page)
+			io.write_string(w, "</td>")
 			write_desc(w, top.page, about)
 		} else {
 			fmt.wprintf(w, `<span class="pkg-group-label">%s</span></td><td class="pkg-desc"><span class="pkg-count">%d example%s</span></td>`, top.name, len(below), "" if len(below) == 1 else "s")
 		}
 		io.write_string(w, "</tr>\n")
 		for page in below {
-			fmt.wprintf(w, `<tr class="pkg-child"><td class="pkg-name"><a href="%s">`, example_url(page))
+			io.write_string(w, `<tr class="pkg-child"><td class="pkg-name">`)
+			write_example_link_open(w, page)
 			write_breakable_path(w, example_pages[page].path[len(top.name)+1:])
-			io.write_string(w, `</a></td>`)
+			io.write_string(w, `</a>`)
+			write_example_platforms(w, page)
+			io.write_string(w, `</td>`)
 			write_desc(w, page, about)
 			io.write_string(w, "</tr>\n")
 		}

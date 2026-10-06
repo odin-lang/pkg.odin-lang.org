@@ -979,13 +979,45 @@ pre.example-code a.ln {
 pre.example-code a.ln:hover {
 	color: inherit;
 }
-pre.example-code .line:target {
+pre.example-code .line:target, pre.example-code .line.example-line-selected {
 	display: inline-block;
 	min-width: 100%;
 	background-color: rgba(56, 130, 210, 0.14);
 }
-.dark-mode pre.example-code .line:target {
+.dark-mode pre.example-code .line:target, .dark-mode pre.example-code .line.example-line-selected {
 	background-color: rgba(122, 173, 229, 0.16);
+}
+/* the platforms an example's code is for, beside its name as declarations' badges are */
+h1 .doc-badge {
+	font-size: 0.875rem;
+	vertical-align: middle;
+}
+/* an example's screenshot, when its name is hovered: framed as the code previews are */
+.example-screenshot-preview {
+	position: absolute;
+	z-index: 1080;
+	width: min(20rem, calc(100vw - 1rem));
+	padding: 0.375rem;
+	border: 1px solid #c6c8ca;
+	border-radius: 0.25rem;
+	background-color: #f8f8f8;
+	box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.25);
+	pointer-events: none;
+}
+.dark-mode .example-screenshot-preview {
+	border-color: var(--dark-border, #242f3f);
+	background-color: var(--dark-code, #182028);
+}
+.example-screenshot-preview img {
+	display: block;
+	width: 100%;
+	height: auto;
+	border-radius: 0.125rem;
+}
+.example-screenshot-preview > div {
+	margin-top: 0.375rem;
+	color: var(--odin-sidebar-muted);
+	font-size: 0.8125rem;
 }
 .example-note {
 	color: var(--odin-sidebar-muted);
