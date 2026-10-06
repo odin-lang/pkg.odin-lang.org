@@ -176,8 +176,7 @@ h2 .pkg-count {
 	line-height: 1.5;
 }
 .odin-pkg-table td {
-	padding: 0.375rem 0.75rem;
-	border-bottom: 1px solid var(--odin-rule);
+	padding: 0.1875rem 0.75rem;
 	vertical-align: baseline;
 }
 .odin-pkg-table tr:hover td {
@@ -191,28 +190,23 @@ h2 .pkg-count {
 	color: var(--odin-sidebar-link);
 }
 
-/* groups get some space, and their packages hang off the same guide line as in the sidebar */
-.odin-pkg-table tbody.pkg-group > tr.pkg-group-head > td,
-.odin-pkg-table tbody.pkg-group + tbody:not(.pkg-group) > tr > td {
-	padding-top: 1.25rem;
+/* a line above each top-level entry, a package or a group's heading, and none between a group's members,
+   so the list scans by its groups; a heading also stands a little further off */
+.odin-pkg-table tbody + tbody > tr:first-child > td {
+	padding-top: 0.3125rem;
+	border-top: 1px solid var(--odin-rule);
+}
+.odin-pkg-table tbody.pkg-group > tr.pkg-group-head > td {
+	padding-top: 0.75rem;
 }
 .odin-pkg-table tr.pkg-group-head .pkg-name {
 	font-weight: 600;
 }
 .odin-pkg-table .pkg-group-label {
-	color: var(--odin-sidebar-muted);
+	color: inherit;
 }
 .odin-pkg-table tr.pkg-child td.pkg-name {
-	position: relative;
 	padding-left: 1.75rem;
-}
-.odin-pkg-table tr.pkg-child td.pkg-name::before {
-	content: "";
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 1rem;
-	border-left: 1px solid var(--odin-card-border);
 }
 
 /* the first heading, normally Overview, sits under the search rather than a heading's height below it */
@@ -257,46 +251,33 @@ h2 .pkg-count {
 	.odin-pkg-table, .odin-pkg-table tbody, .odin-pkg-table tr, .odin-pkg-table td {
 		display: block;
 	}
-	.odin-pkg-table tr {
-		position: relative;
-		border-bottom: 1px solid var(--odin-rule);
-	}
 	.odin-pkg-table td, .odin-pkg-table td.pkg-name {
 		width: auto;
-		border-bottom: none;
 		white-space: normal;
 	}
+	/* a name and its description are one entry, so the space and the line go above the name only */
 	.odin-pkg-table td.pkg-name {
 		padding-bottom: 0;
 	}
 	.odin-pkg-table td.pkg-desc,
-	.odin-pkg-table tbody.pkg-group > tr.pkg-group-head > td.pkg-desc,
-	.odin-pkg-table tbody.pkg-group + tbody:not(.pkg-group) > tr > td.pkg-desc {
-		padding-top: 0.125rem;
+	.odin-pkg-table tbody + tbody > tr:first-child > td.pkg-desc,
+	.odin-pkg-table tbody.pkg-group > tr.pkg-group-head > td.pkg-desc {
+		padding-top: 0;
+	}
+	.odin-pkg-table tbody + tbody > tr:first-child > td.pkg-desc {
+		border-top: none;
 	}
 	.odin-pkg-table td.pkg-desc:empty {
 		display: none;
 	}
 	.odin-pkg-table td.pkg-name:has(+ td.pkg-desc:empty) {
-		padding-bottom: 0.375rem;
+		padding-bottom: 0.1875rem;
 	}
 	.odin-pkg-table td.pkg-import {
 		display: none;
 	}
-	/* the guide line runs past both the name and the description of a child package */
 	.odin-pkg-table tr.pkg-child td {
 		padding-left: 1.75rem;
-	}
-	.odin-pkg-table tr.pkg-child td.pkg-name::before {
-		content: none;
-	}
-	.odin-pkg-table tr.pkg-child::before {
-		content: "";
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		left: 1rem;
-		border-left: 1px solid var(--odin-card-border);
 	}
 	/* a name or code word longer than the screen still must not widen the page;
 	   links and code set their own overflow-wrap, so they need it too */
