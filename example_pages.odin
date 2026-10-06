@@ -617,7 +617,13 @@ write_example_page :: proc(w: io.Writer, index: int) {
 			for j < len(items) && items[j].level > item.level {
 				j += 1
 			}
-			fmt.wprintf(w, `<li><a href="#%s">%s`, item.id, item.text)
+			// a file breaks as a path does, and a procedure at its `_`s, as the package pages' names do
+			fmt.wprintf(w, `<li><a href="#%s">`, item.id)
+			switch item.level {
+			case 0:  io.write_string(w, item.text)
+			case 1:  write_breakable_path(w, item.text)
+			case:    write_breakable_name(w, item.text)
+			}
 			if item.count > 0 {
 				fmt.wprintf(w, `<span class="toc-count">%d</span>`, item.count)
 			}

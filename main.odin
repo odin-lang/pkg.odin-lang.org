@@ -3916,14 +3916,14 @@ write_index_item :: proc(w: io.Writer, entry: doc.Scope_Entry) {
 write_breakable_name :: proc(w: io.Writer, name: string) {
 	for i in 0..<len(name) {
 		io.write_byte(w, name[i])
-		if (name[i] == '_' || name[i] == '/') && i > 0 && i+1 < len(name) {
+		if (name[i] == '_' || name[i] == '/' || name[i] == '-') && i > 0 && i+1 < len(name) {
 			io.write_string(w, "<wbr>")
 		}
 	}
 }
 
 write_breakable_path :: proc(w: io.Writer, path: string) {
-	// each part, with its `/`, goes onto the next line whole, and only a part too long for a line by itself breaks at its `_`s
+	// each part, with its `/`, goes onto the next line whole, and only a part too long for a line by itself breaks at its `_`s and `-`s
 	rest := path
 	for rest != "" {
 		slash := strings.index_byte(rest, '/')
