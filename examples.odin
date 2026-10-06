@@ -568,7 +568,7 @@ example_excerpt :: proc(use: Example_Use) -> string {
 		if hit {
 			strings.write_string(&b, `<span class="doc-example-hit">`)
 		}
-		fmt.sbprintf(&b, `<span class="ln">%d</span>%s`, n, lines[n-1])
+		fmt.sbprintf(&b, `<span class="ln">%d</span><span class="line-text">%s</span>`, n, lines[n-1])
 		if hit {
 			strings.write_string(&b, "</span>")
 		}

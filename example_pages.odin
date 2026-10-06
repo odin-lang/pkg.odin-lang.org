@@ -519,7 +519,7 @@ write_example_page :: proc(w: io.Writer, index: int) {
 			file_heading(w, file.name, info.build, line_count(file.source), file_url(program, file.name))
 			io.write_string(w, `<pre class="doc-example-code example-code"><code class="hljs nohighlight">`)
 			for line, i in example_html_lines(page.program, fi) {
-				fmt.wprintf(w, `<span class="line" id="{0:s}-L{1:d}"><a class="ln" href="#{0:s}-L{1:d}">{1:d}</a>{2:s}</span>`+"\n", file.name, i+1, line)
+				fmt.wprintf(w, `<span class="line" id="{0:s}-L{1:d}"><a class="ln" href="#{0:s}-L{1:d}">{1:d}</a><span class="line-text">{2:s}</span></span>`+"\n", file.name, i+1, line)
 			}
 			io.write_string(w, "</code></pre>\n")
 			fmt.wprintln(w, `</div>`)
