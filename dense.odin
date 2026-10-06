@@ -9,14 +9,18 @@ import "core:strings"
 
 import doc "core:odin/doc-format"
 
+import_path_matches :: proc(pattern, import_path: string) -> bool {
+	// "core:rexcode/isa/*" is every package under it
+	if strings.has_suffix(pattern, "/*") {
+		return strings.has_prefix(import_path, pattern[:len(pattern)-1])
+	}
+	return import_path == pattern
+}
+
 is_dense_pkg :: proc(pkg: ^doc.Pkg) -> bool {
 	import_path := pkg_import_path(pkg)
 	for pattern in cfg.dense_packages {
-		if strings.has_suffix(pattern, "/*") {
-			if strings.has_prefix(import_path, pattern[:len(pattern)-1]) {
-				return true
-			}
-		} else if import_path == pattern {
+		if import_path_matches(pattern, import_path) {
 			return true
 		}
 	}
@@ -72,6 +76,35 @@ write_dense_signature :: proc(writer: ^Type_Writer, e: ^doc.Entity, common_cc: s
 }
 
 @(private="file")
+write_dense_table_start :: proc(w: io.Writer, pkg: ^doc.Pkg, common_cc := "") {
+	collection := cfg.pkg_to_collection[pkg]
+	fmt.wprintf(w, `<table class="doc-dense" data-source="%s/%s/"`, collection.source_url, collection.pkg_to_path[pkg])
+	if common_cc != "" {
+		fmt.wprintf(w, ` data-cc="%s"`, common_cc)
+	}
+	if docs, ok := cfg.upstream_docs[pkg_import_path(pkg)]; ok {
+		fmt.wprintf(w, ` data-upstream="%s" data-upstream-title="%s"`, docs.url, docs.title)
+	}
+	io.write_string(w, ">\n")
+}
+
+@(private="file")
+write_dense_row_attributes :: proc(w: io.Writer, pkg: ^doc.Pkg, e: ^doc.Entity, name: string) {
+	// ` data-src="file.odin#L12"`, and ` data-up="C_Name"` where the upstream page isn't the row's own name
+	if e.pos.file != 0 && e.pos.line > 0 {
+		fmt.wprintf(w, ` data-src="%s#L%d"`, slashpath.base(str(cfg.files[e.pos.file].name)), e.pos.line)
+	}
+	if pkg_import_path(pkg) in cfg.upstream_docs {
+		_, url, upstream_name := upstream_doc(pkg, e, name)
+		if url == "" {
+			io.write_string(w, ` data-up=""`)
+		} else if upstream_name != name {
+			fmt.wprintf(w, ` data-up="%s"`, upstream_name)
+		}
+	}
+}
+
+@(private="file")
 entry_docs :: proc(e: ^doc.Entity) -> string {
 	docs := str(e.docs)
 	if strings.trim_space(docs) == "" {
@@ -98,8 +131,6 @@ write_dense_docs :: proc(w: io.Writer, pkg: ^doc.Pkg, e: ^doc.Entity, name, docs
 }
 
 write_dense_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, procs, groups: []doc.Scope_Entry) {
-	collection := cfg.pkg_to_collection[pkg]
-	path := collection.pkg_to_path[pkg]
 	writer := &Type_Writer{w = w, pkg = doc.Pkg_Index(intrinsics.ptr_sub(pkg, &cfg.pkgs[0]))}
 	defer delete(writer.generic_scope)
 
@@ -153,11 +184,7 @@ write_dense_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, procs, groups: []doc
 		fmt.wprintf(w, `; each is a <code><span class="keyword-type">proc</span> <span class="string">"%s"</span></code> unless it says otherwise`, common_cc)
 	}
 	io.write_string(w, ".</p>\n")
-	fmt.wprintf(w, `<table class="doc-dense" data-source="%s/%s/"`, collection.source_url, path)
-	if common_cc != "" {
-		fmt.wprintf(w, ` data-cc="%s"`, common_cc)
-	}
-	io.write_string(w, ">\n")
+	write_dense_table_start(w, pkg, common_cc)
 
 	emitted := make(map[^doc.Entity]bool, len(procs), context.temp_allocator)
 	write_row :: proc(w: io.Writer, writer: ^Type_Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry, common_cc: string, emitted: ^map[^doc.Entity]bool) {
@@ -170,9 +197,7 @@ write_dense_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, procs, groups: []doc
 		} else {
 			emitted^[e] = true
 			fmt.wprintf(w, `<tr id="%s"`, name)
-			if e.pos.file != 0 && e.pos.line > 0 {
-				fmt.wprintf(w, ` data-src="%s#L%d"`, slashpath.base(str(cfg.files[e.pos.file].name)), e.pos.line)
-			}
+			write_dense_row_attributes(w, pkg, e, name)
 			fmt.wprintf(w, `><td><a href="#%s">%s</a></td><td><code>`, name, name)
 		}
 		write_dense_signature(writer, e, common_cc)
@@ -212,7 +237,7 @@ write_dense_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, procs, groups: []doc
 		if e.pos.file != 0 && e.pos.line > 0 {
 			fmt.wprintf(w, ` data-src="%s#L%d"`, slashpath.base(str(cfg.files[e.pos.file].name)), e.pos.line)
 		}
-		fmt.wprintf(w, `><th colspan="2"><a href="#%s">%s</a> <span class="doc-dense-count">%d</span>`, name, name, len(members))
+		fmt.wprintf(w, `><th colspan="2"><a href="#%s">%s</a> <span class="doc-dense-count">%d forms</span>`, name, name, len(members))
 		docs := entry_docs(e)
 		if name == str(e.name) && &cfg.pkgs[cfg.files[e.pos.file].pkg] == pkg {
 			report_begin(pkg, e, name)
@@ -237,6 +262,71 @@ write_dense_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, procs, groups: []doc
 			}
 		}
 		io.write_string(w, "</tbody>\n")
+	}
+	if in_loose {
+		io.write_string(w, "</tbody>\n")
+	}
+	io.write_string(w, "</table>\n")
+}
+
+write_dense_constants :: proc(w: io.Writer, pkg: ^doc.Pkg, consts: []doc.Scope_Entry) {
+	writer := &Type_Writer{w = w, pkg = doc.Pkg_Index(intrinsics.ptr_sub(pkg, &cfg.pkgs[0]))}
+	defer delete(writer.generic_scope)
+
+	io.write_string(w, `<p class="doc-dense-note">One row per constant, under the prefix it shares with others.</p>`+"\n")
+	write_dense_table_start(w, pkg)
+
+	write_row :: proc(w: io.Writer, writer: ^Type_Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
+		e := &cfg.entities[entry.entity]
+		name := str(entry.name)
+		owner := fmt.tprintf("%s.%s", str(pkg.name), name)
+		fmt.wprintf(w, `<tr id="%s"`, name)
+		write_dense_row_attributes(w, pkg, e, name)
+		fmt.wprintf(w, `><td><a href="#%s">%s</a></td><td><code>`, name, name)
+		write_constant(writer, e, name, owner, with_name = false)
+		io.write_string(w, "</code>")
+
+		docs := entry_docs(e)
+		if name == str(e.name) && &cfg.pkgs[cfg.files[e.pos.file].pkg] == pkg {
+			report_begin(pkg, e, name)
+			report_declaration(pkg, e, name, strings.trim_space(docs) != "")
+		}
+		write_dense_docs(w, pkg, e, name, docs)
+		report_end()
+		io.write_string(w, "</td></tr>\n")
+	}
+
+	in_loose := false
+	for i := 0; i < len(consts); /**/ {
+		prefix := index_group_prefix(str(consts[i].name))
+		j := i + 1
+		if prefix != "" {
+			for j < len(consts) && index_group_prefix(str(consts[j].name)) == prefix {
+				j += 1
+			}
+		}
+		run := consts[i:j]
+		if prefix != "" && len(run) >= INDEX_MIN_GROUP_SIZE {
+			if in_loose {
+				io.write_string(w, "</tbody>\n")
+				in_loose = false
+			}
+			io.write_string(w, `<tbody class="doc-dense-set">`+"\n")
+			fmt.wprintf(w, `<tr class="doc-dense-group"><th colspan="2">%s_… <span class="doc-dense-count">%d</span></th></tr>`+"\n", prefix, len(run))
+			for entry in run {
+				write_row(w, writer, pkg, entry)
+			}
+			io.write_string(w, "</tbody>\n")
+		} else {
+			if !in_loose {
+				io.write_string(w, "<tbody>\n")
+				in_loose = true
+			}
+			for entry in run {
+				write_row(w, writer, pkg, entry)
+			}
+		}
+		i = j
 	}
 	if in_loose {
 		io.write_string(w, "</tbody>\n")

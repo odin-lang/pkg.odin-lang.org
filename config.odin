@@ -53,6 +53,14 @@ Config :: struct {
 	// Packages of generated declarations, e.g. "core:rexcode/isa/*": their procedures are listed one per row,
 	// under their procedure groups, rather than each with a heading and a block of its own
 	dense_packages: []string,
+	// Where packages whose declarations are documented elsewhere have their documentation, keyed by import path
+	// ("vendor:stb/*" for every package under it); those with upstream_docs or objc_docs needn't be listed
+	external_docs:  map[string]External_Docs,
+}
+
+External_Docs :: struct {
+	title: string,
+	url:   string,
 }
 
 Collection :: struct {

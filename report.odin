@@ -23,6 +23,9 @@ Report_Kind :: enum u8 {
 	Missing_Param,   // Inputs or Returns leaves out something the signature has
 	Bad_Example,     // an Example that doesn't parse
 	Output_Only,     // an Output without an Example
+	Deprecated_Bare,     // `@(deprecated)` without saying what to use instead
+	Deprecated_Unmarked, // docs calling it deprecated, without `@(deprecated)`
+	Other_Name,          // docs beginning with another declaration's name, as if copied from its
 }
 
 REPORT_KIND_CODES := [Report_Kind]string{
@@ -32,6 +35,9 @@ REPORT_KIND_CODES := [Report_Kind]string{
 	.Missing_Param   = "missing",
 	.Bad_Example     = "example",
 	.Output_Only     = "output",
+	.Deprecated_Bare     = "deprecated",
+	.Deprecated_Unmarked = "unmarked",
+	.Other_Name          = "name",
 }
 
 Decl_Kind :: enum u8 {Type, Constant, Variable, Procedure, Proc_Group}
@@ -233,6 +239,65 @@ conventionally_unlisted :: proc(tuple: doc.Type_Index, name: string) -> bool {
 	return false
 }
 
+report_check_naming :: proc(docs: string, pkg: ^doc.Pkg, e: ^doc.Entity, name: string) {
+	if report_pkg == nil || strings.trim_space(docs) == "" {
+		return
+	}
+	text := strip_comment_gutter(docs)
+
+	if _, deprecated := find_entity_attribute(e, "deprecated"); !deprecated {
+		for line in strings.split_lines(text, context.temp_allocator) {
+			t := strings.to_lower(strings.trim_space(line), context.temp_allocator)
+			if strings.has_prefix(t, "deprecated") || strings.contains(t, " is deprecated") || strings.contains(t, " are deprecated") {
+				report_add(.Deprecated_Unmarked, "the docs call it deprecated, but it isn't marked `@(deprecated)`")
+				break
+			}
+		}
+	}
+
+	// `builder_cap` in the docs of `builder_len`, of the same kind, and neither's name the start of the other's
+	first := strings.trim_left_space(text)
+	if end := strings.index_any(first, " \t\n"); end >= 0 {
+		first = first[:end]
+	}
+	quoted := strings.has_prefix(first, "`")
+	first = strings.trim(first, "`*")
+	first = strings.trim_right(first, ".,:;()")
+	// a word, like "Normalize" or "pop", rather than a name, unless it's quoted or snake_case
+	if !quoted && !strings.contains_rune(strings.trim(first, "_"), '_') {
+		return
+	}
+	if first == "" || strings.contains(name, first) || strings.contains(first, name) || is_local_name(e, first) {
+		return
+	}
+	other, ok := kinds_by_name(pkg)[first]
+	if !ok {
+		return
+	}
+	same_kind :: proc(a, b: doc.Entity_Kind) -> bool {
+		is_proc :: proc(k: doc.Entity_Kind) -> bool { return k == .Procedure || k == .Proc_Group }
+		return a == b || is_proc(a) && is_proc(b)
+	}
+	if same_kind(other, e.kind) {
+		report_add(.Other_Name, fmt.tprintf("the docs begin with `%s`, another declaration", first))
+	}
+}
+
+@(private="file")
+kinds_by_name :: proc(pkg: ^doc.Pkg) -> map[string]doc.Entity_Kind {
+	@(static) cache: map[^doc.Pkg]map[string]doc.Entity_Kind
+	if kinds, ok := cache[pkg]; ok {
+		return kinds
+	}
+	context.allocator = runtime.default_allocator()
+	kinds := make(map[string]doc.Entity_Kind)
+	for entry in array(pkg.entries) {
+		kinds[str(entry.name)] = cfg.entities[entry.entity].kind
+	}
+	cache[pkg] = kinds
+	return kinds
+}
+
 @(private="file")
 example_error: struct {
 	line: int,
@@ -346,7 +411,14 @@ generate_report :: proc(b: ^strings.Builder, collections: []^Collection) {
 			write_json_string(w, fmt.tprintf("%s/%s/", c.base_url, path) if path != "" else fmt.tprintf("%s/", c.base_url))
 			io.write_string(w, ", \"source\": ")
 			write_json_string(w, fmt.tprintf("%s/%s", c.source_url, path))
-			fmt.wprintf(w, `, "overview": %v, "declared": {{`, r.has_overview)
+			fmt.wprintf(w, `, "overview": %v, "dense": %v`, r.has_overview, is_dense_pkg(pkg))
+			if title, url := external_docs_of(pkg); url != "" {
+				io.write_string(w, `, "external": `)
+				write_json_string(w, title)
+				io.write_string(w, `, "external_url": `)
+				write_json_string(w, url)
+			}
+			io.write_string(w, `, "declared": {`)
 			for kind, i in Decl_Kind {
 				fmt.wprintf(w, `%s"%s": %d`, ", " if i > 0 else "", DECL_KIND_CODES[kind], r.declared[kind])
 			}

@@ -16,14 +16,16 @@
 	}
 
 	const CATEGORIES = [
-		{key: "links",    label: "Links",      kinds: ["link", "stale"],     badge: "kind-t",   none: "Every link and name resolves."},
-		{key: "params",   label: "Parameters", kinds: ["param", "missing"],  badge: "kind-p",   none: "Every Inputs and Returns list matches its signature."},
-		{key: "examples", label: "Examples",   kinds: ["example", "output"], badge: "kind-c",   none: "Every example parses."},
-		{key: "overview", label: "Overviews",  kinds: [],                    badge: "kind-pkg", none: "Every package has an overview."},
+		{key: "links",        label: "Links",        kinds: ["link", "stale"],          badge: "kind-t",   none: "Every link and name resolves."},
+		{key: "params",       label: "Parameters",   kinds: ["param", "missing"],       badge: "kind-p",   none: "Every Inputs and Returns list matches its signature."},
+		{key: "examples",     label: "Examples",     kinds: ["example", "output"],      badge: "kind-c",   none: "Every example parses."},
+		{key: "names",        label: "Names",        kinds: ["name"],                   badge: "kind-b",   none: "No docs begin with another declaration's name."},
+		{key: "deprecations", label: "Deprecations", kinds: ["deprecated", "unmarked"], badge: "kind-v",   none: "Every deprecation is marked, and says what to use instead."},
+		{key: "overview",     label: "Overviews",    kinds: [],                         badge: "kind-pkg", none: "Every package has an overview."},
 	];
 	const DECL_KINDS = {t: "Types", c: "Constants", v: "Variables", p: "Procedures", g: "Procedure groups"};
 	const SIZES = {
-		total:    {label: "Declarations", of: n => n.total},
+		total:    {label: "Declarations", of: n => n.decls},
 		undoc:    {label: "Undocumented", of: n => n.undoc},
 		problems: {label: "Problems",     of: n => n.problems},
 	};
@@ -41,10 +43,11 @@
 
 	const make_node = (name, path, parent) => ({
 		name, path, parent, children: [], pkg: null, self: null,
-		total: 0, undoc: 0, problems: 0, packages: 0,
-		counts: {links: 0, params: 0, examples: 0, overview: 0},
+		decls: 0, total: 0, undoc: 0, problems: 0, packages: 0,
+		counts: Object.fromEntries(CATEGORIES.map(c => [c.key, 0])),
 	});
 	const add_stats = (to, from) => {
+		to.decls    += from.decls;
 		to.total    += from.total;
 		to.undoc    += from.undoc;
 		to.problems += from.problems;
@@ -54,35 +57,54 @@
 		}
 	};
 
-	const root = make_node("All", "", null);
-	const nodes = new Map([["", root]]);
-	const pkg_by_import = new Map();
 	for (const p of data.packages) {
-		p.total = Object.values(p.declared).reduce((a, b) => a + b, 0);
-		p.undoc = Object.values(p.undocumented).reduce((a, l) => a + l.length, 0);
-		p.counts = {links: 0, params: 0, examples: 0, overview: p.overview ? 0 : 1};
+		p.decls = Object.values(p.declared).reduce((a, b) => a + b, 0);
+		p.undoc_all = Object.values(p.undocumented).reduce((a, l) => a + l.length, 0);
+		p.counts = Object.fromEntries(CATEGORIES.map(c => [c.key, 0]));
+		p.counts.overview = p.overview ? 0 : 1;
 		for (const [kind] of p.issues) {
 			p.counts[category_of(kind).key] += 1;
 		}
 		p.problems = p.issues.length + p.counts.overview;
 		p.packages = 1;
-		pkg_by_import.set(p.import, p);
-
-		let node = root;
-		const parts = p.path.split("/");
-		parts.forEach((part, i) => {
-			const path = parts.slice(0, i + 1).join("/");
-			let child = nodes.get(path);
-			if (!child) {
-				child = make_node(part, path, node);
-				node.children.push(child);
-				nodes.set(path, child);
-			}
-			node = child;
-		});
-		node.pkg = p;
-		p.node = node;
 	}
+
+	// Generated packages, and the undocumented declarations of what's documented elsewhere, count only when asked to
+	const options = {generated: false, elsewhere: false};
+	try {
+		Object.assign(options, JSON.parse(localStorage.getItem("odin-report-options")) || {});
+	} catch {
+	}
+
+	let root, nodes, pkg_by_import, included;
+	const build = () => {
+		root = make_node("All", "", null);
+		nodes = new Map([["", root]]);
+		pkg_by_import = new Map();
+		included = data.packages.filter(p => options.generated || !p.dense);
+		for (const p of included) {
+			p.elsewhere = !!p.external && !options.elsewhere;
+			p.total = p.elsewhere ? 0 : p.decls;
+			p.undoc = p.elsewhere ? 0 : p.undoc_all;
+			pkg_by_import.set(p.import, p);
+
+			let node = root;
+			const parts = p.path.split("/");
+			parts.forEach((part, i) => {
+				const path = parts.slice(0, i + 1).join("/");
+				let child = nodes.get(path);
+				if (!child) {
+					child = make_node(part, path, node);
+					node.children.push(child);
+					nodes.set(path, child);
+				}
+				node = child;
+			});
+			node.pkg = p;
+			p.node = node;
+		}
+		aggregate(root);
+	};
 	const aggregate = node => {
 		if (node.pkg) {
 			// a package with packages inside has a tile of its own among them
@@ -97,7 +119,7 @@
 			add_stats(node, child);
 		}
 	};
-	aggregate(root);
+	build();
 
 	const title_of = node => {
 		if (node === root) {
@@ -120,22 +142,19 @@
 
 	// The page around the map
 
-	const all_problems = CATEGORIES.map(c => root.counts[c.key]).reduce((a, b) => a + b, 0);
+	const dense_names = data.packages.filter(p => p.dense).map(p => p.import).join(", ");
 	report.insertAdjacentHTML("beforeend", `
-		<div class="odin-report-stats">
-			<div><b>${count(data.packages.length)}</b> packages</div>
-			<div><b>${count(root.total)}</b> declarations</div>
-			<div><b>${percent(coverage_of(root))}</b> documented</div>
-			<div><b>${count(all_problems)}</b> problems:
-				${CATEGORIES.map(c => `<a class="odin-report-badge ${c.badge}" href="#=${c.key}">${c.label} ${count(root.counts[c.key])}</a>`).join(" ")}
-			</div>
-			<div class="odin-report-generated">Generated ${escape(data.generated)}</div>
-		</div>
+		<div class="odin-report-stats"></div>
 		<div class="odin-report-toolbar">
 			<nav class="odin-report-crumbs" aria-label="Where the map is"></nav>
 			<div class="odin-report-controls">
+				<div class="odin-report-include" role="group" aria-label="Include">
+					<span>Include</span>
+					<label title="${escape(`Packages of generated declarations, listed one per row: ${dense_names}`)}"><input type="checkbox" data-option="generated"> generated packages</label>
+					<label title="The undocumented declarations of packages documented elsewhere, such as SDL's, Vulkan's and Win32's"><input type="checkbox" data-option="elsewhere"> what's documented elsewhere</label>
+				</div>
 				<input type="search" class="odin-report-find" list="odin-report-find-list" placeholder="Find a package…" aria-label="Find a package" spellcheck="false" autocomplete="off">
-				<datalist id="odin-report-find-list">${[...pkg_by_import.keys()].sort().map(i => `<option value="${escape(i)}">`).join("")}</datalist>
+				<datalist id="odin-report-find-list"></datalist>
 				<div class="odin-report-size" role="group" aria-label="Size the map by">
 					<span>Size</span>
 					${Object.entries(SIZES).map(([key, s]) => `<button type="button" data-size="${key}">${s.label}</button>`).join("")}
@@ -151,6 +170,7 @@
 		</div>
 		<div class="odin-report-legend">
 			<span>0%</span><span class="odin-report-scale"></span><span>100% documented</span>
+			<span class="odin-report-swatch"></span><span class="odin-report-swatch-label">documented elsewhere</span>
 			<span class="odin-report-badge kind-c">3</span><span>problems</span>
 			<span class="odin-report-hint">Click a package for its details, a directory to zoom in · arrow keys move · Esc goes up a level</span>
 		</div>
@@ -165,6 +185,20 @@
 	const ctx    = canvas.getContext("2d");
 
 	const state = {zoom: root, selected: null, view: "group", category: null, size: "total", hover: null};
+
+	const render_stats = () => {
+		const problems = CATEGORIES.map(c => root.counts[c.key]).reduce((a, b) => a + b, 0);
+		report.querySelector(".odin-report-stats").innerHTML = `
+			<div><b>${count(included.length)}</b> packages</div>
+			<div><b>${count(root.decls)}</b> declarations</div>
+			<div><b>${percent(coverage_of(root))}</b> documented${root.total !== root.decls ? ` <span class="odin-report-note">of ${count(root.total)}; the other ${count(root.decls - root.total)} are documented elsewhere</span>` : ""}</div>
+			<div><b>${count(problems)}</b> problems:
+				${CATEGORIES.map(c => `<a class="odin-report-badge ${c.badge}" href="#=${c.key}">${c.label} ${count(root.counts[c.key])}</a>`).join(" ")}
+			</div>
+			<div class="odin-report-generated">Generated ${escape(data.generated)}</div>`;
+		report.querySelector("#odin-report-find-list").innerHTML = [...pkg_by_import.keys()].sort().map(i => `<option value="${escape(i)}">`).join("");
+		report.querySelectorAll(".odin-report-swatch, .odin-report-swatch-label").forEach(el => (el.hidden = options.elsewhere));
+	};
 	try {
 		state.size = SIZES[localStorage.getItem("odin-report-size")] ? localStorage.getItem("odin-report-size") : "total";
 	} catch {
@@ -193,9 +227,21 @@
 			frame:  dark ? "rgba(255, 255, 255, 0.035)" : "rgba(0, 0, 0, 0.03)",
 			badge_bg:   dark ? "rgba(243, 154, 94, 0.18)" : "rgba(184, 83, 14, 0.12)",
 			badge_text: dark ? "#f39a5e" : "#b8530e",
+			elsewhere:  dark ? "rgba(122, 173, 229, 0.2)" : "rgba(56, 130, 210, 0.14)",
 		};
+		report.querySelector(".odin-report-swatch").style.background = theme.elsewhere;
 		report.querySelector(".odin-report-scale").style.background =
 			`linear-gradient(to right, ${[0, 0.25, 0.5, 0.75, 1].map(fill_for).join(", ")})`;
+	};
+	const fill_of = node => node.total ? fill_for(coverage_of(node)) : node.decls ? theme.elsewhere : fill_for(null);
+	const docs_line = node => {
+		if (node.total) {
+			return `${percent(coverage_of(node))} of ${count(node.total)}`;
+		}
+		if (node.decls) {
+			return node.pkg && node.children.length === 0 ? `docs: ${node.pkg.external}` : "documented elsewhere";
+		}
+		return "nothing declared";
 	};
 	const fill_for = coverage => {
 		if (coverage === null) {
@@ -423,7 +469,7 @@
 		const used = ctx.measureText(name).width;
 		ctx.font = `11px ${theme.font}`;
 		ctx.fillStyle = theme.muted;
-		const stats = fit_text(node.total ? `${percent(coverage_of(node))} of ${count(node.total)}` : "nothing declared", right - r.x - 16 - used);
+		const stats = fit_text(docs_line(node), right - r.x - 16 - used);
 		if (stats && !stats.startsWith("…")) {
 			ctx.fillText(stats, r.x + 14 + used, r.y + 15);
 		}
@@ -436,7 +482,7 @@
 		if (w <= 0 || h <= 0) {
 			return;
 		}
-		ctx.fillStyle = fill_for(coverage_of(node));
+		ctx.fillStyle = fill_of(node);
 		ctx.fillRect(x, y, w, h);
 		if (item.group) {
 			// more inside: a folded corner
@@ -472,7 +518,7 @@
 		if (h > 36 && w > 40) {
 			ctx.font = `11px ${theme.font}`;
 			ctx.globalAlpha *= 0.75;
-			ctx.fillText(fit_text(node.total ? `${percent(coverage_of(node))} of ${count(node.total)}` : "nothing declared", w - 12), x + 6, y + 31);
+			ctx.fillText(fit_text(docs_line(node), w - 12), x + 6, y + 31);
 			ctx.globalAlpha /= 0.75;
 		}
 		ctx.restore();
@@ -551,8 +597,8 @@
 		return [ev.clientX - rect.left, ev.clientY - rect.top];
 	};
 
-	const counts_html = node => CATEGORIES.filter(c => node.counts[c.key] > 0)
-		.map(c => `<span class="odin-report-badge ${c.badge}">${c.key === "overview" ? (node.pkg && node.children.length === 0 ? "No overview" : `${count(node.counts[c.key])} without an overview`) : `${c.label} ${count(node.counts[c.key])}`}</span>`).join(" ");
+	const counts_text = node => CATEGORIES.filter(c => node.counts[c.key] > 0)
+		.map(c => c.key === "overview" ? (node.pkg && node.children.length === 0 ? "no overview" : `${count(node.counts[c.key])} without an overview`) : `${c.label.toLowerCase()} ${count(node.counts[c.key])}`).join(" · ");
 	const bar_html = node => {
 		const c = coverage_of(node);
 		return `<span class="odin-report-bar"><span style="width:${c === null ? 0 : c * 100}%;background:${fill_for(c)}"></span></span>`;
@@ -574,8 +620,8 @@
 		tip.innerHTML = `
 			<b>${escape(title_of(node))}</b>
 			${item.group ? `<span class="odin-report-tip-note">${plural(node.packages, "package")}</span>` : ""}
-			<div>${bar_html(node)} ${node.total ? `${count(node.total - node.undoc)} of ${count(node.total)} documented` : "Nothing declared"}</div>
-			${node.problems ? `<div>${counts_html(node)}</div>` : ""}`;
+			<div>${node.total ? `${bar_html(node)} ${count(node.total - node.undoc)} of ${count(node.total)} documented` : node.decls ? (node.pkg && node.children.length === 0 ? `Documented at ${escape(node.pkg.external)}` : "Documented elsewhere") : "Nothing declared"}</div>
+			${node.problems ? `<div class="odin-report-tip-note">Problems: ${counts_text(node)}</div>` : ""}`;
 		tip.hidden = false;
 		const box = map.getBoundingClientRect();
 		const tw = tip.offsetWidth, th = tip.offsetHeight;
@@ -785,15 +831,13 @@
 	};
 
 	const source_of = (p, file, line) => file ? `${p.source}/${file}#L${line}` : p.source;
+	const what_of = (kind, detail) => ({
+		link:    "`" + detail + "` doesn't resolve",
+		example: `the example doesn't parse: ${detail}`,
+		output:  "an Output with no Example",
+	}[kind] || detail);
 	const issue_html = (p, [kind, name, detail, file, line], with_pkg = false) => {
-		const what = {
-			link:    `${with_code("`" + detail + "`")} doesn't resolve`,
-			stale:   with_code(detail),
-			param:   with_code(detail),
-			missing: with_code(detail),
-			example: `Example doesn't parse: ${with_code(detail)}`,
-			output:  "An Output with no Example",
-		}[kind] || with_code(detail);
+		const what = with_code(what_of(kind, detail));
 		const target = name ? `<a href="${escape(p.url)}#${escape(name)}">${with_pkg ? `${escape(p.import)}.` : ""}${escape(name)}</a>` : `<a href="${escape(p.url)}">${with_pkg ? `${escape(p.import)} ` : ""}overview</a>`;
 		return `<li>${target}<span class="odin-report-what">${what}</span>${file || !name ? `<a class="odin-report-src" href="${escape(source_of(p, file, line))}">${file ? `${escape(file)}:${line}` : "source"}</a>` : ""}</li>`;
 	};
@@ -806,20 +850,64 @@
 			<div class="odin-report-names" data-kind="${kind}">${links(shown)}${names.length > NAMES_SHOWN ? ` <button type="button" class="odin-report-more">Show all ${count(names.length)}</button>` : ""}</div></details>`;
 	};
 
+	const checklist = p => {
+		const lines = [`### ${p.import}`, ""];
+		if (!p.overview) {
+			lines.push(`- [ ] The package has no overview: a doc comment on its \`package\` line ([source](${p.source}))`);
+		}
+		for (const c of CATEGORIES) {
+			for (const [kind, name, detail, file, line] of p.issues.filter(i => c.kinds.includes(i[0]))) {
+				const where = file ? ` ([${file}:${line}](${source_of(p, file, line)}))` : "";
+				lines.push(`- [ ] ${name ? `\`${name}\`` : "Overview"}: ${what_of(kind, detail)}${where}`);
+			}
+		}
+		return lines.join("\n") + "\n";
+	};
+	const copy_text = async text => {
+		try {
+			await navigator.clipboard.writeText(text);
+		} catch {
+			const area = document.createElement("textarea");
+			area.value = text;
+			area.style.position = "fixed";
+			area.style.opacity = "0";
+			document.body.appendChild(area);
+			area.select();
+			try {
+				document.execCommand("copy");
+			} catch {
+			}
+			area.remove();
+		}
+	};
+
 	const render_package = p => {
 		const by_category = CATEGORIES.map(c => ({c, issues: p.issues.filter(i => c.kinds.includes(i[0]))}));
 		const undocumented = Object.entries(p.undocumented).filter(([, names]) => names.length);
+		const external = p.external ? `<a class="odin-report-external" href="${escape(p.external_url)}">${escape(p.external)}</a>` : "";
 		panel.innerHTML = `
 			<h2>${escape(p.import)}</h2>
-			<p class="odin-report-links"><a href="${escape(p.url)}">Docs</a> · <a href="${escape(p.source)}">Source</a></p>
-			<p>${bar_html(p)} ${p.total ? `${count(p.total - p.undoc)} of ${count(p.total)} declarations documented (${percent(coverage_of(p))})` : "Nothing declared"}</p>
-			${p.overview ? "" : `<p class="odin-report-flag"><span class="odin-report-badge kind-pkg">No overview</span> The package has no doc comment of its own.</p>`}
+			<p class="odin-report-links"><a href="${escape(p.url)}">Docs</a> · <a href="${escape(p.source)}">Source</a>${external ? ` · ${external}` : ""}</p>
+			<p>${p.elsewhere
+				? `Its ${plural(p.decls, "declaration")} are documented at ${external}, so whether they're documented here isn't counted.`
+				: p.total ? `${bar_html(p)} ${count(p.total - p.undoc)} of ${count(p.total)} declarations documented (${percent(coverage_of(p))})` : "Nothing declared"}</p>
+			${p.problems ? `<p><button type="button" class="odin-report-copy">Copy the problems as a checklist</button></p>` : ""}
+			${p.overview ? "" : `<h3>Overview</h3><p class="odin-report-what">The package has no doc comment of its own.</p>`}
 			${by_category.filter(({issues}) => issues.length).map(({c, issues}) => `
-				<h3><span class="odin-report-badge ${c.badge}">${c.label}</span> <span class="odin-report-count">${count(issues.length)}</span></h3>
+				<h3>${c.label} <span class="odin-report-count">${count(issues.length)}</span></h3>
 				<ul class="odin-report-issues">${issues.map(i => issue_html(p, i)).join("")}</ul>`).join("")}
 			${p.problems === 0 ? `<p class="odin-report-good">No problems found.</p>` : ""}
-			${undocumented.length ? `<h3>Undocumented <span class="odin-report-count">${count(p.undoc)}</span></h3>${undocumented.map(([kind, names]) => names_html(p, kind, names)).join("")}` : ""}
+			${undocumented.length && !p.elsewhere ? `<h3>Undocumented <span class="odin-report-count">${count(p.undoc)}</span></h3>${undocumented.map(([kind, names]) => names_html(p, kind, names)).join("")}` : ""}
 		`;
+		const copy = panel.querySelector(".odin-report-copy");
+		if (copy) {
+			copy.addEventListener("click", async () => {
+				await copy_text(checklist(p));
+				const label = copy.textContent;
+				copy.textContent = "Copied";
+				setTimeout(() => (copy.textContent = label), 1200);
+			});
+		}
 		panel.querySelectorAll(".odin-report-more").forEach(button => {
 			button.addEventListener("click", () => {
 				const div = button.parentElement;
@@ -845,20 +933,20 @@
 		const pkgs = packages_under(node).sort((a, b) => b.problems - a.problems || b.undoc - a.undoc || a.import.localeCompare(b.import));
 		panel.innerHTML = `
 			<h2>${escape(title_of(node))}</h2>
-			<p>${bar_html(node)} ${count(node.total - node.undoc)} of ${count(node.total)} declarations documented (${percent(coverage_of(node))}) in ${plural(node.packages, "package")}</p>
-			${node.problems ? `<p>${counts_html(node)}</p>` : `<p class="odin-report-good">No problems found.</p>`}
+			<p>${node.total ? `${bar_html(node)} ${count(node.total - node.undoc)} of ${count(node.total)} declarations documented (${percent(coverage_of(node))})` : "Documented elsewhere"} in ${plural(node.packages, "package")}</p>
+			${node.problems ? "" : `<p class="odin-report-good">No problems found.</p>`}
 			<table class="odin-report-table">
 				<thead><tr><th>Package</th><th>Documented</th><th>Problems</th></tr></thead>
 				<tbody>${pkgs.map(p => `<tr>
 					<td><a href="#${escape(p.import)}">${escape(p.import)}</a></td>
-					<td>${bar_html(p)} ${p.total ? percent(coverage_of(p)) : "–"}</td>
+					<td>${p.elsewhere ? `<span class="odin-report-count">at ${escape(p.external)}</span>` : `${bar_html(p)} ${p.total ? percent(coverage_of(p)) : "–"}`}</td>
 					<td>${p.problems ? count(p.problems) : ""}</td>
 				</tr>`).join("")}</tbody>
 			</table>`;
 	};
 
 	const render_category = c => {
-		const pkgs = data.packages.filter(p => p.counts[c.key] > 0);
+		const pkgs = included.filter(p => p.counts[c.key] > 0);
 		let body;
 		if (c.key === "overview") {
 			body = `<ul class="odin-report-issues">${pkgs.map(p => `<li><a href="#${escape(p.import)}">${escape(p.import)}</a><span class="odin-report-what">${p.total ? plural(p.total, "declaration") : "nothing declared"}</span><a class="odin-report-src" href="${escape(p.source)}">source</a></li>`).join("")}</ul>`;
@@ -866,7 +954,7 @@
 			body = `<ul class="odin-report-issues">${pkgs.flatMap(p => p.issues.filter(i => c.kinds.includes(i[0])).map(i => issue_html(p, i, true))).join("")}</ul>`;
 		}
 		panel.innerHTML = `
-			<h2><span class="odin-report-badge ${c.badge}">${c.label}</span> <span class="odin-report-count">${count(root.counts[c.key])}</span></h2>
+			<h2>${c.label} <span class="odin-report-count">${count(root.counts[c.key])}</span></h2>
 			<p class="odin-report-links">${CATEGORIES.filter(other => other !== c).map(other => `<a href="#=${other.key}">${other.label}</a>`).join(" · ")} · <a href="#">All packages</a></p>
 			${pkgs.length ? body : `<p class="odin-report-good">${c.none}</p>`}`;
 	};
@@ -891,7 +979,25 @@
 	observer.observe(document.body, {attributes: true, attributeFilter: ["class"]});
 	observer.observe(document.documentElement, {attributes: true, attributeFilter: ["class"]});
 
+	report.querySelectorAll(".odin-report-include input").forEach(input => {
+		input.checked = !!options[input.dataset.option];
+		input.addEventListener("change", () => {
+			options[input.dataset.option] = input.checked;
+			try {
+				localStorage.setItem("odin-report-options", JSON.stringify(options));
+			} catch {
+			}
+			const zoom = state.zoom.path;
+			build();
+			state.zoom = nodes.get(zoom) || root;
+			render_stats();
+			apply_address();
+			relayout(true);
+		});
+	});
+
 	read_theme();
+	render_stats();
 	update_size_buttons();
 	new ResizeObserver(resize).observe(map);
 	window.addEventListener("resize", resize);

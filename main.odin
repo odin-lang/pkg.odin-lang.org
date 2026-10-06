@@ -1057,6 +1057,12 @@ upstream_doc :: proc(pkg: ^doc.Pkg, e: ^doc.Entity, name: string) -> (title, url
 	switch docs.names {
 	case "vulkan":
 		c_name = vulkan_c_name(e, name)
+	case "same":
+		c_name = entity_link_name(e)
+		// e.g. `CreateFileW`, `RECT`, `WM_PAINT`, rather than an Odin helper like `utf8_to_wstring` or `Address_Family`
+		if c_name == "" && name != "" && 'A' <= name[0] && name[0] <= 'Z' && !(strings.contains_rune(name, '_') && strings.to_upper(name, context.temp_allocator) != name) {
+			c_name = name
+		}
 	case:
 		c_name = entity_link_name(e)
 
@@ -1079,6 +1085,27 @@ upstream_doc :: proc(pkg: ^doc.Pkg, e: ^doc.Entity, name: string) -> (title, url
 	}
 	url, _ = strings.replace_all(docs.url, "{name}", c_name, context.temp_allocator)
 	return docs.title, url, c_name
+}
+
+external_docs_of :: proc(pkg: ^doc.Pkg) -> (title, url: string) {
+	import_path := pkg_import_path(pkg)
+	for pattern, docs in cfg.external_docs {
+		if import_path_matches(pattern, import_path) {
+			return docs.title, docs.url
+		}
+	}
+	if docs, ok := cfg.upstream_docs[import_path]; ok {
+		// the page the links are under, e.g. "https://wiki.libsdl.org/SDL3/"
+		end := strings.index(docs.url, "{name}")
+		if end >= 0 {
+			end = strings.last_index_byte(docs.url[:end], '/') + 1
+		}
+		return docs.title, docs.url[:end] if end > 0 else docs.url
+	}
+	if framework, ok := cfg.objc_docs.packages[import_path]; ok && framework != "" {
+		return "Apple Docs", fmt.tprintf("https://developer.apple.com/documentation/%s", framework)
+	}
+	return
 }
 
 vulkan_c_name :: proc(e: ^doc.Entity, name: string) -> string {
@@ -1421,6 +1448,9 @@ write_pkg_meta :: proc(w: io.Writer, collection: ^Collection, path: string, pkg:
 		io.write_string(w, "</li>\n")
 	}
 	fmt.wprintf(w, `<li><span>Source</span> <a href="%s">%s</a></li>`+"\n", src_url, short_source_url(src_url))
+	if title, url := external_docs_of(pkg); url != "" {
+		fmt.wprintf(w, `<li><span>Docs</span> <a class="doc-upstream" href="%s">%s</a></li>`+"\n", url, title)
+	}
 	if files > 0 {
 		fmt.wprintf(w, `<li><span>Files</span> %d</li>`+"\n", files)
 	}
@@ -3481,13 +3511,13 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		src_url := fmt.tprintf("%s/%s/%s#L%d", collection.source_url, path, filename, e.pos.line)
 		io.write_string(w, `<div class="doc-source">`)
 		if title, url, upstream_name := upstream_doc(pkg, e, name); url != "" && is_declared_here {
-			fmt.wprintf(w, "<a href=\"{0:s}\" title=\"{1:s}: {2:s}\"><em>{1:s}</em><span class=\"doc-source-loc\"> &middot; {2:s}</span></a>", url, title, upstream_name)
+			fmt.wprintf(w, "<a class=\"doc-upstream\" href=\"{0:s}\" title=\"{1:s}: {2:s}\"><em>{1:s}</em><span class=\"doc-source-loc\"> &middot; {2:s}</span></a>", url, title, upstream_name)
 		} else if c_name := entity_c_name(e, name); c_name != "" && is_declared_here {
 			fmt.wprintf(w, "<span class=\"doc-c-name\" title=\"The C symbol this binds\"><em>C</em><span class=\"doc-source-loc\"> &middot; %s</span></span>", c_name)
 		}
 		if class != nil {
 			if url := objc_doc_url(pkg, class.name); url != "" {
-				fmt.wprintf(w, "<a href=\"{0:s}\" title=\"Apple's documentation for {1:s}\"><em>Apple Docs</em><span class=\"doc-source-loc\"> &middot; {1:s}</span></a>", url, class.name)
+				fmt.wprintf(w, "<a class=\"doc-upstream\" href=\"{0:s}\" title=\"Apple's documentation for {1:s}\"><em>Apple Docs</em><span class=\"doc-source-loc\"> &middot; {1:s}</span></a>", url, class.name)
 			}
 		}
 		fmt.wprintf(w, "<a href=\"{0:s}\"><em>Source</em><span class=\"doc-source-loc\"> &middot; {1:s}:{2:d}</span></a></div>", src_url, filename, e.pos.line)
@@ -3507,6 +3537,9 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			msg = raw
 		}
 		io.write_string(w, `<div class="doc-deprecated" role="note"><strong>Deprecated.</strong>`)
+		if strings.trim_space(msg) == "" {
+			report_add(.Deprecated_Bare, "is deprecated without saying what to use instead")
+		}
 		if strings.trim_space(msg) != "" {
 			io.write_byte(w, ' ')
 			linked, _, _ := link_code_names(msg, &doc_ctx)
@@ -3554,55 +3587,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		case .Constant:
 			fmt.wprint(w, `<pre class="doc-code">`)
 			write_declaration_attributes(w, e)
-			the_type := cfg.types[e.type]
-			hover := constant_hover(e)
-			if hover != "" {
-				fmt.wprintf(w, `<span class="doc-value" data-value="%s">`, hover)
-			}
-
-			init_string := escape_html_string(str(e.init_string))
-			if init_string == "" {
-				doc_warnf("%s: constant has no value", doc_ctx.owner)
-				init_string = "…"
-			}
-
-			ignore_type := true
-			if the_type.kind == .Basic && is_type_untyped(the_type) {
-			} else {
-				ignore_type = false
-				type_name := str(the_type.name)
-				if type_name != "" && strings.has_prefix(init_string, type_name) {
-					ignore_type = true
-				}
-			}
-
-			if ignore_type {
-				fmt.wprintf(w, "%s :: ", name)
-			} else {
-				fmt.wprintf(w, "%s: ", name)
-				write_type(writer, the_type, {.Allow_Indent})
-				fmt.wprintf(w, " : ")
-			}
-
-			if is_type_string_or_rune(the_type) {
-				switch init_string[0] {
-				case '"', '`', '\'':
-					io.write_string(w, "<span class=\"string\">")
-					io.write_string(w, init_string)
-					io.write_string(w, "</span>")
-				case:
-					if strings.has_prefix(init_string, "runtime.") {
-						io.write_string(w, add_styling_to_builtin(init_string))
-					} else {
-						io.write_string(w, init_string)
-					}
-				}
-			} else {
-				io.write_string(w, init_string)
-			}
-			if hover != "" {
-				io.write_string(w, "</span>")
-			}
+			write_constant(writer, e, name, doc_ctx.owner)
 			fmt.wprintln(w, "</pre>")
 			write_config_flag(w, str(e.init_string))
 		case .Variable:
@@ -3719,6 +3704,7 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 	if is_declared_here {
 		report_declaration(pkg, e, name, strings.trim_space(the_docs) != "")
 		report_check_params(the_docs, e)
+		report_check_naming(the_docs, pkg, e, name)
 	}
 
 	if the_docs != "" {
@@ -3750,6 +3736,62 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 		proc_names_seen: map[string]bool
 		write_related_procedure_groups(w, pkg, e, &proc_names_seen)
 		delete(proc_names_seen)
+	}
+}
+
+write_constant :: proc(writer: ^Type_Writer, e: ^doc.Entity, name, owner: string, with_name := true) {
+	w := writer.w
+	the_type := cfg.types[e.type]
+	hover := constant_hover(e)
+	if hover != "" {
+		fmt.wprintf(w, `<span class="doc-value" data-value="%s">`, hover)
+	}
+
+	init_string := escape_html_string(str(e.init_string))
+	if init_string == "" {
+		doc_warnf("%s: constant has no value", owner)
+		init_string = "…"
+	}
+
+	ignore_type := true
+	if the_type.kind == .Basic && is_type_untyped(the_type) {
+	} else {
+		ignore_type = false
+		type_name := str(the_type.name)
+		if type_name != "" && strings.has_prefix(init_string, type_name) {
+			ignore_type = true
+		}
+	}
+
+	if with_name {
+		io.write_string(w, name)
+	}
+	if ignore_type {
+		io.write_string(w, " :: " if with_name else ":: ")
+	} else {
+		io.write_string(w, ": ")
+		write_type(writer, the_type, {.Allow_Indent})
+		io.write_string(w, " : ")
+	}
+
+	if is_type_string_or_rune(the_type) {
+		switch init_string[0] {
+		case '"', '`', '\'':
+			io.write_string(w, "<span class=\"string\">")
+			io.write_string(w, init_string)
+			io.write_string(w, "</span>")
+		case:
+			if strings.has_prefix(init_string, "runtime.") {
+				io.write_string(w, add_styling_to_builtin(init_string))
+			} else {
+				io.write_string(w, init_string)
+			}
+		}
+	} else {
+		io.write_string(w, init_string)
+	}
+	if hover != "" {
+		io.write_string(w, "</span>")
 	}
 }
 
@@ -4035,7 +4077,7 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 
 	dense := is_dense_pkg(pkg)
 	is_dense_section :: proc(dense: bool, name: string) -> bool {
-		return dense && (name == "Procedures" || name == "Procedure Groups")
+		return dense && (name == "Procedures" || name == "Procedure Groups" || name == "Constants")
 	}
 
 	write_index :: proc(w: io.Writer, name: string, entries: []doc.Scope_Entry, listed_as_rows := false) {
@@ -4056,7 +4098,8 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 		if len(entries) == 0 {
 			io.write_string(w, "<p class=\"pkg-empty-section\">This section is empty.</p>\n")
 		} else if listed_as_rows {
-			io.write_string(w, "<p class=\"pkg-empty-section\">Listed one per row under <a href=\"#pkg-procedures\">Procedures</a>.</p>\n")
+			section := "Constants" if name == "Constants" else "Procedures"
+			fmt.wprintf(w, "<p class=\"pkg-empty-section\">Listed one per row under <a href=\"#pkg-{0:s}\">{1:s}</a>.</p>\n", slugify(section, context.temp_allocator), section)
 		} else {
 			write_index_body(w, entries)
 		}
@@ -4106,6 +4149,9 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 				}
 			case len(eo.entries) == 0:
 				write_entries(w, pkg, eo.name, eo.entries)
+			case eo.name == "Constants":
+				fmt.wprintln(w, `<h2 id="pkg-constants" class="pkg-header">Constants</h2>`)
+				write_dense_constants(w, pkg, eo.entries)
 			case:
 				fmt.wprintln(w, `<h2 id="pkg-procedure-groups" class="pkg-header">Procedure Groups</h2>`)
 				fmt.wprintln(w, `<p class="pkg-empty-section">Listed with their procedures under <a href="#pkg-procedures">Procedures</a>.</p>`)

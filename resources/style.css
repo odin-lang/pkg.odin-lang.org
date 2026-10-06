@@ -353,6 +353,38 @@ pre.doc-code .number, ul.doc-objc-methods .number, table.doc-dense .number {
 	text-decoration: underline;
 }
 
+/* documentation elsewhere, e.g. the SDL Wiki's: a way out, set apart from the Source link beside it */
+a.doc-upstream {
+	display: inline-block;
+	padding: 0 0.625em;
+	border: 1px solid rgba(56, 130, 210, 0.5);
+	border-radius: 1em;
+	background-color: rgba(56, 130, 210, 0.08);
+	color: var(--odin-sidebar-link) !important;
+	line-height: 1.5;
+	text-decoration: none !important;
+}
+a.doc-upstream:hover {
+	background-color: rgba(56, 130, 210, 0.18);
+}
+a.doc-upstream::after {
+	content: "\2009\2197\FE0E";
+}
+a.doc-upstream em {
+	font-style: normal;
+	font-weight: 600;
+}
+a.doc-upstream .doc-source-loc {
+	color: inherit;
+}
+.dark-mode a.doc-upstream {
+	border-color: rgba(122, 173, 229, 0.5);
+	background-color: rgba(122, 173, 229, 0.1);
+}
+.dark-mode a.doc-upstream:hover {
+	background-color: rgba(122, 173, 229, 0.2);
+}
+
 a > .a-hidden {
 	opacity: 0;
 }
@@ -545,12 +577,12 @@ section.documentation .pkg-entity > h3 {
 }
 
 /* a constant or enum member shows its value while hovered, in decimal and hexadecimal */
-pre.doc-code .doc-value:hover::after {
+pre.doc-code .doc-value:hover::after, table.doc-dense .doc-value:hover::after {
 	content: " // " attr(data-value);
 	color: #888;
 }
 /* too long for the end of its line, the value shows in the preview instead */
-pre.doc-code .doc-value.doc-value-long:hover::after {
+pre.doc-code .doc-value.doc-value-long:hover::after, table.doc-dense .doc-value.doc-value-long:hover::after {
 	content: none;
 }
 /* wraps within the preview, its later lines under the text rather than the `//` */
@@ -867,9 +899,6 @@ table.doc-dense tbody + tbody tr.doc-dense-group > th {
 	color: var(--odin-sidebar-muted);
 	font-weight: 400;
 }
-.doc-dense-count::after {
-	content: " forms";
-}
 .doc-dense-doc {
 	font-family: var(--bs-body-font-family);
 	font-size: 0.875rem;
@@ -883,7 +912,7 @@ table.doc-dense tr:hover > td, table.doc-dense tr:hover > th {
 	background-color: var(--odin-sidebar-hover);
 }
 /* put by search.js into whichever row is hovered */
-.doc-dense-source {
+.doc-dense-source, a.doc-dense-upstream {
 	float: right;
 	margin-left: 1rem;
 	font-family: var(--bs-body-font-family);

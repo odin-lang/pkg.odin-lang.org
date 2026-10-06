@@ -213,11 +213,22 @@ document.addEventListener("click", async (ev) => {
 	const link = document.createElement("a");
 	link.className = "doc-dense-source";
 	link.textContent = "Source";
+	// and, where there is one, its page in the upstream documentation, e.g. Microsoft Learn's
+	const upstream = document.createElement("a");
+	upstream.className = "doc-upstream doc-dense-upstream";
 	document.addEventListener("mouseover", ev => {
 		const row = ev.target.closest && ev.target.closest(".doc-dense tr[data-src]");
 		if (row && link.parentElement !== row.lastElementChild) {
-			link.href = row.closest(".doc-dense").dataset.source + row.dataset.src;
+			const table = row.closest(".doc-dense");
+			link.href = table.dataset.source + row.dataset.src;
 			row.lastElementChild.prepend(link);
+			if (table.dataset.upstream && row.dataset.up !== "") {
+				upstream.href = table.dataset.upstream.replace("{name}", encodeURIComponent(row.dataset.up || row.id));
+				upstream.textContent = table.dataset.upstreamTitle;
+				link.after(upstream);
+			} else {
+				upstream.remove();
+			}
 		}
 	});
 }
@@ -934,11 +945,11 @@ window.addEventListener("keydown", ev => {
 	// a value too long to show at the end of its line, where the box would cut it off, shows here instead
 	const measure = document.createElement("canvas").getContext("2d");
 	document.addEventListener("mouseover", ev => {
-		const span = ev.target.closest && ev.target.closest("pre.doc-code .doc-value");
+		const span = ev.target.closest && ev.target.closest("pre.doc-code .doc-value, table.doc-dense .doc-value");
 		if (!span || span === current || span.closest(".odin-type-preview")) {
 			return;
 		}
-		const pre = span.closest("pre");
+		const pre = span.closest("pre, td");
 		const style = getComputedStyle(pre);
 		measure.font = `${style.fontSize} ${style.fontFamily}`;
 		const room = pre.getBoundingClientRect().right - parseFloat(style.paddingRight) - span.getBoundingClientRect().right;
@@ -951,7 +962,7 @@ window.addEventListener("keydown", ev => {
 		}
 	});
 	document.addEventListener("mouseout", ev => {
-		const span = ev.target.closest && ev.target.closest("pre.doc-code .doc-value");
+		const span = ev.target.closest && ev.target.closest("pre.doc-code .doc-value, table.doc-dense .doc-value");
 		if (span && span === current && !span.contains(ev.relatedTarget)) {
 			hide();
 		}
