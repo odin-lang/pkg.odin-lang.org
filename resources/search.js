@@ -28,23 +28,15 @@ document.addEventListener("DOMContentLoaded", () => {
 		btn.setAttribute("aria-label", "Copy code to clipboard");
 		btn.addEventListener("click", async () => {
 			const code = pre.querySelector("code") || pre;
+			const lines = code.querySelectorAll(".line-text");
 			btn.hidden = true;
-			const text = code.innerText.replace(/\s+$/, "");
+			const text = (
+				lines.length
+					? Array.from(lines, (line) => line.textContent).join("\n")
+					: code.innerText
+			).replace(/\s+$/, "");
 			btn.hidden = false;
-			try {
-				await navigator.clipboard.writeText(text);
-			} catch {
-				const r = document.createRange();
-				r.selectNodeContents(code);
-				const sel = getSelection();
-				sel.removeAllRanges();
-				sel.addRange(r);
-				try {
-					document.execCommand("copy");
-				} catch {
-				}
-				sel.removeAllRanges();
-			}
+			await copy_text(text);
 			btn.textContent = "Copied";
 			setTimeout(() => (btn.textContent = "Copy"), 1200);
 		});
