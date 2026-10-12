@@ -836,7 +836,7 @@ generate_report :: proc(b: ^strings.Builder, collections: []^Collection) {
 <noscript>The report needs JavaScript; its data is in <a href="/report/data.json">data.json</a>.</noscript>
 </div>
 `)
-	io.write(w, #load("resources/footer.txt.html"))
+	write_footer_html(w)
 	io.write_string(w, `<script src="/report/report.js"></script>`+"\n</body>\n</html>\n")
 	if nil != os.write_entire_file("report/index.html", b.buf[:]) {
 		errorf("unable to write the report/index.html file")

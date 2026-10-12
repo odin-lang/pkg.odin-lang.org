@@ -823,10 +823,22 @@ write_pkg_data_pkg :: proc(w: io.Writer, collection: ^Collection, path: string, 
 	fmt.wprint(w, "\n\t}")
 }
 
+// resources/footer.txt.html, with the year of the build in its copyright
+write_footer_html :: proc(w: io.Writer) {
+	footer := string(#load("resources/footer.txt.html"))
+	before, year, after := strings.partition(footer, "{{year}}")
+	io.write_string(w, before)
+	if year != "" {
+		y, _, _ := time.date(build_time())
+		fmt.wprint(w, y)
+	}
+	io.write_string(w, after)
+}
+
 write_html_footer :: proc(w: io.Writer, pkg_data_url: string) {
 	io.write_string(w, "\n")
 
-	io.write(w, #load("resources/footer.txt.html"))
+	write_footer_html(w)
 	if pkg_data_url != "" {
 		fmt.wprintf(w, `<script src="%s"></script>`+"\n", pkg_data_url)
 	}
