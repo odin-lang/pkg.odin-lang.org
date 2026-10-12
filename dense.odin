@@ -115,17 +115,31 @@ entry_docs :: proc(e: ^doc.Entity) -> string {
 
 @(private="file")
 write_dense_docs :: proc(w: io.Writer, pkg: ^doc.Pkg, e: ^doc.Entity, name, docs: string) {
-	// the first sentence, and the rest when opened
 	summary := doc_summary(docs)
 	if summary == "" {
 		return
 	}
-	if len(strings.trim_space(docs)) <= len(summary) + 1 {
-		fmt.wprintf(w, `<div class="doc-dense-doc">%s</div>`, escape_html_string(summary, context.temp_allocator))
+	ctx := Doc_Context{
+		pkg            = pkg,
+		owner          = fmt.tprintf("%s.%s", str(pkg.name), name),
+		heading_prefix = name,
+		entity         = e,
+		self_name      = name,
+	}
+	source, whole := doc_summary_markdown(docs)
+	if whole && strings.trim_space(markdown_plain_text(docs, context.temp_allocator)) == summary {
+		io.write_string(w, `<div class="doc-dense-doc">`)
+		write_markdown_inline(w, source, &ctx)
+		io.write_string(w, "</div>")
 		return
 	}
-	fmt.wprintf(w, `<details class="doc-dense-doc"><summary>%s</summary>`, escape_html_string(summary, context.temp_allocator))
-	ctx := Doc_Context{pkg = pkg, owner = fmt.tprintf("%s.%s", str(pkg.name), name), heading_prefix = name, entity = e, self_name = name}
+	io.write_string(w, `<details class="doc-dense-doc"><summary>`)
+	if whole {
+		write_markdown_inline(w, source, &ctx)
+	} else {
+		io.write_string(w, escape_html_string(summary, context.temp_allocator))
+	}
+	io.write_string(w, "</summary>")
 	write_docs(w, docs, doc_ctx = &ctx)
 	io.write_string(w, "</details>")
 }

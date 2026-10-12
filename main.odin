@@ -120,6 +120,7 @@ main :: proc() {
 	}
 	for collection in not_hidden {
 		dir := collection.name
+		log.infof("generate %s packages", dir)
 
 		strings.builder_reset(&b)
 		write_html_header(w, fmt.tprintf("%s library - pkg.odin-lang.org", dir), .Full_Width,

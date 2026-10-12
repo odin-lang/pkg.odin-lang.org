@@ -586,6 +586,18 @@ window.addEventListener("keydown", ev => {
 	};
 	reveal();
 	window.addEventListener("hashchange", reveal);
+
+	// Finding text past the preview, or tabbing to a link there, scrolls the preview to it, so it's shown in full
+	// with what was found kept where it was on the screen
+	for (const clip of document.querySelectorAll(".pkg-overview-clip")) {
+		clip.addEventListener("scroll", () => {
+			const by = clip.scrollTop;
+			if (by > 0 && show_full(clip.firstElementChild)) {
+				clip.scrollTop = 0;
+				window.scrollBy(0, by);
+			}
+		});
+	}
 }
 
 // Hovering a parameter in a signature highlights its description in the Inputs list, and the other way around

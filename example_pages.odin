@@ -84,13 +84,11 @@ generate_example_pages :: proc(b: ^strings.Builder) {
 }
 
 // From its README, or else the comment its code starts with
-example_summary :: proc(index: int) -> string {
+example_summary_docs :: proc(index: int) -> (docs: string, from_readme: bool) {
 	page := example_pages[index]
 	program := examples.programs[page.program]
-	if page.file < 0 && program.readme != "" {
-		if summary := doc_summary(program.readme); summary != "" {
-			return summary
-		}
+	if page.file < 0 && program.readme != "" && doc_summary(program.readme) != "" {
+		return program.readme, true
 	}
 	file := page.file
 	if file < 0 && len(page.members) == 0 {
@@ -102,9 +100,28 @@ example_summary :: proc(index: int) -> string {
 		}
 	}
 	if file < 0 {
-		return ""
+		return "", false
 	}
-	return doc_summary(leading_comment(program.files[file].source))
+	return leading_comment(program.files[file].source), false
+}
+
+example_summary :: proc(index: int) -> string {
+	docs, _ := example_summary_docs(index)
+	return doc_summary(docs)
+}
+
+write_example_summary :: proc(w: io.Writer, index: int) {
+	docs, from_readme := example_summary_docs(index)
+	source, whole := doc_summary_markdown(docs)
+	if !whole {
+		io.write_string(w, escape_html_text(doc_summary(docs)))
+		return
+	}
+	ctx := Doc_Context{owner = example_pages[index].path}
+	if from_readme {
+		ctx.readme_base = example_github_url(fmt.tprintf("%s/", examples.programs[example_pages[index].program].path))
+	}
+	write_markdown_inline(w, source, &ctx)
 }
 
 // The screenshot a file of a folder of programs that are each a file has beside it, like raylib's ports have
@@ -588,7 +605,9 @@ write_example_page :: proc(w: io.Writer, index: int) {
 			write_breakable_path(w, slashpath.base(example_pages[member].path))
 			io.write_string(w, "</a>")
 			write_example_platforms(w, member)
-			fmt.wprintf(w, "</td><td class=\"pkg-desc\">%s</td></tr></tbody>\n", escape_html_text(example_summary(member)))
+			io.write_string(w, `</td><td class="pkg-desc">`)
+			write_example_summary(w, member)
+			io.write_string(w, "</td></tr></tbody>\n")
 		}
 		fmt.wprintln(w, `</table>`)
 		append(&toc, Toc_Item{id = "example-examples", text = "Examples", count = len(page.members)})
@@ -922,7 +941,7 @@ write_examples_index :: proc(w: io.Writer) {
 
 	write_desc :: proc(w: io.Writer, page: int, about: map[int][dynamic]^doc.Pkg) {
 		io.write_string(w, `<td class="pkg-desc">`)
-		io.write_string(w, escape_html_text(example_summary(page)))
+		write_example_summary(w, page)
 		if pkgs, ok := about[page]; ok {
 			slice.sort_by(pkgs[:], proc(a, b: ^doc.Pkg) -> bool {
 				return pkg_import_path(a) < pkg_import_path(b)

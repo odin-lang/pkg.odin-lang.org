@@ -368,9 +368,9 @@ doc_summary_line :: proc(docs: string) -> string {
 	return ""
 }
 
-doc_summary :: proc(docs: string) -> string {
-	MAX_LEN :: 160
+DOC_SUMMARY_MAX_LEN :: 160
 
+doc_summary_paragraph :: proc(docs: string) -> string {
 	b := strings.builder_make(context.temp_allocator)
 	docs := docs
 	for line in strings.split_lines_iterator(&docs) {
@@ -389,12 +389,17 @@ doc_summary :: proc(docs: string) -> string {
 			strings.write_byte(&b, ' ')
 		}
 		strings.write_string(&b, t)
-		if strings.builder_len(b) > 4*MAX_LEN {
+		if strings.builder_len(b) > 4*DOC_SUMMARY_MAX_LEN {
 			break
 		}
 	}
+	return strings.to_string(b)
+}
 
-	text := markdown_plain_text(strings.to_string(b), context.temp_allocator)
+doc_summary :: proc(docs: string) -> string {
+	MAX_LEN :: DOC_SUMMARY_MAX_LEN
+
+	text := markdown_plain_text(doc_summary_paragraph(docs), context.temp_allocator)
 	for i := 1; i+1 < len(text); i += 1 {
 		// not at "e.g." or "i.e."
 		if text[i] == '.' && text[i+1] == ' ' && !(i >= 2 && text[i-2] == '.') {
@@ -407,6 +412,14 @@ doc_summary :: proc(docs: string) -> string {
 		text = fmt.tprintf("%s…", text[:cut if cut > 0 else MAX_LEN])
 	}
 	return text
+}
+
+doc_summary_markdown :: proc(docs: string) -> (source: string, whole: bool) {
+	// The paragraph a summary is made from, when the summary is all of it, so it can be shown
+	// with its code and links rather than as plain text
+	source = doc_summary_paragraph(docs)
+	summary := doc_summary(docs)
+	return source, summary != "" && strings.trim_space(markdown_plain_text(source, context.temp_allocator)) == summary
 }
 
 auto_link_url :: proc(literal: string, ctx: ^Doc_Context) -> (url: string, ok: bool) {
@@ -802,6 +815,7 @@ render_markdown :: proc(src: string, ctx: ^Doc_Context, allocator := context.all
 		}
 	}
 
+	kept_closing_tags := make(map[^cm.Node]string, context.temp_allocator)
 	for node in nodes {
 		#partial switch cm.node_get_type(node) {
 		case .Heading:
@@ -844,7 +858,31 @@ render_markdown :: proc(src: string, ctx: ^Doc_Context, allocator := context.all
 				cm.node_set_fence_info(node, "plaintext")
 			}
 		case .HTML_Inline:
-			cm.node_replace(node, new_text(string(cm.node_get_literal(node))))
+			// Other HTML is shown as text, but for a few tags for text, like `<sub>`, kept when they open and close in the same paragraph
+			literal := string(cm.node_get_literal(node))
+			tag, keep := kept_closing_tags[node]
+			if !keep {
+				switch t := strings.to_lower(literal, context.temp_allocator); t {
+				case "<br>", "<br/>", "<br />":
+					tag, keep = "<br>", true
+				case "<sub>", "<sup>", "<kbd>":
+					closing := fmt.tprintf("</%s", t[1:])
+					for next := cm.node_next(node); next != nil; next = cm.node_next(next) {
+						if cm.node_get_type(next) != .HTML_Inline {
+							continue
+						}
+						n := strings.to_lower(string(cm.node_get_literal(next)), context.temp_allocator)
+						if n == closing {
+							kept_closing_tags[next] = closing
+							tag, keep = t, true
+						}
+						if n == closing || n == t {
+							break
+						}
+					}
+				}
+			}
+			cm.node_replace(node, new_custom(.Custom_Inline, tag, "") if keep else new_text(literal))
 			cm.node_free(node)
 		case .HTML_Block:
 			para := cm.node_new(.Paragraph)
