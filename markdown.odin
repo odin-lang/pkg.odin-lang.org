@@ -7,6 +7,7 @@ import "core:log"
 import "core:net"
 import "core:slice"
 import "core:strings"
+import "core:sync"
 
 import doc "core:odin/doc-format"
 import cm "vendor:commonmark"
@@ -35,7 +36,7 @@ Doc_Heading :: struct {
 doc_warning_count: int
 
 doc_warnf :: proc(format: string, args: ..any) {
-	doc_warning_count += 1
+	sync.atomic_add(&doc_warning_count, 1)
 	log.warnf(format, ..args)
 }
 
@@ -121,6 +122,10 @@ lookup_doc_pkg :: proc(ref: string, from: ^doc.Pkg) -> ^doc.Pkg {
 
 doc_entity_url :: proc(p: ^doc.Pkg, name: string) -> string {
 	c := cfg.pkg_to_collection[p]
+	if is_package_page(c.base_url, c.pkg_to_path[p]) {
+		return fmt.tprintf("#%s", name)
+	}
+
 	if path := c.pkg_to_path[p]; path != "" {
 		return fmt.tprintf("%s/%s/#%s", c.base_url, path, name)
 	}

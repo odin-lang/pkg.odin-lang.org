@@ -870,7 +870,8 @@ window.addEventListener("keydown", ev => {
 			types_of.set(json, fetch(json).then(r => r.ok ? r.json() : null).catch(() => null));
 		}
 		const types = await types_of.get(json);
-		return (types && types[id]) || null;
+		// links to declarations of its own package are just `#name`, so are made whole for this page
+		return (types && types[id]) ? types[id].replace(/href="#/g, `href="${dir}#`) : null;
 	};
 
 	// another package's declarations, from the search data beside its page

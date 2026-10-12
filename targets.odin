@@ -147,10 +147,14 @@ header_target :: proc(header: ^doc.Header) -> string {
 		{"netbsd", "NetBSD"}, {"haiku", "Haiku"}, {"js", "JS"}, {"wasi", "WASI"}, {"orca", "Orca"},
 	}
 	ARCHES :: []string{"amd64", "arm64", "i386", "arm32", "wasm32", "wasm64p32", "riscv64"}
-	@(static) targets: map[^doc.Header]string
+
+	@(thread_local)
+	targets: map[^doc.Header]string
+
 	if target, ok := targets[header]; ok {
 		return target
 	}
+
 	counts: [len(oses)]int
 	for file in doc.from_array(header, header.files)[1:] {
 		name, _ := strings.replace_all(doc.from_string(header, file.name), "\\", "/", context.temp_allocator)
@@ -164,12 +168,14 @@ header_target :: proc(header: ^doc.Header) -> string {
 			}
 		}
 	}
+
 	best := -1
 	for count, i in counts {
 		if count > 0 && (best < 0 || count > counts[best]) {
 			best = i
 		}
 	}
+
 	target := oses[best][1] if best >= 0 else ""
 	targets[header] = target
 	return target

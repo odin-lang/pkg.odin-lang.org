@@ -31,10 +31,10 @@ Set_Type :: struct {
 	runes:   bool,
 }
 
-constant_values:   map[^doc.Entity]Maybe(Int_Value)
-constant_sets:     map[^doc.Entity]Maybe(u128)
-constants_by_name: map[^doc.Pkg]map[string]^doc.Entity
-enum_members_of:   map[^doc.Entity][]Enum_Member // by the first member
+@(thread_local) constant_values:   map[^doc.Entity]Maybe(Int_Value)
+@(thread_local) constant_sets:     map[^doc.Entity]Maybe(u128)
+@(thread_local) constants_by_name: map[^doc.Pkg]map[string]^doc.Entity
+@(thread_local) enum_members_of:   map[^doc.Entity][]Enum_Member // by the first member
 
 constant_value :: proc(e: ^doc.Entity, depth := 0) -> (v: Int_Value, ok: bool) {
 	if e.kind != .Constant {

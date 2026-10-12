@@ -29,6 +29,7 @@ Objc_Info :: struct {
 	method_of: map[^doc.Entity]^Objc_Method,
 }
 
+@(thread_local)
 objc_info_cache: map[^doc.Pkg]^Objc_Info
 
 objc_info_get :: proc(pkg: ^doc.Pkg) -> ^Objc_Info {
@@ -419,7 +420,12 @@ write_objc_methods :: proc(w: io.Writer, page_pkg, pkg: ^doc.Pkg, class_entity: 
 	if collection == nil {
 		return
 	}
-	base := fmt.tprintf("%s/%s/", collection.base_url, collection.pkg_to_path[pkg])
+
+	base := ""
+	if !is_package_page(collection.base_url, collection.pkg_to_path[pkg]) {
+		base = fmt.tprintf("%s/%s/", collection.base_url, collection.pkg_to_path[pkg])
+	}
+
 	class_name := str(class_entity.name)
 	if pkg != page_pkg {
 		class_name = fmt.tprintf("%s.%s", pkg_import_name(pkg), class_name)
@@ -584,10 +590,9 @@ objc_doc_url :: proc(pkg: ^doc.Pkg, class_name: string) -> string {
 }
 
 
-// The package whose Contents panel is being written, for its classes to list their methods
+@(thread_local)
 toc_pkg: ^doc.Pkg
 
-// A procedure listed under its class in the Contents panel rather than under Procedures
 objc_listed_under_class :: proc(pkg: ^doc.Pkg, entry: doc.Scope_Entry, class_names: map[string]bool) -> bool {
 	e := &cfg.entities[entry.entity]
 	m := objc_method_of(pkg, e)

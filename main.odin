@@ -11,6 +11,8 @@ import "core:path/slashpath"
 import "core:slice"
 import "core:strconv"
 import "core:strings"
+import "core:sync"
+import "core:thread"
 import "core:time"
 import "core:unicode"
 
@@ -18,6 +20,7 @@ import doc "core:odin/doc-format"
 
 import cm "vendor:commonmark"
 
+@(thread_local)
 cfg: Config
 
 main :: proc() {
@@ -587,7 +590,9 @@ Header_Kind :: enum {
 header_lower :: proc() -> string {
 	// with every builtin in its Odin grammar for highlight.js, like `int` and `ensure`, so the docs' own examples
 	// colour them as the examples' code does, rather than only the few the grammar lists itself
-	@(static) header: string
+	@(thread_local)
+	header: string
+
 	if header == "" {
 		context.allocator = runtime.default_allocator()
 		lists: [3][dynamic]string
@@ -840,67 +845,99 @@ init_pkg_entries_map :: proc(collection: ^Collection, node: ^Dir_Node) {
 }
 
 
-generate_package_from_directory_tree :: proc(b: ^strings.Builder, node: ^Dir_Node) -> (runtime_pkg: ^doc.Pkg) {
-	if node.pkg != nil {
-		pkg  := node.pkg
-		collection := cfg.pkg_to_collection[pkg]
-		path := collection.pkg_to_path[pkg]
-		dir  := collection.name
-		init_cfg_from_pkg(pkg)
+Package_Page :: struct {
+	base_url: string,
+	path:     string,
+}
+@(thread_local)
+package_page: Package_Page
 
-		if str(pkg.name) == "runtime" {
-			runtime_pkg = pkg
-		}
+is_package_page :: proc(base_url, path: string) -> bool {
+	return package_page.base_url != "" && base_url == package_page.base_url && path == package_page.path
+}
 
-		if str(pkg.fullpath) not_in cfg.pkgs_line_docs {
-			line_doc := doc_summary_line(str(pkg.docs))
-			cfg.pkgs_line_docs[strings.clone(str(pkg.fullpath))] = strings.clone(line_doc)
-		}
-
-		strings.builder_reset(b)
-		w := strings.to_writer(b)
-
-		desc := markdown_plain_text(cfg.pkgs_line_docs[str(pkg.fullpath)], context.temp_allocator)
-		if desc == "" {
-			desc = fmt.tprintf("API documentation for the Odin package %s.", path)
-		}
-
-		write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width, description = desc)
-		write_pkg(w, dir, path, pkg, collection, collection.pkg_entries_map[pkg])
-		write_html_footer(w, pkg_data_url(collection, path))
-		recursive_make_directory(path, dir)
-
-		// links to the page's own declarations, of which there can be tens of thousands, as just `#name`
-		own := fmt.tprintf(`href="%s/%s/#`, collection.base_url, path) if path != "" else fmt.tprintf(`href="%s/#`, collection.base_url)
-		page, allocated := strings.replace_all(string(b.buf[:]), own, `href="#`)
-		_ = os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), transmute([]byte)page)
-		if allocated {
-			delete(page)
-		}
-
-		strings.builder_reset(b)
-		pkg_data_begin(w)
-		write_pkg_data_pkg(w, collection, path, pkg, summaries = true)
-		pkg_data_end(w)
-		_ = os.write_entire_file(fmt.tprintf("%s/%s/pkg-data.js", dir, path), b.buf[:])
-
-		strings.builder_reset(b)
-		if write_examples_json(w, pkg) {
-			_ = os.write_entire_file(fmt.tprintf("%s/%s/examples.json", dir, path), b.buf[:])
-		}
-
-		strings.builder_reset(b)
-		write_type_previews(w)
-		_ = os.write_entire_file(fmt.tprintf("%s/%s/types.json", dir, path), b.buf[:])
+write_entity_href :: proc(w: io.Writer, base_url, path, name: string) {
+	if !is_package_page(base_url, path) {
+		io.write_string(w, base_url)
+		io.write_byte(w, '/')
+		io.write_string(w, path)
+		io.write_byte(w, '/')
 	}
-	for child in node.children {
-		res := generate_package_from_directory_tree(b, child)
-		if runtime_pkg == nil {
-			runtime_pkg = res
-		}
+	io.write_byte(w, '#')
+	io.write_string(w, name)
+}
+
+generate_package_page :: proc(b: ^strings.Builder, pkg: ^doc.Pkg) {
+	collection := cfg.pkg_to_collection[pkg]
+	path := collection.pkg_to_path[pkg]
+	dir  := collection.name
+	init_cfg_from_pkg(pkg)
+
+	strings.builder_reset(b)
+	w := strings.to_writer(b)
+
+	desc := markdown_plain_text(cfg.pkgs_line_docs[str(pkg.fullpath)], context.temp_allocator)
+	if desc == "" {
+		desc = fmt.tprintf("API documentation for the Odin package %s.", path)
 	}
 
-	return runtime_pkg
+	package_page = {collection.base_url, path}
+	write_html_header(w, fmt.tprintf("package %s - pkg.odin-lang.org", path), .Full_Width, description = desc)
+	write_pkg(w, dir, path, pkg, collection, collection.pkg_entries_map[pkg])
+	write_html_footer(w, pkg_data_url(collection, path))
+	package_page = {}
+	recursive_make_directory(path, dir)
+	_ = os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
+
+	strings.builder_reset(b)
+	pkg_data_begin(w)
+	write_pkg_data_pkg(w, collection, path, pkg, summaries = true)
+	pkg_data_end(w)
+	_ = os.write_entire_file(fmt.tprintf("%s/%s/pkg-data.js", dir, path), b.buf[:])
+
+	strings.builder_reset(b)
+	if write_examples_json(w, pkg) {
+		_ = os.write_entire_file(fmt.tprintf("%s/%s/examples.json", dir, path), b.buf[:])
+	}
+
+	strings.builder_reset(b)
+	write_type_previews(w)
+	_ = os.write_entire_file(fmt.tprintf("%s/%s/types.json", dir, path), b.buf[:])
+}
+
+generate_package_pages :: proc(pkgs: []^doc.Pkg) {
+	if len(pkgs) == 0 {
+		return
+	}
+	_ = build_time()
+
+	Pages :: struct {
+		pkgs:   []^doc.Pkg,
+		next:   int,
+		cfg:    Config,
+		logger: log.Logger,
+		done:   sync.Wait_Group,
+	}
+	pages := Pages{pkgs = pkgs, cfg = cfg, logger = context.logger}
+	for _ in 0..<min(os.get_processor_core_count(), len(pkgs)) {
+		sync.wait_group_add(&pages.done, 1)
+		thread.create_and_start_with_poly_data(&pages, proc(pages: ^Pages) {
+			context.logger = pages.logger
+
+			arena := new(runtime.Default_Temp_Allocator)
+			runtime.default_temp_allocator_init(arena, runtime.DEFAULT_TEMP_ALLOCATOR_BACKING_SIZE, runtime.default_allocator())
+			context.temp_allocator = runtime.default_temp_allocator(arena)
+			cfg = pages.cfg
+
+			b := strings.builder_make()
+			defer strings.builder_destroy(&b)
+			for i := sync.atomic_add(&pages.next, 1); i < len(pages.pkgs); i = sync.atomic_add(&pages.next, 1) {
+				generate_package_page(&b, pages.pkgs[i])
+			}
+			sync.wait_group_done(&pages.done)
+		}, self_cleanup = true)
+	}
+	sync.wait_group_wait(&pages.done)
 }
 
 generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collection) {
@@ -908,7 +945,30 @@ generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collec
 
 	dir := collection.name
 
-	runtime_pkg := generate_package_from_directory_tree(b, collection.root)
+	collect :: proc(node: ^Dir_Node, pkgs: ^[dynamic]^doc.Pkg) {
+		if node.pkg != nil {
+			append(pkgs, node.pkg)
+		}
+		for child in node.children {
+			collect(child, pkgs)
+		}
+	}
+	pkgs := make([dynamic]^doc.Pkg, context.temp_allocator)
+	collect(collection.root, &pkgs)
+
+	runtime_pkg: ^doc.Pkg
+	for pkg in pkgs {
+		init_cfg_from_pkg(pkg)
+		if str(pkg.name) == "runtime" && runtime_pkg == nil {
+			runtime_pkg = pkg
+		}
+		if str(pkg.fullpath) not_in cfg.pkgs_line_docs {
+			line_doc := doc_summary_line(str(pkg.docs))
+			cfg.pkgs_line_docs[strings.clone(str(pkg.fullpath))] = strings.clone(line_doc)
+		}
+		report_of(pkg)
+	}
+	generate_package_pages(pkgs[:])
 
 	if runtime_pkg != nil &&
 	   collection.name == "base" {
@@ -1484,7 +1544,8 @@ import_declaration :: proc(collection: ^Collection, path: string, pkg: ^doc.Pkg)
 
 // e.g. "core:sys/darwin/Foundation"
 pkg_import_path :: proc(pkg: ^doc.Pkg) -> string {
-	@(static) paths: map[^doc.Pkg]string
+	@(thread_local)
+	paths: map[^doc.Pkg]string
 
 	if path, ok := paths[pkg]; ok {
 		return path
@@ -1501,7 +1562,9 @@ pkg_import_path :: proc(pkg: ^doc.Pkg) -> string {
 }
 
 pkg_import_name :: proc(pkg: ^doc.Pkg) -> string {
-	@(static) names: map[^doc.Pkg]string
+	@(thread_local)
+	names: map[^doc.Pkg]string
+
 	if name, ok := names[pkg]; ok {
 		return name
 	}
@@ -1703,13 +1766,17 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 			assert(name != "")
 			io.write_string(w, name)
 			io.write_string(w, " := ")
-			fmt.wprintf(w, `<a href="%s/runtime/#Source_Code_Location">`, base.base_url)
+			io.write_string(w, `<a href="`)
+			write_entity_href(w, base.base_url, "runtime", "Source_Code_Location")
+			io.write_string(w, `">`)
 			io.write_string(w, init_string)
 			io.write_string(w, `</a>`)
 		case strings.has_prefix(init_string, "context."):
 			io.write_string(w, name)
 			io.write_string(w, " := ")
-			fmt.wprintf(w, `<a href="%s/runtime/#Context">`, base.base_url)
+			io.write_string(w, `<a href="`)
+			write_entity_href(w, base.base_url, "runtime", "Context")
+			io.write_string(w, `">`)
 			io.write_string(w, init_string)
 			io.write_string(w, `</a>`)
 		case:
@@ -1904,23 +1971,16 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		}
 		if .Private in e.flags {
 			io.write_string(w, name)
-		} else if n := strings.index_rune(name, '('); n >= 0 {
-			fmt.wprintf(
-				w,
-				`<a class="code-typename" href="{2:s}/{0:s}/#{1:s}">{1:s}</a>`,
-				collection.pkg_to_path[&cfg.pkgs[tn_pkg]],
-				name[:n],
-				collection.base_url,
-			)
-			io.write_string(w, name[n:])
 		} else {
-			fmt.wprintf(
-				w,
-				`<a class="code-typename" href="{2:s}/{0:s}/#{1:s}">{1:s}</a>`,
-				collection.pkg_to_path[&cfg.pkgs[tn_pkg]],
-				name,
-				collection.base_url,
-			)
+			// e.g. `Foo` of `Foo($T)`
+			n := strings.index_rune(name, '(')
+			linked := name[:n] if n >= 0 else name
+			io.write_string(w, `<a class="code-typename" href="`)
+			write_entity_href(w, collection.base_url, collection.pkg_to_path[&cfg.pkgs[tn_pkg]], linked)
+			io.write_string(w, `">`)
+			io.write_string(w, linked)
+			io.write_string(w, `</a>`)
+			io.write_string(w, name[len(linked):])
 		}
 	case .Generic:
 		name := str(type.name)
@@ -3004,7 +3064,9 @@ print_procs :: proc(w:               io.Writer,
 	case is_inherited || len(unseen) == 0:
 	case len(unseen) == 1:
 		e := unseen[0]
-		fmt.wprintf(w, `<div class="doc-related-one"><h4>%s</h4> <a href="%s/%s/#%s">%s</a>`, title, collection.base_url, collection.pkg_to_path[pkg], str(e.name), str(e.name))
+		fmt.wprintf(w, `<div class="doc-related-one"><h4>%s</h4> <a href="`, title)
+		write_entity_href(w, collection.base_url, collection.pkg_to_path[pkg], str(e.name))
+		fmt.wprintf(w, `">%s</a>`, str(e.name))
 		if marks_group(e, ignore_procedure_group_suffix) {
 			io.write_string(w, `&nbsp;<em>(procedure group)</em>`)
 		}
@@ -3037,14 +3099,9 @@ print_procs :: proc(w:               io.Writer,
 			}
 			fmt.wprintln(w, `<summary class="hideme">`)
 			if is_inherited {
-				fmt.wprintf(
-					w,
-					"<h6 style=\"display:inline-block\">Procedures Through `using` From "+`<a href="%s/%s/#%s">%s</a></h5>`,
-					collection.base_url,
-					collection.pkg_to_path[pkg],
-					parent_name,
-					parent_name,
-				)
+				io.write_string(w, "<h6 style=\"display:inline-block\">Procedures Through `using` From "+`<a href="`)
+				write_entity_href(w, collection.base_url, collection.pkg_to_path[pkg], parent_name)
+				fmt.wprintf(w, `">%s</a></h5>`, parent_name)
 				fmt.wprintln(w)
 			} else {
 				fmt.wprintf(w, "<h4 style=\"display:inline-block\">%s</h4>\n", title)
@@ -3054,15 +3111,9 @@ print_procs :: proc(w:               io.Writer,
 			seen_item = true
 		}
 
-		fmt.wprintf(w, "<li>")
-		fmt.wprintf(
-			w,
-			`<a href="%s/%s/#%s">%s</a>`,
-			collection.base_url,
-			collection.pkg_to_path[pkg],
-			proc_name,
-			proc_name,
-		)
+		io.write_string(w, `<li><a href="`)
+		write_entity_href(w, collection.base_url, collection.pkg_to_path[pkg], proc_name)
+		fmt.wprintf(w, `">%s</a>`, proc_name)
 
 		if marks_group(e, ignore_procedure_group_suffix) {
 			fmt.wprintf(w, `&nbsp;<em>(procedure groups)</em>`)
@@ -3154,7 +3205,7 @@ pkg_relations_get :: proc(pkg: ^doc.Pkg) -> ^Pkg_Relations {
 		m[k] = arr
 	}
 
-	@(static)
+	@(thread_local)
 	pkg_relations_cache: map[^doc.Pkg]^Pkg_Relations
 
 	if r, ok := pkg_relations_cache[pkg]; ok {
@@ -3278,6 +3329,11 @@ proc_signature_key :: proc(t: doc.Type_Index) -> (key: string, ok: bool) {
 	if pt.kind != .Proc {
 		return
 	}
+
+	outer_page := package_page
+	package_page = {}
+	defer package_page = outer_page
+
 	proc_flags := transmute(doc.Type_Flags_Proc)pt.flags
 	if .Polymorphic in proc_flags {
 		return
@@ -3354,7 +3410,9 @@ write_matching_procedures :: proc(w: io.Writer, pkg: ^doc.Pkg, e: ^doc.Entity) {
 		if m.pkg != pkg {
 			fmt.wprintf(w, `<a href="%s/%s/">%s</a>.`, collection.base_url, collection.pkg_to_path[m.pkg], pkg_import_name(m.pkg))
 		}
-		fmt.wprintf(w, `<a href="{0:s}/{1:s}/#{2:s}">{2:s}</a></li>`+"\n", collection.base_url, collection.pkg_to_path[m.pkg], m.name)
+		io.write_string(w, `<a href="`)
+		write_entity_href(w, collection.base_url, collection.pkg_to_path[m.pkg], m.name)
+		fmt.wprintf(w, `">%s</a></li>`+"\n", m.name)
 	}
 	fmt.wprintln(w, "</ul>")
 	fmt.wprintln(w, "</details>")
@@ -3520,11 +3578,14 @@ write_related_constants :: proc(w: io.Writer, pkg: ^doc.Pkg, parent: ^doc.Entity
 	fmt.wprintln(w, "<ul>")
 	for e in list {
 		name := str(e.name)
-		if constants_seen[name] { continue }
+		if constants_seen[name] {
+			continue
+		}
 		constants_seen[name] = true
-		fmt.wprintf(w, "<li>")
-		fmt.wprintf(w, `<a href="%s/%s/#%s">%s</a>`, collection.base_url, collection.pkg_to_path[pkg], name, name)
-		fmt.wprintfln(w, "</li>")
+
+		io.write_string(w, `<li><a href="`)
+		write_entity_href(w, collection.base_url, collection.pkg_to_path[pkg], name)
+		fmt.wprintfln(w, `">%s</a></li>`, name)
 	}
 	fmt.wprintln(w, "</ul>")
 }
@@ -3610,7 +3671,9 @@ write_entry :: proc(w: io.Writer, pkg: ^doc.Pkg, entry: doc.Scope_Entry) {
 			class = "code-procedure"
 		}
 
-		fmt.wprintf(w, `<a class="{3:s}" href="{2:s}/{0:s}/#{1:s}">`, collection.pkg_to_path[this_pkg], name, collection.base_url, class)
+		fmt.wprintf(w, `<a class="%s" href="`, class)
+		write_entity_href(w, collection.base_url, collection.pkg_to_path[this_pkg], name)
+		io.write_string(w, `">`)
 		io.write_string(w, name)
 		io.write_string(w, `</a>`)
 	}
@@ -3952,6 +4015,7 @@ write_definition :: proc(w: io.Writer, html: string) {
 Type_Preview :: struct {
 	name, html: string,
 }
+@(thread_local)
 type_previews: [dynamic]Type_Preview
 
 add_type_preview :: proc(name, html: string) {

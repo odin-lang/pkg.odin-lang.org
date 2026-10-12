@@ -196,7 +196,8 @@ common_prefix :: proc(strs: []string) -> string {
 
 recursive_make_directory :: proc(path: string, prefix := "") {
 	// NOTE(bill) Every package's page makes its parents too (like `core` and `core/sys`) but each only needs making once
-	@(static) made: map[string]bool
+	@(thread_local)
+	made: map[string]bool
 
 	head, _, tail := strings.partition(path, "/")
 	path_to_make := head

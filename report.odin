@@ -92,9 +92,9 @@ report_pkgs: map[^doc.Pkg]^Report_Pkg
 
 // What is being documented, while its problems belong in the report:
 // a declaration on the page of the package declaring it, or the package's overview
-report_pkg:    ^doc.Pkg
-report_entity: ^doc.Entity
-report_name:   string
+@(thread_local) report_pkg:    ^doc.Pkg
+@(thread_local) report_entity: ^doc.Entity
+@(thread_local) report_name:   string
 
 report_of :: proc(pkg: ^doc.Pkg) -> ^Report_Pkg {
 	// kept to the end, whatever allocator the caller was using
@@ -433,27 +433,35 @@ report_check_naming :: proc(docs: string, pkg: ^doc.Pkg, e: ^doc.Entity, name: s
 
 @(private="file")
 kinds_by_name :: proc(pkg: ^doc.Pkg) -> map[string]doc.Entity_Kind {
-	@(static) cache: map[^doc.Pkg]map[string]doc.Entity_Kind
+	@(thread_local)
+	cache: map[^doc.Pkg]map[string]doc.Entity_Kind
+
 	if kinds, ok := cache[pkg]; ok {
 		return kinds
 	}
+
 	context.allocator = runtime.default_allocator()
+
 	kinds := make(map[string]doc.Entity_Kind)
 	for entry in array(pkg.entries) {
 		kinds[str(entry.name)] = cfg.entities[entry.entity].kind
 	}
+
 	cache[pkg] = kinds
 	return kinds
 }
 
-@(private="file")
+@(private="file", thread_local)
 example_error: struct {
 	line: int,
 	msg:  string,
 }
-@(private="file")
+
+@(private="file", thread_local)
+
 example_offset: int
-@(private="file")
+
+@(private="file", thread_local)
 example_file: ^ast.File
 
 @(private="file")
@@ -474,8 +482,9 @@ parses :: proc(src: string) -> bool {
 
 @(private="file")
 package_names :: proc() -> map[string]bool {
-	// what examples may write `name.` for: every package's directory and declared name, and the conventional aliases
-	@(static) names: map[string]bool
+	@(thread_local)
+	names: map[string]bool
+
 	if len(names) == 0 {
 		context.allocator = runtime.default_allocator()
 		for c in cfg.collections {
@@ -607,7 +616,9 @@ check_example_imports :: proc(file: ^ast.File) {
 
 @(private="file")
 misspellings :: proc() -> map[string]string {
-	@(static) words: map[string]string
+	@(thread_local)
+	words: map[string]string
+
 	if len(words) == 0 {
 		context.allocator = runtime.default_allocator()
 		text := string(#load("resources/misspellings.txt"))
