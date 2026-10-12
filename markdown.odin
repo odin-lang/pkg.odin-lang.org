@@ -583,24 +583,30 @@ markdown_plain_text :: proc(src: string, allocator := context.allocator) -> stri
 	return strings.trim_space(strings.to_string(b))
 }
 
+@(private="file")
+new_text :: proc(literal: string) -> ^cm.Node {
+	n := cm.node_new(.Text)
+	cm.node_set_literal(n, strings.clone_to_cstring(literal, context.temp_allocator))
+	return n
+}
+
+@(private="file")
+new_custom :: proc(type: cm.Node_Type, on_enter, on_exit: string) -> ^cm.Node {
+	n := cm.node_new(type)
+	cm.node_set_on_enter(n, strings.clone_to_cstring(on_enter, context.temp_allocator))
+	cm.node_set_on_exit(n,  strings.clone_to_cstring(on_exit,  context.temp_allocator))
+	return n
+}
+
+@(private="file")
+move_children :: proc(from, to: ^cm.Node) {
+	for child := cm.node_first_child(from); child != nil; child = cm.node_first_child(from) {
+		cm.node_unlink(child)
+		cm.node_append_child(to, child)
+	}
+}
+
 render_markdown :: proc(src: string, ctx: ^Doc_Context, allocator := context.allocator) -> string {
-	new_text :: proc(literal: string) -> ^cm.Node {
-		n := cm.node_new(.Text)
-		cm.node_set_literal(n, strings.clone_to_cstring(literal, context.temp_allocator))
-		return n
-	}
-	new_custom :: proc(type: cm.Node_Type, on_enter, on_exit: string) -> ^cm.Node {
-		n := cm.node_new(type)
-		cm.node_set_on_enter(n, strings.clone_to_cstring(on_enter, context.temp_allocator))
-		cm.node_set_on_exit(n,  strings.clone_to_cstring(on_exit,  context.temp_allocator))
-		return n
-	}
-	move_children :: proc(from, to: ^cm.Node) {
-		for child := cm.node_first_child(from); child != nil; child = cm.node_first_child(from) {
-			cm.node_unlink(child)
-			cm.node_append_child(to, child)
-		}
-	}
 	// Text and whether it contains a link
 	inline_text :: proc(node: ^cm.Node) -> (text: string, has_link: bool) {
 		b := strings.builder_make(context.temp_allocator)
@@ -628,7 +634,7 @@ render_markdown :: proc(src: string, ctx: ^Doc_Context, allocator := context.all
 
 	runtime.DEFAULT_TEMP_ALLOCATOR_TEMP_GUARD(ignore = allocator == context.temp_allocator)
 
-	root := cm.parse_document_from_string(convert_double_bracket_links(src, ctx), cm.DEFAULT_OPTIONS)
+	root := parse_markdown_with_tables(convert_double_bracket_links(src, ctx))
 	defer cm.node_free(root)
 
 	// The tree may only be changed once iteration has finished
@@ -995,8 +1001,23 @@ format_param_lists :: proc(html: string) -> string {
 write_markdown_inline :: proc(w: io.Writer, text: string, ctx: ^Doc_Context, code_class := "") {
 	runtime.DEFAULT_TEMP_ALLOCATOR_TEMP_GUARD()
 
-	// Escape what would start a heading, list, quote, rule, or fence
-	t := strings.trim_space(text)
+	html := strings.trim_space(render_markdown(escape_block_start(strings.trim_space(text)), ctx, context.temp_allocator))
+
+	if strings.has_prefix(html, "<p>")  &&
+	   strings.has_suffix(html, "</p>") &&
+	   strings.count(html, "<p>") == 1 {
+		html = html[len("<p>"):len(html)-len("</p>")]
+	}
+
+	if code_class != "" {
+		html, _ = strings.replace_all(html, "<code>", fmt.tprintf(`<code class="%s">`, code_class), context.temp_allocator)
+	}
+	io.write_string(w, html)
+}
+
+escape_block_start :: proc(t: string) -> string {
+	// NOTE((bill): Escape what would start a heading, list, quote, rule, fence, or an HTML block that runs on past blank lines
+
 	escape_at := -1
 	if len(t) > 0 {
 		switch t[0] {
@@ -1014,7 +1035,8 @@ write_markdown_inline :: proc(w: io.Writer, text: string, ctx: ^Doc_Context, cod
 				escape_at = 0
 			}
 		case '`', '~':
-			if strings.has_prefix(t, "```") || strings.has_prefix(t, "~~~") {
+			if strings.has_prefix(t, "```") ||
+			   strings.has_prefix(t, "~~~") {
 				escape_at = 0
 			}
 		case '0'..='9':
@@ -1025,18 +1047,286 @@ write_markdown_inline :: proc(w: io.Writer, text: string, ctx: ^Doc_Context, cod
 			if i < len(t) && (t[i] == '.' || t[i] == ')') && (i+1 == len(t) || t[i+1] == ' ') {
 				escape_at = i
 			}
+		case '<':
+			rest := t[1:]
+			if strings.has_prefix(rest, "!") || strings.has_prefix(rest, "?") {
+				escape_at = 0
+			}
+			for name in ([]string{"script", "pre", "style", "textarea"}) {
+				if len(rest) >= len(name) && strings.equal_fold(rest[:len(name)], name) &&
+				   (len(rest) == len(name) || strings.index_byte(" \t>", rest[len(name)]) >= 0) {
+					escape_at = 0
+				}
+			}
 		}
 	}
+
 	if escape_at >= 0 {
-		t = fmt.tprintf("%s\\%s", t[:escape_at], t[escape_at:])
+		return fmt.tprintf("%s\\%s", t[:escape_at], t[escape_at:])
+	}
+	return t
+}
+
+Table_Cell :: struct {
+	text: string,
+	line: int,
+}
+
+Markdown_Table :: struct {
+	anchor: int,
+	aligns: []string,
+	rows:   [][]Table_Cell,
+}
+
+parse_markdown_with_tables :: proc(md: string) -> (root: ^cm.Node) {
+	// NOTE(bill): cmark has no GFM tables meaning we have to rewrite each table as a paragraph per cell for cmark to
+	// parse along with the rest of the document, then put back together from those paragraphs
+	md := md
+	tables := make([dynamic]Markdown_Table, context.temp_allocator)
+	for {
+		root = cm.parse_document_from_string(md, cm.DEFAULT_OPTIONS)
+		table, rewritten := rewrite_first_table(root, md) or_break
+		cm.node_free(root)
+		append(&tables, table)
+		md = rewritten
+	}
+	if len(tables) == 0 {
+		return
 	}
 
-	html := strings.trim_space(render_markdown(t, ctx, context.temp_allocator))
-	if strings.has_prefix(html, "<p>") && strings.has_suffix(html, "</p>") && strings.count(html, "<p>") == 1 {
-		html = html[len("<p>"):len(html)-len("</p>")]
+	top := make(map[int]^cm.Node, context.temp_allocator)
+	for node := cm.node_first_child(root); node != nil; node = cm.node_next(node) {
+		top[int(cm.node_get_start_line(node))] = node
 	}
-	if code_class != "" {
-		html, _ = strings.replace_all(html, "<code>", fmt.tprintf(`<code class="%s">`, code_class), context.temp_allocator)
+	for table in tables {
+		node := new_custom(.Custom_Block, `<div class="doc-table-scroll"><table class="doc-table">`, "</table></div>")
+		section := new_custom(.Custom_Block, "<thead>", "</thead>")
+		cm.node_append_child(node, section)
+		for row, r in table.rows {
+			if r == 1 {
+				section = new_custom(.Custom_Block, "<tbody>", "</tbody>")
+				cm.node_append_child(node, section)
+			}
+			tr := new_custom(.Custom_Block, "<tr>", "</tr>")
+			cm.node_append_child(section, tr)
+			tag := "th" if r == 0 else "td"
+			for cell, c in row {
+				open := fmt.tprintf("<%s>", tag)
+				if align := table.aligns[c]; align != "" {
+					open = fmt.tprintf(`<%s style="text-align: %s">`, tag, align)
+				}
+				td := new_custom(.Custom_Inline, open, fmt.tprintf("</%s>", tag))
+				cm.node_append_child(tr, td)
+				if cell.line == 0 {
+					continue
+				}
+				para := top[cell.line]
+				if para != nil && cm.node_get_type(para) == .Paragraph {
+					move_children(para, td)
+				} else {
+					// NOTE(bill): cmark took it for another kind of block like an HTML block or a link reference definition
+					cm.node_append_child(td, new_text(cell.text))
+				}
+				if para != nil {
+					cm.node_free(para)
+				}
+			}
+		}
+		anchor := top[table.anchor]
+		cm.node_replace(anchor, node)
+		cm.node_free(anchor)
 	}
-	io.write_string(w, html)
+	return
+}
+
+rewrite_first_table :: proc(root: ^cm.Node, md: string) -> (table: Markdown_Table, rewritten: string, ok: bool) {
+	split_table_row :: proc(line: string) -> []string {
+		s := strings.trim(line, " \t")
+		if strings.has_prefix(s, "|") {
+			s = s[1:]
+		}
+		cells := make([dynamic]string, context.temp_allocator)
+		for len(s) > 0 {
+			b := strings.builder_make(context.temp_allocator)
+			i := 0
+			for /**/; i < len(s) && s[i] != '|'; i += 1 {
+				// An escaped pipe stays in the cell and loses its backslash even inside a code span
+				if s[i] == '\\' && i+1 < len(s) && s[i+1] == '|' {
+					i += 1
+				}
+				strings.write_byte(&b, s[i])
+			}
+			append(&cells, strings.trim(strings.to_string(b), " \t"))
+			s = s[min(i+1, len(s)):]
+		}
+		return cells[:]
+	}
+
+	line_indent :: proc(line: string) -> (columns: int) {
+		loop: for c in transmute([]byte)line {
+			switch c {
+			case ' ':
+				columns += 1
+			case '\t':
+				columns += 4 - columns%4
+			case:
+				break loop
+			}
+		}
+		return
+	}
+
+	lines := strings.split_lines(md, context.temp_allocator)
+	for node := cm.node_first_child(root); node != nil; node = cm.node_next(node) {
+		first := int(cm.node_get_start_line(node)) - 1
+		last  := int(cm.node_get_end_line  (node)) - 1
+
+		// A setext heading's text may be a table whose rows its underline then continues or ends
+		is_setext := false
+		#partial switch cm.node_get_type(node) {
+		case .Paragraph:
+		case .Heading:
+			if first == last {
+				continue
+			}
+
+			// cmark's end line for a setext heading can be the line after its underline
+			last = first + 1
+			for last+1 < len(lines) {
+				t := strings.trim(lines[last], " \t")
+				if line_indent(lines[last]) < 4 && t != "" && (t[0] == '=' || t[0] == '-') && strings.trim_left(t, t[:1]) == "" {
+					break
+				}
+				last += 1
+			}
+
+			is_setext = true
+		case:
+			continue
+		}
+		block := lines[first:last+1]
+
+		header := -1
+		delimiters: for i in 1..<(len(block)-1 if is_setext else len(block)) {
+			line := block[i]
+			if line_indent(line) >= 4 {
+				continue delimiters
+			}
+
+			for c in transmute([]byte)line {
+				switch c {
+				case '|', ':', '-', ' ', '\t':
+				case:
+					continue delimiters
+				}
+			}
+
+			cells := split_table_row(line)
+			if len(cells) == 0 || len(split_table_row(block[i-1])) != len(cells) {
+				continue delimiters
+			}
+
+			aligns := make([]string, len(cells), context.temp_allocator)
+			for cell, c in cells {
+				dashes := strings.trim_suffix(strings.trim_prefix(cell, ":"), ":")
+				if dashes == "" || strings.trim_left(dashes, "-") != "" {
+					continue delimiters
+				}
+				left, right := strings.has_prefix(cell, ":"), strings.has_suffix(cell, ":")
+				switch {
+				case left && right: aligns[c] = "center"
+				case left:          aligns[c] = "left"
+				case right:         aligns[c] = "right"
+				}
+			}
+
+			header = i-1
+			table.aligns = aligns
+
+			break delimiters
+		}
+		if header < 0 {
+			continue
+		}
+
+		end := header + 2
+		body: for ; end < len(block); end += 1 {
+			line := block[end]
+			if len(split_table_row(line)) == 0 {
+				break body
+			}
+			// Indented code
+			if line_indent(line) >= 4 {
+				break body
+			}
+
+			// A thematic break
+			t := strings.trim(line, " \t")
+			if strings.index_byte("-*_", t[0]) >= 0 {
+				marks := 0
+				for c in transmute([]byte)t {
+					if c == t[0] {
+						marks += 1
+					} else if c != ' ' && c != '\t' {
+						marks = 0
+						break
+					}
+				}
+				if marks >= 3 {
+					break body
+				}
+			}
+			// A list item, even an empty one or one not numbered from 1, which could not interrupt a paragraph
+			i := 0
+			switch t[0] {
+			case '-', '*', '+':
+				i = 1
+			case '0'..='9':
+				for i < len(t) && i < 9 && '0' <= t[i] && t[i] <= '9' {
+					i += 1
+				}
+				if i == len(t) || (t[i] != '.' && t[i] != ')') {
+					continue body
+				}
+				i += 1
+			case:
+				continue body
+			}
+
+			if i == len(t) || t[i] == ' ' || t[i] == '\t' {
+				break body
+			}
+		}
+
+		out := make([dynamic]string, context.temp_allocator)
+		append(&out, ..lines[:first+header])
+		if header > 0 {
+			append(&out, "")
+		}
+		table.anchor = len(out) + 1
+		append(&out, "table", "")
+
+		rows := make([dynamic][]Table_Cell, context.temp_allocator)
+		for line, i in block[header:end] {
+			if i == 1 {
+				continue
+			}
+			cells := split_table_row(line)
+			row := make([]Table_Cell, len(table.aligns), context.temp_allocator)
+			for &cell, c in row {
+				if c < len(cells) && cells[c] != "" {
+					cell = {cells[c], len(out) + 1}
+					append(&out, escape_block_start(cells[c]), "")
+				}
+			}
+			append(&rows, row)
+		}
+
+		table.rows = rows[:]
+
+		append(&out, ..lines[first+end:])
+
+		return table, strings.join(out[:], "\n", context.temp_allocator), true
+	}
+	return
 }
