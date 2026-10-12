@@ -1,5 +1,8 @@
 "use strict";
 
+// The sidebars' collapsing, their `[` and `]` shortcuts, and the code blocks' copy buttons are
+// odin-lang.org's js/docs.js, shared with its documentation pages
+
 const userAgent = navigator.userAgent;
 const osList = [
 	{lookFor: "Win",     name: "windows"},
@@ -14,35 +17,6 @@ for (const os of osList) {
 		document.body.classList.add(`os-${os.name}`);	
 	}	
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-	const scope = document.querySelector(".documentation") || document;
-	scope.querySelectorAll("pre").forEach((pre) => {
-		if (pre.querySelector(".copy-code")) {
-			return;
-		}
-		const btn = document.createElement("button");
-		btn.type        = "button";
-		btn.className   = "copy-code";
-		btn.textContent = "Copy";
-		btn.setAttribute("aria-label", "Copy code to clipboard");
-		btn.addEventListener("click", async () => {
-			const code = pre.querySelector("code") || pre;
-			const lines = code.querySelectorAll(".line-text");
-			btn.hidden = true;
-			const text = (
-				lines.length
-					? Array.from(lines, (line) => line.textContent).join("\n")
-					: code.innerText
-			).replace(/\s+$/, "");
-			btn.hidden = false;
-			await copy_text(text);
-			btn.textContent = "Copied";
-			setTimeout(() => (btn.textContent = "Copy"), 1200);
-		});
-		pre.appendChild(btn);
-	});
-});
 
 function text_at_point(x, y) {
 	let node = null, offset = 0;
@@ -411,18 +385,6 @@ document.addEventListener("click", ev => {
 	const expanded = btn.previousElementSibling.classList.toggle("expanded");
 	btn.setAttribute("aria-expanded", expanded);
 	btn.textContent = expanded ? "Show fewer lines" : label;
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-	const list = document.querySelector("#pkg-sidebar .odin-sidebar-content");
-	const active = list && list.querySelector("a.active");
-	if (!active || list.scrollHeight <= list.clientHeight) {
-		return;
-	}
-	const top = active.getBoundingClientRect().top - list.getBoundingClientRect().top;
-	if (top < 0 || top > list.clientHeight - active.offsetHeight) {
-		list.scrollTop += top - list.clientHeight/2;
-	}
 });
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -800,21 +762,6 @@ window.addEventListener("keydown", ev => {
 		}
 	});
 }
-
-// [ and ] collapse or expand the packages and contents sidebars
-window.addEventListener("keydown", ev => {
-	if (ev.ctrlKey || ev.metaKey || ev.altKey || (ev.key !== "[" && ev.key !== "]")) {
-		return;
-	}
-	if (ev.target.closest && ev.target.closest("input, textarea, select, [contenteditable]")) {
-		return;
-	}
-	const button = document.querySelector(`.odin-sidebar-toggle[data-sidebar="${ev.key === "[" ? "pkg-sidebar" : "toc-sidebar"}"]`);
-	if (button && button.offsetParent !== null) {
-		ev.preventDefault();
-		toggleSidebar(button);
-	}
-});
 
 {
 	const types_of = new Map();

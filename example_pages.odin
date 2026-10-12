@@ -855,18 +855,18 @@ write_example_licence :: proc(w: io.Writer, license: be.Example_License) {
 
 @(private="file")
 write_examples_sidebar :: proc(w: io.Writer, current: int) {
-	fmt.wprintln(w, `<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">`)
+	fmt.wprintln(w, `<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar odin-sidebar-border navbar-light sticky-top odin-below-navbar">`)
 	defer fmt.wprintln(w, `</nav>`)
-	write_sidebar_toggle(w, "pkg-sidebar", "Examples")
+	write_sidebar_toggle(w, "nav-sidebar", "Examples")
 	fmt.wprintln(w, `<div class="odin-sidebar-content pb-3">`)
 	defer fmt.wprintln(w, `</div>`)
-	fmt.wprintf(w, "<h4 class=\"pkg-sidebar-title\"><a style=\"color: inherit;\" href=\"%s/\">Examples</a></h4>\n", EXAMPLES_URL)
+	fmt.wprintf(w, "<h4 class=\"odin-sidebar-title\"><a href=\"%s/\">Examples</a></h4>\n", EXAMPLES_URL)
 
 	write_node :: proc(w: io.Writer, node: ^Example_Node, current: int, top: bool) {
 		label, n := example_node_label(node)
 		switch {
 		case !top:                 io.write_string(w, `<li>`)
-		case len(n.children) > 0:  io.write_string(w, `<li class="nav-item pkg-sidebar-group">`)
+		case len(n.children) > 0:  io.write_string(w, `<li class="nav-item odin-sidebar-group">`)
 		case:                      io.write_string(w, `<li class="nav-item">`)
 		}
 		if n.page >= 0 {
@@ -874,7 +874,7 @@ write_examples_sidebar :: proc(w: io.Writer, current: int) {
 			write_breakable_path(w, label)
 			io.write_string(w, `</a>`)
 		} else {
-			io.write_string(w, `<span class="pkg-sidebar-label">`)
+			io.write_string(w, `<span class="odin-sidebar-label">`)
 			write_breakable_path(w, label)
 			io.write_string(w, `</span>`)
 		}

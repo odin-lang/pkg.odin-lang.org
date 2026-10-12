@@ -2762,21 +2762,21 @@ write_sidebar_toggle :: proc(w: io.Writer, name, label: string) {
 
 write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collection, pkg_name: string, path: string) {
 
-	fmt.wprintln(w, `<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar-border navbar-light sticky-top odin-below-navbar">`)
+	fmt.wprintln(w, `<nav id="pkg-sidebar" class="col-lg-2 odin-sidebar odin-sidebar-border navbar-light sticky-top odin-below-navbar">`)
 	defer fmt.wprintln(w, `</nav>`)
 
-	write_sidebar_toggle(w, "pkg-sidebar", "Packages")
+	write_sidebar_toggle(w, "nav-sidebar", "Packages")
 
 	fmt.wprintln(w, `<div class="odin-sidebar-content pb-3">`)
 	defer fmt.wprintln(w, `</div>`)
 
 	if pkg_name != "" {
-		fmt.wprintf(w, `<div class="pkg-sidebar-current">Current Package: <em><a href="%s/%s">%s</a></em></div>` + "\n", collection.base_url, path, pkg_name)
+		fmt.wprintf(w, `<div class="odin-sidebar-current">Current Package: <em><a href="%s/%s">%s</a></em></div>` + "\n", collection.base_url, path, pkg_name)
 	}
 
 	fmt.wprintf(
 		w,
-		"<h4 class=\"pkg-sidebar-title\"><a style=\"text-transform: capitalize; color: inherit;\" href=\"%s\">%s Library</a></h4>\n",
+		"<h4 class=\"odin-sidebar-title\"><a style=\"text-transform: capitalize;\" href=\"%s\">%s Library</a></h4>\n",
 		collection.base_url,
 		collection.name,
 	)
@@ -2786,7 +2786,7 @@ write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collect
 
 	write_side_bar_item :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collection, dir: ^Dir_Node, is_active: bool) {
 		if len(dir.children) != 0 {
-			fmt.wprint(w, `<li class="nav-item pkg-sidebar-group">`)
+			fmt.wprint(w, `<li class="nav-item odin-sidebar-group">`)
 		} else {
 			fmt.wprint(w, `<li class="nav-item">`)
 		}
@@ -2796,7 +2796,7 @@ write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collect
 		} else if dir.pkg != nil || dir.name == "builtin" || dir.name == "intrinsics" {
 			fmt.wprintf(w, `<a href="%s/%s">%s</a>`, collection.base_url, dir.path, dir.name)
 		} else {
-			fmt.wprintf(w, `<span class="pkg-sidebar-label">%s</span>`, dir.name)
+			fmt.wprintf(w, `<span class="odin-sidebar-label">%s</span>`, dir.name)
 		}
 		if len(dir.children) != 0 {
 			fmt.wprintln(w, "<ul>")
@@ -2809,7 +2809,7 @@ write_pkg_sidebar :: proc(w: io.Writer, curr_pkg: ^doc.Pkg, collection: ^Collect
 				} else if child.pkg != nil {
 					fmt.wprintf(w, `<a href="%s/%s">`, collection.base_url, child.path)
 				} else {
-					io.write_string(w, `<span class="pkg-sidebar-label">`)
+					io.write_string(w, `<span class="odin-sidebar-label">`)
 				}
 				write_breakable_name(w, child.name)
 				if child.pkg == curr_pkg || child.pkg != nil {

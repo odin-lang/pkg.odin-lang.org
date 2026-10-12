@@ -719,37 +719,6 @@ details.code-example > summary {
 	font-weight: 700;
 }
 
-/* code blocks share the box and colours of the signatures, rather than
-   highlight.js's github-dark theme in both light and dark mode */
-.documentation pre:has(> code) {
-	padding: 0.625rem;
-	border: 1px solid var(--odin-code-border);
-	border-radius: 0.25rem;
-	background-color: var(--odin-code-bg);
-	tab-size: 8;
-}
-.documentation pre > code.hljs {
-	padding: 0;
-	background: none;
-	color: var(--odin-code-text);
-}
-.documentation .hljs-keyword, .documentation .hljs-literal {
-	color: var(--odin-code-keyword);
-}
-.documentation .hljs-built_in {
-	color: var(--odin-code-keyword);
-	font-weight: 600;
-}
-.documentation .hljs-string {
-	color: var(--odin-code-string);
-}
-.documentation .hljs-number {
-	color: var(--odin-code-number);
-}
-.documentation .hljs-comment {
-	color: var(--odin-code-comment);
-}
-
 /* the "Inputs:" and "Returns:" lists, with the names in a column */
 ul.doc-params {
 	display: grid;
@@ -1416,12 +1385,6 @@ pre.doc-code-long:not(.expanded) {
 	mask-image: linear-gradient(to bottom, #000 calc(100% - 3em), transparent);
 }
 
-@media only screen and (max-width: 991px) {
-	#pkg-sidebar {
-		display: none;
-	}
-}
-
 .doc-index-list > li.doc-index-group {
 	list-style: none;
 	margin-left: -1rem;
@@ -1460,28 +1423,6 @@ pre.doc-code-long:not(.expanded) {
 	opacity: 0.85;
 }
 
-.documentation pre {
-	position: relative;
-}
-.documentation pre .copy-code {
-	position:      absolute;
-	top:           0.4rem;
-	right:         0.4rem;
-	font:          inherit;
-	font-size:     0.75rem;
-	line-height:   1;
-	padding:       0.3em 0.55em;
-	border:        1px solid rgba(127, 127, 127, .35);
-	border-radius: 0.4em;
-	background:    rgba(127, 127, 127, 0.12);
-	color:         inherit;
-	cursor:        pointer;
-	opacity:       0;
-	transition:    opacity 0.12s ease;
-}
-.documentation pre:hover .copy-code,
-.documentation pre .copy-code:focus { opacity: 1; }
-.documentation pre .copy-code:hover { background: rgba(127,127,127,.25); }
 
 
 .toc-group > .toc-group-label {
@@ -1521,289 +1462,16 @@ main > .container.full-width {
 	max-width: calc(100% - 2em) !important;
 }
 
-/* sidebars */
+/* The sidebars, the contents, and the code blocks (with the palette `pre.doc-code` uses too) are
+   styled by odin-lang.org's css/style.css, shared with its documentation pages */
 
 :root {
-	--odin-code-bg:        #f8f8f8;
-	--odin-code-border:    #c6c8ca;
-	--odin-code-text:      #202224;
-	--odin-code-keyword:   #ff5252;
-	--odin-code-string:    #093;
-	--odin-code-number:    #0b7285;
-	--odin-code-comment:   #888;
-	--odin-code-directive: #05a;
-	--odin-code-procedure: #047919;
-
-	--odin-sidebar-width: clamp(11rem, 13vw, 14rem);
-	--odin-toc-width:     clamp(11rem, 15vw, 16rem);
-	--odin-rail-width:    2.5rem;
-	--odin-sidebar-link:  #3882d2;
-	--odin-sidebar-muted: #6c757d;
-	--odin-sidebar-hover: rgba(127, 127, 127, 0.12);
-	--odin-sidebar-thumb: rgba(127, 127, 127, 0.3);
-	--odin-rule:          #e9ecef;
-	--odin-card-border:   #dee2e6;
+	--odin-rule:        #e9ecef;
+	--odin-card-border: #dee2e6;
 }
-/* code's colours: signatures, examples and the import line alike */
 .dark-mode {
-	--odin-code-bg:        var(--dark-code);
-	--odin-code-border:    var(--dark-border);
-	--odin-code-text:      var(--bs-light);
-	--odin-code-string:    #0a5;
-	--odin-code-number:    #79c0ff;
-	--odin-code-directive: #58a6ff;
-	--odin-code-procedure: #42b557;
-
-	--odin-sidebar-link:  #7aade5;
-	--odin-sidebar-muted: #8b98a9;
-	--odin-rule:          #1c2430;
-	--odin-card-border:   var(--dark-border);
-}
-
-#pkg-sidebar, #TableOfContents {
-	font-size: 0.8125rem;
-}
-
-#pkg-sidebar {
-	overflow-x: hidden;
-}
-
-#pkg-sidebar > div {
-	overflow-x: auto;
-}
-
-.dark-mode #pkg-sidebar, .dark-mode .odin-toc-border {
-	color-scheme: dark;
-}
-
-.odin-sidebar-content:hover, #TableOfContents:hover {
-	--odin-sidebar-thumb: rgba(127, 127, 127, 0.6);
-}
-/* the standard properties make Chrome on Windows draw arrow buttons, so only Firefox gets them */
-@supports not selector(::-webkit-scrollbar) {
-	.odin-sidebar-content, #TableOfContents, #TableOfContents > ul {
-		scrollbar-width: thin;
-		scrollbar-color: var(--odin-sidebar-thumb) transparent;
-	}
-}
-.odin-sidebar-content::-webkit-scrollbar, #TableOfContents::-webkit-scrollbar, #TableOfContents > ul::-webkit-scrollbar {
-	width: 6px;
-	height: 6px;
-}
-.odin-sidebar-content::-webkit-scrollbar-track, #TableOfContents::-webkit-scrollbar-track, #TableOfContents > ul::-webkit-scrollbar-track {
-	background: transparent;
-}
-.odin-sidebar-content::-webkit-scrollbar-thumb, #TableOfContents::-webkit-scrollbar-thumb, #TableOfContents > ul::-webkit-scrollbar-thumb {
-	background-color: var(--odin-sidebar-thumb);
-	border-radius: 3px;
-}
-
-.pkg-sidebar-current {
-	margin-bottom: 1rem;
-	color: var(--odin-sidebar-muted);
-}
-.pkg-sidebar-current a {
-	color: var(--odin-sidebar-link);
-}
-
-h4.pkg-sidebar-title {
-	font-size: 1.125rem;
-	font-weight: 600;
-	margin-bottom: 0.5rem;
-}
-
-#pkg-sidebar ul {
-	list-style-type: none;
-	padding: 0;
-}
-
-#pkg-sidebar li > a, #pkg-sidebar .pkg-sidebar-label,
-#TableOfContents a {
-	display: block;
-	padding: 0.0625rem 0.5rem;
-	border-radius: 0.25rem;
-	color: var(--odin-sidebar-link);
-	font-size: inherit;
-}
-#pkg-sidebar li > a:hover, #TableOfContents a:hover {
-	background-color: var(--odin-sidebar-hover);
-}
-
-#pkg-sidebar li:not(:last-child) {
-	margin-bottom: 0.125rem;
-}
-
-#pkg-sidebar .pkg-sidebar-group > a, #pkg-sidebar .pkg-sidebar-group > .pkg-sidebar-label {
-	font-weight: 600;
-}
-#pkg-sidebar .pkg-sidebar-label {
-	color: var(--odin-sidebar-muted);
-}
-
-#pkg-sidebar li > ul {
-	margin: 0.125rem 0 0.375rem 0.75rem;
-	padding-left: 0.25rem;
-	border-left: 1px solid var(--odin-sidebar-hover);
-}
-
-#pkg-sidebar a.active {
-	font-weight: 600;
-	color: var(--bs-secondary);
-	background-color: rgba(var(--bs-secondary-rgb), 0.12);
-}
-
-#TableOfContents {
-	overflow-x: hidden;
-}
-
-#TableOfContents > ul {
-	overflow-x: auto;
-}
-
-#TableOfContents > ul > li:not(:first-child) {
-	margin-top: 0.75rem;
-}
-#TableOfContents > ul > li > a {
-	color: var(--odin-sidebar-muted);
-	font-size: 0.75rem;
-	font-weight: 600;
-	letter-spacing: 0.05em;
-	text-transform: uppercase;
-}
-
-#TableOfContents li > ul {
-	padding-left: 0.75rem;
-}
-
-/* wrapped names hang under their first line */
-#pkg-sidebar li > a, #TableOfContents li li > a {
-	padding-left: 1.25rem;
-	text-indent: -0.75rem;
-}
-
-/* only the current entry is highlighted, the bar still spans its children */
-#TableOfContents li.active, .dark-mode #TableOfContents li.active {
-	color: inherit;
-	font-weight: inherit;
-	border-left: none;
-	padding: 0;
-	/* an inset box-shadow leaves hairlines on its other edges at fractional display scales */
-	background: linear-gradient(var(--bs-secondary), var(--bs-secondary)) no-repeat left / 2px 100%;
-}
-/* paint-only: making it bold changes its width, which relays out every entry (~9000 on core:sys/windows) as you scroll */
-#TableOfContents li.active > a {
-	color: var(--bs-secondary);
-	background-color: rgba(var(--bs-secondary-rgb), 0.12);
-}
-
-.odin-sidebar-toggle {
-	display: none;
-	align-items: center;
-	gap: 0.5rem;
-	padding: 0.25rem;
-	border: none;
-	border-radius: 0.25rem;
-	background: none;
-	color: var(--odin-sidebar-muted);
-	font-size: 0.75rem;
-	font-weight: 600;
-	letter-spacing: 0.05em;
-	text-transform: uppercase;
-	line-height: 1;
-	cursor: pointer;
-}
-.odin-sidebar-toggle:hover {
-	background-color: var(--odin-sidebar-hover);
-	color: inherit;
-}
-.odin-sidebar-toggle svg {
-	width: 1rem;
-	height: 1rem;
-	fill: none;
-	stroke: currentColor;
-	stroke-width: 1.75;
-	stroke-linecap: round;
-	stroke-linejoin: round;
-}
-.odin-sidebar-toggle span {
-	display: none;
-}
-
-@media only screen and (min-width: 992px) {
-	.odin-docs-layout > #pkg-sidebar {
-		display: flex;
-		flex-direction: column;
-		flex: 0 0 var(--odin-sidebar-width);
-		width: var(--odin-sidebar-width);
-		overflow: hidden;
-	}
-	.odin-docs-layout > .odin-toc-border {
-		flex: 0 0 var(--odin-toc-width);
-		width: var(--odin-toc-width);
-	}
-	.odin-docs-layout > article {
-		flex: 1 1 0;
-		width: auto;
-		min-width: 0;
-	}
-
-	/* the toggles stay put while the lists scroll beneath them */
-	.odin-docs-layout > .odin-toc-border > .odin-below-navbar {
-		display: flex;
-		flex-direction: column;
-		overflow: hidden;
-	}
-	.odin-sidebar-content, .odin-docs-layout #TableOfContents {
-		flex: 1 1 auto;
-		min-height: 0;
-		overflow-y: auto;
-	}
-
-	.odin-sidebar-toggle {
-		display: flex;
-		flex: none;
-		margin-bottom: 0.5rem;
-	}
-	#pkg-sidebar > .odin-sidebar-toggle {
-		align-self: flex-end;
-		margin-top: 1rem;
-	}
-	.odin-toc-border .odin-sidebar-toggle {
-		align-self: flex-start;
-	}
-	.odin-toc-border .odin-sidebar-toggle svg {
-		transform: scaleX(-1);
-	}
-
-	/* collapsed sidebars shrink to a rail holding only their toggle */
-	.pkg-sidebar-collapsed .odin-docs-layout > #pkg-sidebar,
-	.toc-sidebar-collapsed .odin-docs-layout > .odin-toc-border {
-		flex-basis: var(--odin-rail-width);
-		width: var(--odin-rail-width);
-		padding-left: 0;
-		padding-right: 0;
-	}
-	.pkg-sidebar-collapsed #pkg-sidebar > .odin-sidebar-content,
-	.toc-sidebar-collapsed #TableOfContents {
-		display: none;
-	}
-	.pkg-sidebar-collapsed #pkg-sidebar > .odin-sidebar-toggle,
-	.toc-sidebar-collapsed .odin-toc-border .odin-sidebar-toggle {
-		align-self: center;
-		flex-direction: column;
-		padding: 0.5rem 0.25rem;
-	}
-	.pkg-sidebar-collapsed #pkg-sidebar > .odin-sidebar-toggle span,
-	.toc-sidebar-collapsed .odin-toc-border .odin-sidebar-toggle span {
-		display: block;
-		writing-mode: vertical-rl;
-	}
-	.pkg-sidebar-collapsed #pkg-sidebar > .odin-sidebar-toggle svg {
-		transform: scaleX(-1);
-	}
-	.toc-sidebar-collapsed .odin-toc-border .odin-sidebar-toggle svg {
-		transform: none;
-	}
+	--odin-rule:        #1c2430;
+	--odin-card-border: var(--dark-border);
 }
 
 
