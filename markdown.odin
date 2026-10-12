@@ -637,6 +637,132 @@ render_markdown :: proc(src: string, ctx: ^Doc_Context, allocator := context.all
 	root := parse_markdown_with_tables(convert_double_bracket_links(src, ctx))
 	defer cm.node_free(root)
 
+	// NOTE(bill): Bare URLs become links
+	// This is to match  GitHub's autolink extension:
+	//     * `http://` or `https://` not straight after a letter
+	//     * `www.` after whitespace, `*`, `_`, `~` or `(`, then a domain and
+	//        everything up to whitespace or `<`, but for trailing punctuation. Not inside links or headings
+	{
+		texts := make([dynamic]^cm.Node, context.temp_allocator)
+		iter := cm.iter_new(root)
+		in_link := 0
+		for {
+			ev := cm.iter_next(iter)
+			if ev == .Done {
+				break
+			}
+			node := cm.iter_get_node(iter)
+			#partial switch cm.node_get_type(node) {
+			case .Link, .Image, .Heading:
+				in_link += 1 if ev == .Enter else -1
+			case .Text:
+				if in_link == 0 {
+					append(&texts, node)
+				}
+			}
+		}
+		cm.iter_free(iter)
+
+		for node in texts {
+			literal := string(cm.node_get_literal(node))
+			if !strings.contains(literal, "://") && !strings.contains(literal, "www.") {
+				continue
+			}
+			done := 0
+			for i := 0; i < len(literal); i += 1 {
+				rest := literal[i:]
+				is_www := strings.has_prefix(rest, "www.")
+				scheme := 4 if is_www else 0
+				for prefix in ([]string{"http://", "https://"}) {
+					if len(rest) >= len(prefix) && strings.equal_fold(rest[:len(prefix)], prefix) {
+						scheme = len(prefix)
+					}
+				}
+				if scheme == 0 {
+					continue
+				}
+				if i > 0 {
+					c := literal[i-1]
+					if !is_www && ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z') {
+						continue
+					}
+					if is_www && strings.index_byte(" \t*_~(", c) < 0 {
+						continue
+					}
+				} else if prev := cm.node_previous(node); is_www && prev != nil {
+					#partial switch cm.node_get_type(prev) {
+					case .Soft_Break, .Line_Break, .Emph, .Strong:
+					case:
+						continue
+					}
+				}
+
+				end := scheme
+				periods, underscores, last_underscores := 0, 0, 0
+				domain: for ; end < len(rest); end += 1 {
+					switch rest[end] {
+					case '.':
+						periods += 1
+						last_underscores, underscores = underscores, 0
+					case '_':
+						underscores += 1
+					case '-', '0'..='9', 'a'..='z', 'A'..='Z', 0x80..=0xff:
+						// okay
+					case:
+						break domain
+					}
+				}
+				if end == scheme || underscores > 0 || last_underscores > 0 || (is_www && periods == 0) {
+					continue
+				}
+
+				for end < len(rest) && strings.index_byte(" \t\n\r\v\f<", rest[end]) < 0 {
+					end += 1
+				}
+				opening, closing := strings.count(rest[:end], "("), strings.count(rest[:end], ")")
+				trim: for end > scheme {
+					switch rest[end-1] {
+					case ')':
+						if closing <= opening {
+							break trim
+						}
+						closing -= 1
+						end -= 1
+					case '?', '!', '.', ',', ':', '*', '_', '~', '\'', '"':
+						end -= 1
+					case ';':
+						j := end - 2
+						for j > 0 && ('a' <= rest[j] && rest[j] <= 'z' || 'A' <= rest[j] && rest[j] <= 'Z') {
+							j -= 1
+						}
+						end = j if j >= 0 && j < end-2 && rest[j] == '&' else end-1
+					case:
+						break trim
+					}
+				}
+				if end <= scheme {
+					continue
+				}
+
+				url := rest[:end]
+				if i > done {
+					cm.node_insert_before(node, new_text(literal[done:i]))
+				}
+				anchor := new_custom(.Custom_Inline, doc_link_open_tag(fmt.tprintf("%s%s", "http://" if is_www else "", url)), "</a>")
+				cm.node_append_child(anchor, new_text(url))
+				cm.node_insert_before(node, anchor)
+				done = i + end
+				i = done - 1
+			}
+			if done > 0 {
+				if done < len(literal) {
+					cm.node_insert_before(node, new_text(literal[done:]))
+				}
+				cm.node_free(node)
+			}
+		}
+	}
+
 	// The tree may only be changed once iteration has finished
 	nodes := make([dynamic]^cm.Node, context.temp_allocator)
 	{
