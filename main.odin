@@ -4166,14 +4166,30 @@ write_pkg :: proc(w: io.Writer, dir, path: string, pkg: ^doc.Pkg, collection: ^C
 	overview_headings: [dynamic]Doc_Heading
 	report_of(pkg).has_overview = strings.trim_space(overview_docs) != ""
 	if strings.trim_space(overview_docs) != "" {
-		fmt.wprintln(w, "<h2>Overview</h2>")
-		fmt.wprintln(w, "<div id=\"pkg-overview\">")
-		defer fmt.wprintln(w, "</div>")
+		// A huge overview, like a library's whole manual, is a preview fading out until it is shown in full,
+		// and is collapsed again beside its heading. One checkbox does both, so they work without scripts too
+		HUGE_OVERVIEW_WORDS :: 5000
+		words := len(strings.fields(overview_docs, context.temp_allocator))
+		is_huge := words > HUGE_OVERVIEW_WORDS
+		if is_huge {
+			fmt.wprintln(w, `<div class="pkg-overview-preview"><input type="checkbox" id="pkg-overview-full" class="pkg-overview-full">`)
+			fmt.wprintln(w, `<div class="pkg-overview-head"><h2>Overview</h2><label for="pkg-overview-full" class="pkg-overview-toggle"><span class="pkg-overview-expand">Expand</span><span class="pkg-overview-collapse">Collapse</span></label></div>`)
+			fmt.wprintln(w, `<div id="pkg-overview"><div class="pkg-overview-clip">`)
+		} else {
+			fmt.wprintln(w, "<h2>Overview</h2>")
+			fmt.wprintln(w, "<div id=\"pkg-overview\">")
+		}
 
 		ctx := Doc_Context{pkg = pkg, owner = path, heading_prefix = "overview", headings = &overview_headings}
 		report_begin(pkg)
 		write_docs(w, overview_docs, doc_ctx = &ctx)
 		report_end()
+
+		if is_huge {
+			fmt.wprintf(w, `</div></div><label for="pkg-overview-full" class="pkg-overview-more">Show the full overview <span class="pkg-count">%s words</span></label></div>`+"\n", thousands(words))
+		} else {
+			fmt.wprintln(w, "</div>")
+		}
 	}
 
 	// e.g. `core:image/png` on `core:image`'s page, which otherwise only the sidebar shows

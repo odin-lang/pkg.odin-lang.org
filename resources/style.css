@@ -211,6 +211,7 @@ h2 .pkg-count {
 
 /* the first heading, normally Overview, sits under the search rather than a heading's height below it */
 #pkg-top > h2:first-child,
+#pkg-top > .pkg-overview-preview:first-child,
 #pkg-top > #pkg-index:first-child > h2 {
 	margin-top: -3em;
 }
@@ -1051,6 +1052,53 @@ h1 .doc-badge {
 	margin-top: 0.375rem;
 	color: var(--odin-sidebar-muted);
 	cursor: pointer;
+}
+/* a huge overview is a preview fading out, until its checkbox is checked, by the toggle beside the
+   heading or the button under the preview; the toggle unchecks it again */
+.pkg-overview-full:not(:checked) ~ #pkg-overview > .pkg-overview-clip {
+	max-height: 32rem;
+	overflow: hidden;
+	overflow: clip;
+	-webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 10rem), transparent);
+	mask-image: linear-gradient(to bottom, #000 calc(100% - 10rem), transparent);
+}
+.pkg-overview-full {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	opacity: 0;
+}
+.pkg-overview-head {
+	display: flex;
+	align-items: baseline;
+	gap: 0.75rem;
+}
+.pkg-overview-toggle, .pkg-overview-more {
+	border: 1px solid var(--odin-card-border);
+	border-radius: 0.25rem;
+	cursor: pointer;
+}
+.pkg-overview-toggle {
+	padding: 0.0625rem 0.5rem;
+	font-size: 0.8125rem;
+	color: var(--odin-sidebar-muted);
+}
+.pkg-overview-more {
+	display: inline-block;
+	margin: 0.5rem 0 1rem;
+	padding: 0.25rem 0.75rem;
+}
+.pkg-overview-toggle:hover, .pkg-overview-more:hover {
+	border-color: var(--odin-sidebar-link);
+}
+.pkg-overview-full:focus-visible ~ .pkg-overview-head > .pkg-overview-toggle {
+	outline: 2px solid var(--odin-sidebar-link);
+	outline-offset: 2px;
+}
+.pkg-overview-full:checked ~ .pkg-overview-head .pkg-overview-expand,
+.pkg-overview-full:not(:checked) ~ .pkg-overview-head .pkg-overview-collapse,
+.pkg-overview-full:checked ~ .pkg-overview-more {
+	display: none;
 }
 .example-screenshot {
 	display: block;

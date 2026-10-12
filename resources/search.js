@@ -560,6 +560,34 @@ window.addEventListener("keydown", ev => {
 	}
 });
 
+// A link to something past the preview of a huge overview, like a section in the Contents, shows it in full first
+{
+	const target_of = hash => hash.length > 1 ? document.getElementById(decodeURIComponent(hash.slice(1))) : null;
+	const show_full = target => {
+		const clip = target && target.closest(".pkg-overview-clip");
+		const full = clip && clip.closest(".pkg-overview-preview").querySelector(":scope > .pkg-overview-full");
+		if (!full || full.checked) {
+			return false;
+		}
+		full.checked = true;
+		return true;
+	};
+	document.addEventListener("click", ev => {
+		const link = ev.target.closest && ev.target.closest('a[href^="#"]');
+		if (link) {
+			show_full(target_of(link.hash));
+		}
+	});
+	const reveal = () => {
+		const target = target_of(location.hash);
+		if (show_full(target)) {
+			target.scrollIntoView();
+		}
+	};
+	reveal();
+	window.addEventListener("hashchange", reveal);
+}
+
 // Hovering a parameter in a signature highlights its description in the Inputs list, and the other way around
 {
 	const can_highlight = typeof CSS !== "undefined" && CSS.highlights && typeof Highlight !== "undefined";
