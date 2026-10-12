@@ -2445,6 +2445,9 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", doc_ctx: ^Doc_
 	// Tab-indented lines straight after a list item continue it, rather than starting a code block
 	in_list := false
 
+	// NOTE(bill): Lines up to the end of a Markdown fence stay in its paragraph, however they are indented
+	fence_end := -1
+
 	// Find the minimum common prefix length of tabs, so an entire doc comment can be indented
 	// without it rendering in a <pre> tag.
 	if len(lines_to_process) > 0 {
@@ -2477,6 +2480,10 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", doc_ctx: ^Doc_
 	for line, i in lines_to_process {
 		text := strings.trim_space(line)
 		next_block_kind := curr_block_kind
+
+		if i <= fence_end {
+			continue
+		}
 
 		switch curr_block_kind {
 		case .Paragraph:
@@ -2548,6 +2555,20 @@ write_docs :: proc(w: io.Writer, docs: string, name: string = "", doc_ctx: ^Doc_
 
 		if next_block_kind == .Paragraph {
 			in_list = is_list_item(text) || (in_list && strings.has_prefix(line, "\t") && text != "")
+			if strings.has_prefix(text, "```") || strings.has_prefix(text, "~~~") {
+				n := 0
+				for n < len(text) && text[n] == text[0] {
+					n += 1
+				}
+
+				for j in i+1..<len(lines_to_process) {
+					t := strings.trim_space(lines_to_process[j])
+					if len(t) >= n && strings.trim_left(t, text[:1]) == "" {
+						fence_end = j
+						break
+					}
+				}
+			}
 		} else {
 			in_list = false
 		}
