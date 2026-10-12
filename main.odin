@@ -333,13 +333,8 @@ init_cfg_from_header :: proc(header: ^doc.Header, loc := #caller_location) {
 	cfg.pkgs     = array(cfg.header.pkgs)
 	cfg.entities = array(cfg.header.entities)
 	cfg.types    = array(cfg.header.types)
-
-	for &pkg in cfg.pkgs {
-		for &entry in array(pkg.entries) {
-			cfg.entity_to_pkg[&cfg.entities[entry.entity]] = &pkg
-		}
-	}
 }
+
 init_cfg_from_pkg :: proc(pkg: ^doc.Pkg, loc := #caller_location) {
 	assert(pkg != nil, loc=loc)
 	init_cfg_from_header(cfg.pkg_to_header[pkg], loc)
@@ -370,6 +365,11 @@ generate_from_path :: proc(path: string, all_packages: bool) {
 
 		init_cfg_from_header(header)
 
+		for &pkg in cfg.pkgs {
+			for &entry in array(pkg.entries) {
+				cfg.entity_to_pkg[&cfg.entities[entry.entity]] = &pkg
+			}
+		}
 	}
 
 	when ODIN_DEBUG {
@@ -1483,11 +1483,20 @@ import_declaration :: proc(collection: ^Collection, path: string, pkg: ^doc.Pkg)
 
 // e.g. "core:sys/darwin/Foundation"
 pkg_import_path :: proc(pkg: ^doc.Pkg) -> string {
+	@(static) paths: map[^doc.Pkg]string
+
+	if path, ok := paths[pkg]; ok {
+		return path
+	}
+
 	collection := cfg.pkg_to_collection[pkg]
 	if collection == nil {
 		return ""
 	}
-	return fmt.tprintf("%s:%s", collection.name, collection.pkg_to_path[pkg])
+
+	path := fmt.aprintf("%s:%s", collection.name, collection.pkg_to_path[pkg])
+	paths[pkg] = path
+	return path
 }
 
 pkg_import_name :: proc(pkg: ^doc.Pkg) -> string {
@@ -3950,21 +3959,24 @@ add_type_preview :: proc(name, html: string) {
 
 write_json_string :: proc(w: io.Writer, s: string) {
 	io.write_byte(w, '"')
-	for r in s {
-		switch r {
+	start := 0
+	for i in 0..<len(s) {
+		c := s[i]
+		if c != '"' && c != '\\' && c >= 0x20 {
+			continue
+		}
+		io.write_string(w, s[start:i])
+		switch c {
 		case '"':  io.write_string(w, `\"`)
 		case '\\': io.write_string(w, `\\`)
 		case '\n': io.write_string(w, `\n`)
 		case '\t': io.write_string(w, `\t`)
 		case '\r': io.write_string(w, `\r`)
-		case:
-			if r < 0x20 {
-				fmt.wprintf(w, `\u%04x`, r)
-			} else {
-				io.write_rune(w, r)
-			}
+		case:      fmt.wprintf(w, `\u%04x`, c)
 		}
+		start = i + 1
 	}
+	io.write_string(w, s[start:])
 	io.write_byte(w, '"')
 }
 
