@@ -9,30 +9,6 @@
 	<script>window.odinHighlightExtras = {built_in: "ODIN_DOC_BUILT_INS", type: "ODIN_DOC_TYPES", literal: "ODIN_DOC_LITERALS"};</script>
 	<script src="https://odin-lang.org/js/highlight-odin.js"></script>
 	<script>hljs.highlightAll()</script>
-	<script>
-		function OSDarkModeQuery() {
-			return window.matchMedia?.("(prefers-color-scheme: dark)");
-		}
-		function setDarkMode() {
-			document.body.classList.add("dark-mode");
-			window.localStorage.setItem("theme", "dark");
-		}
-		function removeDarkMode() {
-			document.body.classList.remove("dark-mode");
-			window.localStorage.setItem("theme", "light");
-		}
-		function toggleDarkMode() {
-			if (document.body.classList.contains("dark-mode")) removeDarkMode()
-			else setDarkMode()
-		}
-		function syncThemeToOS() {
-			if (OSDarkModeQuery().matches) setDarkMode()
-			else removeDarkMode()
-		}
-		document.addEventListener("DOMContentLoaded", () => {
-			OSDarkModeQuery().addEventListener("change", syncThemeToOS);
-		});
-	</script>
 	<!-- The sidebars and the code blocks' copy buttons, shared with odin-lang.org's documentation.
 	     Not deferred, so a collapsed sidebar is collapsed before the page is drawn -->
 	<script src="https://odin-lang.org/js/docs.js"></script>
@@ -41,16 +17,8 @@
 	<link rel="stylesheet" type="text/css" href="/style.css">
 </head>
 <body>
-<script>
-	const themeSet = window.localStorage.getItem("theme");
-	if (themeSet === null) {
-		syncThemeToOS();
-	} else if (themeSet === "dark") {
-		setDarkMode();
-	} else if (themeSet === "light") {
-		removeDarkMode();
-	}
-</script>
+<!-- Light and dark mode, shared with odin-lang.org. First in the <body> and not deferred, so the page is drawn in the right mode from the start -->
+<script src="https://odin-lang.org/js/theme.js"></script>
 <header class="sticky-top">
 	<nav class="navbar navbar-expand-lg navbar-dark bg-primary odin-menu">
 		<div class="container">
