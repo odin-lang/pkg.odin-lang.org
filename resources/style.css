@@ -332,7 +332,6 @@ pre.doc-code .number, ul.doc-objc-methods .number, table.doc-dense .number {
 }
 
 
-
 .doc-source {
 	display: inline;
 	float: right;
@@ -600,64 +599,6 @@ ul.doc-params > li.doc-param-active {
 	margin-bottom: 1.5rem;
 }
 
-/* ? lists the keyboard shortcuts */
-.odin-shortcuts {
-	position: fixed;
-	inset: 0;
-	z-index: 1090;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 1rem;
-	background-color: rgba(0, 0, 0, 0.4);
-}
-.odin-shortcuts[hidden] {
-	display: none;
-}
-.odin-shortcuts-box {
-	min-width: min(22rem, 100%);
-	padding: 1.25rem 1.5rem;
-	border: 1px solid var(--odin-card-border);
-	border-radius: 0.5rem;
-	background-color: var(--bs-body-bg, #fff);
-	box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.25);
-	outline: none;
-}
-.dark-mode .odin-shortcuts-box {
-	background-color: var(--dark-background);
-	color: var(--bs-light);
-}
-.odin-shortcuts-box h2 {
-	margin: 0 0 1rem;
-	font-size: 1.125rem;
-	font-weight: 600;
-}
-.odin-shortcuts-box dl {
-	display: grid;
-	grid-template-columns: max-content 1fr;
-	gap: 0.625rem 1.5rem;
-	margin: 0;
-	align-items: baseline;
-}
-.odin-shortcuts-box dt {
-	font-weight: 400;
-	text-align: right;
-}
-.odin-shortcuts-box dd {
-	margin: 0;
-}
-.odin-shortcuts-box kbd {
-	display: inline-block;
-	min-width: 1.75em;
-	padding: 0.125rem 0.375rem;
-	border: 1px solid var(--odin-card-border);
-	border-bottom-width: 2px;
-	border-radius: 0.25rem;
-	background: none;
-	color: inherit;
-	font-size: 0.8125rem;
-	text-align: center;
-}
 
 /* how to use a declaration, joined to it: calling a method, or setting a #config value */
 .documentation pre.doc-code:has(+ pre.doc-code-usage) {
@@ -1296,28 +1237,12 @@ table.doc-dense tr.doc-dense-copied > td, table.doc-dense tr.doc-dense-copied > 
 	animation: odin-target-flash 2.5s ease-out;
 }
 
-/* moved by search.js into whichever declaration heading is hovered or focused */
-.copy-link {
-	margin-left: 0.5rem;
-	padding: 0.125rem 0.375rem;
-	border: 1px solid var(--odin-card-border);
-	border-radius: 0.25rem;
-	background: none;
-	color: var(--odin-sidebar-muted);
-	font-size: 0.75rem;
-	font-weight: 400;
-	line-height: 1;
-	vertical-align: middle;
-	opacity: 0;
-	cursor: pointer;
-}
-.pkg-entity > h3:hover .copy-link, .copy-link:focus, .copy-link.copied {
+
+/* the shared "copy link" button shows on a hovered declaration */
+.pkg-entity > h3:hover .copy-link {
 	opacity: 1;
 }
-.copy-link:hover {
-	border-color: var(--odin-sidebar-link);
-	color: inherit;
-}
+
 
 /* the section being read, under the navbar; search.js adds it and keeps it up to date */
 .odin-section-label {
@@ -1424,7 +1349,6 @@ pre.doc-code-long:not(.expanded) {
 }
 
 
-
 .toc-group > .toc-group-label {
 	display: block;
 	font-size: 0.85em;
@@ -1467,11 +1391,9 @@ main > .container.full-width {
 
 :root {
 	--odin-rule:        #e9ecef;
-	--odin-card-border: #dee2e6;
 }
 .dark-mode {
 	--odin-rule:        #1c2430;
-	--odin-card-border: var(--dark-border);
 }
 
 
@@ -1498,179 +1420,7 @@ main > .container.full-width {
 	padding-top: 3rem !important;
 }
 
-.odin-search-wrapper {
-	display: flex;
-	gap: 0.5rem;
-	margin-top: 1rem;
-}
-.odin-search-field {
-	position: relative;
-	flex: 1;
-	min-width: 0;
-}
 
-.odin-search-shortcut {
-	display: flex;
-	align-items: center;
-	column-gap: 0.25rem;
-	position: absolute;
-	top: 50%;
-	right: 0.5rem;
-	transform: translateY(-50%);
-	z-index: 1001;
-	user-select: none;
-	pointer-events: none;
-	font-size: 0.75rem;
-	background-color: white;
-	opacity: 0.5;
-}
-
-.os-linux .odin-search-shortcut {
-	display: flex;
-}
-
-.odin-search-key {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	min-width: 30px;
-	height: 30px;
-	padding: 0.25rem;
-	border: 1px solid rgba(0,0,0,0.2);
-	border-radius: 0.25rem;
-}
-
-.key-macos, .key-windows, .odin-search-or {
-	display: none;
-}
-
-.os-macos .key-macos,
-.os-macos .odin-search-or {
-	display: flex;
-}
-
-.os-windows .key-windows,
-.os-windows .odin-search-or,
-.os-linux .key-windows,
-.os-linux .odin-search-or {
-	display: flex;
-}
-
-#odin-search {
-	position: relative!important;
-	z-index: 1000;
-	width: 100%;
-	height: 3rem;
-	font-size: 1.5rem;
-	border: 1px solid #888;
-	padding-left:  0.5rem;
-	padding-right: 0.5rem;
-	border-radius: 0.25rem;
-}
-
-.os-ios #odin-search,
-.os-android #odin-search {
-	padding-right: 0.5rem !important;
-}
-
-.os-macos #odin-search {
-	padding-right: 6rem;
-}
-
-.os-windows #odin-search,
-.os-linux #odin-search {
-	padding-right: 6.5rem;
-}
-
-/* the way to the keyboard shortcuts: a button of its own beside the search box, as tall as it */
-.odin-shortcuts-button {
-	flex: none;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: 3rem;
-	padding: 0;
-	border: 1px solid #888;
-	border-radius: 0.25rem;
-	background: none;
-	color: var(--odin-sidebar-muted);
-	cursor: pointer;
-}
-.odin-shortcuts-button svg {
-	width: 1.5rem;
-	height: 1.5rem;
-	fill: none;
-	stroke: currentColor;
-	stroke-width: 1.5;
-	stroke-linecap: round;
-	stroke-linejoin: round;
-}
-.dark-mode .odin-shortcuts-button {
-	border-color: var(--dark-border);
-	background-color: var(--dark-background);
-}
-.odin-shortcuts-button:hover, .odin-shortcuts-button:focus-visible {
-	border-color: var(--odin-sidebar-link);
-	color: var(--odin-sidebar-link);
-}
-/* no keyboard, no shortcuts */
-.os-ios .odin-shortcuts-button,
-.os-android .odin-shortcuts-button {
-	display: none;
-}
-
-.os-ios .odin-search-shortcut,
-.os-android .odin-search-shortcut {
-	display: none;
-}
-
-#odin-search-results {
-	padding-left: 0;
-}
-
-
-#odin-search-results li {
-	list-style: none;
-	padding: 0.5rem 1.0rem;
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-}
-#odin-search-results li + li {
-	border-top: 1px solid var(--odin-card-border);
-}
-#odin-search-results li:hover {
-	background-color: var(--odin-sidebar-hover);
-}
-/* drawn inside the row, so moving the selection moves nothing */
-#odin-search-results li.selected {
-	background-color: rgba(56, 130, 210, 0.12);
-	box-shadow: inset 3px 0 0 var(--odin-sidebar-link);
-}
-.dark-mode #odin-search-results li.selected {
-	background-color: rgba(122, 173, 229, 0.16);
-}
-
-/* a result's kind comes first, in a badge like the declarations' own, coloured by kind */
-#odin-search-results li .kind {
-	flex: none;
-	width: 4.5rem;
-	padding: 0.2rem 0 0.3rem;
-	border: 1px solid rgba(var(--kind-rgb), 0.55);
-	border-radius: 0.2rem;
-	background-color: rgba(var(--kind-rgb), 0.1);
-	color: var(--kind-color);
-	font-size: 0.75rem;
-	font-weight: 500;
-	line-height: 1.1;
-	letter-spacing: 0.02em;
-	text-align: center;
-	white-space: nowrap;
-	cursor: default;
-}
-#odin-search-results li .kind.deprecated {
-	opacity: 0.55;
-}
 /* a procedure group is a set of procedures: the procedures' colour, in outline */
 #odin-search-results li .kind-g {
 	background-color: transparent;
@@ -1741,7 +1491,6 @@ main > .container.full-width {
 }
 
 
-
 .pkg-breadcrumb {
 	padding-top: 1rem;
 }
@@ -1771,24 +1520,6 @@ main > .container.full-width {
 	#odin-search-time, #odin-search-options {
 		flex: 100%;
 	}
-}
-
-
-.dark-mode #odin-search-results li {
-	color: var(--bs-light);
-}
-
-
-
-.dark-mode #odin-search {
-	background-color: var(--dark-background) !important;
-	border-color: var(--dark-border) !important;
-	color: var(--bs-light) !important;
-}
-
-.dark-mode .odin-search-shortcut {
-	background-color: var(--dark-border) !important;
-	color: var(--bs-light) !important;
 }
 
 

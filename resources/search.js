@@ -1,22 +1,8 @@
 "use strict";
 
-// The sidebars' collapsing, their `[` and `]` shortcuts, and the code blocks' copy buttons are
-// odin-lang.org's js/docs.js, shared with its documentation pages
-
-const userAgent = navigator.userAgent;
-const osList = [
-	{lookFor: "Win",     name: "windows"},
-	{lookFor: "Mac",     name: "macos"},
-	{lookFor: "X11",     name: "unix"},
-	{lookFor: "Linux",   name: "linux"},
-	{lookFor: "iPhone",  name: "ios"},
-	{lookFor: "Android", name: "android"},
-];
-for (const os of osList) {
-	if (userAgent.includes(os.lookFor)) {
-		document.body.classList.add(`os-${os.name}`);	
-	}	
-}
+// The sidebars' collapsing, their `[` and `]` shortcuts, the code blocks' copy buttons, and the
+// `os-windows`, `os-macos`, etc. classes on the <html> are odin-lang.org's js/docs.js, shared with
+// its documentation pages
 
 function text_at_point(x, y) {
 	let node = null, offset = 0;
@@ -698,7 +684,7 @@ window.addEventListener("keydown", ev => {
 	};
 	const open = () => {
 		if (!sheet) {
-			const mac = document.body.classList.contains("os-macos");
+			const mac = document.documentElement.classList.contains("os-macos");
 			const rows = [
 				[[mac ? "\u2318K" : "Ctrl+K", "/"], "Search"],
 				[["\u2191", "\u2193", "Enter"], "Choose a search result"],
@@ -985,7 +971,7 @@ window.addEventListener("keydown", ev => {
 	// Names in examples, e.g. `strings.split`, look as they did, but hovering one shows what it is,
 	// and Ctrl+click (Cmd+click) goes to it; a plain click still selects text
 	const here = location.pathname.replace(/\/?$/, "/");
-	const mac = document.body.classList.contains("os-macos");
+	const mac = document.documentElement.classList.contains("os-macos");
 
 	// `import "core:strings"` and `import str "core:strings"` in the example name its packages
 	const imports = new WeakMap();
