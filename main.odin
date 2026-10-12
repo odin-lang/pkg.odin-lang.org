@@ -1950,10 +1950,8 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 		e := cfg.entities[type_entities[0]]
 		name := str(type.name)
 		tn_pkg := cfg.files[e.pos.file].pkg
-		collection: Collection
-		if c := cfg.pkg_to_collection[&cfg.pkgs[tn_pkg]]; c != nil {
-			collection = c^
-		} else if str(cfg.pkgs[tn_pkg].name) == "" {
+		collection := cfg.pkg_to_collection[&cfg.pkgs[tn_pkg]]
+		if collection == nil && str(cfg.pkgs[tn_pkg].name) == "" {
 			// e.g. `objc_class`, from base:intrinsics, which has no package of its own here
 			fmt.wprintf(w, `intrinsics.<a class="code-typename" href="/base/intrinsics#{0:s}">{0:s}</a>`, name)
 			break
@@ -1969,7 +1967,8 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 				fmt.wprintf(w, `%s.`, pkg_import_name(&cfg.pkgs[tn_pkg]))
 			}
 		}
-		if .Private in e.flags {
+
+		if .Private in e.flags || collection == nil {
 			io.write_string(w, name)
 		} else {
 			// e.g. `Foo` of `Foo($T)`
