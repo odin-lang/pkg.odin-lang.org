@@ -900,6 +900,7 @@ generate_package_page :: proc(b: ^strings.Builder, pkg: ^doc.Pkg) {
 	package_page = {}
 	recursive_make_directory(path, dir)
 	_ = os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
+	write_signatures_json(fmt.tprintf("%s/%s/signatures.json", dir, path), string(b.buf[:]))
 
 	strings.builder_reset(b)
 	pkg_data_begin(w)
@@ -995,6 +996,7 @@ generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collec
 		write_html_footer(w, pkg_data_url(collection, path))
 		recursive_make_directory(path, dir)
 		_ = os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
+		write_signatures_json(fmt.tprintf("%s/%s/signatures.json", dir, path), string(b.buf[:]))
 
 		// the builtin page also searches the @(builtin) procedures of runtime
 		strings.builder_reset(b)
@@ -1017,6 +1019,7 @@ generate_packages_in_collection :: proc(b: ^strings.Builder, collection: ^Collec
 		write_html_footer(w, pkg_data_url(collection, path))
 		recursive_make_directory(path, dir)
 		_ = os.write_entire_file(fmt.tprintf("%s/%s/index.html", dir, path), b.buf[:])
+		write_signatures_json(fmt.tprintf("%s/%s/signatures.json", dir, path), string(b.buf[:]))
 
 		strings.builder_reset(b)
 		pkg_data_begin(w)
@@ -4073,6 +4076,72 @@ write_type_previews :: proc(w: io.Writer) {
 		delete(p.html)
 	}
 	clear(&type_previews)
+}
+
+SIGNATURE_MAX_LINES :: 40
+
+write_signatures_json :: proc(file_name, page_html: string) {
+	ENTITY :: "<div class=\"pkg-entity\">\n<h3 id=\""
+
+	b := strings.builder_make(context.temp_allocator)
+	w := strings.to_writer(&b)
+	io.write_string(w, "{\n")
+	count := 0
+	rest := page_html
+	for {
+		i := strings.index(rest, ENTITY)
+		if i < 0 {
+			break
+		}
+		rest = rest[i+len(ENTITY):]
+		quote := strings.index_byte(rest, '"')
+		if quote <= 0 {
+			continue
+		}
+
+		name := rest[:quote]
+
+		entity := rest
+		if end := strings.index(entity, ENTITY); end >= 0 {
+			entity = entity[:end]
+		}
+
+		if end := strings.index(entity, "<details"); end >= 0 {
+			entity = entity[:end]
+		}
+
+		start := strings.index(entity, `<pre class="doc-code`)
+		if start < 0 {
+			continue
+		}
+
+		code := entity[start:]
+		code = code[strings.index_byte(code, '>')+1:]
+		end := strings.index(code, "</pre>")
+		if end < 0 {
+			continue
+		}
+
+		text := strings.trim_right_space(html_plain_text(code[:end], context.temp_allocator))
+		if lines := strings.count(text, "\n") + 1; lines > SIGNATURE_MAX_LINES {
+			cut := 0
+			for _ in 0..<SIGNATURE_MAX_LINES {
+				cut += strings.index_byte(text[cut:], '\n') + 1
+			}
+			text = fmt.tprintf("%s…", text[:cut])
+		}
+
+		if count > 0 {
+			io.write_string(w, ",\n")
+		}
+
+		write_json_string(w, name)
+		io.write_string(w, ": ")
+		write_json_string(w, text)
+		count += 1
+	}
+	io.write_string(w, "\n}\n")
+	_ = os.write_entire_file(file_name, b.buf[:])
 }
 
 INDEX_MIN_GROUP_SIZE :: 3

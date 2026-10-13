@@ -219,3 +219,46 @@ escape_html_string :: proc(s: string, allocator := context.allocator) -> string 
 	escaped, _ = strings.replace_all(escaped, ">", HTML_GREATER_THAN)
 	return escaped
 }
+d
+html_plain_text :: proc(html: string, allocator := context.allocator) -> string {
+	b := strings.builder_make(allocator)
+	for i := 0; i < len(html); {
+		c := html[i]
+		if c == '<' {
+			end := strings.index_byte(html[i:], '>')
+			if end < 0 {
+				strings.write_string(&b, html[i:])
+				break
+			}
+			if strings.has_prefix(html[i:], "<br") {
+				strings.write_byte(&b, '\n')
+			}
+			i += end+1
+		} else if c == '&' {
+			decoded, entity := "", ""
+			if end := strings.index_byte(html[i:], ';'); end > 0 {
+				entity = html[i:][:end+1]
+			}
+			switch entity {
+			case HTML_LESS_THAN:    decoded = "<"
+			case HTML_GREATER_THAN: decoded = ">"
+			case "&amp;":           decoded = "&"
+			case "&quot;":          decoded = `"`
+			case "&#39;":           decoded = "'"
+			case "&nbsp;":          decoded = " "
+			case "&middot;":        decoded = "·"
+			}
+			if decoded == "" {
+				strings.write_byte(&b, c)
+				i += 1
+			} else {
+				strings.write_string(&b, decoded)
+				i += len(entity)
+			}
+		} else {
+			strings.write_byte(&b, c)
+			i += 1
+		}
+	}
+	return strings.to_string(b)
+}
