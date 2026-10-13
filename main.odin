@@ -2266,7 +2266,7 @@ write_type :: proc(using writer: ^Type_Writer, type: doc.Type, flags: Write_Type
 				if i != len(type_entities) {
 					e = &cfg.entities[type_entities[i]]
 				}
-				if i+1 >= len(type_entities) || prev_field_group_index != e.field_group_index {
+				if i == len(type_entities) || prev_field_group_index != e.field_group_index {
 					if i != len(type_entities) {
 						prev_field_group_index = e.field_group_index
 					}

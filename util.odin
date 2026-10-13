@@ -219,7 +219,7 @@ escape_html_string :: proc(s: string, allocator := context.allocator) -> string 
 	escaped, _ = strings.replace_all(escaped, ">", HTML_GREATER_THAN)
 	return escaped
 }
-d
+
 html_plain_text :: proc(html: string, allocator := context.allocator) -> string {
 	b := strings.builder_make(allocator)
 	for i := 0; i < len(html); {
