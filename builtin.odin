@@ -389,7 +389,7 @@ add_styling_to_builtin :: proc(txt: string) -> string {
 				case "#soa":
 					append_anchored_span_other(&b, s, "//odin-lang.org/docs/overview/#soa-data-types", "directive", ident, &prev_offset)
 				case "#optional_ok":
-					append_anchored_span_other(&b, s, "//odin-lang.org/docs/overview/#optional_ok", "directive", ident, &prev_offset)
+					append_anchored_span_other(&b, s, "//odin-lang.org/docs/directives/#optional_ok", "directive", ident, &prev_offset)
 
 				case "#simd", "#const":
 					append_span(&b, s, "directive", ident, &prev_offset)
